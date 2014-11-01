@@ -1,0 +1,105 @@
+
+.project {
+    min-height: 300px;
+    min-width: 368px;
+    width: auto;
+    max-width: 500px;
+    position: relative;
+    background-size: cover;
+    background-position: center top;
+    border: 1px solid #DDD;
+    border-radius: 3px;
+    margin: 10px 5px 10px 5px;
+    display: inline-block;
+        -webkit-transition: 0.3s, opacity 0.3s;
+        -moz-transition: 0.3s, opacity 0.3s;
+        transition: 0.3s, opacity 0.3s;
+}
+
+.p_overlay {
+    background-color:rgba(50,50,50,0);
+    width: 100%;
+    height: 100%;
+	-webkit-transition: 0.2s ease-in;
+	-moz-transition: 0.2s ease-in;
+	-o-transition: 0.2s ease-in;
+	transition:  0.2s ease-in;
+    color: #FFFFFF;
+    cursor: pointer;
+    position: absolute;
+}
+
+.p_overlay:hover {
+    background-color:rgba(50,50,50,0.8);;
+	-webkit-transition: 0.2s ease-in;
+	-moz-transition: 0.2s ease-in;
+	-o-transition: 0.2s ease-in;
+	transition:  0.2s ease-in;
+}
+
+.p_overlay:hover > .p_title > .title {
+    color: rgba(255, 255, 255, 1);
+    -webkit-transition: 0.2s ease-in;
+	-moz-transition: 0.2s ease-in;
+	-o-transition: 0.2s ease-in;
+	transition:  0.2s ease-in;
+}
+.p_overlay:hover > .p_title > .tags  {
+    color: rgba(255, 255, 255, 1);
+    border-top: 1px solid #c70606;
+	-webkit-transition: 0.45s ease-in;
+	-moz-transition: 0.45s ease-in;
+	-o-transition: 0.45s ease-in;
+	transition:  0.45s ease-in;
+}
+
+.p_title {
+    text-align:center;
+    position: relative;
+    text-align:center;
+    top: 50%;
+    margin-top: -33px; /* carefully calculated */
+    font-size: 24px;
+    padding-bottom: 10px;
+    border: none;
+}
+
+.p_title span {
+    width: auto;
+    display: inline-block;
+}
+
+.title {
+    color: rgba(255, 255, 255, 0);
+}
+
+.tags {
+    margin-top: 10px;
+    padding-top: 10px;
+    font-size: 12px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0);
+}
+
+
+@media only screen and (max-width: 880px) {
+    .picture-container {
+        text-align: center;
+    }
+    .project {
+        min-width: 600px;
+        min-height: 200px;
+        -webkit-transition: 0.3s, opacity 0.3s;
+        -moz-transition: 0.3s, opacity 0.3s;
+        transition: 0.3s, opacity 0.3s;
+    }
+}
+@media only screen and (max-width: 700px) {
+    .project {
+        min-width: 400px;
+        min-height: 200px;
+        -webkit-transition: 0.3s, opacity 0.3s;
+        -moz-transition: 0.3s, opacity 0.3s;
+        transition: 0.3s, opacity 0.3s;
+    }
+}

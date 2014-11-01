@@ -1,0 +1,21 @@
+---
+layout: default
+---
+<section class="cd-section cd-container">
+    <article class="post">
+            <div class="author">
+                    <div class="bubble">
+                        <img src="{{ site.avatar }}" />
+                    </div>
+                    <div class="post_title">
+                        <a href="{{ site.baseurl }}{{ page.url }}"><h2>{{ page.title }}</h2></a>
+                    </div>
+            </div>
+            <p id="date">Written on {{ page.date | date: "%B %e, %Y" }}</p>
+            <br/>
+            <div class="entry">
+                {{ content }}
+            </div>
+      {% include disqus.html disqus_identifier=page.disqus_identifier %}
+    </article>
+</section>

@@ -1,0 +1,141 @@
+---
+layout: default
+---
+<section id="cd-placeholder-1" class="cd-section cd-container">
+    <div class="author">
+        <div class="section-image"></div>
+        <h2>About me</h2>
+    </div>
+    <p>Hello! My name is Maxime Kjaer, and I'm an 18-year-old Computer Science student. Originally from Copenhagen, Denmark, I'm now living and studying at the EPFL, the Swiss Federal Institute of Technology in Lausanne.</p>
+    <p>When I'm not studying or programming, I like running, wasting my time on Netflix or talking to my friends.</p>
+    <p>Introductions aside, this site won't be a shrine of self-celebration (I can't stand that). No, I'll mainly use it as an outlet for my thoughts, ideas and work, should anyone want to read into that.</p>
+</section>
+
+<section id="cd-placeholder-2" class="cd-section cd-container">
+    <div class="author">
+        <div class="section-image"></div>
+        <h2>Contact me</h2>
+    </div>
+    <p>Simple. Shoot me an email at maxime.kjaer@epfl.ch.</p>
+</section>
+
+<section id="cd-placeholder-3" class="cd-section cd-container">
+    <div class="author">
+        <div class="section-image"></div>
+        <h2>Latest blog posts</h2>
+    </div>
+    <br/><br/><br/><br/>
+        {% assign counter=0 %}
+        {% for post in site.posts %}
+        {% if counter < 2 %}
+        {% assign counter=counter | plus:1 %}
+        <article class="post">
+            <div class="author">
+                <div class="bubble">
+                    <img src="{{ site.avatar }}" />
+                </div>
+                <div class="post_title">
+                    <a href="{{ site.baseurl }}{{ post.url }}"><h2>{{ post.title }}</h2></a>
+                </div>
+            </div>
+            <p id="date">Written on {{ post.date | date: "%B %e, %Y" }}</p>
+            <br/>
+            <div class="entry">
+                {{ post.excerpt}}
+            </div>
+          <a href="{{ site.baseurl }}{{ post.url }}" class="read-more">Read More</a>
+        </article>
+      {% endif %}
+      {% endfor %}
+</section>
+
+
+<section id="cd-placeholder-4" class="cd-section cd-container">
+    <div class="author">
+        <div class="section-image"></div>
+        <h2>My résumé</h2>
+    </div>
+    <p><b>Places:</b></p>
+    <ul>
+        <li><b>EPFL</b>, Lausanne, Switzerland, 2014-present</li>
+        <li><b>Prince Henrik's French School</b>, Copenhagen, Denmark, 2000-2014</li>
+    </ul>
+    <p><b>Diplomas:</b></p>
+    <ul>
+        <li><b>Cambridge CAE:</b> A</li>
+        <li><b>TOEFL:</b> 117/120</li>
+        <li><b>French Baccalauréat:</b> 17.47/20</li>
+        <li><b>Danish DFB</b>: 11.9/12</li>
+    </ul>
+    
+</section>
+
+<section id="cd-placeholder-5" class="cd-section cd-container">
+    <div class="author">
+        <div class="section-image"></div>
+        <h2>Projects</h2>
+                        <div class="picture-container">
+                    <a href="https://github.com/MaximeKjaer/TwitpicBackup">
+                        <div id="p1" class="project" style="background-image:url({{ site.url }}/images/twitpic2.png); background-position: center;">
+                            <div class="p_overlay">
+                                <div class="p_title">
+                                    <span class="title">Twitpic Backup</span>
+                                    <br/>
+                                    <span class="tags">PYTHON, WEB</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <a href="https://github.com/MaximeKjaer/dailyprogrammer-challenges">
+                        <div id="p1" class="project" style="background-image:url({{ site.url }}/images/dailyprogrammer2.jpg); background-position: left top;">
+                            <div class="p_overlay">
+                                <div class="p_title">
+                                    <span class="title">/r/dailyprogrammer Challenges</span>
+                                    <br/>
+                                    <span class="tags">PYTHON, PROGRAMMING CHALLENGES</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <a href="http://piratebox.cc/">
+                        <div id="p1" class="project" style="background-image:url({{ site.url }}/images/pbox_build.jpg);">
+                            <div class="p_overlay">
+                                <div class="p_title">
+                                    <span class="title">Built a PirateBox</span>
+                                    <br/>
+                                    <span class="tags">LINUX, WI-FI, HACKS</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    
+			        <a href="https://chrome.google.com/webstore/detail/library-manager/cjkgbbikkgioafiagcjmagjlnonpfpcb">
+                        <div id="p1" class="project" style="background-image:url({{ site.url }}/images/libman.png); background-position: left top;">
+                            <div class="p_overlay">
+                                <div class="p_title">
+                                    <span class="title">Library Manager</span>
+                                    <br/>
+                                    <span class="tags">CHROME, WEB, DESIGN</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                
+			        <a href="https://github.com/MaximeKjaer/PboxDesign3.0">
+                        <div id="p1" class="project" style="background-image:url({{ site.url }}/images/pbox_design.png);">
+                            <div class="p_overlay">
+                                <div class="p_title">
+                                    <span class="title">PirateBox Design 3.0</span>
+                                    <br/>
+                                    <span class="tags">WEB, DESIGN</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    
+                  </div> 
+    </div>
+</section>

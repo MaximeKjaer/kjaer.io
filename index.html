@@ -1,0 +1,23 @@
+---
+layout: default
+---
+<section class="cd-section cd-container">
+      {% for post in site.posts %}
+        <article class="post">
+            <div class="author">
+                <div class="bubble">
+                    <img src="{{ site.avatar }}" />
+                </div>
+                <div class="post_title">
+                    <a href="{{ site.baseurl }}{{ post.url }}"><h2>{{ post.title }}</h2></a>
+                </div>
+            </div>
+            <p id="date">Written on {{ post.date | date: "%B %e, %Y" }}</p>
+            <br/>
+            <div class="entry">
+                {{ post.content | truncatewords:50}}
+            </div>
+          <a href="{{ site.baseurl }}{{ post.url }}" class="read-more">Read More</a>
+        </article>
+      {% endfor %}
+</section>
