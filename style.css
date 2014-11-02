@@ -21,7 +21,13 @@ a {
     text-decoration: none;
 }
 
-
+table, tr, td {
+    border: 1px solid black;
+    text-align: center;
+}
+td {
+    padding: 5px;   
+}
 article {
     margin-bottom: 60px;   
 }
