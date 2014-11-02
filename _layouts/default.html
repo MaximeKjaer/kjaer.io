@@ -14,7 +14,7 @@
     <![endif]-->
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,700,800' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="{{ site.baseurl }}/reset.css"> <!-- CSS reset -->
-    <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/style2.css" />
+    <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/style.css" />
     <link rel="alternate" type="application/rss+xml" title="{{ site.name }} - {{ site.description }}" href="{{ site.baseurl }}/feed.xml" />
 
     <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
@@ -50,31 +50,31 @@
 		<nav>
 			<ul>
 				<li>
-					<a href="#cd-placeholder-1">
+					<a href="/about/#cd-placeholder-1">
 						<b>About me</b>
 						<span></span><!-- icon -->
 					</a>
 				</li>
 				<li>
-					<a href="#cd-placeholder-2">
+					<a href="/about/#cd-placeholder-2">
 						<b>Contact</b>
 						<span></span><!-- icon -->
 					</a>
 				</li>
 				<li>
-					<a href="#cd-placeholder-3">
+					<a href="/about/#cd-placeholder-3">
 						<b>Blog</b>
 						<span></span><!-- icon -->
 					</a>
 				</li>
 				<li>
-					<a href="#cd-placeholder-4">
+					<a href="/about/#cd-placeholder-4">
 						<b>Résumé</b>
 						<span></span><!-- icon -->
 					</a>
 				</li>
 				<li>
-					<a href="#cd-placeholder-5">
+					<a href="/about/#cd-placeholder-5">
 						<b>Projects</b>
 						<span></span><!-- icon -->
 					</a>
@@ -89,6 +89,9 @@
     
     <script src="{{ site.baseurl }}/js/jquery-2.1.1.js"></script>
     <script src="{{ site.baseurl }}/js/main.js"></script> <!-- Resource jQuery -->
+    {% if page.url != "/index.html" %}
+        <script src="{{ site.baseurl }}/js/smooth-scroll.js"></script>
+    {% endif %}
     <script src="{{ site.baseurl }}/js/modernizr.js"></script> <!-- Resource dModernizr -->
 
         {% include analytics.html %}
