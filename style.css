@@ -35,7 +35,7 @@ article {
 img {
     max-width: 100%;
 }
-
+/* undoing the reset */
 ul {
     list-style: initial;
     margin: initial;
@@ -44,7 +44,7 @@ ul {
 li {
     display: list-item;
 }
-
+/* Special formatting for the blog posts */
 .entry h2 {
     padding-top: 0.5em;
     line-height: 2em;   
@@ -56,6 +56,7 @@ li {
 
 
 /* Comment out before pushing */
+
 code {
     background: rgba(0, 0, 0, 0.09);
     border-radius: 3px;
@@ -701,7 +702,7 @@ My additions
     position: relative;
     width: 40px;
     height: 40px;
-    margin: 0 0 -40px -45px;
+    margin: 0 0 -34px -45px;
     background-image: url(../images/cd-nav-icons.svg);
 }
 #cd-placeholder-1 .section-image {
@@ -709,9 +710,13 @@ My additions
 }
 #cd-placeholder-2 .section-image {
     background-position: -40px 0;
+    margin: 0 0 -33px -45px; /* pixel perfection */
 }
 #cd-placeholder-3 .section-image {
     background-position: -80px 0;
+    /* This position is actually better for this icon */
+    margin: 0 0 -40px -45px;
+
 }
 #cd-placeholder-4 .section-image {
     background-position: -120px 0;
@@ -746,12 +751,18 @@ My additions
 }
 
 @media only screen and (max-width: 1170px) {
+    .section-image {
+        visibility: hidden;
+    }
     .bubble {
         visibility: hidden;
     }
 }
 
 @media only screen and (min-width: 1170px) {
+    .section-image {
+        visibility: visible;
+    }
     .bubble {
         visibility: visible;
     }
