@@ -668,7 +668,7 @@ Placeholder Sections
     font-size: 1.875rem;
 }
 
-.cd-section #date {
+.cd-section .date {
       font-size: 20px;
 }
 

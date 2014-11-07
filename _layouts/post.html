@@ -5,13 +5,13 @@ layout: default
     <article class="post">
             <div class="author">
                     <div class="bubble">
-                        <img src="{{ site.avatar }}?&s=68" />
+                        <img src="{{ site.avatar }}?&amp;s=68" alt="{{ site.name }}"/>
                     </div>
                     <div class="post_title">
                         <a href="{{ site.baseurl }}{{ page.url }}"><h2>{{ page.title }}</h2></a>
                     </div>
             </div>
-            <p id="date">Written on {{ page.date | date: "%B %e, %Y" }}</p>
+            <p class="date">Written on {{ page.date | date: "%B %e, %Y" }}</p>
             <br/>
             <div class="entry">
                 {{ content }}
