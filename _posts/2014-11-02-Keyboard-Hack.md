@@ -1,9 +1,12 @@
 ---
 layout: post
 title: Reverse-Engineering a keyboard
+description: Mapping a keyboard's PCB
 ---
 
 For the last few weeks, I’ve been working on building a [MAME](http://mamedev.org/) arcade machine from an old computer. The software part is done (I’ll cover that in another post), and I have started to prepare the hardware. To save some money, I decided not to buy the [I-PAC](http://www.ultimarc.com/ipac1.html). Instead, hacking a keyboard seemed cheaper, and I just happened to have a lot of old, unused keyboards at hand. I thought that I’d just connect some wires from the keyboard to a button; when the button is pressed, it would emulate a keystroke. The only problem was that it would take up too much space, and it wouldn’t be practical. The connections wouldn’t be optimal, the keyboard might fall… All in all, a better approach was possible, and much needed.
+
+<!--- Separator -->
 
 If you open up a keyboard, you’ll often find a small PCB connected to a USB cable (sometimes to some LEDs too), a rubber sheet with dots on it, and to three plastic sheets:
 

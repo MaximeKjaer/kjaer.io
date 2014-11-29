@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Setting up GitHub Pages with Jekyll
+description: This is my first post
 ---
 
 I've just set up my Jekyll blog using Github Pages! First thoughts? "Huh, well this was easy." Full instructions are [here](https://github.com/barryclark/jekyll-now), but in a nutshell, here's how it goes:
@@ -9,15 +10,11 @@ I've just set up my Jekyll blog using Github Pages! First thoughts? "Huh, well t
 
 And once you have your own repo, go to the Settings and rename it to `yourGithubUsername.github.io`.
 
-
-![]({{ site.baseurl }}/images/step1.gif)
-
-
 ## 2. Edit a few settings
 
 You just need to tell Jekyll what your name is, what your blog will be called, give it links to whatever social media that you want to link to... To do that, go through the `_config.yml` file, and fill it out like a form.
 
-![]({{ site.baseurl }}/images/config.png)
+<!--- Separator -->
 
 ## 3. Write a post
 
@@ -26,8 +23,6 @@ Go to your `_posts` folder and edit the Hello-World file. Don't touch the text b
 Remember to change the date if you want that to be reflected on your blog. To do so, change the name of the Markdown file to fit the following format:
 
     YEAR-MONTH-DAY-Title_goes_here
-
-![]({{ site.baseurl }}/images/first-post.png)
 
 ## 4. Enjoy!
 

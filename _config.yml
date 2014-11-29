@@ -73,3 +73,6 @@ exclude:
     - Gemfile.lock
     - LICENSE
     - README.md
+
+# I want to be able to define exactly where a post should break to more content.
+excerpt_separator: "<!---"
