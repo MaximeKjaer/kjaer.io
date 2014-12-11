@@ -31,7 +31,6 @@ My personal page - built using [Jekyll](http://jekyllrb.com/) & elbow grease.
 
 ## To-do
 
-- Minify CSS and JS.
 - Make a better footer.
 - Better IDs for my `#cd-placeholder1` sections.
 - Add tags to posts (will fit right under "Written on ...") **only possible after self-hosting, since it requires a plugin - so consider a DigitalOcean plan**

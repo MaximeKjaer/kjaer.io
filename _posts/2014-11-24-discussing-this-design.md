@@ -21,7 +21,7 @@ Despite being stuck for quite a while at steps 2 to 4, I think that I may finall
 
 The first thing that I want to mention is that I wrote it by hand. I did use a few of [Codyhouse's "nuggets"](http://codyhouse.co/), but the rest was painstakingly written by me, because I wanted the absolute pixel-perfect control that this offers.
 
-On the technical side of things, I'm using the [Jekyll](http://jekyllrb.com/) platform, based off of the [Jekyll Now](https://github.com/barryclark/jekyll-now) preset (which has been largely modified to meet my needs). I tried to make it as modular as even possible as to make modifications easy and have a lot of reusability. You can check out the [GitHub repo](https://github.com/MaximeKjaer/MaximeKjaer.github.io) if you want to have a look for yourself.
+On the technical side of things, I'm using the [Jekyll](http://jekyllrb.com/) platform, based off of the [Jekyll Now](https://github.com/barryclark/jekyll-now) preset (which has been largely modified to meet my needs, so much so that there barely is anything left from the original repo). I tried to make it as modular as even possible as to make modifications easy and have a lot of reusability. You can check out the [GitHub repo](https://github.com/MaximeKjaer/MaximeKjaer.github.io) if you want to have a look for yourself.
 
 But the main goal of this post was to discuss design decisions, so why don't we dive into that now:
 
@@ -35,7 +35,7 @@ For a moment, I was afraid my color scheme was a bit dull. It needed some eye ca
 
 For the rest of the site, I wanted a Sans-Serif font (that's just a personal preference, again), and just plain *simplicity*. The safe bet for a design that ages well isn't flat design or material design (though it has some good ideas, it's a bit of a fad in my opinion - but that's for another post). No, simplicity is the only thing that won't go out of fashion.
 
-So simplicity was the keyword, and I really did try to keep it at that. It's way too easy to overload a page with information, but simplifying things is actually not simple, quite ironically.
+So simplicity was the keyword, and I really did try to keep it at that. It's incredibly easy to overload a page with information, but simplifying things is actually not simple, quite ironically.
 
 A lot of thought went into the post page. It's supposed have the same feel as the rest of the site, and to focus the reader's attention on the post itself. That's why I put the black navbar on top, which makes the intro seem a bit shorter, and an arrow at the bottom of the image, to incite the user to scroll down to the content (according to [this article](http://hugeinc.com/ideas/perspective/everybody-scrolls), what I'm doing is a combination of the two best ways to get users to scroll).
 
@@ -47,11 +47,11 @@ Does that mean that I am *completely* done? Absolutely not. I recognize that I s
 
 ### To-do
 
-- Minify CSS and JS.
 - Make a better footer.
 - Better IDs for my `#cd-placeholder1` sections.
 - Add tags to posts (will fit right under "Written on ...") **only possible after self-hosting, since it requires a plugin - so consider a DigitalOcean plan**
 - Try out a few other SEO tricks (just enough to get the site to actually show when googling my name).
+- Add an `image:` field to the YAML Front Matter in posts.
 
 ### Done
 
@@ -72,6 +72,6 @@ Does that mean that I am *completely* done? Absolutely not. I recognize that I s
 - When clicking on the first blog post, there should be a noticeable difference in the page! (fixed with new post page)
 - Don't load font sizes that I don't need.
 - Get a logo.
-
+- Minify CSS and JS.
 
 So there you have it. I could keep tweaking things (and I probably will), but I'm happy with the site. Welcome!
