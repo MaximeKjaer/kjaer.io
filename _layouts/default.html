@@ -6,14 +6,14 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
     <title>{% if page.title %}{{ page.title }} – {% endif %}{{ site.name }} – {{ site.description }}</title>
     <meta name="author" content="{{ site.name }}" />
-    <meta name="description" content="{{ site.description }}">
+    <meta name="description" content="{{ site.name }} - {{ site.description }}">
     <!--[if lt IE 9]>
       <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="{{ site.baseurl }}/css/reset.min.css"> <!-- CSS reset -->
     <link rel="stylesheet" href="{{ site.baseurl }}/css/default.min.css"> <!-- CSS for the default type -->
-    <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/css/style.min.css" />
+    <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/css/style.css" />
     <link rel="alternate" type="application/rss+xml" title="{{ site.name }} - {{ site.description }}" href="{{ site.baseurl }}/feed.xml" />
   </head>
   <body>
@@ -31,7 +31,7 @@
 	<section id="cd-intro">
 		<div id="cd-intro-tagline">
 			<h1>{{ site.name }}</h1>
-            <h2>{{ site.description }}</h2>
+            <h2>A Copenhagen kid studying <abbr title="Computer Science">CS</abbr> in Switzerland</h2>
             {% if page.url == "/index.html" %}
                     <a href="{{ site.baseurl }}/about" class="cd-btn">Read more about me</a>
             {% else %}
@@ -56,7 +56,7 @@
 					</a>
 				</li>
 				<li>
-					<a href="/about/#cd-placeholder-3">
+					<a href="..">
 						<b>Blog</b>
 						<span></span><!-- icon -->
 					</a>

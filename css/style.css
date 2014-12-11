@@ -10,12 +10,6 @@ Primary style
     box-sizing: border-box;
 }
 
-@-webkit-keyframes pulsate {
-    0% {opacity: 1.0;}
-    50% {opacity: 0.8;}
-    100% {opacity: 1.0;}
-}
-
 body {
     font-size: 100%;
     font-family: "Open Sans", sans-serif;
@@ -190,15 +184,10 @@ Placeholder Sections
   transition: 0.3s, opacity 0.3s;
 }
 
-.no-touch .cd-btn:hover {
-  background-color: #f5484a;
-    /*
+.cd-btn:hover {
   -webkit-transition: 0.3s, opacity 0.3s;
   -moz-transition: 0.3s, opacity 0.3s;
   transition: 0.3s, opacity 0.3s;
-    */
-    -webkit-animation: pulsate 2s ease-in;
-    -webkit-animation-iteration-count: infinite; 
 
 }
 @media only screen and (min-width: 1170px) {

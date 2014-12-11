@@ -21,37 +21,6 @@ layout: default
     </p>
 </section>
 
-<section id="cd-placeholder-3" class="cd-section cd-container">
-    <div class="author">
-        <div class="section-image"></div>
-        <h2>Latest blog posts</h2>
-    </div>
-    <br/><br/><br/><br/>
-        {% assign counter=0 %}
-        {% for post in site.posts %}
-        {% if counter < 2 %}
-        {% assign counter=counter | plus:1 %}
-        <article class="post">
-            <div class="author">
-                <div class="bubble">
-                    <img src="{{ site.avatar }}?&amp;s=68" alt="{{ site.name }}"/>
-                </div>
-                <div class="post_title">
-                    <a href="{{ site.baseurl }}{{ post.url }}"><h2>{{ post.title }}</h2></a>
-                </div>
-            </div>
-            <p class="date">Written on {{ post.date | date: "%B %e, %Y" }}</p>
-            <br/>
-            <div class="entry">
-                {{ post.excerpt}}
-            </div>
-          <a href="{{ site.baseurl }}{{ post.url }}" class="read-more">Read More</a>
-        </article>
-      {% endif %}
-      {% endfor %}
-</section>
-
-
 <section id="cd-placeholder-4" class="cd-section cd-container">
     <div class="author">
         <div class="section-image"></div>
