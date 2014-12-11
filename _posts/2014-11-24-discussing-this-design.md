@@ -6,7 +6,7 @@ description: I think I'm done.
 
 With this post, I am pushing a bit of a redesign.
 
-###The Creative Process
+### The Creative Process
 
     1. This is awesome  
     2. This is tricky 
@@ -35,7 +35,9 @@ For a moment, I was afraid my color scheme was a bit dull. It needed some eye ca
 
 For the rest of the site, I wanted a Sans-Serif font (that's just a personal preference, again), and just plain *simplicity*. The safe bet for a design that ages well isn't flat design or material design (though it has some good ideas, it's a bit of a fad in my opinion - but that's for another post). No, simplicity is the only thing that won't go out of fashion.
 
-So simplicity was the keyword, and I really did try to keep it at that. It's way to easy to overload a page with information, but simplifying things is actually not simple, quite ironically.
+So simplicity was the keyword, and I really did try to keep it at that. It's way too easy to overload a page with information, but simplifying things is actually not simple, quite ironically.
+
+A lot of thought went into the post page. It's supposed have the same feel as the rest of the site, and to focus the reader's attention on the post itself. That's why I put the black navbar on top, which makes the intro seem a bit shorter, and an arrow at the bottom of the image, to incite the user to scroll down to the content (according to [this article](http://hugeinc.com/ideas/perspective/everybody-scrolls), what I'm doing is a combination of the two best ways to get users to scroll).
 
 I reused the red in the icons for the links, and my `<hr>` tags are also as simple as they can get (they are meant to look like a small notch in the page). Oh, and did I mention the tiny little smiley at the bottom of my page? My old blog had that, so I just *had* to include it in this one.
 
@@ -43,16 +45,15 @@ I could go on for hours, but you get the bulk of it.
 
 Does that mean that I am *completely* done? Absolutely not. I recognize that I still can make a few tweaks. This site being hosted on GitHub Pages (for now), I figured that I may as well be fully transparent with the whole process - so without further ado, here is my little to-do list:
 
-## To-do
+### To-do
 
 - Minify CSS and JS.
-- Get a logo.
 - Make a better footer.
 - Better IDs for my `#cd-placeholder1` sections.
 - Add tags to posts (will fit right under "Written on ...") **only possible after self-hosting, since it requires a plugin - so consider a DigitalOcean plan**
 - Try out a few other SEO tricks (just enough to get the site to actually show when googling my name).
 
-## Done
+### Done
 
 - Alt text on all images.
 - Title on the post author's picture.
@@ -70,5 +71,7 @@ Does that mean that I am *completely* done? Absolutely not. I recognize that I s
 - Splitting the CSS into different files. Some of the CSS will never be used on the front page.
 - When clicking on the first blog post, there should be a noticeable difference in the page! (fixed with new post page)
 - Don't load font sizes that I don't need.
+- Get a logo.
+
 
 So there you have it. I could keep tweaking things (and I probably will), but I'm happy with the site. Welcome!

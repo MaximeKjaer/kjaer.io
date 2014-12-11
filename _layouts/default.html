@@ -4,24 +4,21 @@
     <meta charset="utf-8" />
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
-
     <title>{% if page.title %}{{ page.title }} – {% endif %}{{ site.name }} – {{ site.description }}</title>
     <meta name="author" content="{{ site.name }}" />
     <meta name="description" content="{{ site.description }}">
-
     <!--[if lt IE 9]>
       <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" href="{{ site.baseurl }}/reset.css"> <!-- CSS reset -->
-    <link rel="stylesheet" href="{{ site.baseurl }}/default.css"> <!-- CSS for the default type -->
-    <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/style.css" />
+	<link rel="stylesheet" href="{{ site.baseurl }}/css/reset.min.css"> <!-- CSS reset -->
+    <link rel="stylesheet" href="{{ site.baseurl }}/css/default.min.css"> <!-- CSS for the default type -->
+    <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/css/style.min.css" />
     <link rel="alternate" type="application/rss+xml" title="{{ site.name }} - {{ site.description }}" href="{{ site.baseurl }}/feed.xml" />
   </head>
-
   <body>
 	<header class="cd-header">
-		<div id="cd-logo"><a href="{{ site.baseurl }}/"><img src="{{ site.baseurl }}/images/cd-logo.svg" alt="Logo"></a></div>
+		<div id="cd-logo"><a href="{{ site.baseurl }}/"><img src="{{ site.baseurl }}/images/logo.png" alt="Logo"></a></div>
 		<nav class="cd-primary-nav">
 			<ul>
 				<!-- inser more links here -->
@@ -40,10 +37,8 @@
             {% else %}
                     <a href="{{ site.baseurl }}/" class="cd-btn">&larr; Back home</a>
             {% endif %}
-
 		</div> <!-- #cd-intro-tagline -->
 	</section> <!-- #cd-intro -->
-          
 	<div class="cd-secondary-nav">
 		<a href="#0" class="cd-secondary-nav-trigger">Menu<span></span></a> <!-- button visible on small devices -->
 		<nav>
@@ -81,22 +76,29 @@
 			</ul>
 		</nav>
 	</div> <!-- .cd-secondary-nav -->
-
 	<main class="cd-main-content">
-        {{ content }}
+        {{ content }}  
+ <!-- 
+            I'll add this in a future version. It's really not necessary right now.
+
+        <div class="pagination cd-container">
+            {% if paginator.previous_page %}
+                <a href="{{ paginator.previous_page_path }}" class="previous">Newer Posts</a>
+            {% endif %}
+            {% if paginator.next_page %}
+                <a href="{{ paginator.next_page_path }}" class="next">Older Posts</a>
+            {% endif %}
+            <hr/>
+        </div>
+-->
     </main>
     {% include footer.html %}
-
-    
-    <script src="{{ site.baseurl }}/js/jquery-2.1.1.js"></script> <!-- Resource jQuery -->
-    <script src="{{ site.baseurl }}/js/main.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="{{ site.baseurl }}/js/main.min.js"></script>
     {% if page.url != "/index.html" %}
-        <script src="{{ site.baseurl }}/js/smooth-scroll.js"></script>
+        <script src="{{ site.baseurl }}/js/smooth-scroll.min.js"></script>
     {% endif %}
-    <script src="{{ site.baseurl }}/js/modernizr.js"></script> <!-- Resource dModernizr -->
-
-        {% include analytics.html %}  
-      
-      
+    <script src="{{ site.baseurl }}/js/modernizr.custom.min.js"></script> <!-- Resource dModernizr -->
+        {% include analytics.html %}
     </body>
 </html>

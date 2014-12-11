@@ -129,7 +129,7 @@ Main components
 #cd-intro #cd-intro-background {
   height: 100%;
   width: 100%;
-  background: url("images/winter-background.jpg") no-repeat center center;
+  background: url("../images/winter-background.jpg") no-repeat center center;
   background-size: cover;
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
 }

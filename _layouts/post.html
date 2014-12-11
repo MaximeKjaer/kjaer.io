@@ -1,30 +1,26 @@
 ---
 ---
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
-    
     <title>{% if page.title %}{{ page.title }} – {% endif %}{{ site.name }} – {{ site.description }}</title>
-    
     <meta name="author" content="{{ site.name }}" />
     <meta name="description" content="{{ site.description }}">
-
     <!--[if lt IE 9]>
       <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,700,800' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" href="{{ site.baseurl }}/reset.css"> <!-- CSS reset -->
-    <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/style.css" />
-    <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/post.css" />
+	<link rel="stylesheet" href="{{ site.baseurl }}/css/reset.min.css"> <!-- CSS reset -->
+    <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/css/style.min.css" />
+    <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/css/post.min.css" />
     <link rel="alternate" type="application/rss+xml" title="{{ site.name }} - {{ site.description }}" href="{{ site.baseurl }}/feed.xml" />  	
 </head>
 <body>
 	<header class="cd-header">
-		<div id="cd-logo"><a href="{{ site.baseurl }}/"><img src="../images/cd-logo.svg" alt="Logo"></a></div>
+		<div id="cd-logo"><a href="{{ site.baseurl }}/"><img src="../images/logo.png" alt="Logo"></a></div>
 
 		<nav class="cd-main-nav">
 <ul>
@@ -61,16 +57,14 @@
 			</ul>
 		</nav> <!-- cd-main-nav -->
 	</header>
-
 	<section id="cd-intro">
 		<div id="cd-intro-background"></div>
 		<div id="cd-intro-tagline">
 			<h1>{{ page.title }}</h1>
             <h2 style="text-transform: uppercase">{{ page.date | date: "%B %e, %Y" }}</h2>
-
+            <h2>{% if page.link %}<a href="{{ page.link }}" class="cd-btn">View the link</a>{% endif %}</h2>
 		</div> <!-- cd-intro-tagline -->
 	</section> <!-- #cd-intro -->
-
 	<main class="cd-content">
         <div class="scroll-down">
                 <svg viewBox="0 0 64 64" enable-background="new 0 0 64 64">
@@ -78,8 +72,18 @@
                 </svg>
         </div>
 		<div class="cd-container entry">
-            {% if page.description %}<h1>{{ page.description }}</h1>{% endif %}
+            {% if page.description %}
+                <h1>{{ page.description }}</h1>
+            {% endif %}
             {{ content }}
+            {% if page.link %}<a href="{{ page.link }}" class="cd-btn">View the link</a>{% endif %}
+            {% if page.tag %}
+                <div style="height: 1px; background-color: #494c57; text-align: center">
+                    <span style="background-color: #f0eee1; position: relative; top: -0.8em; padding: 8px;">
+                        {{ page.tag }}
+                    </span>
+                </div>
+            {% endif %}
 		</div>
         <section class="cd-section cd-container">
             {% include disqus.html disqus_identifier=page.disqus_identifier %}
@@ -87,10 +91,8 @@
         </section>
             {% include footer.html %}
 	</main> <!-- cd-content -->
-
-
-    <script src="{{ site.baseurl }}/js/jquery-2.1.1.js"></script> <!-- Resource jQuery -->
-    <script src="{{ site.baseurl}}/js/modernizr.js"></script> <!-- Modernizr -->
-	<script src="{{ site.baseurl}}/js/post.js"></script> <!-- Resource jQuery -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="{{ site.baseurl}}/js/modernizr.custom.min.js"></script> <!-- Modernizr -->
+	<script src="{{ site.baseurl}}/js/post.min.js"></script>
 </body>
 </html>

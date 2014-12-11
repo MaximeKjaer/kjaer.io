@@ -184,55 +184,6 @@ Intro
   }
 }
 
-.cd-btn {
-  display: inline-block;
-  padding: 1em 1.8em;
-  /*background-color: rgba(245, 72, 74, 0.9);*/
-    background-image: linear-gradient(80deg, rgba(245, 72, 105, 0.9) 0%, rgba(255, 120, 35, 0.9) 115%);
-    z-index: 10000;
-  margin-top: 1em;
-  border-radius: 20em;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: white;
-  -webkit-transition: 0.3s, opacity 0.3s;
-  -moz-transition: 0.3s, opacity 0.3s;
-  transition: 0.3s, opacity 0.3s;
-}
-
-.no-touch .cd-btn:hover {
-  background-color: #f5484a;
-    /*
-  -webkit-transition: 0.3s, opacity 0.3s;
-  -moz-transition: 0.3s, opacity 0.3s;
-  transition: 0.3s, opacity 0.3s;
-    */
-    -webkit-animation: pulsate 2s ease-in;
-    -webkit-animation-iteration-count: infinite; 
-
-}
-@media only screen and (min-width: 1170px) {
-  .cd-btn.is-hidden {
-    /* assign a position fixed and move outside the viewport (on the right) */
-    opacity: 0;
-    position: fixed;
-    right: -20%;
-    top: 0;
-    padding: .8em 1.2em;
-    margin: 14px 0 0;
-    -webkit-transition: right 0.3s, opacity 0.3s;
-    -moz-transition: right 0.3s, opacity 0.3s;
-    transition: right 0.3s, opacity 0.3s;
-  }
-  .cd-btn.is-hidden.slide-in {
-    /* slide in when the secondary nav gets fixed */
-    right: 5%;
-    opacity: 1;
-  }
-}
-
 
 /* -------------------------------- 
 
