@@ -22,7 +22,34 @@ body {
 a {
     color: #f5484a;
     text-decoration: none;
+    position: relative;
 }
+
+/* Does not work for multiple lines. It's a shame, but I can't fix it... Also, IE messes it up :'( */
+/* So to the trashcan it is, unfortunately.
+main a:after {
+    position: absolute;
+    display: inline;
+    left: 0;
+    bottom: 11%;
+    width: 0;
+    height: 1px;
+    background-color: #fd7e7f;
+    content: "";
+    transition: width 0.2s;
+    z-index: -1;
+}
+main a:hover:after {
+    width: 100%;
+}
+*/
+
+/* Override for images */
+/*
+main a[href^='/images']:after {
+    display: none;
+}
+*/
 
 hr {
     height: 0;
