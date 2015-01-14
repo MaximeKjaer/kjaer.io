@@ -47,11 +47,9 @@ Does that mean that I am *completely* done? Absolutely not. I recognize that I s
 
 ### To-do
 
-- Make a better footer.
 - Better IDs for my `#cd-placeholder1` sections.
 - Add tags to posts (will fit right under "Written on ...") **only possible after self-hosting, since it requires a plugin - so consider a DigitalOcean plan**
 - Try out a few other SEO tricks (just enough to get the site to actually show when googling my name).
-- Add an `image:` field to the YAML Front Matter in posts.
 
 ### Done
 
@@ -73,5 +71,7 @@ Does that mean that I am *completely* done? Absolutely not. I recognize that I s
 - Don't load font sizes that I don't need.
 - Get a logo.
 - Minify CSS and JS.
+- Make a better footer.
+- Add an `image:` field to the YAML Front Matter in posts.
 
 So there you have it. I could keep tweaking things (and I probably will), but I'm happy with the site. Welcome!

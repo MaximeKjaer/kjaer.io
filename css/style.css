@@ -64,6 +64,7 @@ table, tr, td {
     border: 1px solid black;
     text-align: center;
 }
+
 td {
     padding: 5px;   
 }
@@ -211,11 +212,14 @@ Placeholder Sections
   transition: 0.3s, opacity 0.3s;
 }
 
+.entry .cd-btn {
+    padding: 0.75em 1.25em;   
+}
+
 .cd-btn:hover {
   -webkit-transition: 0.3s, opacity 0.3s;
   -moz-transition: 0.3s, opacity 0.3s;
   transition: 0.3s, opacity 0.3s;
-
 }
 @media only screen and (min-width: 1170px) {
   .cd-btn.is-hidden {
@@ -306,7 +310,7 @@ My additions
 }
 
 /* Comment out before pushing? */
-
+/*
 code {
     background: rgba(0, 0, 0, 0.09);
     border-radius: 3px;
@@ -336,7 +340,7 @@ pre>code, blockquote>p {
   background: transparent;
   border: 0;
 }
-
+*/
 
 .author {
     display: inline-block;

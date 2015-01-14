@@ -14,6 +14,7 @@
     <![endif]-->
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,700,800' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="{{ site.baseurl }}/css/reset.min.css"> <!-- CSS reset -->
+    <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/css/syntax.min.css" />
     <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/css/style.min.css" />
     <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/css/post.min.css" />
     <link rel="alternate" type="application/rss+xml" title="{{ site.name }} - {{ site.description }}" href="{{ site.baseurl }}/feed.xml" />  	
@@ -58,7 +59,11 @@
 		</nav> <!-- cd-main-nav -->
 	</header>
 	<section id="cd-intro">
-		<div id="cd-intro-background"></div>
+        {% if page.image %}
+		  <div id="cd-intro-background" style="background: url({{ site.baseurl }}/images/{{ page.image}}) no-repeat center center;"></div>
+        {% else %}
+        <div id="cd-intro-background" style="background: url({{ site.baseurl }}/images/winter-background) no-repeat center center;"></div>
+        {% endif %}
 		<div id="cd-intro-tagline">
 			<h1>{{ page.title }}</h1>
             <h2 style="text-transform: uppercase">{{ page.date | date: "%B %e, %Y" }}</h2>

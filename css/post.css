@@ -44,7 +44,7 @@ Main components
   margin-right: 5%;
   width: 44px;
   height: 100%;
-  background: url("images/cd-icon-menu.svg") no-repeat center center;
+  background: url("../images/cd-icon-menu.svg") no-repeat center center;
   background-size: 44px 44px;
   cursor: pointer;
 }
@@ -129,7 +129,7 @@ Main components
 #cd-intro #cd-intro-background {
   height: 100%;
   width: 100%;
-  background: url("../images/winter-background.jpg") no-repeat center center;
+  /* background: url("../images/winter-background.jpg") no-repeat center center; */
   background-size: cover;
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
 }
@@ -153,7 +153,7 @@ Main components
   font-size: 1.5rem;
   text-align: center;
   color: #FFF;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 0 10px #000;
 }
 #cd-intro h2 {
   margin-top: 10px;
@@ -161,7 +161,7 @@ Main components
   font-size: 1rem;
   text-align: center;
   color: #FFF;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
 }
 @media only screen and (min-width: 768px) {
   #cd-intro {
