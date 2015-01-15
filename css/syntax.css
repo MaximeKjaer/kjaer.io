@@ -13,6 +13,18 @@ code>table, code>table tr, code>table td {
   padding-left: 10px;
 }
 
+pre, blockquote {
+    overflow: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 16px;
+    font-size: 85%;
+    line-height: 1.45;
+    background-color: #f7f7f7;
+    border-radius: 3px;
+
+}
+
 code {
     background: #f7f7f7;
     border-radius: 3px;

@@ -309,39 +309,6 @@ My additions
     margin: 1em 0 1em 0;
 }
 
-/* Comment out before pushing? */
-/*
-code {
-    background: rgba(0, 0, 0, 0.09);
-    border-radius: 3px;
-    padding: 2px 4px 2px 4px;
-    font-size: inherit;
-    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
-}
-
-pre, blockquote {
-    overflow: auto;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    padding: 16px;
-    font-size: 85%;
-    line-height: 1.45;
-    background-color: #f7f7f7;
-    border-radius: 3px;
-
-}
-
-pre>code, blockquote>p {
-  padding: 0;
-  margin: 0 !important;
-  font-size: 100%;
-  word-break: normal;
-  white-space: pre;
-  background: transparent;
-  border: 0;
-}
-*/
-
 .author {
     display: inline-block;
 }

@@ -60,9 +60,9 @@
 	</header>
 	<section id="cd-intro">
         {% if page.image %}
-		  <div id="cd-intro-background" style="background: url({{ site.baseurl }}/images/{{ page.image}}) no-repeat center center;"></div>
+		  <div id="cd-intro-background" style="background: url({{ site.baseurl }}/images/{{ page.image}}) no-repeat center center; background-size: cover;"></div>
         {% else %}
-        <div id="cd-intro-background" style="background: url({{ site.baseurl }}/images/winter-background) no-repeat center center;"></div>
+        <div id="cd-intro-background" style="background: url('{{ site.baseurl }}/images/winter-background.jpg') no-repeat center center; background-size: cover;"></div>
         {% endif %}
 		<div id="cd-intro-tagline">
 			<h1>{{ page.title }}</h1>

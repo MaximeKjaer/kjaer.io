@@ -2,6 +2,7 @@
 layout: post
 title: Discussing this design
 description: I think I'm done.
+image: stickers.jpg
 ---
 
 With this post, I am pushing a bit of a redesign.
