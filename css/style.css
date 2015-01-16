@@ -302,7 +302,10 @@ My additions
 }
 
 .entry img {
-    margin: 18px 0 18px 0;   
+    margin: 18px 0 18px 0;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .entry p, .entry hr {
@@ -477,7 +480,6 @@ footer {
     margin-top: 10px;
     padding-top: 10px;
     font-size: 12px;
-    font-weight: 400;
     color: rgba(255, 255, 255, 0);
 }
 

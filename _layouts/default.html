@@ -1,22 +1,11 @@
+---
+---
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes'>
-    <title>{% if page.title %}{{ page.title }} – {% endif %}{{ site.name }} – {{ site.description }}</title>
-    <meta name="author" content="{{ site.name }}" />
-    <meta name="description" content="{{ site.name }} - {{ site.description }}">
-    <!--[if lt IE 9]>
-      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" href="{{ site.baseurl }}/css/reset.min.css"> <!-- CSS reset -->
-    <link rel="stylesheet" href="{{ site.baseurl }}/css/default.min.css"> <!-- CSS for the default type -->
-    <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/css/syntax.min.css" />
-    <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/css/style.min.css" />
-    <link rel="alternate" type="application/rss+xml" title="{{ site.name }} - {{ site.description }}" href="{{ site.baseurl }}/feed.xml" />
-  </head>
+    {% include headers.html %}
+    <link rel="stylesheet" href="{{ site.baseurl }}/css/default.min.css">
+    </head>
   <body>
 	<header class="cd-header">
 		<div id="cd-logo"><a href="{{ site.baseurl }}/"><img src="{{ site.baseurl }}/images/logo.png" alt="Logo"></a></div>
@@ -57,7 +46,7 @@
 					</a>
 				</li>
 				<li>
-					<a href="..">
+					<a href="/">
 						<b>Blog</b>
 						<span></span><!-- icon -->
 					</a>

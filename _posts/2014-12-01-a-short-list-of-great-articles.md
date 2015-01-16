@@ -1,7 +1,7 @@
 ---
 layout: post
 title: A short list of great articles
-image: hipster.jpg
+image: library.jpg
 ---
 
 I read *a lot* of articles on a daily basis. But some of them really stand out to me: they give me food for thought, great insight into very interesting subjects, or are just generally eloquently written.
