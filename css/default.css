@@ -167,7 +167,7 @@ Intro
   padding-top: 120px;
 }
 #cd-intro h1 {
-  font-size: 1.5rem;
+  font-size: 2em;
   font-weight: 500;
   color: #FFF;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -191,7 +191,7 @@ Intro
   }
   #cd-intro h1 {
     font-size: 32px;
-    font-size: 2rem;
+    font-size: 3rem;
   }
 }
 @media only screen and (min-width: 1170px) {

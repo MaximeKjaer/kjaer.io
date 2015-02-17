@@ -9,12 +9,12 @@ With this post, I am pushing a bit of a redesign.
 
 ### The Creative Process
 
-    1. This is awesome  
-    2. This is tricky 
-    3. This is shit 
-    4. I am shit 
-    5. This might be ok 
-    6. This is awesome
+> 1. This is awesome  
+> 2. This is tricky 
+> 3. This is shit 
+> 4. I am shit 
+> 5. This might be ok 
+> 6. This is awesome  
 
 Despite being stuck for quite a while at steps 2 to 4, I think that I may finally have reached the point where I am happy with the site. I'm actually a bit proud of it, to be honest!
 
