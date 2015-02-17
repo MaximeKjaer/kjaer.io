@@ -170,12 +170,12 @@ Placeholder Sections
 }
 
 .cd-section p, .cd-section ul {
-    line-height: 1.6;
+    line-height: 1.7;
     margin-bottom: 1em;
 }
 
 .cd-section li {
-    line-height: 1.6;
+    line-height: 1.7;
 }
 
 @media only screen and (min-width: 1170px) {
@@ -188,10 +188,6 @@ Placeholder Sections
 .date {
     font-size: 20px;
     color: #030d18;
-}
-
-.cd-section #entry {
-    font-size: 18px;
 }
 
 .cd-btn {

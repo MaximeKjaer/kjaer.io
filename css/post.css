@@ -192,7 +192,7 @@ Main components
 .cd-content {
   position: relative;
   padding: 2em 0 0 0;
-  line-height: 1.6;
+  line-height: 1.7;
   background-color: #f0eee1;
   z-index: 2;
 }
@@ -232,7 +232,7 @@ Main components
 
 @media only screen and (min-width: 768px) {
   .cd-content {
-    line-height: 1.8;
+    line-height: 1.7;
   }
 
 }
