@@ -28,6 +28,7 @@ code {
     background: #f7f7f7;
     border-radius: 3px;
     font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    padding: 2px 4px;
 }
 
 .highlight td {

@@ -463,3 +463,8 @@ Secondary Fixed Navigation
     display: none;
   }
 }
+
+.cd-section h4 { /* Resume */
+    line-height: 1.7;
+    margin-bottom: 0.5;
+}

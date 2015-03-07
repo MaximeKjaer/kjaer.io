@@ -248,9 +248,9 @@ My additions
 
 .entry h1, .entry h2, .entry h3, .entry h4, .entry h5, .entry h6 {
     width: 100%;
-    font-weight: bold;
+    margin: 0 auto;
     padding-top: 0.5em;
-    margin-bottom: 1em;
+    margin-bottom: 0.5em;
     line-height: 1.75em;
 }
 
@@ -268,7 +268,7 @@ My additions
     font-size: 1.3em;
 }
 .entry h4 {
-    font-size: 1.15em;   
+    font-size: 1.15em;
 }
 .entry h5 {
     font-size: 1em;   
@@ -279,21 +279,21 @@ My additions
 }
 
 /* undoing the reset */
-.entry ul {
+.entry ul, .cd-container ul {
     list-style: circle;
     margin: initial;
     padding: 0 1em 0 2em;
     margin-bottom: 1em;
 }
 
-.entry ol {
+.entry ol, .cd-container ol {
     list-style: decimal;
     margin: initial;
     padding: 0 1em 0 2em;
     margin-bottom: 1em;   
 }
 
-.entry li {
+.entry li .cd-container li {
     display: list-item;
 }
 
