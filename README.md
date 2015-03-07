@@ -55,3 +55,5 @@ My personal page - built using [Jekyll](http://jekyllrb.com/) & elbow grease.
 - Better IDs for my `#cd-placeholder1` sections.
 - Add tags to posts (will fit right under "Written on ...") **only possible after self-hosting, since it requires a plugin - so consider a DigitalOcean plan**
 - Try out a few other SEO tricks (just enough to get the site to actually show when googling my name).
+- Use the `<time>` tag for publishing date.
+- Redo the resume.
