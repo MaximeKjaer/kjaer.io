@@ -53,8 +53,8 @@
         {% endif %}
 		<div id="cd-intro-tagline">
 			<h1>{{ page.title }}</h1>
-            <h2 style="text-transform: uppercase">{{ page.date | date: "%B %e, %Y" }}</h2>
-            <h2>{% if page.link %}<a href="{{ page.link }}" class="cd-btn">View the link</a>{% endif %}</h2>
+            <h2 style="text-transform: uppercase"><time datetime="{{ page.date | date: '%F' }}">{{ page.date | date: "%B %e, %Y" }}</time></h2>
+            {% if page.link %}<h2><a href="{{ page.link }}" class="cd-btn">View the link</a></h2>{% endif %}
 		</div> <!-- cd-intro-tagline -->
 	</section> <!-- #cd-intro -->
 	<main class="cd-content">

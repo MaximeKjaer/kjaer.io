@@ -51,6 +51,7 @@ Does that mean that I am *completely* done? Absolutely not. I recognize that I s
 - Better IDs for my `#cd-placeholder1` sections.
 - Add tags to posts (will fit right under "Written on ...") **only possible after self-hosting, since it requires a plugin - so consider a DigitalOcean plan**
 - Try out a few other SEO tricks (just enough to get the site to actually show when googling my name).
+- Make images show up on feedly.
 
 ### Done
 
@@ -74,5 +75,6 @@ Does that mean that I am *completely* done? Absolutely not. I recognize that I s
 - Minify CSS and JS.
 - Make a better footer.
 - Add an `image:` field to the YAML Front Matter in posts.
+- Use the `<time>` tag for the publishing date.
 
 So there you have it. I could keep tweaking things (and I probably will), but I'm happy with the site. Welcome!
