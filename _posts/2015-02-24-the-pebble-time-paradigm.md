@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Pebble Time, a glimpse of future interaction paradigms
+title: A glimpse of future interaction paradigms
 image: pebble.jpg
 ---
 
