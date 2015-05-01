@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Am I famous now?
+category: link
 link: https://soundcloud.com/upvoted/014-to-the-moon#t=36:14
 image: dogecar.jpg
 ---

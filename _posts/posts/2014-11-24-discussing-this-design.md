@@ -1,26 +1,25 @@
 ---
 layout: post
 title: Discussing this design
-description: I think I'm done.
 image: stickers.jpg
+description: It took me a really long time to become satisfied about the design of this site. There have been so many changes and revisions, I've deleted the entire project and started over more than once &mdash; why? Because it took a lot of attempts before I hit something that I could be proud to call my site.
 ---
 
-With this post, I am pushing a bit of a redesign.
+# The Creative Process
 
-### The Creative Process
+1. This is awesome  
+2. This is tricky 
+3. This is shit 
+4. I am shit 
+5. This might be ok 
+6. This is awesome  
 
-> 1. This is awesome  
-> 2. This is tricky 
-> 3. This is shit 
-> 4. I am shit 
-> 5. This might be ok 
-> 6. This is awesome  
+While making this site, I've been stuck for quite a while at steps 2 to 4, However, I think that I may finally have reached the point where I am happy with the site. I’m actually a bit proud of it, to be honest! There will surely be many more changes down the road, but at least I feel like I'm on the right track.
 
-Despite being stuck for quite a while at steps 2 to 4, I think that I may finally have reached the point where I am happy with the site. I'm actually a bit proud of it, to be honest!
+# A quick overview of this design
 
-## A quick overview of this design
+I wrote the site by hand. Using a Wordpress or a Squarespace theme didn't really feel that personal, so I decided to take the scenic route and make this the old-fashioned way. Now, full disclosure: I did use a few of [Codyhouse’s “nuggets”](http://codyhouse.co/), but the rest was painstakingly written by me, because I wanted the absolute pixel-perfect control that this could offer.
 
-The first thing that I want to mention is that I wrote it by hand. I did use a few of [Codyhouse's "nuggets"](http://codyhouse.co/), but the rest was painstakingly written by me, because I wanted the absolute pixel-perfect control that this offers.
 
 On the technical side of things, I'm using the [Jekyll](http://jekyllrb.com/) platform, based off of the [Jekyll Now](https://github.com/barryclark/jekyll-now) preset (which has been largely modified to meet my needs, so much so that there barely is anything left from the original repo). I tried to make it as modular as even possible as to make modifications easy and have a lot of reusability. You can check out the [GitHub repo](https://github.com/MaximeKjaer/MaximeKjaer.github.io) if you want to have a look for yourself.
 
