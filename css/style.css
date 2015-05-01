@@ -11,14 +11,11 @@ Primary style
 }
 
 body {
-    font-size: 100%;
-    font-family: "Open Sans", sans-serif;
-    font-weight: 300;
-    /*font-family: "Open Sans", sans-serif;*/
-    /*color: #030d18;*/
     background-color: #f0eee1;
+    font-size: 100%;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 400;
     color: #3f4148;
-    /*background-color: #f0f1e7;*/
 }
 
 a {
@@ -69,6 +66,10 @@ hr {
     border-left: 0;
 }
 
+aside hr {
+    margin: 1em 0;
+}
+
 table, tr, td {
     border: 1px solid black;
     text-align: center;
@@ -97,20 +98,22 @@ Modules - reusable parts of our design
 
 -------------------------------- */
 .cd-container {
-  /* this class is used to give a max-width to the element it is applied to, and center it horizontally when it reaches that max-width */
-  width: 90%;
-  max-width: 768px;
-  margin: 0 auto;
+    /* this class is used to give a max-width to the element it is applied to, and center it horizontally when it reaches that max-width */
+    width: 90%;
+    max-width: 768px;
+    margin: 0 auto;
 }
+
 .cd-container:after {
-  content: "";
-  display: table;
-  clear: both;
+    content: "";
+    display: table;
+    clear: both;
 }
 
 .has-top-margin {
   /* this class is given - using jQuery - to the .cd-main-content following the .cd-secondary-nav when it becomes fixed */
 }
+
 @media only screen and (min-width: 1170px) {
   .has-top-margin {
     -webkit-animation: animate-margin-top 0.3s;
@@ -157,21 +160,21 @@ Placeholder Sections
   margin: 0 auto;
   padding: 2em 0 0.5em 0;
 }
-.cd-section h1 { /* Post Titles */
+.cd-section h1, aside h1 { /* Post Titles */
     font-size: 2em;
 }
 
-.cd-section h2 {
+.cd-section h2, aside h2 {
     font-size: 1.875em;
 }
-.cd-section h3 {
+.cd-section h3, aside h3 {
     font-size: 1.5em;
 }
-.cd-section h4 {
+.cd-section h4, aside h4 {
     font-size: 1.375em;   
 }
-.cd-section h5 {
-    font-size: 1em;  
+.cd-section h5, aside h5 {
+    font-size: 1em;
 }
 .cd-section h6 {
     font-size: 1em;
@@ -179,12 +182,12 @@ Placeholder Sections
 }
 
 .cd-section p, .cd-section ul {
-    line-height: 1.7;
+    line-height: 1.6;
     margin-bottom: 1em;
 }
 
 .cd-section li {
-    line-height: 1.6;
+    line-height: 1.7;
 }
 
 @media only screen and (min-width: 1170px) {
@@ -254,6 +257,9 @@ My additions
 ------------------------------- */
 
 /* Special formatting for the blog posts */
+.entry .intro {
+    font-weight: 700;
+}
 
 .entry h1, .entry h2, .entry h3, .entry h4, .entry h5, .entry h6 {
     font-weight: 400;
