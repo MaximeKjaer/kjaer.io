@@ -13,9 +13,11 @@ Primary style
 body {
     font-size: 100%;
     font-family: "Open Sans", sans-serif;
+    font-weight: 300;
+    /*font-family: "Open Sans", sans-serif;*/
     /*color: #030d18;*/
     background-color: #f0eee1;
-    color: #494c57;
+    color: #3f4148;
     /*background-color: #f0f1e7;*/
 }
 
@@ -23,7 +25,14 @@ a {
     color: #f5484a;
     text-decoration: none;
     position: relative;
+    transition: color 0.1s;
 }
+
+main a:hover {
+    color: #ef7c7d;
+    transition: color 0.1s;
+}
+
 
 /* Does not work for multiple lines. It's a shame, but I can't fix it... Also, IE messes it up :'( */
 /* So to the trashcan it is, unfortunately.
@@ -175,7 +184,7 @@ Placeholder Sections
 }
 
 .cd-section li {
-    line-height: 1.7;
+    line-height: 1.6;
 }
 
 @media only screen and (min-width: 1170px) {
@@ -247,15 +256,12 @@ My additions
 /* Special formatting for the blog posts */
 
 .entry h1, .entry h2, .entry h3, .entry h4, .entry h5, .entry h6 {
+    font-weight: 400;
     width: 100%;
     margin: 0 auto;
-    padding-top: 0.5em;
+    padding-top: 0.25em;
     margin-bottom: 0.5em;
     line-height: 1.75em;
-}
-
-.entry h1, .entry h2 {
-    border-bottom: 2px solid rgba(0, 39, 59, 0.0784314);
 }
 
 .entry h1 { /* Post Titles */
@@ -281,20 +287,21 @@ My additions
 /* undoing the reset */
 .entry ul, .cd-container ul {
     list-style: circle;
-    margin: initial;
-    padding: 0 1em 0 2em;
-    margin-bottom: 1em;
 }
 
 .entry ol, .cd-container ol {
-    list-style: decimal;
-    margin: initial;
-    padding: 0 1em 0 2em;
-    margin-bottom: 1em;   
+    list-style: decimal;  
 }
 
-.entry li .cd-container li {
+.entry ol, .entry ol, .entry ul, .entry ul {
+    margin: initial;
+    padding: 0 1em 0 2em;
+    margin-bottom: 1em; 
+}
+.entry li, .cd-container li {
     display: list-item;
+    /* font-style: italic; Maybe. Not right now! */
+    font-weight: 400;
 }
 
 .entry img {
@@ -309,9 +316,8 @@ My additions
 }
 
 .entry blockquote {
-    font-size: 1.25em;
+    font-size: 100%;
     border-left: 2px solid #f5484a;
-    font-variant: small-caps;
 }
 
 .entry blockquote > p {
@@ -389,6 +395,7 @@ My additions
 }
 
 footer {
+    margin: 0 auto;
     line-height: 1.5em;
     padding-bottom: 1em;
     text-align: center;
