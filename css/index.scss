@@ -23,6 +23,7 @@ body {
     background-image: $background;
     @include retina {
         background-image: $background-2x;
+        background-size: 500px 500px;
     }
 }
 
