@@ -6,6 +6,12 @@
 
 html {
     font-size: 69%; /* Usually 62.5 % */
+    @include responsive(medium-screens) {
+        font-size: 66%;
+    }
+    @include responsive(small-screens) {
+        font-size: 63%;
+    }
 }
 
 body {
@@ -129,7 +135,7 @@ a {
 
 .container {
     margin: 0 auto;
-    padding: 0 2em;
+    padding: 0 2rem;
     max-width: 750px;
     display: block;
 }

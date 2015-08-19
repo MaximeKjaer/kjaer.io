@@ -45,6 +45,4 @@ My personal page - built using [Jekyll](http://jekyllrb.com/) & elbow grease.
     ![Image title](/images/local-image.jpeg) // This is better, by the way.
     
 ## To-do
-
 - "Input" blog section for sharing a selection of links that I've read.
-- Rework the typography on mobile screen sizes.
