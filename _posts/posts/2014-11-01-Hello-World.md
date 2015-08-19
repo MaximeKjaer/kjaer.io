@@ -14,7 +14,7 @@ And once you have your own repo, go to the Settings and rename it to `yourGithub
 
 You just need to tell Jekyll what your name is, what your blog will be called, give it links to whatever social media that you want to link to... To do that, go through the `_config.yml` file, and fill it out like a form.
 
-<!--- Separator -->
+<!-- More -->
 
 ## 3. Write a post
 

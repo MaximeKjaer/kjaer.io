@@ -1,94 +1,31 @@
----
----
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    {% include headers.html %}
-    <link rel="stylesheet" href="{{ site.baseurl }}/css/default.min.css">
-    </head>
-  <body>
-	<header class="cd-header">
-		<div id="cd-logo"><a href="{{ site.baseurl }}/"><img src="{{ site.baseurl }}/images/logo.png" alt="Logo"></a></div>
-		<nav class="cd-primary-nav">
-			<ul>
-				<!-- inser more links here -->
-				<li><a href="http://github.com/{{ site.footer-links.github }}">GitHub</a></li>
-				<li><a href="https://soundcloud.com/{{ site.footer-links.soundcloud }}">Soundcloud</a></li>
-				<li><a href="http://instagram.com/{{ site.footer-links.instagram }}">Instagram</a></li>
-			</ul>
-		</nav> <!-- cd-primary-nav -->
-	</header>
-	<section id="cd-intro">
-		<div id="cd-intro-tagline">
-			<h1>{{ site.name }}</h1>
-            <h2>A Copenhagen kid studying <abbr title="Computer Science">CS</abbr> in Switzerland</h2>
-            {% if page.url == "/index.html" %}
-                    <a href="{{ site.baseurl }}/about" class="cd-btn">Read more about me</a>
-            {% else %}
-                    <a href="{{ site.baseurl }}/" class="cd-btn">&larr; Back home</a>
-            {% endif %}
-		</div> <!-- #cd-intro-tagline -->
-	</section> <!-- #cd-intro -->
-	<div class="cd-secondary-nav">
-		<a href="#0" class="cd-secondary-nav-trigger">Menu<span></span></a> <!-- button visible on small devices -->
-		<nav>
-			<ul>
-				<li>
-					<a href="/about/#cd-placeholder-1">
-						<b>About me</b>
-						<span></span><!-- icon -->
-					</a>
-				</li>
-				<li>
-					<a href="/about/#cd-placeholder-2">
-						<b>Contact</b>
-						<span></span><!-- icon -->
-					</a>
-				</li>
-				<li>
-					<a href="/">
-						<b>Blog</b>
-						<span></span><!-- icon -->
-					</a>
-				</li>
-				<li>
-					<a href="/about/#cd-placeholder-4">
-						<b>Résumé</b>
-						<span></span><!-- icon -->
-					</a>
-				</li>
-				<li>
-					<a href="/about/#cd-placeholder-5">
-						<b>Projects</b>
-						<span></span><!-- icon -->
-					</a>
-				</li>
-			</ul>
-		</nav>
-	</div> <!-- .cd-secondary-nav -->
-	<main class="cd-main-content">
-        {{ content }}
- <!-- 
-            I'll add this in a future version. It's really not necessary right now.
+<html>
+<head>
+    {% include head.html %}
+</head>
+<body>
+    <div class="hero" style="background-image: url('{% if page.image %}/images/{{ page.image }}{% else %}{{ site.hero_image }}{% endif %}');">
+        
 
-        <div class="pagination cd-container">
-            {% if paginator.previous_page %}
-                <a href="{{ paginator.previous_page_path }}" class="previous">Newer Posts</a>
-            {% endif %}
-            {% if paginator.next_page %}
-                <a href="{{ paginator.next_page_path }}" class="next">Older Posts</a>
-            {% endif %}
-            <hr/>
+        <div class="top-right">
+            <a href="/about">ABOUT</a>
         </div>
--->
-    </main>
+
+         
+        <div class="title">
+            <a href="{{ site.baseurl }}/">
+                <h1>OUTPUT</h1>
+                <p>{{ site.subtitle }}</p>
+            </a>
+        </div>
+    </div>
+    <div class="content">
+       <div class="container">
+           
+           {{ content | markdownify }}
+        
+        </div>
+    </div>
     {% include footer.html %}
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script src="{{ site.baseurl }}/js/main.min.js"></script>
-    {% if page.url != "/index.html" %}
-        <script src="{{ site.baseurl }}/js/smooth-scroll.min.js"></script>
-    {% endif %}
-    <script src="{{ site.baseurl }}/js/modernizr.custom.min.js"></script> <!-- Resource dModernizr -->
-        {% include analytics.html %}
-    </body>
+</body>
 </html>

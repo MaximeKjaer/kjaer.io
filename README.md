@@ -1,58 +1,40 @@
-# [KjaerMaxi.me](http://kjaermaxi.me/)
+# Imperative
 
-My personal page - built using [Jekyll](http://jekyllrb.com/) & elbow grease.
+**Imperative** is a clean and simple Jekyll blog that won't take you more than two minutes to set up.
 
-## Syntax of a post:
+- You can host your blog for free right here on GitHub.
+- You don't need to install anything :relieved:
+- It just takes a few clicks to try out, and you can always delete your forked repository if you don't like it!
+- Again &mdash; it's *really* easy, trust me! :relaxed:
 
-    ---
-    layout: post
-    title: A sample post
-    description: Showing the syntax of a post.
-    image: splash-image.jpg
-    link: http://link-to-something-interesting.com/
-    ---
+<!-- Insert images and demo here!! -->
 
-    Using the YAML Front Matter (everything above this sentence) is mandatory. Filling out the post and title fields is more than highly recommended.
+## Quick Start
+### 1. Fork Imperative to your account
 
-    This text will be the post's body, and will also be shown on the front page's preview.
-    
-    ## Code
-    
-    It is possible to insert code:
-    
-    {% highlight python %}
-    def hello():
-        print("Hello World!")
-    {% endhighlight %}
-    
-    
-    As of right now, line numbers don't work because of a bug in Rouge.
+Fork the repo, and then rename it to `yourGitHubUsername.github.io`.
 
-    ## Separator
-    
-    <!--- Separator -->
+At this point, your blog is actually already live over at [yourgithubusername.github.io](http://yourgithubusername.github.io)!
 
-    This text won't be shown in the preview, as it comes after the Separator tag.
-    
-    ## Quotes
-    
-    > "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras in consectetur augue. Sed quis efficitur mauris. Suspendisse potenti. Duis maximus consequat leo, eget placerat eros venenatis id. Cras a sem turpis. Quisque porta sollicitudin magna, mattis luctus risus pulvinar malesuada. Fusce posuere mattis convallis. Aliquam sit amet dictum metus, quis accumsan libero."  
-    > *-- Cicero*
+### 2. Customize your site
+The [_config.yml](/_config.yml) file is where the basic customization is happening. Here are some of the things that you can do:
 
-    ## Images
-    
-    ![Image title](http://link-to-image.com/image.jpeg)
-    
-    ![Image title](/images/local-image.jpeg) // This is better, by the way.
-    
-    ## Ending a post
-    
-    No particular syntax is needed to end a post.
+- Change your name
+- Change your description
+- Enable Google Analytics
+- Enable Disqus comments
+- Change the blog's URL structure
+- Change the pagination of your blog
+- And much more to come!
 
-## To-do
+### 3. Write your first blog post!
+You can edit the file in the [_posts](/_posts/) folder to publish your first blog post.
 
-- Better links in the footer.
-- Better IDs for my `#cd-placeholder1` sections.
-- Add tags to posts (will fit right under "Written on ...") **only possible after self-hosting, since it requires a plugin - so consider a DigitalOcean plan**
-- Try out a few other SEO tricks (just enough to get the site to actually show when googling my name).
-- Redo the resume.
+There are a few formatting rules for blog posts, which I will describe somewhere before publishing this repo.
+
+## Questions?
+You're more than welcome to [open an issue](https://github.com/MaximeKjaer/imperative/issues)! I'll make sure to respond :smile:
+
+## Credits
+- [Jekyll](https://github.com/jekyll/jekyll) &ndash; Thanks to all contributors for this fantastic tool
+- [Jekyll Now](https://github.com/barryclark/jekyll-now) &ndash; Thanks to [Barry Clark](https://github.com/barryclark) and all contributors. Jekyll Now is the project that gave me the idea for this theme in the first place, and you'll still find a few snippets of their code in this repo (this README is inspired by their work too, really!).

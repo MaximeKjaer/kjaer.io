@@ -1,92 +1,17 @@
 ---
+layout: default
 ---
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    {% include headers.html %}
-    <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/css/post.min.css" />
-</head>
-<body>
 
+<article>
+    {% if page.title %}
+    <header>
+        <h1>{{ page.title }}</h1>
+        <p class="date"><time datetime="{{ page.date | date: '%F' }}">{{ page.date | date: "%B %e, %Y" }}</time></p>
+    </header>
+    {% endif %}
+    
+    {{ content }}    
 
-	<header class="cd-header">
-		<div id="cd-logo"><a href="{{ site.baseurl }}/"><img src="../images/logo.png" alt="Logo"></a></div>
+</article>
 
-		<nav class="cd-main-nav">
-			<ul>
-				<li>
-					<a href="/about/#cd-placeholder-1">
-						<b>About me</b>
-						<span></span><!-- icon -->
-					</a>
-				</li>
-				<li>
-					<a href="/about/#cd-placeholder-2">
-						<b>Contact</b>
-						<span></span><!-- icon -->
-					</a>
-				</li>
-				<li>
-					<a href="..">
-						<b>Blog</b>
-						<span></span><!-- icon -->
-					</a>
-				</li>
-				<li>
-					<a href="/about/#cd-placeholder-4">
-						<b>Résumé</b>
-						<span></span><!-- icon -->
-					</a>
-				</li>
-				<li>
-					<a href="/about/#cd-placeholder-5">
-						<b>Projects</b>
-						<span></span><!-- icon -->
-					</a>
-				</li>
-			</ul>
-		</nav> <!-- cd-main-nav -->
-	</header>
-	<section id="cd-intro">
-        {% if page.image %}
-		  <div id="cd-intro-background" style="background: url({{ site.baseurl }}/images/{{ page.image}}) no-repeat center center; background-size: cover;"></div>
-        {% else %}
-        <div id="cd-intro-background" style="background: url('{{ site.baseurl }}/images/winter-background.jpg') no-repeat center center; background-size: cover;"></div>
-        {% endif %}
-		<div id="cd-intro-tagline">
-			<h1>{{ page.title }}</h1>
-            <h2 style="text-transform: uppercase"><time datetime="{{ page.date | date: '%F' }}">{{ page.date | date: "%B %e, %Y" }}</time></h2>
-            {% if page.link %}<h2><a href="{{ page.link }}" class="cd-btn">View the link</a></h2>{% endif %}
-		</div> <!-- cd-intro-tagline -->
-	</section> <!-- #cd-intro -->
-	<main class="cd-content">
-        <div class="scroll-down">
-                <svg viewBox="0 0 64 64" enable-background="new 0 0 64 64">
-                    <path d="M53,23c0-1.657-1.343-3-3-3c-0.809,0-1.542,0.321-2.082,0.841l-0.001-0.001L31.993,36.764L16.275,21.046C15.725,20.406,14.91,20,14,20c-1.657,0-3,1.343-3,3c0,0.805,0.318,1.536,0.835,2.075l-0.008,0.008l18,18l0.001-0.001C30.374,43.648,31.139,44,31.987,44c0.002,0,0.004,0,0.007,0c0.002,0,0.004,0,0.007,0c0.849,0,1.612-0.352,2.159-0.918l0.001,0.001l18-18l-0.001-0.001C52.68,24.543,53,23.809,53,23z" style="fill: #494c57;"></path>
-                </svg>
-        </div>
-		<div class="cd-container entry">
-            {% if page.description %}
-                <p class="intro">{{ page.description }}</p>
-            {% endif %}
-            {{ content }}
-            {% if page.link %}<a href="{{ page.link }}" class="cd-btn">View the link</a>{% endif %}
-            {% if page.tag %}
-                <div style="height: 1px; background-color: #494c57; text-align: center">
-                    <span style="background-color: #f0eee1; position: relative; top: -0.8em; padding: 8px;">
-                        {{ page.tag }}
-                    </span>
-                </div>
-            {% endif %}
-		</div>
-        <section class="cd-section cd-container">
-            {% include disqus.html disqus_identifier=page.disqus_identifier %}
-            <hr/>
-        </section>
-            {% include footer.html %}
-	</main> <!-- cd-content -->
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script src="{{ site.baseurl}}/js/modernizr.custom.min.js"></script> <!-- Modernizr -->
-	<script src="{{ site.baseurl}}/js/post.min.js"></script>
-</body>
-</html>
+{% include disqus.html disqus_identifier=page.disqus_identifier %}

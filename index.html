@@ -1,97 +1,19 @@
 ---
 layout: default
 ---
-<!-- This is some small CSS, so I'm inlining it -->
-<style>
-.cd-container {
-  width: 70%;
-  max-width: 768px;
-  margin: 0 1.5% 0 0;
-  float: left;
-}
 
-.group:before, .group:after {
-  content: "";
-  display: table;
-}
-.group:after {
-  clear: both;
-}
-.group {
-    max-width: 1018px;
-    margin: 0 auto;
-  display: table;
-}
-
-aside {
-    padding-top: 4em;
-    float: right;
-    width: 25%;
-    max-width: 250px;
-    margin: 0 1.5% 0 0;
-}
-
-aside a {
-    font-size: 1.25em;
-}
-    
-@media only screen and (max-width: 1018px) {
-    .group {
-        max-width: 768px;
-    }
-    .cd-container {
-        width: 100%;
-        float: none;
-    }
-    aside {
-        float: none;
-        width: 100%;
-        max-width: 768px;
-    }
-}   
-</style>
-
-<section class="group">
-    <section class="cd-section cd-container">
-        <h1 id="post_cat">Posts</h1>
-        <br>
-          {% for post in site.posts %}
-            {% if post.categories contains 'link' %}
-            {% else %}
-            <article class="post">
-                <div class="author">
-                    <div class="bubble">
-                        <img src="{{ site.avatar }}" alt="{{ site.name }}" title="{{ site.name }}"/>
-                    </div> 
-                    <div class="post_title">
-                        <h1><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></h1>
-                    </div>
-                </div>
-                <p class="date">Written on <time datetime="{{ post.date | date: '%F' }}">{{ post.date | date: "%B %e, %Y" }}</time></p>
-                <div class="entry">
-                    {% if post.description %}
-                        <p class="intro">{{ post.description }}</p>
-                    {% endif %}
-                    {{ post.excerpt }}
-                </div>
-                <a href="{{ site.baseurl }}{{ post.url }}" class="read-more">Read More</a>
-                <hr/>
-            </article>
-            {% endif %}
-          {% endfor %}
-    </section>
-    <aside>
-        <h1 id="links_cat">Links</h1>
-        <br>
-        {% for post in site.posts %}
-            {% if post.categories contains 'link' %}
-                <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title}}</a>
-                <p class="time">
-                    <br>
-                    <time datetime="{{ post.date | date: '%F' }}">{{ post.date | date: "%B %e, %Y" }}</time>
-                </p>
-                <hr>
-            {% endif %}
-        {% endfor %}
-    </aside>
-</section>
+{% for post in site.posts %}
+   <article class="post">
+       <header>
+            <a href="{{ post.url }}">
+                <h1>{{ post.title }}</h1>
+            </a>
+            <p class="date"><time datetime="{{ post.date | date: '%F' }}">{{ post.date | date: "%B %e, %Y" }}</time></p>
+        </header>
+        
+        {{ post.excerpt }}
+        
+        <a href="{{ post.url }}">Read more</a>
+        
+    </article>
+{% endfor %}

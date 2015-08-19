@@ -2,8 +2,11 @@
 layout: post
 title: Discussing this design
 image: stickers.jpg
-description: It took me a really long time to become satisfied about the design of this site. There have been so many changes and revisions, I've deleted the entire project and started over more than once &mdash; why? Because it took a lot of attempts before I hit something that I could be proud to call my site.
+published: false
 ---
+
+It took me a really long time to become satisfied about the design of this site. There have been so many changes and revisions, I've deleted the entire project and started over more than once &mdash; why? Because it took a lot of attempts before I hit something that I could be proud to call my site.
+
 
 # The Creative Process
 
@@ -20,12 +23,11 @@ While making this site, I've been stuck for quite a while at steps 2 to 4, Howev
 
 I wrote the site by hand. Using a Wordpress or a Squarespace theme didn't really feel that personal, so I decided to take the scenic route and make this the old-fashioned way. Now, full disclosure: I did use a few of [Codyhouse’s “nuggets”](http://codyhouse.co/), but the rest was painstakingly written by me, because I wanted the absolute pixel-perfect control that this could offer.
 
-
 On the technical side of things, I'm using the [Jekyll](http://jekyllrb.com/) platform, based off of the [Jekyll Now](https://github.com/barryclark/jekyll-now) preset (which has been largely modified to meet my needs, so much so that there barely is anything left from the original repo). I tried to make it as modular as even possible as to make modifications easy and have a lot of reusability. You can check out the [GitHub repo](https://github.com/MaximeKjaer/MaximeKjaer.github.io) if you want to have a look for yourself.
 
 But the main goal of this post was to discuss design decisions, so why don't we dive into that now:
 
-<!--- Separator -->
+<!-- More -->
 
 The header features a pretty picture of Lausanne, the city in which I study. I chose this picture for multiple reasons: firstly, it was a bit dark, which means that I easily can place white text over it - that's the practical reason. Then, the picture was taken right next to where I live, which adds a personal touch to it. The fact that it was taken during the winter is just a bonus, really, because I **love** snow; the first snowfall of the year is like Christmas to me.
 
@@ -33,7 +35,7 @@ The more I thought about making the header personal, the more ideas came up. Eve
 
 For a moment, I was afraid my color scheme was a bit dull. It needed some eye candy. And that's exactly what the button in the middle of the header is. Again, for it to be in the header, it had to mean something to me. Combining candy and personal details and preferences, I ended up with the colors of Haribo Peaches (my favorites!).
 
-For the rest of the site, I wanted a Sans-Serif font (that's just a personal preference, again), and just plain *simplicity*. The safe bet for a design that ages well isn't flat design or material design (though it has some good ideas, it's a bit of a fad in my opinion - but that's for another post). No, simplicity is the only thing that won't go out of fashion.
+The safe bet for a design that ages well isn't flat design or material design (though it has some good ideas, it's a bit of a fad in my opinion - but that's for another post). No, simplicity is the only thing that won't go out of fashion.
 
 So simplicity was the keyword, and I really did try to keep it at that. It's incredibly easy to overload a page with information, but simplifying things is actually not simple, quite ironically.
 

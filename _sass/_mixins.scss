@@ -1,0 +1,65 @@
+@mixin skewY($angle) {
+    -webkit-transform: skewY($angle);
+        -ms-transform: skewY($angle);
+            transform: skewY($angle);
+}
+
+@mixin translateY($amount) {
+        -webkit-transform: translateY($amount);
+            -ms-transform: translateY($amount);
+                transform: translateY($amount);
+}
+
+@mixin transform-origin($origin) {
+    -webkit-transform-origin: $origin;
+        -ms-transform-origin: $origin;
+            transform-origin: $origin;
+}
+
+@mixin opacity($amount) {
+    opacity: $amount;
+    filter: alpha(opacity=$amount*100);
+}
+
+@mixin transition($properties, $time) {
+    -webkit-transition: $properties $time;
+            transition: $properties $time;
+}
+
+@mixin user-select($property) {
+    -webkit-touch-callout: $property;
+      -webkit-user-select: $property;
+       -khtml-user-select: $property;
+         -moz-user-select: $property;
+          -ms-user-select: $property;
+              user-select: $property;
+}
+
+@mixin selection {
+    ::-moz-selection { @content; }
+    ::selection { @content; }
+}
+
+@mixin responsive($width) {
+    @if $width == wide-screens {
+        @media only screen and (max-width: $width-large) {
+            @content;
+        }
+    }
+    @else if $width == medium-screens {
+        @media only screen and (max-width: $width-medium) {
+            @content;
+        }
+    }
+    @else if $width == small-screens {
+        @media only screen and (max-width: $width-small) {
+            @content;
+        }
+    }
+}
+
+@mixin retina {
+    @media (-webkit-min-device-pixel-ratio: 1.5), (min--moz-device-pixel-ratio: 1.5), (-o-min-device-pixel-r atio: 3/2), (min-device-pixel-ratio: 1.5), (min-resolution: 1.5dppx) {
+        @content;
+    }
+}
