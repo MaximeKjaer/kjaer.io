@@ -35,7 +35,8 @@ body {
        (min-device-pixel-ratio: 1.5),
        (min-resolution: 1.5dppx) {
     body {
-        background-image: url('/images/example_@2X.png')
+        background-image: url('/images/example_@2X.png');
+        background-size: 500px 500px;
     }
 }
 {% endhighlight %}
@@ -46,7 +47,8 @@ Meanwhile, the SCSS is just this:
 body {
     background-image: $background;
     @include retina {
-        background-image: $background-2x;   
+        background-image: $background-2x;
+        background-size: 500px 500px;
     }
 }
 {% endhighlight %}
