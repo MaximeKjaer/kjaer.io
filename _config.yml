@@ -42,3 +42,4 @@ exclude:
     - README.md
     - nohup.out
     - serve.bat
+    - vendor

@@ -1,5 +1,7 @@
 # [KjaerMaxi.me](http://kjaermaxi.me/)
 
+[![Build Status](https://travis-ci.org/MaximeKjaer/kjaermaxi.me.svg?branch=travis-test)](https://travis-ci.org/MaximeKjaer/kjaermaxi.me)
+
 My personal page - built using [Jekyll](http://jekyllrb.com/) & elbow grease.
 
 ## Syntax of a post:
@@ -43,6 +45,3 @@ My personal page - built using [Jekyll](http://jekyllrb.com/) & elbow grease.
     ![Image title](http://link-to-image.com/image.jpeg)
     
     ![Image title](/images/local-image.jpeg) // This is better, by the way.
-    
-## To-do
-- "Input" blog section for sharing a selection of links that I've read.

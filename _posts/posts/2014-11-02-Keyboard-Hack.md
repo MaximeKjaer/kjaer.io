@@ -24,13 +24,13 @@ I threw the middle sheet out; I didn’t need it.
 
 I started out by scanning my two sheets. They were a bit longer than a piece of A4 paper, and my Canon MP640 couldn’t scan a complete sheet. I ended up scanning each plastic sheet twice. This is what the scans of the bottom sheet looked like:
 
-[![]({{ site.baseurl }}/images/Keyboard-Hack/min/min_a1.png)]({{ site.baseurl }}/images/Keyboard-Hack/max/a1.jpg)
+[![A scan of the left side of the plastic sheet]({{ site.baseurl }}/images/Keyboard-Hack/min/min_a1.png)]({{ site.baseurl }}/images/Keyboard-Hack/max/a1.jpg)
 
-[![]({{ site.baseurl }}/images/Keyboard-Hack/min/min_a2.png)]({{ site.baseurl }}/images/Keyboard-Hack/max/a2.jpg)
+[![A scan of the right side of the plastic sheet]({{ site.baseurl }}/images/Keyboard-Hack/min/min_a2.png)]({{ site.baseurl }}/images/Keyboard-Hack/max/a2.jpg)
 
 To stitch them together, I used [Microsoft ICE](http://research.microsoft.com/en-us/um/redmond/groups/ivm/ice/): it’s a great piece of software from the Microsoft Research team. It stitches multiple photos into one big panorama, and does so perfectly: forget the  skewed, distorted panoramas that you may have taken with your phone, this software almost never makes mistakes.
 
-[![]({{ site.baseurl }}/images/Keyboard-Hack/min/min_stitch0001.png)]({{ site.baseurl }}/images/Keyboard-Hack/max/stitch0001.jpg)
+[![A scan of the complete plastic sheet]({{ site.baseurl }}/images/Keyboard-Hack/min/min_stitch0001.png)]({{ site.baseurl }}/images/Keyboard-Hack/max/stitch0001.jpg)
 
 So I had my two huge scans (they were about 12MB each). I may have asked for a too good quality, as a tenth of the resolution I had would have been sufficient. If your scanner lets you choose the resolution of your scan, 200-300 dpi should be more than enough – I had asked for 600.
 
@@ -38,9 +38,9 @@ I edited the stitched scans with [GIMP](http://www.gimp.org/). The first thought
 
 This are the results I got:
 
-[![]({{ site.baseurl }}/images/Keyboard-Hack/min/min_keyboard_stitch.png)]({{ site.baseurl }}/images/Keyboard-Hack/max/keyboard_stitch.jpg)
+[![Colored plastic sheet (layer 1)]({{ site.baseurl }}/images/Keyboard-Hack/min/min_keyboard_stitch.png)]({{ site.baseurl }}/images/Keyboard-Hack/max/keyboard_stitch.jpg)
 
-[![]({{ site.baseurl }}/images/Keyboard-Hack/min/min_keyboard-a.png)]({{ site.baseurl }}/images/Keyboard-Hack/max/keyboard-a.jpg)
+[![Colored plastic sheet (layer 2)]({{ site.baseurl }}/images/Keyboard-Hack/min/min_keyboard-a.png)]({{ site.baseurl }}/images/Keyboard-Hack/max/keyboard-a.jpg)
 
 
 Interestingly enough, some dots weren’t used at all: they didn’t correspond to any rubber button, or to any key on the keyboard! I guess that the manufacturer did this so that they would be able to use the same plastic sheets for different keyboard layouts.
