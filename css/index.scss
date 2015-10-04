@@ -242,7 +242,7 @@ h4 {
     font-size: $medium;
 }
 
-article a:hover, footer p a:hover {
+article a:hover, footer nav a:hover {
     border-bottom: 1px solid;
 }
 
@@ -262,9 +262,16 @@ footer {
     text-align: center;
     font-size: $medium;
     
-    p {
+    nav {
         margin: 1em 0;
-        line-height: 0;
+    }
+    ul {
+        list-style: none;
+    }
+    li {
+        display: inline-block;
+        margin: 0 1em;
+        
     }
 }
 
