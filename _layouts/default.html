@@ -4,7 +4,7 @@
     {% include head.html %}
 </head>
 <body>
-    <div class="hero" style="background-image: url('{% if page.image %}/images/{{ page.image }}{% else %}{{ site.hero_image }}{% endif %}');">
+    <header class="hero" style="background-image: url('{% if page.image %}/images/{{ page.image }}{% else %}{{ site.hero_image }}{% endif %}');">
         
 
         <nav class="top-right">
@@ -18,14 +18,14 @@
                 <p>{{ site.subtitle }}</p>
             </a>
         </div>
-    </div>
-    <div class="content">
+    </header>
+    <main class="content">
        <div class="container">
            
-           {{ content | markdownify }}
+           {{ content }}
         
         </div>
-    </div>
+    </main>
     {% include footer.html %}
 </body>
 </html>
