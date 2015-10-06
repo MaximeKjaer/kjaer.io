@@ -22,7 +22,9 @@ Go to your `_posts` folder and edit the Hello-World file. Don't touch the text b
 
 Remember to change the date if you want that to be reflected on your blog. To do so, change the name of the Markdown file to fit the following format:
 
-    YEAR-MONTH-DAY-Title_goes_here
+{% highlight %}
+    YEAR-MONTH-DAY-Title_goes_here.md
+{% endhighlight %}
 
 ## 4. Enjoy!
 
