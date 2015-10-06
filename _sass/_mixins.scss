@@ -1,71 +1,71 @@
 @mixin skewY($angle) {
-    -webkit-transform: skewY($angle);
-        -ms-transform: skewY($angle);
-            transform: skewY($angle);
+	-webkit-transform: skewY($angle);
+		-ms-transform: skewY($angle);
+			transform: skewY($angle);
 }
 
 @mixin translateY($amount) {
-        -webkit-transform: translateY($amount);
-            -ms-transform: translateY($amount);
-                transform: translateY($amount);
+		-webkit-transform: translateY($amount);
+			-ms-transform: translateY($amount);
+				transform: translateY($amount);
 }
 
 @mixin transform-origin($origin) {
-    -webkit-transform-origin: $origin;
-        -ms-transform-origin: $origin;
-            transform-origin: $origin;
+	-webkit-transform-origin: $origin;
+		-ms-transform-origin: $origin;
+			transform-origin: $origin;
 }
 
 @mixin opacity($amount) {
-    opacity: $amount;
-    filter: alpha(opacity=$amount*100);
+	opacity: $amount;
+	filter: alpha(opacity=$amount*100);
 }
 
 @mixin transition($properties, $time) {
-    -webkit-transition: $properties $time;
-            transition: $properties $time;
+	-webkit-transition: $properties $time;
+			transition: $properties $time;
 }
 
 @mixin user-select($property) {
-    -webkit-touch-callout: $property;
-      -webkit-user-select: $property;
-       -khtml-user-select: $property;
-         -moz-user-select: $property;
-          -ms-user-select: $property;
-              user-select: $property;
+	-webkit-touch-callout: $property;
+	  -webkit-user-select: $property;
+	   -khtml-user-select: $property;
+		 -moz-user-select: $property;
+		  -ms-user-select: $property;
+			  user-select: $property;
 }
 
 @mixin selection {
-    ::-moz-selection { @content; }
-    ::selection { @content; }
+	::-moz-selection { @content; }
+	::selection { @content; }
 }
 
 @mixin responsive($width) {
-    @if $width == wide-screens {
-        @media only screen and (max-width: $width-large) {
-            @content;
-        }
-    }
-    @else if $width == medium-screens {
-        @media only screen and (max-width: $width-medium) {
-            @content;
-        }
-    }
-    @else if $width == small-screens {
-        @media only screen and (max-width: $width-small) {
-            @content;
-        }
-    }
+	@if $width == wide-screens {
+		@media only screen and (max-width: $width-large) {
+			@content;
+		}
+	}
+	@else if $width == medium-screens {
+		@media only screen and (max-width: $width-medium) {
+			@content;
+		}
+	}
+	@else if $width == small-screens {
+		@media only screen and (max-width: $width-small) {
+			@content;
+		}
+	}
 }
 
 @mixin retina { //from http://stackoverflow.com/a/16154726
-    @media
-        only screen and (-webkit-min-device-pixel-ratio: 2),
-        only screen and (   min--moz-device-pixel-ratio: 2),
-        only screen and (     -o-min-device-pixel-ratio: 2/1),
-        only screen and (        min-device-pixel-ratio: 2),
-        only screen and (                min-resolution: 192dpi),
-        only screen and (                min-resolution: 2dppx) {
-            @content;
-    }
+	@media
+		only screen and (-webkit-min-device-pixel-ratio: 2),
+		only screen and (min--moz-device-pixel-ratio: 2),
+		only screen and (-o-min-device-pixel-ratio: 2/1),
+		only screen and (min-device-pixel-ratio: 2),
+		only screen and (min-resolution: 192dpi),
+		only screen and (min-resolution: 2dppx) {
+			@content;
+	}
 }
