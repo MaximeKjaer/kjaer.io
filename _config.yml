@@ -31,15 +31,19 @@ permalink: /:title/
 excerpt_separator: "<!--"
 
 sass:
-    style: :compressed # It's either :compressed or :expanded.
-    sass_dir: _sass
+  sass_dir: _sass
+  # style: :expanded # It's either :compressed or :expanded.
+  style: :compressed
 
 # Exclude these files from your production _site
 exclude:
-    - Gemfile
-    - Gemfile.lock
-    - LICENSE
-    - README.md
-    - nohup.out
-    - serve.bat
-    - vendor
+  - Gemfile
+  - Gemfile.lock
+  - Gruntfile.js
+  - package.json
+  - npm-debug.log
+  - LICENSE
+  - README.md
+  - nohup.out
+  - serve.bat
+  - vendor
