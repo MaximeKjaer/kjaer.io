@@ -257,15 +257,17 @@ h1 > a:hover, h2 > a:hover, h3 > a:hover, h4 > a:hover, h5 > a:hover, h6 > a:hov
 
 
 footer {
-    margin-top: 5em;
-    color: $dark-grey;
+    margin: 5em auto 0 auto;
     text-align: center;
+    max-width: 750px;
+    color: $dark-grey;
     font-size: $medium;
     
     nav {
         margin: 1em 0;
     }
     ul {
+        padding: 0;
         list-style: none;
     }
     li {
