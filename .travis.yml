@@ -4,6 +4,7 @@ rvm:
 script:
   - bundle exec jekyll build
   - bundle exec htmlproof ./_site --only-4xx --check-html --check-favicon
+  - bundle exec htmlproof ./_site --ext .xml --only-4xx # a test for feed.xml
 env:
   global:
     - NOKOGIRI_USE_SYSTEM_LIBRARIES=true # speeds up installation of html-proofer
