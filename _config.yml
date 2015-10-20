@@ -8,6 +8,11 @@ hero_image: /images/trees.jpg
 # Flags below are optional
 #
 
+author:
+  name: Maxime Kjaer
+  email: maxime.kjaer@gmail.com
+  uri: http://kjaermaxi.me
+
 # Your disqus shortname, entering this will enable commenting on posts
 disqus: kjaermaxime
 
