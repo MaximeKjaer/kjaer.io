@@ -7,7 +7,7 @@ layout: null
 {% else %}
   {% assign url_base = site.github.url %}
 {% endif %}
-<feed xmlns="http://www.w3.org/2005/Atom">
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:webfeeds="http://webfeeds.org/rss/1.0">
   <generator uri="http://jekyllrb.com" version="{{ jekyll.version }}">Jekyll</generator>
   <link href="{{ page.url | prepend: url_base }}" rel="self" type="application/atom+xml" />
   <link href="{{ url_base }}/" rel="alternate" type="text/html" />
@@ -37,6 +37,11 @@ layout: null
       {% endif %}
     </author>
   {% endif %}
+  
+  {% if site.google_analytics%}
+    <webfeeds:analytics id="{{ site.google_analytics }}" engine="GoogleAnalytics"/>
+  {% endif %}
+  <webfeeds:cover image="{{ url_base | xml_escape }}{{ site.hero_image }}" />
 
   {% for post in site.posts limit: 15 %}
     <entry>
