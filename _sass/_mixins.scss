@@ -69,3 +69,48 @@
 			@content;
 	}
 }
+
+@mixin flex {
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+}
+
+@mixin justify-content($position) {
+	-webkit-justify-content: $position;
+	-ms-flex-pack: $position;
+	justify-content: $position;
+}
+
+@mixin align-items($position) {
+	-webkit-align-items: $position;
+	-webkit-box-align: $position;
+	-ms-flex-align: $position;
+	align-items: $position;
+}
+
+@mixin flex-direction($direction) {
+	@if $direction == column or $direction == column-reverse {
+		-webkit-box-orient: vertical;
+	}
+	@else {
+		-webkit-box-orient: horizontal;
+	}
+	@if $direction == row-reverse or $direction == column-reverse {
+		-webkit-box-direction: reverse;
+	}
+	@else {
+		-webkit-box-direction: normal;
+	}
+	-webkit-flex-direction: $direction;
+		-ms-flex-direction: $direction;
+			flex-direction: $direction;
+}
+
+@mixin flex-grow($number) {
+	-ms-flex-positive: $number;
+	-webkit-flex-grow: $number;
+	 -webkit-box-flex: $number;
+			flex-grow: $number;
+}
