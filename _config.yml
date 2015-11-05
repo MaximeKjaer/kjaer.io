@@ -40,6 +40,10 @@ sass:
   # style: :expanded # It's either :compressed or :expanded.
   style: :compressed
 
+# Use the following gems when building the site
+gems:
+  - jekyll-sitemap
+
 # Exclude these files from your production _site
 exclude:
   - Gemfile
