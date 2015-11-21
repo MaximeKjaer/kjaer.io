@@ -10,7 +10,9 @@ My personal page - built using [Jekyll](http://jekyllrb.com/) & elbow grease.
     layout: post
     title: A sample post
     image: splash-image.jpg
-    published: true #false if not published
+    description: This is a sample post showing how everything that you can do with this Jekyll site.
+    published: false # Defaults to true.
+    comments: false # Defaults to true.
     ---
 
     Using the YAML Front Matter (everything above this sentence) is mandatory. Filling out the post and title fields is more than highly recommended.
@@ -38,10 +40,9 @@ My personal page - built using [Jekyll](http://jekyllrb.com/) & elbow grease.
     
     ## Quotes
     
-    > "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras in consectetur augue. Sed quis efficitur mauris. Suspendisse potenti. Duis maximus consequat leo, eget placerat eros venenatis id. Cras a sem turpis. Quisque porta sollicitudin magna, mattis luctus risus pulvinar malesuada. Fusce posuere mattis convallis. Aliquam sit amet dictum metus, quis accumsan libero."  
+    > Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras in consectetur augue. Sed quis efficitur mauris. Suspendisse potenti. Duis maximus consequat leo, eget placerat eros venenatis id. Cras a sem turpis. Quisque porta sollicitudin magna, mattis luctus risus pulvinar malesuada. Fusce posuere mattis convallis. Aliquam sit amet dictum metus, quis accumsan libero.
 
     ## Images
     
     ![Image title](http://link-to-image.com/image.jpeg)
-    
-    ![Image title](/images/local-image.jpeg) // This is better, by the way.
+    ![Image title](/images/local-image.jpeg)
