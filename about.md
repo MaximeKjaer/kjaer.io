@@ -2,6 +2,7 @@
 layout: post
 title: About
 permalink: /about/
+comments: false
 ---
 
 Hello! My name is Maxime Kjaer, and I'm an 19-year-old Computer Science student. Originally from Copenhagen, Denmark, I'm now living in Switzerland and studying at the EPFL, the Swiss Federal Institute of Technology in Lausanne.
