@@ -109,6 +109,7 @@ a {
     z-index: 1;
     position: relative;
     box-sizing: border-box;
+    display: block;
     
     &:after {
         z-index: -1;
