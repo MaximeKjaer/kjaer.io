@@ -238,8 +238,10 @@ h4 {
     font-size: $medium;
 }
 
-article a:hover, footer nav a:hover {
-    border-bottom: 1px solid;
+article, footer nav {
+    & a:hover {
+        border-bottom: 1px solid;
+    }
 }
 
 article header a:hover {
@@ -247,8 +249,10 @@ article header a:hover {
     border-bottom: 0;
 }
 
-h1 > a:hover, h2 > a:hover, h3 > a:hover, h4 > a:hover, h5 > a:hover, h6 > a:hover {
-    border-bottom: 3px solid;
+h1, h2, h3, h4, h5, h6 {
+    & > a:hover {
+        border-bottom: 3px solid;
+    }
 }
 
 
@@ -269,7 +273,6 @@ footer {
     li {
         display: inline-block;
         margin: 0 1em;
-        
     }
 }
 
