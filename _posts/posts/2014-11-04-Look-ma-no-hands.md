@@ -1,6 +1,8 @@
 ---
 layout: post
 title: Look, ma, no hands!
+image: bicycle.jpg
+fallback-color: "#7c7166"
 ---
 
 Baby steps.
