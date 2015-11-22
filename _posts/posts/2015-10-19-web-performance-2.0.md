@@ -2,6 +2,7 @@
 layout: post
 title: Web Performance 2.0 
 image: train.jpg
+fallback-color: "#d1c8c8"
 ---
 
 The web is changing. We've been calling it [Web 1.0](https://en.wikipedia.org/wiki/Web_2.0#.22Web_1.0.22), then [2.0](https://en.wikipedia.org/wiki/Web_2.0), [3.0](https://en.wikipedia.org/wiki/Semantic_Web#Web_3.0), [4.0](http://bigthink.com/big-think-tv/web-40-the-ultra-intelligent-electronic-agent-is-coming), [5.0](https://flatworldbusiness.wordpress.com/flat-education/previously/web-1-0-vs-web-2-0-vs-web-3-0-a-bird-eye-on-the-definition/)... Yet to this day, no one really knows what any of the above is supposed to mean! That's because arbitrarily assigning version numbers to the web is sensationalism at best. It's based on absolutely nothing. And yet, I'm going to talk about something that I actually believe in: Web Performance 2.0.

@@ -2,6 +2,7 @@
 layout: post
 title: A glimpse of future interaction paradigms
 image: pebble.jpg
+fallback-color: "#625b61"
 ---
 
 

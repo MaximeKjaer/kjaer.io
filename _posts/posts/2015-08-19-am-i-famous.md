@@ -2,6 +2,7 @@
 layout: post
 title: Am I famous now?
 image: dogecar.jpg
+fallback-color: "#6e644e"
 ---
 
 I woke up to some amusing news this morning: some code that I have written was [featured on Upvoted](https://soundcloud.com/upvoted/014-to-the-moon#t=36:14), reddit's official podcast!

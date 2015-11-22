@@ -2,6 +2,7 @@
 layout: post
 title: On a recent quote by the Secretary of the DHS
 image: rsa.jpg
+fallback-color: "#0f45b7"
 ---
 
 I happened to stumble across a quote the by Jeh Johnson, Secretery of Homeland Security, that was almost uncannily related to something that I had read the very same day.

@@ -10,6 +10,7 @@ My personal page - built using [Jekyll](http://jekyllrb.com/) & elbow grease.
     layout: post
     title: A sample post
     image: splash-image.jpg
+    fallback-color: "#0f45b7"
     description: This is a sample post showing how everything that you can do with this Jekyll site.
     published: false # Defaults to true.
     comments: false # Defaults to true.

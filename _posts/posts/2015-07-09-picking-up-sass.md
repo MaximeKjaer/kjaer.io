@@ -2,6 +2,7 @@
 layout: post
 title: Picking up Sass
 image: artist.jpg
+fallback-color: "#c6c5b8"
 ---
 
 I've long been resistant to [Sass](http://sass-lang.com/). To me, it seemed like a complicated and superfluous layer of abstraction that would get in the way of how I usually write my CSS, and perhaps even create bloated, inefficient code &mdash; boy, was I wrong.

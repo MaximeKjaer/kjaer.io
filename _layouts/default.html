@@ -4,7 +4,7 @@
     {% include head.html %}
 </head>
 <body>
-    <header class="hero" style="background-image: url('{% if page.image %}/images/{{ page.image }}{% else %}{{ site.hero_image }}{% endif %}');">
+    <header class="hero" style="{% if page.image %}{% if page.fallback-color %}background-color: {{ page.fallback-color }};{% endif %}background-image: url('/images/{{ page.image }}');{% else %}background-color: #d3dbe7;background-image: url('{{ site.hero_image }}');{% endif %}">
         
 
         <nav class="top-right">
