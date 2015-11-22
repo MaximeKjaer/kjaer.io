@@ -1,6 +1,7 @@
 ---
 layout: post
 title: On a recent quote by the Secretary of the DHS
+description: A recent quote by the secretary of the DHS corresponds perfectly to a quote from the almost dystopian book "Digital Fortress". Coincidence? Yes, 100%. Still, it's pretty amusing.
 image: rsa.jpg
 fallback-color: "#0f45b7"
 ---

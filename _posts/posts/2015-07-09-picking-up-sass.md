@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Picking up Sass
+description: I've been writing CSS the old-school way for a long time. But I've finally caved in to using Sass. Here's how it has changed the way I write CSS for the better.
 image: artist.jpg
 fallback-color: "#c6c5b8"
 ---

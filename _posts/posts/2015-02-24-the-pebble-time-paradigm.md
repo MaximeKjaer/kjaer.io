@@ -1,6 +1,7 @@
 ---
 layout: post
 title: A glimpse of future interaction paradigms
+description: Pebble is launching a new smartwatch. All right, not so interesting, you'll say. But what is interesting is what this could mean for the future of interacion paradigms.
 image: pebble.jpg
 fallback-color: "#625b61"
 ---

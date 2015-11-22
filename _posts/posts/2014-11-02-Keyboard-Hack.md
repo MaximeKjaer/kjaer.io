@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Reverse-Engineering a keyboard
-description: Mapping a keyboard's PCB
+description: How I mapped a keyboard's PCB in order to hack it into a joystick controller.
 image: keyboard.jpg
 fallback-color: "#d4c4be"
 ---

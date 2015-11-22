@@ -1,12 +1,12 @@
 ---
 layout: post
 title: Setting up GitHub Pages with Jekyll
-description: This is my first post
+description: This is my very first post, in which I show how easy it is to get a first version of a blog up with Github Pages and Jekyll Now.
 image: desk.jpg
 fallback-color: "#e8e2e3"
 ---
 
-I've just set up my Jekyll blog using Github Pages! First thoughts? "Huh, well this was easy." Full instructions are [here](https://github.com/barryclark/jekyll-now), but in a nutshell, here's how it goes:
+I've just set up my Jekyll blog using Github Pages! First thoughts? "Huh, well that was easy." Full instructions are [here](https://github.com/barryclark/jekyll-now), but in a nutshell, here's how it goes:
 
 ## 1. Fork a preset Jekyll repo
 
