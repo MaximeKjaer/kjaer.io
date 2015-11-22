@@ -11,6 +11,7 @@ I thought that I'd compile a list of some of the best articles that I've read he
 ## Technology
 
 ### Web
+- [Why Static Website Generators Are The Next Big Thing](http://www.smashingmagazine.com/2015/11/modern-static-website-generators-next-big-thing/) &ndash; Mathias Biilmann Christensen, November 2, 2015
 - [1,000,000 Websites](http://jacquesmattheij.com/one-million-websites) &ndash; Jacques Mattheij, July 24, 2015
 - [What one may find in robots.txt](http://xn--thibaud-dya.fr/robots.txt.html) &ndash; Thiébaud Weksteen, May 17, 2014
 - [The State of JavaScript in 2015](http://www.breck-mckye.com/blog/2014/12/the-state-of-javascript-in-2015/) &ndash; Jimmy Breck McKye, December 01, 2014
