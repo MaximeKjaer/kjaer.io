@@ -1,7 +1,6 @@
 ---
 layout: default
 ---
-
 <article>
     {% if page.title %}
     <header>
@@ -10,8 +9,9 @@ layout: default
     </header>
     {% endif %}
     
-    {{ content }}    
-
+    {{ content }}
+    
+	<a href="/" id="back">&laquo; Back </a>
 </article>
 
 {% if page.comments == false %}{% else %}
