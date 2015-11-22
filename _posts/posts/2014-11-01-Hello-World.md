@@ -2,6 +2,8 @@
 layout: post
 title: Setting up GitHub Pages with Jekyll
 description: This is my first post
+image: desk.jpg
+fallback-color: "#e8e2e3"
 ---
 
 I've just set up my Jekyll blog using Github Pages! First thoughts? "Huh, well this was easy." Full instructions are [here](https://github.com/barryclark/jekyll-now), but in a nutshell, here's how it goes:
