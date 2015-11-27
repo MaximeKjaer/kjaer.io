@@ -12,11 +12,10 @@
 $background-color: #f4f4f4;
 
 // Background Image
-// Comment the following lines out if you don't want a background image.
+// Set the following lines to false if you don't want a background image.
 $background-image: url('/images/white_wall_hash.png');
 $background-image-2x: url('/images/white_wall_hash_@2X.png');
 $background-2x-size: 500px 500px;
-
 
 @mixin background { // A mixin that sets the background to what's been specified above.
 	@if $background-color {
