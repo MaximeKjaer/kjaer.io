@@ -1,0 +1,167 @@
+//---------------------------
+//
+// ## Typography styles
+// Styling of a post's typography
+//
+//---------------------------
+
+.post {
+	// Header
+	header {
+		.date {
+			margin-top: 0;
+			-webkit-margin-before: 0;
+			
+			font-family: $title-font;
+			font-weight: $title-weight;
+			text-transform: uppercase;
+		}
+		
+		a:hover {
+			border-bottom: 0; // This fixes a weird IE bug that added like 50px because 1 px border-bottom was added.
+		}
+	}
+	
+	// Titles
+	h1, h2, h3, h4, h5, h6 {
+		&, header {
+			margin-bottom: 0;
+			-webkit-margin-after: 0;
+
+			font-family: $title-font;
+			font-weight: $title-weight;
+		}
+		
+		& > a:hover {
+			border-bottom: 3px solid;
+		}
+	}
+	
+	h1, h2, h3 {
+		& + p {
+			margin-top: 0.5em;
+			-webkit-margin-before: 0.5em;
+		}
+	}
+	
+	h1 {
+		font-size: $xx-large;
+	}
+	
+	h2 {
+		font-size: $x-large;
+	}
+	
+	h3 {
+		font-size: $large;
+	}
+	
+	h4, h5, h6 { // Inline with the text
+		display: inline;
+		padding-right: 0.5rem;
+		margin-top: 1em;
+		-webkit-margin-before: 1em;
+		
+		& + p {
+			display: inline;
+			vertical-align: top;
+			
+			&:after {
+				display: block;
+				margin-bottom: 1em;
+				-webkit-margin-after: 1em;
+				content: '';
+			}
+		}
+
+	}
+	
+	h4 {
+		font-size: $medium;
+		text-transform: uppercase;
+	}
+	
+	h5 {
+		font-size: $medium;
+		font-style: italic;
+		text-transform: uppercase;
+	}
+	
+	h6 {
+		font-size: $medium;
+		font-weight: $title-weight-light;
+		font-style: italic;
+	}
+	
+	// Text
+	p, li, dl, h4, h5, h6 {
+		line-height: $large-line-height;
+		
+		@include media($medium-screen) {
+			line-height: $medium-line-height;
+		}
+
+		@include media($small-screen) {
+			line-height: $small-line-height;
+		}
+	}
+	
+	// Inline code
+	p, li, dl, h1, h2, h3, h4, h5, h6 {
+		code {
+			padding: 1px 2px;
+			border: 1px solid $light-grey;
+			border-radius: 4px;
+			
+			color: darken($dark-grey, 30%);
+		}
+	}
+	
+	// Various other elements
+	hr {
+		border-top: 0;
+		border-bottom: 1px solid $light-grey;
+		width: 20%;
+	}
+	
+	img {
+		display: block;
+		margin: 1em auto;
+		max-width: 100%;
+	}
+	
+	blockquote {
+		border-left: 3px solid $light-grey;
+		margin: 20px 0px;
+		padding: 0 15px;
+		
+		color: $dark-grey;
+		font-style: italic;
+	}
+	
+	sup {
+		font-size: $small;
+	}
+	
+	table {
+		border-collapse: collapse;
+		
+		&, td, th {
+			border: 1px solid $black;
+		}
+		
+		td, th {
+			padding: 0.5rem;
+		}
+		
+		tr:hover {
+			background-color: $light-grey;
+		}
+	}
+}
+
+article, .post, footer nav { // applies to the footer too, now that we're at it!
+	a:hover {
+		border-bottom: 1px solid;
+	}
+}

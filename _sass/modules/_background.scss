@@ -1,0 +1,34 @@
+//---------------------------
+//
+// ## Background Image and/or Color
+// 
+// Dependencies:
+//   - _responsive.scss
+//
+//---------------------------
+
+// Background Color
+// Acts as a fallback to the background image, if it has been set.
+$background-color: #f4f4f4;
+
+// Background Image
+// Comment the following lines out if you don't want a background image.
+$background-image: url('/images/white_wall_hash.png');
+$background-image-2x: url('/images/white_wall_hash_@2X.png');
+$background-2x-size: 500px 500px;
+
+
+@mixin background { // A mixin that sets the background to what's been specified above.
+	@if $background-color {
+		background-color: $background-color;
+	}
+	@if $background-image {
+		background-image: $background-image;
+	}
+	@if $background-image-2x {
+		@include retina {
+			background-image: $background-image-2x;
+			background-size: $background-2x-size;
+		}
+	}
+}

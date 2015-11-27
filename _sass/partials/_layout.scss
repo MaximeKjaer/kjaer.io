@@ -1,0 +1,49 @@
+//---------------------------
+//
+// ## Layout styles
+// Lay out the general building blocks of our page.
+//
+//---------------------------
+
+main {
+	display: block; // Because IE doesn't support main.
+}
+
+.content {
+	position: relative;
+	box-sizing: border-box;
+	z-index: 1;
+	padding-top: 0;
+
+	&:after {
+		@include background;
+		@include skewY(-2deg);
+		@include transform-origin(bottom left);
+
+		display: block;
+		position: absolute;
+		top: -4em;
+		left: 0;
+		z-index: -1;
+		width: 100%;
+		height: 15em;
+		content: '';
+	}
+}
+
+.container {
+	margin: 0 auto;
+	padding: 0 2rem 5rem 2rem;
+	max-width: 750px;
+	display: block;
+}
+
+article {
+	padding-bottom: 34px;
+
+	font-size: $medium; // set a default value.
+	
+	&:not(:last-child) {
+		border-bottom: 1px solid $light-grey;
+	}
+}

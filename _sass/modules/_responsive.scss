@@ -1,0 +1,31 @@
+//---------------------------
+//
+// ## Responsive Web Design
+// This file contains variables, mixins and shorthands needed to create a responsive site.
+//
+//---------------------------
+
+// Media query screen sizes
+$small-screen: 500px;
+$medium-screen: 800px;
+$large-screen: 1200px;
+
+// Media queries
+@mixin media($max-width) {
+	@media only screen and (max-width: $max-width) {
+		@content;
+	}
+}
+
+// Mixin for retina screens
+@mixin retina { //from http://stackoverflow.com/a/16154726
+	@media
+		only screen and (-webkit-min-device-pixel-ratio: 2),
+		only screen and (min--moz-device-pixel-ratio: 2),
+		only screen and (-o-min-device-pixel-ratio: 2/1),
+		only screen and (min-device-pixel-ratio: 2),
+		only screen and (min-resolution: 192dpi),
+		only screen and (min-resolution: 2dppx) {
+			@content;
+	}
+}

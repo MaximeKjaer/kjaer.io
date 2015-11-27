@@ -1,8 +1,16 @@
 ---
 ---
+//---------------------------
+//
+// # Error Style
+// This style applies to the error pages (404 etc.)
+//
+// I haven't included the following Sass the partials folder, since I didn't really want it
+// to be importable by any other styles.
+//
+//---------------------------
 
-@import "_variables",
-        "_mixins";
+@import 'modules/_all';
 
 html, body {
 	width: 100%;
@@ -15,13 +23,20 @@ body {
 	@include align-items(center);
 }
 
-h1 {
-    font-size: 22rem;
-    text-align: center;
-    margin: 0;
-}
-    
-hr {
-    border: 2px solid $red !important;
-    margin: 2rem auto 6rem auto;
+.post {
+	h1 {
+		font-size: 22rem;
+		line-height: 22rem;
+		text-align: center;
+		margin: 0;
+	}
+		
+	hr {
+		border: 3px solid $red;
+		margin: 6rem auto;
+	}
+
+	p {
+		line-height: $medium; // Exact same height as text
+	}
 }

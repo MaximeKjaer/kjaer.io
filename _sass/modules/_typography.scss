@@ -1,0 +1,30 @@
+//---------------------------
+//
+// ## Typography variables
+// Font sizes are based on  a 1em base and 3:4 ratio
+// http://www.modularscale.com/?1&em&1.333&web&text
+//
+//---------------------------
+
+// Title typography
+$title-font: 'Oswald', sans-serif;
+$title-weight: 700;
+$title-weight-light: 300;
+
+// Body typography
+$body-font: 'Lora', serif;
+$body-weight: 400;
+
+// Line heights
+$small-line-height: 1.4;
+$medium-line-height: 1.5;
+$large-line-height: 1.6;
+
+// Font sizes
+$x-small: 0.9rem;
+$small: 1.2rem;
+$medium: 1.6rem;
+$large: 2.132rem;
+$x-large: 2.842rem;
+$xx-large: 3.788rem;
+$huge: 8.972rem;

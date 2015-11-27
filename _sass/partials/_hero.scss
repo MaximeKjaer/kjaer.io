@@ -1,0 +1,77 @@
+//---------------------------
+//
+// ## Hero banner styles
+// For the "hero banner", where the name of the blog and an image are being displayed.
+//
+//---------------------------
+
+.hero {
+	position: relative;
+	
+	height: 560px;
+	height: 55vh; // Override for devices that support it.
+	min-height: 30em;
+	width: 100%;
+	margin: 0;
+	padding-bottom: 4em;
+	
+	background-position: 0 50%;
+	background-size: cover;
+	
+	text-align: center;
+	text-shadow: 0 0 5px rgba($black, 0.8);
+	color: $white;
+	
+	.title {
+		@include translateY(-50%);
+
+		position: relative;
+		top: 50%;
+		
+		font-family: $title-font;
+	}
+	
+	.title, h1, p {
+		margin: 0;
+	}
+	
+	h1 {
+		font-size: $huge;
+	}
+	
+	p {
+		font-size: $xx-large;
+
+		@include media($small-screen) {
+			font-size: $x-large;
+		}
+	}
+}
+
+.top-right {
+	position: absolute;
+	top: 30px;
+	right: 10px;
+	
+	font-family: $title-font;
+	font-weight: $title-weight-light;
+	
+	a {
+		@include opacity(1);
+		@include transition(opacity, $transition-time);
+		
+		position: relative;
+		padding: 0.5em 1em;
+		margin: 1em;
+		border: 1px solid $white;
+		
+		text-decoration: none;
+		font-size: $large;
+		
+		color: $white;
+		
+		&:hover {
+			@include opacity(0.7);
+		}
+	}
+}

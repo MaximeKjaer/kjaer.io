@@ -1,0 +1,44 @@
+//---------------------------
+//
+// ## Base styles
+// For global styles, that apply to the whole document.
+//
+//---------------------------
+
+html, :root {
+	font-size: 69%;
+
+	@include media($medium-screen) {
+		font-size: 66%;
+	}
+	
+	@include media($small-screen) {
+		font-size: 63%;
+	}
+}
+
+html, body, :root {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	@include background;
+	
+	font-family: $body-font;
+	font-weight: $body-weight;
+	font-size: $medium;
+
+	color: $black;
+}
+
+@include selection {
+	color: $white;
+	background-color: $red;
+}
+
+a {
+	text-decoration: none;
+	
+	color: $red;
+}

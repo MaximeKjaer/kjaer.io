@@ -1,0 +1,20 @@
+//---------------------------
+//
+// ## Selection Mixins
+// As soon as I'll have Autoprefixer set up, I'll delete this.
+//
+//---------------------------
+
+@mixin user-select($property) {
+	-webkit-touch-callout: $property;
+	  -webkit-user-select: $property;
+	   -khtml-user-select: $property;
+		 -moz-user-select: $property;
+		  -ms-user-select: $property;
+			  user-select: $property;
+}
+
+@mixin selection {
+	::-moz-selection { @content; } // Mozilla specific
+	::selection { @content; } // Other major browsers
+}

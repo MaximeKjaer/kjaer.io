@@ -1,0 +1,28 @@
+//---------------------------
+//
+// ## Footer styles
+//
+//---------------------------
+
+footer {
+	text-align: center;
+	
+	color: $dark-grey;
+	
+	nav {
+		padding: 1em 0 0 0;
+	}
+	
+	ul {
+		padding: 0;
+
+		list-style: none;
+	}
+
+	li {
+		display: inline-block;
+		margin: 0 1em;
+	}
+}
+
+// See partials/_typography.scss for an additional footer style
