@@ -28,6 +28,10 @@ main {
 		width: 100%;
 		height: 15em;
 		content: '';
+
+		@include media($small-screen) {
+			@include skewY(-4deg);
+		}
 	}
 }
 
