@@ -7,3 +7,4 @@ node_modules
 package.json
 *.bat
 Gemfile.lock
+.jekyll-metadata
