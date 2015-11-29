@@ -5,26 +5,21 @@
 //
 //---------------------------
 
-.code, .gutter {
-	&, pre {
-		margin: 0;
-		padding: 0;
-	}
-}
-
 .lineno {
 	display: inline-block;
-	
 	padding: 5px;
 	margin-right: 5px;
 	
-	color: #ccc;
-	border-right: 1px solid #ccc;
-	
+	color: #ccc;	
+}
+
+.gutter {
 	@include user-select(none);
 	@include selection {
 		background-color: transparent;
 	}
+
+	cursor: default;
 }
 
 .highlight {
@@ -33,20 +28,29 @@
 	
 	background-color: $white;
 	border: 1px solid $light-grey;
+	
+	pre, code {
+		margin: 0;
+		padding: 0;
+	}
 
-	pre code {
+	> pre > code {
 		display: block;
-
-		margin: 4px;
-
 		white-space: pre;
 		overflow-x: auto;
 		word-wrap: normal;
+		
+		.code {
+			border-left: 1px solid #ccc;
+			width: 100%;
+		}
+		
+		table, tr, td, th {
+			border: 0;
+			background-color: $white;
+		}
 	}
 	
-	table, td, th {
-		border: 0;
-	}
 
 	// Syntax highlighting!
 	.c {
