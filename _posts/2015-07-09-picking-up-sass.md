@@ -26,7 +26,7 @@ But there's more to it than that obvious feature. Just the addition of variables
 ##Mixins for readable and compatible code
 I haven't really explored the world of mixin libraries just yet, but I've already seen their potential just from the ones I've written. Apart from drastically reducing the typing in some places, mixins make the code more readable. Assuming that the mixins and variables are predefined, I think this example will speak for itself; say we want to provide an image in a higher resolution for retina screens. The CSS might look like this:
 
-{% highlight css %}
+{% highlight css linenos %}
 body {
     background-image: url('/images/example.png');
 }
@@ -45,7 +45,7 @@ body {
 
 Meanwhile, the SCSS is just this:
 
-{% highlight scss %}
+{% highlight scss linenos %}
 body {
     background-image: $background;
     @include retina {
@@ -54,6 +54,7 @@ body {
     }
 }
 {% endhighlight %}
+
 It's much better!
 
 The second way that mixins have proven themselves to be particularly useful is with all the damned vendor prefixes. Using mixins, it's possible to refer to them all using a single line of code. See, this is the kind of abstraction that I was hoping for!
@@ -68,7 +69,7 @@ The cool thing about Sass is that it's "just" a preprocessor, meaning that it do
 
 My single gripe is that Sass doesn't group media queries. I really like the way that Dan Cederholm writes his responsive declarations in his book: he uses a mixin that allows him to write declarations like these:
 
-{% highlight scss %}
+{% highlight scss linenos %}
 p {
     line-height: 1.5;
     @include responsive(medium-screens) {
@@ -92,7 +93,7 @@ article {
 
 Sadly, this compiles to the following code:
 
-{% highlight scss %}
+{% highlight scss linenos %}
 p {
   line-height: 1.5;
 }
@@ -131,7 +132,7 @@ Why Sass won't group the media queries is beyond me. Even though it may not have
 ##Integrating it into a Jekyll workflow
 As I mentioned earlier on, I like working with Jekyll. Luckily for me, Sass and Jekyll play very well together, since Jekyll comes with built-in Sass support. There's not much to configure; here are the options that we can add to the `_config.yml` file:
 
-{% highlight yml %}
+{% highlight yml linenos %}
 sass:
     style: :compressed # Either :compressed or :expanded.
     sass_dir: _sass # This is the default value

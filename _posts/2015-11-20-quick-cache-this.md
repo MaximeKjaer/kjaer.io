@@ -89,14 +89,14 @@ Phew, the hard part is over! Now, let's kick back and see how we can get Nginx t
 
 First, let's make sure that we at least have Nginx 1.7.3. Before this version, we couldn't have ETags on gzip compressed content. This is some pretty important functionality, so let's just check:
 
-{% highlight bash %}
+{% highlight bash linenos %}
 $ nginx -v
 nginx version: nginx/1.8.0
 {% endhighlight %}
 
 If you don't have the necessary version, you can just quickly update:
 
-{% highlight sh %}
+{% highlight sh linenos %}
 $ sudo add-apt-repository ppa:nginx/stable
 $ sudo apt-get update
 $ sudo apt-get install nginx
@@ -106,7 +106,7 @@ Now we'll get into the thick of it. You'll have to modify your `server` block in
 
 To set a `max-age`, we use the `expires` [keyword](http://nginx.org/en/docs/http/ngx_http_headers_module.html). This adds both a `Cache-Control` and an `Expires` header, which is a bit redundant, but oh well. We're not setting `Cache-Control: public`, since it's implicit with `Cache-Control: max-age=XXX`. Otherwise, there's not much left for us to do, since Nginx is nice enough to enable `ETag` and `Last-Modified` by default. The server block of our configuration files ends up looking like this:
 
-{% highlight nginx %}
+{% highlight nginx linenos %}
 server {
     # HTML and XML
     location ~* \.(?:html|xml)$ {
@@ -130,7 +130,7 @@ server {
 
 To apply our changes, don't forget to run:
 
-{% highlight sh %}
+{% highlight sh linenos %}
 $ nginx -s reload
 {% endhighlight %}
 
