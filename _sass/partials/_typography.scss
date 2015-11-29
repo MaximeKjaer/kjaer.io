@@ -23,15 +23,16 @@
 	}
 	
 	// Titles
-	h1, h2, h3, h4, h5, h6 {
-		&, header {
-			margin-bottom: 0;
-			-webkit-margin-after: 0;
-
-			font-family: $title-font;
-			font-weight: $title-weight;
-		}
+	header, h1, h2, h3, h4, h5, h6 {
+		margin-bottom: 0;
+		-webkit-margin-after: 0;
 		
+		font-family: $title-font;
+		font-weight: $title-weight;
+		}
+	}
+
+	h1, h2, h3, h4, h5, h6 {
 		& > a:hover {
 			border-bottom: 3px solid;
 		}
