@@ -8,9 +8,9 @@ fallback-color: "#d4c4be"
 
 For the last few weeks, I’ve been working on building a [MAME](http://mamedev.org/) arcade machine from an old computer. The software part is done (I’ll cover that in another post), and I have started to prepare the hardware. To save some money, I decided not to buy the [I-PAC](http://www.ultimarc.com/ipac1.html). Instead, hacking a keyboard seemed cheaper, and I just happened to have a lot of old, unused keyboards at hand. I thought that I’d just connect some wires from the keyboard to a button; when the button is pressed, it would emulate a keystroke. The only problem was that it would take up too much space, and it wouldn’t be practical. The connections wouldn’t be optimal, the keyboard might fall… All in all, a better approach was possible, and much needed.
 
-<!-- More -->
-
 If you open up a keyboard, you’ll often find a small PCB connected to a USB cable (sometimes to some LEDs too), a rubber sheet with dots on it, and to three plastic sheets:
+
+<!-- More -->
 
 - The rubber sheet is filled with small rubber buttons; when you press a key, it pushes one of these little rubber buttons down.
 - The top sheet is a printed circuit with dots, each dot corresponding to one key.
@@ -25,13 +25,13 @@ I threw the middle sheet out; I didn’t need it.
 
 I started out by scanning my two sheets. They were a bit longer than a piece of A4 paper, and my Canon MP640 couldn’t scan a complete sheet. I ended up scanning each plastic sheet twice. This is what the scans of the bottom sheet looked like:
 
-[![A scan of the left side of the plastic sheet]({{ site.baseurl }}/images/Keyboard-Hack/min/min_a1.png)]({{ site.baseurl }}/images/Keyboard-Hack/max/a1.jpg)
+![A scan of the left side of the plastic sheet]({{ site.baseurl }}/images/Keyboard-Hack/min/min_a1.png)
 
-[![A scan of the right side of the plastic sheet]({{ site.baseurl }}/images/Keyboard-Hack/min/min_a2.png)]({{ site.baseurl }}/images/Keyboard-Hack/max/a2.jpg)
+![A scan of the right side of the plastic sheet]({{ site.baseurl }}/images/Keyboard-Hack/min/min_a2.png)
 
 To stitch them together, I used [Microsoft ICE](http://research.microsoft.com/en-us/um/redmond/groups/ivm/ice/): it’s a great piece of software from the Microsoft Research team. It stitches multiple photos into one big panorama, and does so perfectly: forget the  skewed, distorted panoramas that you may have taken with your phone, this software almost never makes mistakes.
 
-[![A scan of the complete plastic sheet]({{ site.baseurl }}/images/Keyboard-Hack/min/min_stitch0001.png)]({{ site.baseurl }}/images/Keyboard-Hack/max/stitch0001.jpg)
+![A scan of the complete plastic sheet]({{ site.baseurl }}/images/Keyboard-Hack/min/min_stitch0001.png)
 
 So I had my two huge scans (they were about 12MB each). I may have asked for a too good quality, as a tenth of the resolution I had would have been sufficient. If your scanner lets you choose the resolution of your scan, 200-300 dpi should be more than enough – I had asked for 600.
 
@@ -39,9 +39,9 @@ I edited the stitched scans with [GIMP](http://www.gimp.org/). The first thought
 
 This are the results I got:
 
-[![Colored plastic sheet (layer 1)]({{ site.baseurl }}/images/Keyboard-Hack/min/min_keyboard_stitch.png)]({{ site.baseurl }}/images/Keyboard-Hack/max/keyboard_stitch.jpg)
+![Colored plastic sheet (layer 1)]({{ site.baseurl }}/images/Keyboard-Hack/min/min_keyboard_stitch.png)
 
-[![Colored plastic sheet (layer 2)]({{ site.baseurl }}/images/Keyboard-Hack/min/min_keyboard-a.png)]({{ site.baseurl }}/images/Keyboard-Hack/max/keyboard-a.jpg)
+![Colored plastic sheet (layer 2)]({{ site.baseurl }}/images/Keyboard-Hack/min/min_keyboard-a.png)
 
 
 Interestingly enough, some dots weren’t used at all: they didn’t correspond to any rubber button, or to any key on the keyboard! I guess that the manufacturer did this so that they would be able to use the same plastic sheets for different keyboard layouts.
