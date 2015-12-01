@@ -4,13 +4,23 @@
     {% include head.html %}
 </head>
 <body>
-    <header class="hero" style="{% if page.image %}{% if page.fallback-color %}background-color: {{ page.fallback-color }};{% endif %}background-image: url('/images/{{ page.image }}');{% else %}background-color: #d3dbe7;background-image: url('{{ site.hero_image }}');{% endif %}">
+
+    {% if page.image %}
+        {% if page.fallback-color %}
+            {% assign background-color = page.fallback-color %}
+        {% endif %}
+            {% capture background-image %}/images/{{ page.image }}{% endcapture %}
+    {% else %}
+        {% assign background-color = '#d3dbe7' %}
+        {% assign background-image = site.hero_image %}
+    {% endif %}
+
+    <header class="hero" style="background-color: {{ background-color }}; background-image: url('{{ background-image }}');">
         
 
         <nav class="top-right">
             <a href="/about">ABOUT</a>
         </nav>
-
          
         <div class="title">
             <h1>OUTPUT</h1>

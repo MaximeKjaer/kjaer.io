@@ -1,10 +1,28 @@
+{% if page.title %}
+    {% assign title = page.title %}
+{% elsif site.title and site.subtitle %}
+    {% capture title %}{{ site.title }}&nbsp;&ndash;&nbsp;{{ site.subtitle }}{% endcapture %}
+{% elsif site.title %}
+    {% assign title = page.title %}
+{% else %}
+    {% assign title = 'My Jekyll Blog' %}
+{% endif %}
+
+{% if page.description %}
+    {% capture description %}{{ page.description | replace:'"', '&quot;' }}{% endcapture %}
+{% elsif site.description %}
+    {% capture description %}{{ site.description | replace:'"', '&quot;'}}{% endcapture %}
+{% else %}
+    {% assign description = 'Welcome to my blog!' %}
+{% endif %}
+
 <!-- Meta tags -->
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}&nbsp;&ndash;&nbsp;{{ site.subtitle}}{% endif %}</title>
+<title>{{ title }}</title>
 <meta name="author" content="{{ site.name }}">
-<meta name="description" content="{% if page.description %}{{ page.description | replace:'"', '&quot;' }}{% else %}{{ site.description | replace:'"', '&quot;'}}{% endif %}">
+<meta name="description" content="{{ description }}">
 <link rel="icon" href="/favicon.ico?v=1.0">
 
 <!-- CSS -->
@@ -16,15 +34,8 @@
     <meta property="og:site_name" content="{{ site.name }}">
 {% endif %}
 
-{% if site.description %}
-    <meta property="og:description" content="{{ site.description }}">
-{% endif %}
-
-{% if page.title %}
-    <meta property="og:title" content="{{ page.title }}">
-{% else %}
-    <meta property="og:title" content="{{ site.name }}&nbsp;&ndash;&nbsp;{{ site.description }}">
-{% endif %}
+<meta property="og:title" content="{{ title }}">
+<meta property="og:description" content="{{ description }}">
 
 {% if page.title %}
     <meta property="og:type" content="article">
