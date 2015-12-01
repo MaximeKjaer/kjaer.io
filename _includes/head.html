@@ -1,11 +1,16 @@
-{% if page.title %}
-    {% assign title = page.title %}
-{% elsif site.title and site.subtitle %}
-    {% capture title %}{{ site.title }}&nbsp;&ndash;&nbsp;{{ site.subtitle }}{% endcapture %}
+{% if site.title %}
+    {% capture site_name %}{{ site.title }}&nbsp;&ndash;&nbsp;{{ site.subtitle }}{% endcapture %}
 {% elsif site.title %}
-    {% assign title = page.title %}
+    {% assign site_name = site.title %}
 {% else %}
-    {% assign title = 'My Jekyll Blog' %}
+    {% assign site_name = 'My Jekyll Blog' %}
+{% endif %}
+
+
+{% if page.title %}
+    {% assign page_title = page.title %}
+{% elsif site.title and site.subtitle %}
+    {% assign page_title = site_name %}
 {% endif %}
 
 {% if page.description %}
@@ -20,7 +25,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{ title }}</title>
+<title>{{ page_title }}</title>
 <meta name="author" content="{{ site.name }}">
 <meta name="description" content="{{ description }}">
 <link rel="icon" href="/favicon.ico?v=1.0">
@@ -30,11 +35,11 @@
 <link rel="stylesheet" href="{{ site.baseurl }}/css/index.css">
 
 <!-- OpenGraph meta tags -->
-{% if site.name %}
-    <meta property="og:site_name" content="{{ site.name }}">
+{% if site_name %}
+    <meta property="og:site_name" content="{{ site_name }}">
 {% endif %}
 
-<meta property="og:title" content="{{ title }}">
+<meta property="og:title" content="{{ page_title }}">
 <meta property="og:description" content="{{ description }}">
 
 {% if page.title %}
@@ -71,6 +76,6 @@
 {% endif %}
 
 <!-- RSS -->
-<link rel="alternate" type="application/rss+xml" title="{{ site.name }} - {{ site.description }}" href="{{ site.baseurl }}/feed.xml">
+<link rel="alternate" type="application/rss+xml" title="{{ site_name }}" href="{{ site.baseurl }}/feed.xml">
 
 {% include analytics.html %}
