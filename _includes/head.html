@@ -14,9 +14,9 @@
 {% endif %}
 
 {% if page.description %}
-    {% capture description %}{{ page.description | replace:'"', '&quot;' }}{% endcapture %}
+    {% capture description %}{{ page.description }}{% endcapture %}
 {% elsif site.description %}
-    {% capture description %}{{ site.description | replace:'"', '&quot;'}}{% endcapture %}
+    {% capture description %}{{ site.description }}{% endcapture %}
 {% else %}
     {% assign description = 'Welcome to my blog!' %}
 {% endif %}
@@ -26,8 +26,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ page_title }}</title>
-<meta name="author" content="{{ site.name }}">
-<meta name="description" content="{{ description }}">
+<meta name="author" content="{{ site.name | xml_escape }}">
+<meta name="description" content="{{ description | xml_escape }}">
 <link rel="icon" href="/favicon.ico?v=1.0">
 
 <!-- CSS -->
@@ -36,11 +36,11 @@
 
 <!-- OpenGraph meta tags -->
 {% if site_name %}
-    <meta property="og:site_name" content="{{ site_name }}">
+    <meta property="og:site_name" content="{{ site_name | xml_escape }}">
 {% endif %}
 
-<meta property="og:title" content="{{ page_title }}">
-<meta property="og:description" content="{{ description }}">
+<meta property="og:title" content="{{ page_title | xml_escape }}">
+<meta property="og:description" content="{{ description | xml_escape }}">
 
 {% if page.title %}
     <meta property="og:type" content="article">
@@ -76,6 +76,6 @@
 {% endif %}
 
 <!-- RSS -->
-<link rel="alternate" type="application/rss+xml" title="{{ site_name }}" href="{{ site.baseurl }}/feed.xml">
+<link rel="alternate" type="application/rss+xml" title="{{ site_name | xml_escape }}" href="{{ site.baseurl }}/feed.xml">
 
 {% include analytics.html %}
