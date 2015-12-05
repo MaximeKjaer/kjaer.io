@@ -32,6 +32,7 @@
 	}
 
 	h1, h2, h3, h4, h5, h6 {
+		line-height: $title-line-height;
 		& > a:hover {
 			border-bottom: 3px solid;
 		}
