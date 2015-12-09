@@ -41,6 +41,7 @@
 	
 	p {
 		font-size: $xx-large;
+		font-weight: $title-weight;
 
 		@include media($small-screen) {
 			font-size: $x-large;
