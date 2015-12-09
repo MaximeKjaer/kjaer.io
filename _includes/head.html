@@ -1,4 +1,6 @@
-{% if site.title  and site.subtitle %}
+{% strip %}   
+
+{% if site.title and site.subtitle %}
     {% capture site_name %}{{ site.title }}&nbsp;&ndash;&nbsp;{{ site.subtitle }}{% endcapture %}
 {% elsif site.title %}
     {% assign site_name = site.title %}
@@ -87,3 +89,5 @@
 <link rel="alternate" type="application/rss+xml" title="{{ site_name | xml_escape }}" href="{{ site.baseurl }}/feed.xml">
 
 {% include analytics.html %}
+
+{% endstrip %}
