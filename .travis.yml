@@ -1,21 +1,28 @@
 language: ruby
 rvm:
 - 2.1
-script:
-- bundle exec jekyll build
-- bundle exec htmlproof ./_site --only-4xx --check-html --check-favicon
-- bundle exec htmlproof ./_site --ext .xml --only-4xx
 env:
   global:
   - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
   - secure: NnIMF9H9Iv/2XXCZOkpYxqkItmib/UjLpy3MNmhidzpxOwlmZZZ/ZLJSXeTD+9YCqz0eBwQ3MlIlGXiHyrqqvTAt9fw6dEaeCbw0wgYxTaC3DsOaAzutwiK1uJ8EHWjDxqWLQqiN4cDf7G9PmJAk+0+JH64fsREH5xd/9TqwXMWsOp89TYhjP2yFZgsuJwIHiTweFraZ/PWHwVPpVkQNZO2uzyrbLbv1ZZzR68qxsiWBGvYTJ4K18dP58GofGPw53Y/Qyzv4/yT9dJ1StzT1ma7NQgyy0KwshTqe/NI3m5gkZ/RacVTTcJwMwaHAoIZ+AJeqr1nipByiaGaxQtdEHIaARGmHYmVfN/oD1rlQZ8ftAjScphdkqU0zpDX48IKgN7wf2jyhYJzAJrAn2vOlJOcibt5gD8QftTAdN5VMTcqfQ6JSf8C5nB0hzRpbNhALxY8ZVTphVLalnzwp+3MpD0f/D+CIFu3MGwdBRShwRJhLbeN1R8pXqoeRtjRuPEj2eFA+ndwoZNHPZFzH2/BLusiGnhDd/9pi1PQyHzU0pyXl8EQeGMoukXuWRlbKjs994S6wAvc812XMPyRpiDHEOtPG2C3Uth8r1QX6hwkEy6IR0KX4PUC8yOU1yAn0r3UCbYU4jF3ej70uPeuCTkHBV2vY4Nil9OHVDbSWp3Oza8I=
 addons:
   ssh_known_hosts: kjaermaxi.me
-after_success:
-- chmod 600 raindrop-deploy
-- mv raindrop-deploy ~/.ssh/id_rsa
-- git remote add deploy "deploy@kjaermaxi.me:/var/www/kjaermaxi.me/public_html"
-- git push deploy
 before_install:
 - openssl aes-256-cbc -K $encrypted_22009518e18d_key -iv $encrypted_22009518e18d_iv
   -in raindrop-deploy.enc -out raindrop-deploy -d
+- rm raindrop-deploy.enc
+- chmod 600 raindrop-deploy
+- mv raindrop-deploy ~/.ssh/id_rsa
+script:
+- bundle exec jekyll build
+- bundle exec htmlproof _site --only-4xx --check-html --check-favicon
+- bundle exec htmlproof _site --ext .xml --only-4xx
+after_success:
+- cd _site
+- git init
+- git remote add deploy "deploy@kjaermaxi.me:/var/www/kjaermaxi.me"
+- git config user.name "Travis CI"
+- git config user.email "maxime.kjaer@gmail.com"
+- git add .
+- git commit -m "Deploy"
+- git push --force deploy master
