@@ -50,10 +50,11 @@ exclude:
   - Gemfile
   - Gemfile.lock
   - Gruntfile.js
-  - package.json
-  - npm-debug.log
   - LICENSE
-  - README.md
   - nohup.out
+  - npm-debug.log
+  - package.json
+  - README.md
   - serve.bat
   - vendor
+  - zopfli
