@@ -76,12 +76,11 @@ prose:
       - name: published
         field:
           element: button
-          help: "Defines whether this post is published, or still a draft"
           on: Published
           off: Draft
       - name: comments
         field:
-          element: checkbox
+          element: button
           on: Comments enabled
           off: Comments disabled
 
