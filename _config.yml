@@ -45,6 +45,46 @@ sass:
 gems:
   - jekyll-sitemap
 
+prose:
+  siteurl: http://kjaermaxi.me
+  metadata:
+    _posts:
+      - name: layout
+        field:
+          element: hidden
+          value: post
+      - name: title
+        field:
+          element: text
+          label: Title
+      - name: image
+        field:
+          element: text
+          label: Cover Image
+          value: /images/trees.png
+      - name: fallback-color
+        field:
+          element: text
+          label: Fallback color
+          help: "The color that will be behind the cover image as it loads. For the best effect, choose the average color of the cover image."
+          value: "#0f45b7"
+      - name: description
+        field:
+          element: textarea
+          label: Description
+      - name: published
+        field:
+          element: button
+          help: "Defines whether this post is published, or still a draft"
+          on: Published
+          off: Draft
+      - name: comments
+        field:
+          element: checkbox
+          on: Comments enabled
+          off: Comments disabled
+
+
 # Exclude these files from your production _site
 exclude:
   - Gemfile
