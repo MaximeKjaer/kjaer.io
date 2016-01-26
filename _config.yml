@@ -73,11 +73,6 @@ prose:
         field:
           element: textarea
           label: Description
-      - name: published
-        field:
-          element: button
-          on: Published
-          off: Draft
       - name: comments
         field:
           element: button
