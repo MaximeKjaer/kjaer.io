@@ -8,9 +8,9 @@ env:
 addons:
   ssh_known_hosts: kjaermaxi.me
 before_install:
-- sh _scripts/install.sh
+- _scripts/install.sh
 script:
-- sh _scripts/build.sh
-- sh _scripts/test.sh
+- _scripts/build.sh
+- _scripts/test.sh
 after_success:
-- sh _scripts/deploy.sh
+- _scripts/deploy.sh
