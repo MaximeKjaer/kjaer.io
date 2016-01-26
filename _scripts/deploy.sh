@@ -13,6 +13,5 @@ if [ $TRAVIS_BRANCH == 'master' ] ; then
 	git commit -m "Deploy"
 	git push --force deploy master
 else
-	echo 'Invalid branch. You can only deploy from master.'
-	exit 1
+	echo "Not deploying, since this branch isn't master."
 fi
