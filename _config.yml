@@ -46,6 +46,7 @@ gems:
   - jekyll-sitemap
 
 prose:
+  rooturl: '_posts'
   siteurl: http://kjaermaxi.me
   metadata:
     _posts:
