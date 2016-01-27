@@ -11,4 +11,4 @@ git clone https://code.google.com/p/zopfli/
 cd zopfli
 make
 chmod +x zopfli
-cd ..  # TODO: try to find an environment variable that gives us the directory in which we're working.
+cd ..
