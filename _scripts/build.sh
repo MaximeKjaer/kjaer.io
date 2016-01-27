@@ -4,7 +4,4 @@ set -x
 bundle exec jekyll build
 
 # Compress assets with Zopfli
-zopfli/zopfli --i1000 _site/**/*.html _site/*.html
-zopfli/zopfli --i1000 _site/**/*.css _site/*.css
-zopfli/zopfli --i1000 _site/**/*.js _site/*.js
-zopfli/zopfli --i1000 _site/**/*.xml _site/*.xml
+zopfli/zopfli --i1000 --verbose _site*/*.html  _site*/*.css _site*/*.js  _site*/*.xml
