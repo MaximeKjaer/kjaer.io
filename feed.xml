@@ -90,4 +90,4 @@ layout: null
     </entry>
   {% endfor %}
 </feed>
-{% endstrip %
+{% endstrip %}
