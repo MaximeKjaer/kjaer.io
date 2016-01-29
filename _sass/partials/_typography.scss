@@ -33,13 +33,14 @@
 
 	h1, h2, h3, h4, h5, h6 {
 		line-height: $title-line-height;
-		& > a:hover {
+		
+		> a:hover {
 			border-bottom: 3px solid;
 		}
 	}
 	
 	h1, h2, h3 {
-		& + p {
+		+ p {
 			margin-top: 0.5em;
 			-webkit-margin-before: 0.5em;
 		}
@@ -63,7 +64,7 @@
 		margin-top: 1em;
 		-webkit-margin-before: 1em;
 		
-		& + p {
+		+ p {
 			display: inline;
 			vertical-align: top;
 			
