@@ -88,6 +88,7 @@ exclude:
   - LICENSE
   - nohup.out
   - npm-debug.log
+  - node_modules
   - package.json
   - README.md
   - serve.bat
