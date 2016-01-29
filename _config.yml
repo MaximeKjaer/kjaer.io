@@ -12,7 +12,7 @@ author:
   name: Maxime Kjaer
   email: maxime.kjaer@gmail.com
   twitter: "@maximekjaer"
-  uri: http://kjaermaxi.me
+  uri: https://kjaermaxi.me
 
 # Your disqus shortname, entering this will enable commenting on posts
 disqus: kjaermaxime
@@ -22,7 +22,7 @@ google_analytics: UA-59915030-2
 
 # Your website URL
 # Used for Sitemap.xml and your RSS feed
-url: http://kjaermaxi.me
+url: https://kjaermaxi.me
 
 # If you're hosting your site at a Project repository on GitHub pages 
 # (http://yourusername.github.io/repository-name)
@@ -47,7 +47,7 @@ gems:
 
 prose:
   rooturl: '_posts'
-  siteurl: http://kjaermaxi.me
+  siteurl: https://kjaermaxi.me
   metadata:
     _posts:
       - name: layout
