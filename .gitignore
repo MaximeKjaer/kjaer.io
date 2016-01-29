@@ -4,7 +4,6 @@ _site
 .jekyll
 .bundle
 node_modules
-package.json
 *.bat
 Gemfile.lock
 .jekyll-metadata

@@ -12,3 +12,6 @@ cd zopfli
 make
 chmod +x zopfli
 cd ..
+
+# Install npm dependencies
+npm install
