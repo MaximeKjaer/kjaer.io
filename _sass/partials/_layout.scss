@@ -15,7 +15,7 @@ main {
 	z-index: 1;
 	padding-top: 0;
 
-	&:after {
+	&::after {
 		@include background;
 		@include skewY(-2deg);
 		@include transform-origin(bottom left);

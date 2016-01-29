@@ -67,7 +67,7 @@
 			display: inline;
 			vertical-align: top;
 			
-			&:after {
+			&::after {
 				display: block;
 				margin-bottom: 1em;
 				-webkit-margin-after: 1em;
