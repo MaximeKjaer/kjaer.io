@@ -82,7 +82,7 @@ This is why a lot of people add a so-called fingerprint to CSS, JS and images du
 I don't usually modify my images, except if I've been able to further compress it. If the user already has a slightly bigger image in cache, there's no real need to download another version that might be a few KB smaller. So for images, I can just use the **longest possible max age**. In case I ever need to actually change it, I'll use a different filename.
 
 ### CSS & JS
-I don't serve any JavaScript files on this site, but cache-wise, it should fall into the same category as CSS. I update it every once in a while, but little will be lost if the user doesn't get the absolute latest version. I should be able to get away with a max age that is just a bit longer, like **a day** or so. I only want to build using Jekyll, and it can't add fingerprints to files, so this is "good enough" of an alternative.
+I don't serve any JavaScript files on this site, but cache-wise, it should fall into the same category as CSS. I update it every once in a while, but little will be lost if the user doesn't get the absolute latest version. I should be able to get away with a max age that is a bit longer, like **a week** or so. I only want to build using Jekyll, and it can't add fingerprints to files, so this is "good enough" of an alternative.
 
 ## Let's get it into practice!
 Phew, the hard part is over! Now, let's kick back and see how we can get Nginx to apply what we've decided.
