@@ -23,7 +23,7 @@
 	color: $white;
 	
 	.title {
-		@include translateY(-50%);
+		transform: translateY(-50%);
 
 		position: relative;
 		top: 50%;
@@ -58,8 +58,8 @@
 	font-weight: $title-weight-light;
 	
 	a {
-		@include opacity(1);
-		@include transition(opacity, $transition-time);
+		opacity: 1;
+		transition: opacity $transition-time;
 		
 		position: relative;
 		padding: 0.5em 1em;
@@ -70,9 +70,10 @@
 		font-size: $large;
 		
 		color: $white;
+		opacity: 1;
 		
 		&:hover {
-			@include opacity(0.7);
+			opacity: 0.7;
 		}
 	}
 }

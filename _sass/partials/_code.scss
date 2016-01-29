@@ -14,8 +14,8 @@ $code-default_padding: 5px;
 }
 
 .gutter { // The parent of the linenos.
-	@include user-select(none);
-	@include selection {
+	user-select: none;
+	::selection {
 		background-color: transparent;
 	}
 	

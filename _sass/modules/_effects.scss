@@ -7,32 +7,3 @@
 
 // Standard transition time
 $transition-time: 0.2s;
-
-@mixin skewY($angle) {
-	-webkit-transform: skewY($angle);
-		-ms-transform: skewY($angle);
-			transform: skewY($angle);
-}
-
-@mixin translateY($amount) {
-		-webkit-transform: translateY($amount);
-			-ms-transform: translateY($amount);
-				transform: translateY($amount);
-}
-
-@mixin transform-origin($origin) {
-	-webkit-transform-origin: $origin;
-		-ms-transform-origin: $origin;
-			transform-origin: $origin;
-}
-
-@mixin opacity($amount) {
-	opacity: $amount;
-	filter: alpha(opacity=$amount*100);
-}
-
-@mixin transition($properties, $time: $transition-time) {
-	-webkit-transition: $properties $time;
-			transition: $properties $time;
-}
-

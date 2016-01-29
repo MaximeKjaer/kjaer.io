@@ -17,9 +17,9 @@ main {
 
 	&::after {
 		@include background;
-		@include skewY(-2deg);
-		@include transform-origin(bottom left);
 
+		transform: skewY(-2deg);
+		transform-origin: bottom left;
 		display: block;
 		position: absolute;
 		top: -4em;
@@ -30,7 +30,7 @@ main {
 		content: '';
 
 		@include media($small-screen) {
-			@include skewY(-4deg);
+			transform: skewY(-4deg);
 		}
 	}
 }
