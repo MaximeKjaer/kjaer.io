@@ -18,9 +18,9 @@ html, body {
 }
 
 body {
-	@include flex;
-	@include justify-content(center);
-	@include align-items(center);
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 .post {
