@@ -21,10 +21,10 @@ disqus: kjaermaxime
 google_analytics: UA-59915030-2
 
 image_breakpoints:
-  - 320px
-  - 720px
-  - 1120px
   - 1520px
+  - 1120px
+  - 720px
+  - 320px
 
 # Your website URL
 # Used for Sitemap.xml and your RSS feed
