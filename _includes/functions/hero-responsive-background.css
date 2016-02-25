@@ -1,0 +1,17 @@
+{% comment %}
+	This function adds media a media query background image for .hero
+	using the given size and image.
+
+	Using the replace filter, it changes the filename so that we're
+	fetching the correct image size.
+{% endcomment %}
+
+{% capture jpg %}-{{ include.size }}.jpg{% endcapture %}
+{% capture png %}-{{ include.size }}.png{% endcapture %}
+{% capture gif %}-{{ include.size }}.gif{% endcapture %}
+{% capture filename %}{{ include.image | replace: '.jpg', jpg | replace: '.png', png | replace '.gif', gif }}{% endcapture %}
+@media (max-width: {{ include.size }}) {
+	.hero {
+		background-image: url('{{ filename }}');
+	}
+}

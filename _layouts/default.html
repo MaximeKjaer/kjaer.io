@@ -4,7 +4,7 @@
     {% include head.html %}
 </head>
 <body>
-
+{% strip %}
     {% if page.image %}
         {% if page.fallback-color %}
             {% assign background-color = page.fallback-color %}
@@ -15,7 +15,19 @@
         {% assign background-image = site.hero_image %}
     {% endif %}
 
-    <header class="hero" style="background-color: {{ background-color }}; background-image: url('{{ background-image }}');">
+    <style type="text/css">
+    .hero {
+        background-color: {{ background-color }};
+        background-image: url('{{ background-image }}');
+    }
+
+    {% for size in site.image_breakpoints %}
+        {% include functions/hero-responsive-background.css size=size image=background-image %}
+    {% endfor %}
+
+    </style>
+{% endstrip %}
+    <header class="hero">
 
         <nav class="top-right">
             <a href="/about">ABOUT</a>
