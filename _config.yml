@@ -20,11 +20,12 @@ disqus: kjaermaxime
 # Enter your Google Analytics web tracking code (e.g. UA-2110908-2) to activate tracking
 google_analytics: UA-59915030-2
 
-image_breakpoints:
-  - 1520px
-  - 1120px
-  - 720px
-  - 320px
+image_breakpoints: # Important that these be in decreasing order!
+  - 1440px
+  - 1200px
+  - 800px
+  - 550px
+  - 380px
 
 # Your website URL
 # Used for Sitemap.xml and your RSS feed
