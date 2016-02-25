@@ -8,8 +8,6 @@ env:
 addons:
   ssh_known_hosts: kjaermaxi.me
   apt:
-    sources:
-      - dhor-myway
     packages:
       - graphicsmagick
 before_install:
