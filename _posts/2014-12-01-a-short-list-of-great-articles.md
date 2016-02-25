@@ -22,6 +22,7 @@ I thought that I'd compile a list of some of the best articles that I've read he
 <!--- More -->
 
 ### Programming
+- [Kill Your Dependencies](http://www.mikeperham.com/2016/02/09/kill-your-dependencies/) &ndash; Mike Perham, February 9, 2016
 - [Regexes: The Bad, the Better, and the Best](https://www.loggly.com/blog/regexes-the-bad-better-best/) &ndash; Liz Bennett, June 18, 2015
 - [Why Learning to Code is So Damn Hard](http://www.vikingcodeschool.com/posts/why-learning-to-code-is-so-damn-hard) &ndash; Erik Trautman, February 04, 2015
 - [You can't dig upwards](http://www.evanmiller.org/you-cant-dig-upwards.html) &ndash; Evan Miller, December 07, 2014
