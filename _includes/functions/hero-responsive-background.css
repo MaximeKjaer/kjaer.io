@@ -10,7 +10,7 @@
 {% capture png %}-{{ include.size }}.png{% endcapture %}
 {% capture gif %}-{{ include.size }}.gif{% endcapture %}
 {% capture filename %}{{ include.image | replace: '.jpg', jpg | replace: '.png', png | replace '.gif', gif }}{% endcapture %}
-@media (max-width: {{ include.size }}) {
+@media (max-device-width: {{ include.size }}) {
 	.hero {
 		background-image: url('{{ filename }}');
 	}
