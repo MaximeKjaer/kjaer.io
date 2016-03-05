@@ -22,6 +22,10 @@
 	text-shadow: 0 0 5px rgba($black, 0.8);
 	color: $white;
 	
+	a {
+		color: $white;
+		text-decoration: none;
+	}
 	.title {
 		transform: translateY(-50%);
 
@@ -29,6 +33,7 @@
 		top: 50%;
 		
 		font-family: $title-font;
+		display: inline-block;
 	}
 	
 	.title, h1, p {
