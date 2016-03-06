@@ -1,4 +1,4 @@
 #!/bin/bash
 set -x
 
-timeout 30s bundle exec htmlproof _site --only-4xx --external_only --disable-external --check-html --check-favicon --href-ignore 'https?:\/\/kjaermaxi\.me'
+timeout 30s bundle exec htmlproofer ./_site --check-html --check-favicon --allow-hash-href --external_only --only-4xx --http-status-ignore 429
