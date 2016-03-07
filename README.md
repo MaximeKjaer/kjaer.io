@@ -7,7 +7,6 @@ My personal page - built using [Jekyll](http://jekyllrb.com/) & elbow grease.
 ## Syntax of a post:
 
     ---
-    layout: post
     title: A sample post
     image: splash-image.jpg
     fallback-color: "#0f45b7"

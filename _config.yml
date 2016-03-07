@@ -87,6 +87,13 @@ prose:
           off: Comments disabled
 
 
+defaults:
+  -
+    scope:
+      type: posts
+    values:
+      layout: post
+
 # Exclude these files from your production _site
 exclude:
   - Gemfile

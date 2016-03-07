@@ -1,5 +1,4 @@
 ---
-layout: post
 title: Reverse engineering an Acer KU-0355 keyboard
 description: How I mapped a keyboard's PCB in order to hack it into a joystick controller.
 image: keyboard.jpg

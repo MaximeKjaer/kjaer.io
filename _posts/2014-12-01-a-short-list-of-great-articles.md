@@ -1,5 +1,4 @@
 ---
-layout: post
 title: A short list of great articles
 description: This post serves as a continuously updated list of my favorite articles online.
 image: library.jpg

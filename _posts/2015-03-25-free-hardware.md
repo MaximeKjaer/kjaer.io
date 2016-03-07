@@ -1,5 +1,4 @@
 ---
-layout: post
 title: Free hardware for beta testers is a bad idea
 published: false
 ---

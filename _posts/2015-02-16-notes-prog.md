@@ -1,5 +1,4 @@
 ---
-layout: post
 title: CS-108 – Pratique de la programmation orientée-objet
 image: interlaken.png
 fallback-color: "#9ea98f"

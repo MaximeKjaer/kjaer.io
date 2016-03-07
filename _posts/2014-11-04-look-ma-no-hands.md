@@ -1,5 +1,4 @@
 ---
-layout: post
 title: Look, ma, no hands!
 description: Today, I wrote 200 lines of code, only compiled it once at the end... and it worked, somehow. Baby steps.
 image: bicycle.jpg
