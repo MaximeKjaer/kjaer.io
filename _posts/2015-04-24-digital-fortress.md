@@ -21,6 +21,6 @@ I happened to stumble across a quote the by Jeh Johnson, Secretery of Homeland S
 >
 >In fact, encryption is making it harder for your government to find criminal activity, and potential terrorist activity. 
 > 
-> [Jeh Johnson, Secretary of Homeland Security, RSA Conference, 2015](http://web.archive.org/web/20151014054146/http://www.dhs.gov/news/2015/04/21/remarks-secretary-homeland-security-jeh-johnson-rsa-conference-2015)
+> [Jeh Johnson, Secretary of Homeland Security, RSA Conference, 2015](https://web.archive.org/web/20151014054146/http://www.dhs.gov/news/2015/04/21/remarks-secretary-homeland-security-jeh-johnson-rsa-conference-2015)
 
 **Note:** Please read the full source; in all fairness, the above quote is taken out of context. I don't necessarily believe in any conspiracy theories about secret NSA supercomputers ([although...](https://freedom-to-tinker.com/blog/haldermanheninger/how-is-nsa-breaking-so-much-crypto/)), or about Dan Brown having predicted things 15 years in advance; I just found it quite amusing to read these two quotes within the same day!

@@ -8,13 +8,13 @@ fallback-color: "#c6c5b8"
 
 I've long been resistant to [Sass](http://sass-lang.com/). To me, it seemed like a complicated and superfluous layer of abstraction that would get in the way of how I usually write my CSS, and perhaps even create bloated, inefficient code &mdash; boy, was I wrong.
 
-As it turns out, Dan Cederholm had the *exact* same fear as I did about having to change the way he writes CSS, but the introduction to [his book](http://abookapart.com/products/sass-for-web-designers) persuaded me to take a look at it:
+As it turns out, Dan Cederholm had the *exact* same fear as I did about having to change the way he writes CSS, but the introduction to [his book](https://abookapart.com/products/sass-for-web-designers) persuaded me to take a look at it:
 
 > But remember, since **the SCSS syntax is a superset of CSS3**, you don't have to change anything about the way you write CSS. Commenting, indenting, or not indenting, all your formatting preferences can remain the same when working in .scss files. Once I realized this, I could dive in without fear.
 > 
 > [Dan Cederholm, Sass for Web Designers (Chapter 1), 2013](http://alistapart.com/article/why-sass)
 
-Now, I've been using [Jekyll](http://jekyllrb.com/), the static site generator, for close to a year now, even for super simple sites. I really like how I'm able to keep my HTML [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) by using imports, variables and layouts; it's a system that makes any and all edits incredibly easy and sensible. In a sense, Sass is just the equivalent of Jekyll for CSS: I can import CSS from other files, use variables, and inject code into my predefined mixins, just like I can with HTML in Jekyll. And it turns out that my CSS doesn't only get more maintainable, but I've even found that my design as a whole gets better! Here's how Sass has helped me out:
+Now, I've been using [Jekyll](https://jekyllrb.com/), the static site generator, for close to a year now, even for super simple sites. I really like how I'm able to keep my HTML [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) by using imports, variables and layouts; it's a system that makes any and all edits incredibly easy and sensible. In a sense, Sass is just the equivalent of Jekyll for CSS: I can import CSS from other files, use variables, and inject code into my predefined mixins, just like I can with HTML in Jekyll. And it turns out that my CSS doesn't only get more maintainable, but I've even found that my design as a whole gets better! Here's how Sass has helped me out:
 
 <!-- More -->
 
@@ -127,7 +127,7 @@ article {
 }
 {% endhighlight %}
 
-Why Sass won't group the media queries is beyond me. Even though it may not have much of a direct [impact on performance](http://stackoverflow.com/questions/11626174/is-there-an-advantage-in-grouping-css-media-queries-together), it's not exactly elegant, and it does make for bigger files, which does slow down the page as a whole. I'm really hoping that what Cederholm calls “aggregated media query bubbling” will make it into a future release of Sass &mdash; it's not like it's *that* complicated to implement.
+Why Sass won't group the media queries is beyond me. Even though it may not have much of a direct [impact on performance](https://stackoverflow.com/questions/11626174/is-there-an-advantage-in-grouping-css-media-queries-together), it's not exactly elegant, and it does make for bigger files, which does slow down the page as a whole. I'm really hoping that what Cederholm calls “aggregated media query bubbling” will make it into a future release of Sass &mdash; it's not like it's *that* complicated to implement.
 
 ##Integrating it into a Jekyll workflow
 As I mentioned earlier on, I like working with Jekyll. Luckily for me, Sass and Jekyll play very well together, since Jekyll comes with built-in Sass support. There's not much to configure; here are the options that we can add to the `_config.yml` file:

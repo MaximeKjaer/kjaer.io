@@ -21,11 +21,11 @@ Machines predict a lot of things for us. What would you be interested in buying 
 
 In the new version of the Pebble, everything is different. There is no app listing to choose from anymore (however, there are expandable previews of the apps that are included, but that's a detail). Furthermore, the apps aren't just organized in order of their installation date, but the information shows up in order of chronological relevance for *you*. Everything that has been relevant is above; everything that will become relevant is below. The metaphor of time being the binding factor between events is indeed very fitting for a timepiece, because it gives a whole new dimension to what a watch is, and to how we percieve time.
 
-This idea is not too distant from what Paul Adams describes in his article [The End Of Apps As We Know Them](http://blog.intercom.io/the-end-of-apps-as-we-know-them), where he pledges for user interfaces where we interact with notifications and events rather than screenfuls of apps. Now I don't agree with the whole article, but I do think that he hit the nail on the head with the statement
+This idea is not too distant from what Paul Adams describes in his article [The End Of Apps As We Know Them](https://blog.intercom.io/the-end-of-apps-as-we-know-them), where he pledges for user interfaces where we interact with notifications and events rather than screenfuls of apps. Now I don't agree with the whole article, but I do think that he hit the nail on the head with the statement
 
 > The idea of having a screen full of icons, representing independent apps, that need to be opened to experience them, is making less and less sense. The idea that these apps sit in the background, pushing content into a central experience, is making more and more sense.
 > 
-> *[Paul Adams](http://blog.intercom.io/the-end-of-apps-as-we-know-them)*
+> *[Paul Adams](https://blog.intercom.io/the-end-of-apps-as-we-know-them)*
 
 I'm fairly certain that a decade from now, the grid of apps that is prevalent on most devices will seem like a ridiculous, antique paradigm for the usage of technology. At best, the grid of apps is a temporary hack until we find a better solution.
 

@@ -6,7 +6,7 @@ image: keyboard.jpg
 fallback-color: "#d4c4be"
 ---
 
-For the last few weeks, I’ve been working on building a [MAME](http://mamedev.org/) arcade machine from an old computer. The software part is done (I’ll cover that in another post), and I have started to prepare the hardware. To save some money, I decided not to buy the [I-PAC](http://www.ultimarc.com/ipac1.html). Instead, hacking a keyboard seemed cheaper, and I just happened to have a lot of old, unused keyboards at hand. I thought that I’d just connect some wires from the keyboard to a button; when the button is pressed, it would emulate a keystroke. The only problem was that it would take up too much space, and it wouldn’t be practical. The connections wouldn’t be optimal, the keyboard might fall… All in all, a better approach was possible, and much needed.
+For the last few weeks, I’ve been working on building a [MAME](http://mamedev.org/) arcade machine from an old computer. The software part is done (I’ll cover that in another post), and I have started to prepare the hardware. To save some money, I decided not to buy the [I-PAC](https://www.ultimarc.com/ipac1.html). Instead, hacking a keyboard seemed cheaper, and I just happened to have a lot of old, unused keyboards at hand. I thought that I’d just connect some wires from the keyboard to a button; when the button is pressed, it would emulate a keystroke. The only problem was that it would take up too much space, and it wouldn’t be practical. The connections wouldn’t be optimal, the keyboard might fall… All in all, a better approach was possible, and much needed.
 
 If you open up a keyboard, you’ll often find a small PCB connected to a USB cable (sometimes to some LEDs too), a rubber sheet with dots on it, and to three plastic sheets:
 
@@ -29,13 +29,13 @@ I started out by scanning my two sheets. They were a bit longer than a piece of 
 
 ![A scan of the right side of the plastic sheet]({{ site.baseurl }}/images/Keyboard-Hack/min/min_a2.png)
 
-To stitch them together, I used [Microsoft ICE](http://research.microsoft.com/en-us/um/redmond/groups/ivm/ice/): it’s a great piece of software from the Microsoft Research team. It stitches multiple photos into one big panorama, and does so perfectly: forget the  skewed, distorted panoramas that you may have taken with your phone, this software almost never makes mistakes.
+To stitch them together, I used [Microsoft ICE](https://research.microsoft.com/en-us/um/redmond/groups/ivm/ice/): it’s a great piece of software from the Microsoft Research team. It stitches multiple photos into one big panorama, and does so perfectly: forget the  skewed, distorted panoramas that you may have taken with your phone, this software almost never makes mistakes.
 
 ![A scan of the complete plastic sheet]({{ site.baseurl }}/images/Keyboard-Hack/min/min_stitch0001.png)
 
 So I had my two huge scans (they were about 12MB each). I may have asked for a too good quality, as a tenth of the resolution I had would have been sufficient. If your scanner lets you choose the resolution of your scan, 200-300 dpi should be more than enough – I had asked for 600.
 
-I edited the stitched scans with [GIMP](http://www.gimp.org/). The first thought was to use the magic wand and some “clever” contrast and coloring. That wasn’t a huge success, so I just ended up linking the the dots to the pins with the good old pen and my shift key (it adds the option to draw a line with the pen).
+I edited the stitched scans with [GIMP](https://www.gimp.org/). The first thought was to use the magic wand and some “clever” contrast and coloring. That wasn’t a huge success, so I just ended up linking the the dots to the pins with the good old pen and my shift key (it adds the option to draw a line with the pen).
 
 This are the results I got:
 
