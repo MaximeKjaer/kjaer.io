@@ -93,6 +93,7 @@ defaults:
       type: posts
     values:
       layout: post
+      comments: true
 
 # Exclude these files from your production _site
 exclude:

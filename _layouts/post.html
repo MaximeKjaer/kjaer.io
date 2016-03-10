@@ -14,6 +14,6 @@ layout: default
 	<a href="/" id="back">&laquo; Back </a>
 </article>
 
-{% if page.comments == false %}{% else %}
+{% if page.comments %}
 	{% include disqus.html disqus_identifier=page.disqus_identifier %}
 {% endif %}
