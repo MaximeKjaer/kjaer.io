@@ -2,7 +2,7 @@ title: OUTPUT
 subtitle: The blog of Maxime Kjaer
 description: "Maxime Kjaer's blog posts about the Web, software & technology. Most likely in that order."
 name: Maxime Kjaer
-hero_image: /images/trees.jpg
+hero_image: /images/hero/trees.jpg
 
 #
 # Flags below are optional
@@ -69,7 +69,7 @@ prose:
         field:
           element: text
           label: Cover Image
-          value: /images/trees.png
+          help: "/images/hero/trees.jpg, for example"
       - name: fallback-color
         field:
           element: text

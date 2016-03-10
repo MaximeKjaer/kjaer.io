@@ -1,7 +1,7 @@
 ---
 title: Setting up GitHub Pages with Jekyll
 description: This is my very first post, in which I show how easy it is to get a first version of a blog up with Github Pages and Jekyll Now.
-image: desk.jpg
+image: /images/hero/desk.jpg
 fallback-color: "#e8e2e3"
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: Am I famous now?
 description: I've programmed a Chrome extension, and it was briefly featured on Upvoted, reddit's official podcast. Am I famous now?
-image: dogecar.jpg
+image: /images/hero/dogecar.jpg
 fallback-color: "#6e644e"
 ---
 

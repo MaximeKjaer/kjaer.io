@@ -1,7 +1,7 @@
 ---
 title: Web Performance 2.0 
 description: After a long lull, a surge of new web performance tools are coming out. From HTTP/2 to resource hints, the landscape of performance is changing.
-image: train.jpg
+image: /images/hero/train.jpg
 fallback-color: "#d1c8c8"
 ---
 

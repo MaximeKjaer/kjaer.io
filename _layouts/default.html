@@ -9,7 +9,7 @@
         {% if page.fallback-color %}
             {% assign background-color = page.fallback-color %}
         {% endif %}
-            {% capture background-image %}/images/{{ page.image }}{% endcapture %}
+        {% assign background-image = page.image %}
     {% else %}
         {% assign background-color = '#d3dbe7' %}
         {% assign background-image = site.hero_image %}

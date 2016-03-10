@@ -1,7 +1,7 @@
 ---
 title: Quick, cache this! Everything you need to know about web cache
 description: This blog post serves as a primer on web cache HTTP headers. I'll also show the reasoning behind a good caching strategy, and how to implement it with Nginx.
-image: letter.jpg
+image: /images/hero/letter.jpg
 fallback-color: "#ead3d1"
 ---
 
