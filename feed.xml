@@ -44,50 +44,52 @@ layout: null
   <webfeeds:cover image="{{ url_base | xml_escape }}{{ site.hero_image }}" />
 
   {% for post in site.posts limit: 15 %}
-    <entry>
-      <title>{{ post.title | markdownify | strip_html | strip_newlines | xml_escape }}</title>
-      <link href="{{ post.url | prepend: url_base }}" rel="alternate" type="text/html" title="{{ post.title | xml_escape }}" />
-      <published>{{ post.date | date_to_xmlschema }}</published>
-      {% if post.last_modified_at %}
-        <updated>{{ post.last_modified_at | date_to_xmlschema }}</updated>
-      {% else %}
-        <updated>{{ post.date | date_to_xmlschema }}</updated>
-      {% endif %}
+    {% unless post.unlisted %}
+      <entry>
+        <title>{{ post.title | markdownify | strip_html | strip_newlines | xml_escape }}</title>
+        <link href="{{ post.url | prepend: url_base }}" rel="alternate" type="text/html" title="{{ post.title | xml_escape }}" />
+        <published>{{ post.date | date_to_xmlschema }}</published>
+        {% if post.last_modified_at %}
+          <updated>{{ post.last_modified_at | date_to_xmlschema }}</updated>
+        {% else %}
+          <updated>{{ post.date | date_to_xmlschema }}</updated>
+        {% endif %}
 
-      <id>{{ post.id | prepend: url_base | xml_escape }}</id>
-      <content type="html" xml:base="{{ post.url | prepend: url_base | xml_escape }}">
-        &lt;img src=&quot;{% if post.image %}{{ url_base | xml_escape }}/images/{{ post.image }}{% else %}{{ url_base | xml_escape }}{{ site.hero_image }}{% endif %}&quot; class=&quot;webfeedsFeaturedVisual&quot;&gt;
-      
-      {{ post.content | markdownify | xml_escape }}</content>
+        <id>{{ post.id | prepend: url_base | xml_escape }}</id>
+        <content type="html" xml:base="{{ post.url | prepend: url_base | xml_escape }}">
+          &lt;img src=&quot;{% if post.image %}{{ url_base | xml_escape }}/images/{{ post.image }}{% else %}{{ url_base | xml_escape }}{{ site.hero_image }}{% endif %}&quot; class=&quot;webfeedsFeaturedVisual&quot;&gt;
+        
+        {{ post.content | markdownify | xml_escape }}</content>
 
-      {% if post.author %}
-        <author>
-          {% if post.author.name %}
-            <name>{{ post.author.name | xml_escape }}</name>
-          {% else %}
-            <name>{{ post.author | xml_escape }}</name>
-          {% endif %}
-          {% if post.author.email %}
-            <email>{{ post.author.email | xml_escape }}</email>
-          {% endif %}
-          {% if post.author.uri %}
-            <uri>{{ post.author.uri | xml_escape }}</uri>
-          {% endif %}
-        </author>
-      {% endif %}
+        {% if post.author %}
+          <author>
+            {% if post.author.name %}
+              <name>{{ post.author.name | xml_escape }}</name>
+            {% else %}
+              <name>{{ post.author | xml_escape }}</name>
+            {% endif %}
+            {% if post.author.email %}
+              <email>{{ post.author.email | xml_escape }}</email>
+            {% endif %}
+            {% if post.author.uri %}
+              <uri>{{ post.author.uri | xml_escape }}</uri>
+            {% endif %}
+          </author>
+        {% endif %}
 
-      {% if post.category %}
-        <category term="{{ post.category | xml_escape }}" />
-      {% endif %}
+        {% if post.category %}
+          <category term="{{ post.category | xml_escape }}" />
+        {% endif %}
 
-      {% for tag in post.tags %}
-        <category term="{{ tag | xml_escape }}" />
-      {% endfor %}
+        {% for tag in post.tags %}
+          <category term="{{ tag | xml_escape }}" />
+        {% endfor %}
 
-      {% if post.excerpt and post.excerpt != empty %}
-        <summary>{{ post.excerpt | markdownify | strip_html | strip_newlines | xml_escape }}</summary>
-      {% endif %}
-    </entry>
+        {% if post.excerpt and post.excerpt != empty %}
+          <summary>{{ post.excerpt | markdownify | strip_html | strip_newlines | xml_escape }}</summary>
+        {% endif %}
+      </entry>
+      {% endunless %}
   {% endfor %}
 </feed>
 {% endstrip %}
