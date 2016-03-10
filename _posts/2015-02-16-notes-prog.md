@@ -1,20 +1,20 @@
 ---
 title: CS-108 – Pratique de la programmation orientée-objet
-image: interlaken.png
+image: /images/hero/interlaken.png
 fallback-color: "#9ea98f"
 published: false
 ---
 
-#[Le projet Imhof](http://cs108.epfl.ch/p00_intro.html)
+#[Le projet Imhof](http://cs108.epfl.ch/archive/15/p00_intro.html)
 
 Le but du projet de cette année est de dessiner des cartes topographiques au 1:50'000 dont le style s'inspire de celui des cartes suisses. Ce projet est nommé Imhof en l'honneur d'[Eduard Imhof](http://en.wikipedia.org/wiki/Eduard_Imhof) (1895–1986), cartographe suisse célèbre — entre autres — pour ses magnifiques cartes en relief.
 
-[Voir slides](http://cs108.epfl.ch/files/ppo15_01a_intro-cours-projet.pdf) pour un aperçu rapide du projet et de ses règles.
+[Voir slides](http://cs108.epfl.ch/archive/15/files/ppo15_01a_intro-cours-projet.pdf) pour un aperçu rapide du projet et de ses règles.
 
 ##Rendu du projet
-Le rendu se fera [sur cette page](http://cs108.epfl.ch/submit.html); le jeton a été envoyé par e-mail.
+Le rendu se fera [sur cette page](http://cs108.epfl.ch/archive/15/submit.html); le jeton a été envoyé par e-mail.
 
-#[Test unitaire](http://cs108.epfl.ch/files/ppo15_01b_test-unitaire.pdf)
+#[Test unitaire](http://cs108.epfl.ch/archive/15/files/ppo15_01b_test-unitaire.pdf)
 Le test unitaire est un petit programme qui vérifie automatiquement que les classes se comportent comme on veut. Cela permet de rapidement détecter d'éventuels problèmes dans les petites parties isolées du programme.
 
 La bibliothèque utilisée dans le cadre de ce cours est JUnit.
@@ -84,7 +84,7 @@ public class SortTest {
 }
 {% endhighlight %}
 
-#[Immuabilité](http://cs108.epfl.ch/files/ppo15_01c_immuabilite.pdf)
+#[Immuabilité](http://cs108.epfl.ch/archive/15/files/ppo15_01c_immuabilite.pdf)
 
 ##Exemple
 
@@ -224,7 +224,7 @@ Ici, `u` est un objet par lequel on passe pour accéder à `m`, et qui bloque le
 1. Les tableaux reçus à la construction sont copiés défensivement, rendus non modifiables par unmodifiableList puis stockés ainsi dans des champs.
 2. Ces tableaux non modifiables sont directement retournés par les méthodes d'accès 
 
-#[Bâtisseurs](http://cs108.epfl.ch/files/ppo15_01c_immuabilite.pdf)
+#[Bâtisseurs](http://cs108.epfl.ch/archive/15/files/ppo15_01c_immuabilite.pdf)
 Un défaut de l'immuabilité est qu'il devient difficile de construire des classes immuables (du fait de la finalité de ses champs). Il faut le faire d'un seul coup, et trouver soi-même une façon de stocker les données entre temps...
 
 C'est pourquoi on a des bâtisseurs.
@@ -285,7 +285,7 @@ public final class Date {
 
 Une classe imbriquée statique a accès aux membres privés **statiques** de sa classe englobante, et peut être déclarée privée (`private`) ou protégée (`protected`).
 
-#[Généricité](http://cs108.epfl.ch/files/ppo15_02_genericite.pdf)
+#[Généricité](http://cs108.epfl.ch/archive/15/files/ppo15_02_genericite.pdf)
 Admettons que l'on désire écrire une classe très simplemodélisant ce que nous appellerons une cellule(immuable), dont le but est de stocker un — et un seul — objet.
 
 Intuitivement, on utiliserait alors le type `Object` pour que la cellule fonctionne avec tous les types d'objets.
@@ -367,7 +367,7 @@ Pair<String, Integer> p = c.pairWith(12);
 Pair<String, Integer> p = c.<Integer>pairWith(12);
 {% endhighlight %}
 
-##[Généricité et types de base](http://cs108.epfl.ch/files/ppo15_02_genericite.pdf)
+##[Généricité et types de base](http://cs108.epfl.ch/archive/15/files/ppo15_02_genericite.pdf)
 
 ###Emballage & déballage
 Jusqu'à présent, on ne pouvait qu'utiliser la généricité avec des types évolués. La solution est celle de *l'emballage*, c'est-à-dire utiliser les types évolués correspondant aux types de base. Il est aussi possible de déballer.
@@ -384,7 +384,7 @@ Cell<Integer> c = new Cell<>(1);
 int succ = c.get() + 1;
 {% endhighlight %}
 
-###[Limitations de la généricité en Java](http://cs108.epfl.ch/files/ppo15_02_genericite.pdf)
+###[Limitations de la généricité en Java](http://cs108.epfl.ch/archive/15/files/ppo15_02_genericite.pdf)
 
 Pour des raisons historiques, la généricité en Java possède
 les limitations suivantes:
@@ -414,7 +414,7 @@ class BadException<T> // interdit
     extends Exception {}
 {% endhighlight %}
 
-#[Collections](http://cs108.epfl.ch/files/ppo15_03_listes.pdf)
+#[Collections](http://cs108.epfl.ch/archive/15/files/ppo15_03_listes.pdf)
 
 Une collection est un objet contenant d'autres objets. Nous étudierons ici:
 
@@ -520,7 +520,7 @@ List<…> immutableList = Collections.unmodifiableList(new ArrayList<>(list));
 
 ![](http://i.imgur.com/6AA3QWk.png)
 
-Voir [les slides](http://cs108.epfl.ch/files/ppo15_03_listes.pdf) pour la liste des méthodes implémentées par l'interface `Queue`.
+Voir [les slides](http://cs108.epfl.ch/archive/15/files/ppo15_03_listes.pdf) pour la liste des méthodes implémentées par l'interface `Queue`.
 
 ###Règle des listes
 
@@ -547,7 +547,7 @@ L'interface `Iterator` a 3 méthodes:
 - `E next()`
 - `void remove()`
 
-#[Tables Associatives](http://cs108.epfl.ch/files/ppo15_04_tables-associatives.pdf)
+#[Tables Associatives](http://cs108.epfl.ch/archive/15/files/ppo15_04_tables-associatives.pdf)
 Une collection qui associe des **valeurs** à des **clés**.
 
 ![](http://i.imgur.com/rSNnOfi.png)
@@ -732,7 +732,7 @@ public final class Card {
 {% endhighlight %}
 
 
-#[Input/Output](http://cs108.epfl.ch/files/ppo15_06_entrees-sorties.pdf)
+#[Input/Output](http://cs108.epfl.ch/archive/15/files/ppo15_06_entrees-sorties.pdf)
 
 Deux paquetages Java: `java.io` et `java.nio`.  
 Dans `java.io`, l'abstraction de base est le **flot** (*stream*); dans `java.nio`, c'est surtout la **mémoire tampon** (*buffer*). Nous nous intéresserons aux flots.
@@ -902,7 +902,7 @@ try (Reader i = new InputStreamReader(new FileInputStream(fi), StandardCharsets.
 }
 {% endhighlight %}
 
-#[Fonctions anonymes (lambdas)](http://cs108.epfl.ch/files/ppo15_07_fonctions.pdf)
+#[Fonctions anonymes (lambdas)](http://cs108.epfl.ch/archive/15/files/ppo15_07_fonctions.pdf)
 
 Voici comment on trierait une liste par ordre lexiquographique inverse avec une fonction anonyme
 
@@ -1214,7 +1214,7 @@ try(BufferedReader r = new BufferedReader(new FileReader("f.txt"));
 
 *Note:* A l'endroit marqué X, on pourrait réécrire avec `l::isEmpty` (ou un truc du genre) **si** on ne faisait pas un `!`.
 
-#[Généricité avancée](http://cs108.epfl.ch/files/ppo15_08_genericite-avancee.pdf)
+#[Généricité avancée](http://cs108.epfl.ch/archive/15/files/ppo15_08_genericite-avancee.pdf)
 
 ##Sous-types
 Lorsqu'une classe implémente ou étend une autre, alors son type est un sous-type de l'autre (String est un sous-type d'Object, par exemple).
@@ -1299,7 +1299,7 @@ li.addAllInto(l);
 
 En anglais, on s'en souvient avec l'acronyme **PECS** (*Producer `Extends`, Consumer `Super`*).
 
-#[Types bruts](http://cs108.epfl.ch/files/ppo15_08_genericite-avancee.pdf)
+#[Types bruts](http://cs108.epfl.ch/archive/15/files/ppo15_08_genericite-avancee.pdf)
 
 L'introduction de généricité a été faite de façon *backwards-compatible*. `List` n'était pas générique avant, et pour que l'ancien code continue à être valide, alors `List` a été accepté comme un **type brut**.
 
@@ -1307,7 +1307,7 @@ L'introduction de généricité a été faite de façon *backwards-compatible*. 
 >N'utilisez jamais les types bruts dans votre code, ils n'existent que pour faciliter la migration du code écrit avant l'introduction de la généricité.
 
 
-#[Entiers et manipulation de bits](http://cs108.epfl.ch/files/ppo15_09_entiers.pdf)
+#[Entiers et manipulation de bits](http://cs108.epfl.ch/archive/15/files/ppo15_09_entiers.pdf)
 
 ##Types entiers
 En Java, les entiers peuvent être représentés par `byte`, `short`, `int` et `long`, mais ils sont limités (puisque numériques).
@@ -1462,10 +1462,10 @@ public static int bitCount(byte b) {
 }
 {% endhighlight %}
 
-Voir [les slides](http://cs108.epfl.ch/files/ppo15_09_entiers.pdf) pour une description plus détaillée!
+Voir [les slides](http://cs108.epfl.ch/archive/15/files/ppo15_09_entiers.pdf) pour une description plus détaillée!
 
 
-#[Patrons](http://cs108.epfl.ch/files/ppo15_10_patrons_builder-iterator-strategy-factory.pdf)
+#[Patrons](http://cs108.epfl.ch/archive/15/files/ppo15_10_patrons_builder-iterator-strategy-factory.pdf)
 
 Des modèles de programmation pour résoudre des problèmes récurrents (Cependant, attention à ne pas les surutiliser.)
 
@@ -1492,7 +1492,7 @@ Construit un objet différent en fonction de l'input (par exemple, en fonction d
 
 
 
-Honnêtement, voir les [slides](http://cs108.epfl.ch/files/ppo15_10_patrons_builder-iterator-strategy-factory.pdf). Je ne prendrai pas plus de notes cette semaine. Cependant, une liste est présentée ci-dessous.
+Honnêtement, voir les [slides](http://cs108.epfl.ch/archive/15/files/ppo15_10_patrons_builder-iterator-strategy-factory.pdf). Je ne prendrai pas plus de notes cette semaine. Cependant, une liste est présentée ci-dessous.
 
 - *Builder*
 - *Iterator*
@@ -1539,7 +1539,7 @@ On définit des pseudos-formes qui en transforment d'autres.
 Souvent, il est difficile de grouper plusieurs éléments et les reclasser; par exemple, pour un groupe de formes, on veut les grouper pour former une grande forme.
 
 ### Solution
-On définit une pseudo-forme qui représente un <groupe class=""></groupe>
+On définit une pseudo-forme qui représente un groupe.
 
 ## Composite / Decorator
 La différence entre Composite et Decorator est minime et se résume au fait que le premier référence plusieurs objets de son propre type, le second un seul.
@@ -1574,7 +1574,7 @@ Ensemble du code responsable de la gestion des entrées de l'utilisateur (gérer
 - **Facile à tester**: car les parties sont indépendantes.
 
 
-# [Interfaces graphiques](http://cs108.epfl.ch/files/ppo15_13_interfaces-graphiques.pdf)
+# [Interfaces graphiques](http://cs108.epfl.ch/archive/15/files/ppo15_13_interfaces-graphiques.pdf)
 Les principales librairies sont AWT, Swing et JavaFX.
 
 ## Composants
