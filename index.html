@@ -3,17 +3,19 @@ layout: default
 ---
 
 {% for post in site.posts %}
-   <article class="post">
-       <header>
-            <a href="{{ post.url }}">
-                <h1>{{ post.title }}</h1>
-            </a>
-            {% if post.date %}<p class="date"><time datetime="{{ post.date | date: '%F' }}">{{ post.date | date: "%B %e, %Y" }}</time></p>{% endif %}
-        </header>
-        
-        {{ post.excerpt }}
-        
-        <a href="{{ post.url }}">Read more</a>
-        
-    </article>
+    {% unless post.unlisted %}
+       <article class="post">
+           <header>
+                <a href="{{ post.url }}">
+                    <h1>{{ post.title }}</h1>
+                </a>
+                {% if post.date %}<p class="date"><time datetime="{{ post.date | date: '%F' }}">{{ post.date | date: "%B %e, %Y" }}</time></p>{% endif %}
+            </header>
+            
+            {{ post.excerpt }}
+            
+            <a href="{{ post.url }}">Read more</a>
+            
+        </article>
+    {% endunless %}
 {% endfor %}

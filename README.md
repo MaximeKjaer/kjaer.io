@@ -11,12 +11,13 @@ My personal page - built using [Jekyll](http://jekyllrb.com/) & elbow grease.
     image: splash-image.jpg
     fallback-color: "#0f45b7"
     description: This is a sample post showing how everything that you can do with this Jekyll site.
-    published: false # Defaults to true.
-    comments: false # Defaults to true.
+    published: false #Defaults to true.
+    comments: false #Defaults to true.
+    unlisted: true #Defaults to false.
     ---
-
+    
     Using the YAML Front Matter (everything above this sentence) is mandatory. Filling out the post and title fields is more than highly recommended.
-
+    
     This text will be the post's body, and will also be shown on the front page's preview.
     
     ## Code
