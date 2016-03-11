@@ -1,9 +1,8 @@
 ---
-title: "Waiting for spec support: makeshift responsive images"
+title: "Waiting for browser support: makeshift responsive images"
 description: The new specification for responsive images isn't well supported, especially in the very devices that need it. Here's what we can do in the meantime.
 image: /images/hero/bench.jpg
 fallback-color: "#D4AB9B"
-unlisted: true
 ---
 
 I suffer from the most common responsive issue. As my [recent](/travis/) [post history](/web-performance-2.0/) [may attest to](/quick-cache-this/), performance matters to me. At the same time, though, I also want my images to look great on every screen, and that's not as trivial as it may sound. For a long time, it's been impossible to have high quality images of minimal size on every screen. This classic problem is *just* being solved right now by the [Responsive Issues Community Group](https://www.w3.org/community/respimg/), but the solution isn't quite ready for prime time yet.
