@@ -2,31 +2,31 @@
 <html lang="en" prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article#">
 <head>
     {% include head.html %}
+    {% strip %}
+        {% if page.image %}
+            {% if page.fallback-color %}
+                {% assign background-color = page.fallback-color %}
+            {% endif %}
+            {% assign background-image = page.image %}
+        {% else %}
+            {% assign background-color = '#d3dbe7' %}
+            {% assign background-image = site.hero_image %}
+        {% endif %}
+
+        <style type="text/css">
+        .hero {
+            background-color: {{ background-color }};
+            background-image: url('{{ background-image }}');
+        }
+
+        {% for size in site.image_breakpoints %}
+            {% include functions/hero-responsive-background.css size=size image=background-image %}
+        {% endfor %}
+
+        </style>
+{% endstrip %}
 </head>
 <body>
-{% strip %}
-    {% if page.image %}
-        {% if page.fallback-color %}
-            {% assign background-color = page.fallback-color %}
-        {% endif %}
-        {% assign background-image = page.image %}
-    {% else %}
-        {% assign background-color = '#d3dbe7' %}
-        {% assign background-image = site.hero_image %}
-    {% endif %}
-
-    <style type="text/css">
-    .hero {
-        background-color: {{ background-color }};
-        background-image: url('{{ background-image }}');
-    }
-
-    {% for size in site.image_breakpoints %}
-        {% include functions/hero-responsive-background.css size=size image=background-image %}
-    {% endfor %}
-
-    </style>
-{% endstrip %}
     <header class="hero">
 
         <nav class="top-right">
