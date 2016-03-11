@@ -16,12 +16,12 @@ $code-default_color: #ccc;
 
 .gutter { // The parent of the linenos.
 	user-select: none;
+	cursor: default;
+	
 	::selection {
 		color: $code-default_color;
 		background-color: transparent;
 	}
-	
-	cursor: default;
 }
 
 .highlight {
@@ -61,7 +61,7 @@ $code-default_color: #ccc;
 	// Syntax highlighting!
 	.c {
 		color: #707070;
-		font-style: italic
+		font-style: italic;
 	} // Comment
 	.err {
 		color: #a61717;

@@ -26,6 +26,7 @@
 		color: $white;
 		text-decoration: none;
 	}
+	
 	.title {
 		transform: translateY(-50%);
 
@@ -75,8 +76,7 @@
 		font-size: $large;
 		
 		color: $white;
-		opacity: 1;
-		
+
 		&:hover {
 			opacity: 0.7;
 		}
