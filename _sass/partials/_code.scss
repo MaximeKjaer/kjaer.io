@@ -6,16 +6,18 @@
 //---------------------------
 
 $code-default_padding: 5px;
+$code-default_color: #ccc;
 
 .lineno {
 	display: inline-block;
 
-	color: #ccc;	
+	color: $code-default_color;	
 }
 
 .gutter { // The parent of the linenos.
 	user-select: none;
 	::selection {
+		color: $code-default_color;
 		background-color: transparent;
 	}
 	
@@ -44,7 +46,7 @@ $code-default_padding: 5px;
 		word-wrap: normal;
 
 		.code { // If using linenos, this is the code.
-			border-left: 1px solid #ccc;
+			border-left: 1px solid $code-default_color;
 			width: 100%;
 		}
 		
