@@ -23,7 +23,7 @@
 {% endif %}
 
 {% if page.image %}
-    {% capture image_url %}{{ site.url }}/images/{{ page.image }}{% endcapture %}
+    {% capture image_url %}{{ site.url }}{{ page.image }}{% endcapture %}
 {% else %}
     {% capture image_url %}{{ site.url }}{{ site.hero_image }}{% endcapture %}
 {% endif %}
