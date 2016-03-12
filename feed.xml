@@ -57,7 +57,7 @@ layout: null
 
         <id>{{ post.id | prepend: url_base | xml_escape }}</id>
         <content type="html" xml:base="{{ post.url | prepend: url_base | xml_escape }}">
-          &lt;img src=&quot;{% if post.image %}{{ url_base | xml_escape }}/images/{{ post.image }}{% else %}{{ url_base | xml_escape }}{{ site.hero_image }}{% endif %}&quot; class=&quot;webfeedsFeaturedVisual&quot;&gt;
+          &lt;img src=&quot;{% if post.image %}{{ url_base | xml_escape }}{{ post.image }}{% else %}{{ url_base | xml_escape }}{{ site.hero_image }}{% endif %}&quot; class=&quot;webfeedsFeaturedVisual&quot;&gt;
         
         {{ post.content | markdownify | xml_escape }}</content>
 
