@@ -1,8 +1,9 @@
 ---
 title: CS-108 – Pratique de la programmation orientée-objet
+description: "Mes notes de CS-108 pendant le semestre de printemps 2015 à l'EPFL."
 image: /images/hero/interlaken.png
 fallback-color: "#9ea98f"
-published: false
+unlisted: true
 ---
 
 #[Le projet Imhof](http://cs108.epfl.ch/archive/15/p00_intro.html)
