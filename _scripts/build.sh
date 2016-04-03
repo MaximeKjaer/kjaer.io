@@ -40,9 +40,12 @@ function compare {
 	echo "Comparing this build to the previous one"
 	cd _site
 	git checkout master
+	
 	modfiles=$(git diff --name-only master..build | grep -v $gzip_ext)
-	modimg=$(grep $img_ext <<< "$modfiles") # Maybe we'll get to use this later, but we'll see.
-	modzopfli=$(grep $zopfli_ext <<< "$modfiles")
+	modimg=$(grep $img_ext <<< "$modfiles" | tr '\n' ' ') # Not used right now, but this is a TODO.
+	modzopfli=$(grep $zopfli_ext <<< "$modfiles" | tr '\n' ' ')
+	modfiles=$(echo $modfiles | tr '\n' ' ')
+
 	git merge -X theirs --commit -m "Merge build #$TRAVIS_BUILD_NUMBER" build
 	cd ..
 }
@@ -52,7 +55,7 @@ build
 compare
 
 # Compress assets with Zopfli (should always be the last command)
-echo "Compressing the following assets using Zopfli: $modzopfli"
+echo "Compressing the following assets using Zopfli: $modfiles"
 cd _site
-../zopfli/zopfli --i1000 "$modzopfli"
+../zopfli/zopfli --i1000 $modzopfli
 cd ..
