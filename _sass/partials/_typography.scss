@@ -96,7 +96,7 @@
 	}
 	
 	// Text
-	p, li, dl, h4, h5, h6 {
+	p, li, dl, h4, h5, h6, figcaption {
 		line-height: $large-line-height;
 		
 		@include media($medium-screen) {
@@ -130,6 +130,21 @@
 		display: block;
 		margin: 1em auto;
 		max-width: 100%;
+	}
+
+	figure {
+		img {
+			margin-bottom: 0.5em;
+		}
+		figcaption {
+			text-align: center;
+			font-style: italic;
+			color: $dark-grey;
+			padding: 0 1em;
+			@include media($small-screen) {
+				padding: 0;
+			}
+		}
 	}
 	
 	blockquote {
