@@ -28,6 +28,7 @@ I thought that I'd compile a list of some of the best articles that I've read he
 - [Readme Driven Development](http://tom.preston-werner.com/2010/08/23/readme-driven-development.html) &ndash; Tom Preston-Werner, August 23, 2014
 - [Algorithm for playing Battleships](http://www.datagenetics.com/blog/december32011/index.html) &ndash; Data Genetics, December 2011
 - [Write the Docs](http://docs.writethedocs.org/) &ndash; Eric Holscher & Troy Howard
+- [The Git Parable](http://tom.preston-werner.com/2009/05/19/the-git-parable.html) &mdash; Tom Preston-Werner, 19 May 2009
 
 
 ### Language Design
