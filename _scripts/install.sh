@@ -7,7 +7,7 @@ chmod 600 raindrop-deploy
 mv raindrop-deploy ~/.ssh/id_rsa
 
 echo "Installing zopfli"
-git clone https://code.google.com/p/zopfli/
+git clone https://github.com/google/zopfli.git
 cd zopfli
 make
 chmod +x zopfli
