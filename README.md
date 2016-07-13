@@ -1,4 +1,4 @@
-# [KjaerMaxi.me](http://kjaermaxi.me/)
+# [kjaer.io](https://kjaer.io/)
 
 [![Build Status](https://travis-ci.org/MaximeKjaer/kjaermaxi.me.svg?branch=travis-test)](https://travis-ci.org/MaximeKjaer/kjaermaxi.me)
 
