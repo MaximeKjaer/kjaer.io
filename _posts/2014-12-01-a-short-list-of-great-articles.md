@@ -28,7 +28,11 @@ I thought that I'd compile a list of some of the best articles that I've read he
 - [Readme Driven Development](http://tom.preston-werner.com/2010/08/23/readme-driven-development.html) &ndash; Tom Preston-Werner, August 23, 2014
 - [Algorithm for playing Battleships](http://www.datagenetics.com/blog/december32011/index.html) &ndash; Data Genetics, December 2011
 - [Write the Docs](http://docs.writethedocs.org/) &ndash; Eric Holscher & Troy Howard
+
+### Git
+- [A tidy, linear Git history](http://www.bitsnbites.eu/?p=221) &mdash; Bits'n'Bites, 23 December 2015
 - [The Git Parable](http://tom.preston-werner.com/2009/05/19/the-git-parable.html) &mdash; Tom Preston-Werner, 19 May 2009
+- [Merging vs. Rebasing](https://www.atlassian.com/git/tutorials/merging-vs-rebasing) &mdash; Atlassian
 
 
 ### Language Design
@@ -37,6 +41,7 @@ I thought that I'd compile a list of some of the best articles that I've read he
 - [Great Works in Programming Languages](https://www.cis.upenn.edu/~bcpierce/courses/670Fall04/GreatWorksInPL.shtml) &ndash; Benjamin C. Pierce, December 01, 2004
 
 ### Meta
+- [Bots won't replace apps. Better apps will replace apps.](http://dangrover.com/blog/2016/04/20/bots-wont-replace-apps.html) &mdash; Dan Grover, April 20, 2016
 - [Why Performance Matters: The Perception Of Time](https://www.smashingmagazine.com/2015/09/why-performance-matters-the-perception-of-time/) &ndash; Denys Mishunov, September 24, 2015
 - [How I killed app sales by going freemium](https://medium.com/@shuveb/how-i-killed-app-sales-by-going-freemium-31c04c60d2f2) &ndash; Shuveb Hussain, June 6, 2015 (see [HN thread](https://news.ycombinator.com/item?id=9673650) too)
 
@@ -55,7 +60,6 @@ I thought that I'd compile a list of some of the best articles that I've read he
 ### Art
 - [Some JavaScript Sketches](https://mattdesl.svbtle.com/some-javascript-sketches), Matt Deslauriers, October 13, 2015
 - [Fraunhofer lines](http://booktwo.org/notebook/fraunhofer-lines/) &ndash;  James Bridle, October 5, 2015
-
 
 ## Other
 - [Fukushima](http://www.podniesinski.pl/portal/fukushima/), Arkadiusz Podniesiński, September 16, 2015
