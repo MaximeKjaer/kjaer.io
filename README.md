@@ -1,6 +1,6 @@
 # [kjaer.io](https://kjaer.io/)
 
-[![Build Status](https://travis-ci.org/MaximeKjaer/kjaermaxi.me.svg?branch=travis-test)](https://travis-ci.org/MaximeKjaer/kjaermaxi.me)
+[![Build Status](https://travis-ci.org/MaximeKjaer/kjaer.io.svg?branch=master)](https://travis-ci.org/MaximeKjaer/kjaer.io)
 
 My personal page - built using [Jekyll](http://jekyllrb.com/) & elbow grease.
 
