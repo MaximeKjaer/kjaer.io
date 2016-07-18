@@ -1,4 +1,4 @@
 #!/bin/bash
 
 echo "Proofing the HTML"
-timeout 60s bundle exec htmlproofer ./_site --check-html --check-favicon --allow-hash-href --external_only --only-4xx --http-status-ignore 429
+timeout 120s bundle exec htmlproofer ./_site --check-html --check-favicon --allow-hash-href --external_only --only-4xx --http-status-ignore 429
