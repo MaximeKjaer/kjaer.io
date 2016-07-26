@@ -3,6 +3,7 @@ title: A short list of great articles
 description: This post serves as a continuously updated list of my favorite articles online.
 image: /images/hero/library.jpg
 fallback-color: "#e3deda"
+edited: true
 ---
 
 I read *a lot* of articles on a daily basis. But some of them really stand out to me: they give me food for thought, great insight into very interesting subjects, or are just generally eloquently written.
