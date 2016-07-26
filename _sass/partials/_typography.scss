@@ -179,6 +179,16 @@
 	.twitter-tweet-rendered {
 		margin: auto;
 	}
+
+	.article-links {
+		padding: 0;
+		list-style: none;
+
+		svg {
+			fill: $black;
+			margin-right: .25em;
+		}
+	}
 }
 
 article, .post, footer nav { // applies to the footer too, now that we're at it!

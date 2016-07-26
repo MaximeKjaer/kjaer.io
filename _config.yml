@@ -27,6 +27,9 @@ image_breakpoints: # Important that these be in decreasing order!
   - 550px
   - 380px
 
+# The URL of your GitHub repo
+github: https://github.com/MaximeKjaer/kjaer.io
+
 # Your website URL
 # Used for Sitemap.xml and your RSS feed
 url: https://kjaer.io
