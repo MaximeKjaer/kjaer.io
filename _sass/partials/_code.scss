@@ -5,13 +5,13 @@
 //
 //---------------------------
 
-$code-default_padding: 5px;
-$code-default_color: #ccc;
+$code_default-padding: 5px;
+$code_default-color: #ccc;
 
 .lineno {
 	display: inline-block;
 
-	color: $code-default_color;	
+	color: $code_default-color;	
 }
 
 .gutter { // The parent of the linenos.
@@ -19,7 +19,7 @@ $code-default_color: #ccc;
 	cursor: default;
 	
 	::selection {
-		color: $code-default_color;
+		color: $code_default-color;
 		background-color: transparent;
 	}
 }
@@ -39,19 +39,19 @@ $code-default_color: #ccc;
 	> pre > code { // The whole block, including linenos if any
 		display: block;
 		
-		padding: $code-default_padding; // add the default padding around the code...
+		padding: $code_default-padding; // add the default padding around the code...
 		
 		white-space: pre;
 		overflow-x: auto;
 		word-wrap: normal;
 
 		.code { // If using linenos, this is the code.
-			border-left: 1px solid $code-default_color;
+			border-left: 1px solid $code_default-color;
 			width: 100%;
 		}
 		
 		table, tr, td, th { // If using linenos, this is the container of linenos *and* code.
-			margin: -1 * $code-default_padding; // ... but remove the default padding if we're using linenos.
+			margin: -1 * $code_default-padding; // ... but remove the default padding if we're using linenos.
 			border: 0;
 			background-color: $white;
 		}
