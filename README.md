@@ -1,49 +1,85 @@
-# [kjaer.io](https://kjaer.io/)
+# [kjaer.io](https://kjaer.io)
 
 [![Build Status](https://travis-ci.org/MaximeKjaer/kjaer.io.svg?branch=master)](https://travis-ci.org/MaximeKjaer/kjaer.io)
 
-My personal page - built using [Jekyll](http://jekyllrb.com/) & elbow grease.
+My personal blog. Built with Jekyll.
 
-## Syntax of a post:
+[![Screenshot of my website](https://i.imgur.com/QVTzndb.jpg "Screenshot of my website")](https://i.imgur.com/QVTzndb.jpg)
 
-    ---
-    title: A sample post
-    image: splash-image.jpg
-    fallback-color: "#0f45b7"
-    description: This is a sample post showing how everything that you can do with this Jekyll site.
-    published: false #Defaults to true.
-    comments: false #Defaults to true.
-    unlisted: true #Defaults to false.
-    ---
-    
-    Using the YAML Front Matter (everything above this sentence) is mandatory. Filling out the post and title fields is more than highly recommended.
-    
-    This text will be the post's body, and will also be shown on the front page's preview.
-    
-    ## Code
-    
-    It is possible to insert code:
-    
-    {% highlight python %}
-    def hello():
-        print("Hello World!")
-    {% endhighlight %}
-    
-    As of right now, line numbers don't work because of a bug in Rouge.
+## Writing a post
+See the [Jekyll Documentation](https://jekyllrb.com/docs/posts/) for how to create a Jekyll post.
 
-    ## Separator
-    
-    This text will be shown in the preview, as it comes before the Separator tag.
-    
-    <!--- Separator -->
+### Supported YAML Frontmatter fields
+| Option | Description | Default |
+| :----- | :---------- | :------ |
+| `title` | The title of the post | ` ` |
+| `description` | A brief description of the post. This description *may* be used by search engines, and *will* be used when the post is shared on Facebook and Twitter. | `site.description`
+| `image` | The hero image | `site.hero_image` |
+| `fallback-color` | Hex color code of the color (in quotes) that will be shown behind the hero image. This is especially useful if the hero image fails to load, or takes a while to do so. If we show the image's average color, the flash of the image appearing will be less harsh. I've been using [Color Thief](http://lokeshdhakar.com/projects/color-thief/) to get this average color. | `site.fallback-color` |
+| `comments` | If `false`, there won't be a Disqus comment field on the post | `true` |
+| `published` | If `false`, the post won't be rendered or published | `true` |
+| `unlisted` | If `true`, the post will be published, but won't be listed in the RSS feed or on the front page | `false` |
+| `edited` | If `true`, there will be a link leading to the post's GitHub edit history at the bottom of the post | `false` |
+| `hn` | If a HN link is specified, there will be a link leading to the HN discussion at the bottom of the post | ` ` |
 
-    This text won't be shown in the preview, as it comes after the Separator tag.
-    
-    ## Quotes
-    
-    > Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras in consectetur augue. Sed quis efficitur mauris. Suspendisse potenti. Duis maximus consequat leo, eget placerat eros venenatis id. Cras a sem turpis. Quisque porta sollicitudin magna, mattis luctus risus pulvinar malesuada. Fusce posuere mattis convallis. Aliquam sit amet dictum metus, quis accumsan libero.
+### Excerpt separator
+On the front page of the site, excerpts of every post are shown. On this site, a post "breaks" on the first HTML comment by default, so the end of the front page's excerpt can be marked as such in a post:
 
-    ## Images
-    
-    ![Image title](http://link-to-image.com/image.jpeg)
-    ![Image title](/images/local-image.jpeg)
+```markdown
+---
+title: How to define excerpts within the post
+---
+
+Here's an intro. See you after the break!
+
+<!-- More -->
+
+Here's the rest of the post.
+```
+
+### Sample post
+```markdown
+---
+title: A sample post
+image: /images/hero/example.jpg
+fallback-color: "#0f45b7"
+description: A sample post showing how YAML Frontmatter works on this site.
+comments: false
+unlisted: true
+edited: true
+hn: https://news.ycombinator.com/item?id=12114523
+---
+
+This post is an example.
+
+<!-- More -->
+
+This is the end of the article!
+```
+
+## Building the site
+In a development environment, the following command should suffice:
+
+    jekyll serve
+
+However, to prepare the site for production, a few additional steps are taken:
+
+- Autoprefixer ensures that all the CSS is compatible with the 2 last versions if every browser
+- Hero images are resized to the breakpoints defined in `_config.yml`
+- Assets are Zopfli-compressed
+
+There's a grunt task set up that handles the first two:
+
+    grunt build
+
+The last one is (for now) a simple bash command to the zopfli binary. It would be great to manage this through Grunt though.
+
+    zopfli --i1000 $files
+
+
+## Wishlist / Todo :star:
+- [ ] Rework `_config.yml` file to provide more optional switches
+- [ ] Rework `_config.yml`'s [prose.io](http://prose.io/) settings
+- [ ] Check to see that all `_config.yml` fields actually are used.
+- [ ] Rework 404 page
+- [ ] Set up Grunt to take care of Zopfli compression
