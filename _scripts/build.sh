@@ -29,7 +29,7 @@ function build {
 	echo "Building..."
 	bundle exec jekyll build # Build the site with Jekyll
 	grunt build # Build with Grunt; see Gruntfile.js for more details.
-	echo "Commiting the build"
+	echo "Committing the build"
 	cd _site
 	git add .
 	git commit -q -m "Build #$TRAVIS_BUILD_NUMBER"
