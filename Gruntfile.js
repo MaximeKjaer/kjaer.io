@@ -3,7 +3,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-responsive-images');
 
 	// Read what image breakpoints have been specified in _config.yml
-	var breakpoints = grunt.file.readYAML('_config.yml').image_breakpoints;
+	var breakpoints = grunt.file.readYAML('_config.yml').hero.breakpoints;
 	var sizes = [];
 	for (i = 0; i < breakpoints.length; i++)
 		sizes.push({width: breakpoints[i],

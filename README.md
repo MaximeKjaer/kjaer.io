@@ -14,8 +14,8 @@ See the [Jekyll Documentation](https://jekyllrb.com/docs/posts/) for how to crea
 | :----- | :---------- | :------ |
 | `title` | The title of the post | ` ` |
 | `description` | A brief description of the post. This description *may* be used by search engines, and *will* be used when the post is shared on Facebook and Twitter. | `site.description`
-| `image` | The hero image | `site.hero_image` |
-| `fallback-color` | Hex color code of the color (in quotes) that will be shown behind the hero image. This is especially useful if the hero image fails to load, or takes a while to do so. If we show the image's average color, the flash of the image appearing will be less harsh. I've been using [Color Thief](http://lokeshdhakar.com/projects/color-thief/) to get this average color. | `site.fallback-color` |
+| `image` | The hero image | `site.hero.image` |
+| `fallback-color` | Hex color code of the color (in quotes) that will be shown behind the hero image. This is especially useful if the hero image fails to load, or takes a while to do so. If we show the image's average color, the flash of the image appearing will be less harsh. I've been using [Color Thief](http://lokeshdhakar.com/projects/color-thief/) to get this average color. | `site.hero.fallback-color` |
 | `comments` | If `false`, there won't be a Disqus comment field on the post | `true` |
 | `published` | If `false`, the post won't be rendered or published | `true` |
 | `unlisted` | If `true`, the post will be published, but won't be listed in the RSS feed or on the front page | `false` |
@@ -80,6 +80,5 @@ The last one is (for now) a simple bash command to the zopfli binary. It would b
 ## Wishlist / Todo :star:
 - [ ] Rework `_config.yml` file to provide more optional switches
 - [ ] Rework `_config.yml`'s [prose.io](http://prose.io/) settings
-- [ ] Check to see that all `_config.yml` fields actually are used.
 - [ ] Rework 404 page
 - [ ] Set up Grunt to take care of Zopfli compression

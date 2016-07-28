@@ -1,7 +1,8 @@
 ---
 layout: null
 ---
-{% strip %}<?xml version="1.0" encoding="utf-8"?>
+{% strip %}
+<?xml version="1.0" encoding="utf-8"?>
 {% if site.url %}
   {% assign url_base = site.url | append: site.baseurl %}
 {% else %}
@@ -26,22 +27,20 @@ layout: null
     <author>
       {% if site.author.name %}
         <name>{{ site.author.name | xml_escape }}</name>
-      {% else %}
-        <name>{{ site.author | xml_escape }}</name>
       {% endif %}
       {% if site.author.email %}
         <email>{{ site.author.email | xml_escape }}</email>
       {% endif %}
-      {% if site.author.uri %}
-        <uri>{{ site.author.uri | xml_escape }}</uri>
+      {% if site.author.url %}
+        <uri>{{ site.author.url | xml_escape }}</uri>
       {% endif %}
     </author>
   {% endif %}
   
-  {% if site.google_analytics%}
+  {% if site.google_analytics %}
     <webfeeds:analytics id="{{ site.google_analytics }}" engine="GoogleAnalytics"/>
   {% endif %}
-  <webfeeds:cover image="{{ url_base | xml_escape }}{{ site.hero_image }}" />
+  <webfeeds:cover image="{{ url_base | xml_escape }}{{ site.hero.image }}" />
 
   {% for post in site.posts limit: 15 %}
     {% unless post.unlisted %}
@@ -57,7 +56,7 @@ layout: null
 
         <id>{{ post.id | prepend: url_base | xml_escape }}</id>
         <content type="html" xml:base="{{ post.url | prepend: url_base | xml_escape }}">
-          &lt;img src=&quot;{% if post.image %}{{ url_base | xml_escape }}{{ post.image }}{% else %}{{ url_base | xml_escape }}{{ site.hero_image }}{% endif %}&quot; class=&quot;webfeedsFeaturedVisual&quot;&gt;
+          &lt;img src=&quot;{% if post.image %}{{ url_base | xml_escape }}{{ post.image }}{% else %}{{ url_base | xml_escape }}{{ site.hero.image }}{% endif %}&quot; class=&quot;webfeedsFeaturedVisual&quot;&gt;
         
         {{ post.content | markdownify | xml_escape }}</content>
 
@@ -71,8 +70,8 @@ layout: null
             {% if post.author.email %}
               <email>{{ post.author.email | xml_escape }}</email>
             {% endif %}
-            {% if post.author.uri %}
-              <uri>{{ post.author.uri | xml_escape }}</uri>
+            {% if post.author.url %}
+              <uri>{{ post.author.url | xml_escape }}</uri>
             {% endif %}
           </author>
         {% endif %}

@@ -9,8 +9,8 @@
             {% endif %}
             {% assign background-image = page.image %}
         {% else %}
-            {% assign background-color = '#d3dbe7' %}
-            {% assign background-image = site.hero_image %}
+            {% assign background-color = site.hero.fallback-color %}
+            {% assign background-image = site.hero.image %}
         {% endif %}
 
         <style type="text/css">
@@ -20,7 +20,7 @@
             {% if page.background-position %} background-position: {{ page.background-position}}; {% endif %}
         }
 
-        {% for size in site.image_breakpoints %}
+        {% for size in site.hero.breakpoints %}
             {% include functions/hero-responsive-background.css size=size image=background-image %}
         {% endfor %}
 
@@ -36,7 +36,7 @@
          
         <a href="/">
             <div class="title">
-                <h1>OUTPUT</h1>
+                <h1>{{ site.name }}</h1>
                 <p>{{ site.subtitle }}</p>
             </div>
         </a>

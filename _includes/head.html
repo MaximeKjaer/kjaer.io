@@ -1,31 +1,27 @@
 {% strip %}   
 
-{% if site.title and site.subtitle %}
-    {% capture site_name %}{{ site.title }}&nbsp;&ndash;&nbsp;{{ site.subtitle }}{% endcapture %}
-{% elsif site.title %}
-    {% assign site_name = site.title %}
-{% else %}
-    {% assign site_name = 'My Jekyll Blog' %}
+{% if site.name and site.subtitle %}
+    {% capture site_title %}{{ site.name }}&nbsp;&ndash;&nbsp;{{ site.subtitle }}{% endcapture %}
+{% elsif site.name %}
+    {% assign site_title = site.name %}
 {% endif %}
 
 {% if page.title %}
     {% assign page_title = page.title %}
 {% else %}
-    {% assign page_title = site_name %}
+    {% assign page_title = site_title %}
 {% endif %}
 
 {% if page.description %}
     {% capture description %}{{ page.description }}{% endcapture %}
 {% elsif site.description %}
     {% capture description %}{{ site.description }}{% endcapture %}
-{% else %}
-    {% assign description = 'Welcome to my blog!' %}
 {% endif %}
 
 {% if page.image %}
     {% capture image_url %}{{ site.url }}{{ page.image }}{% endcapture %}
 {% else %}
-    {% capture image_url %}{{ site.url }}{{ site.hero_image }}{% endcapture %}
+    {% capture image_url %}{{ site.url }}{{ site.hero.image }}{% endcapture %}
 {% endif %}
 
 <!-- Meta tags -->
@@ -33,7 +29,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ page_title }}</title>
-<meta name="author" content="{{ site.name | xml_escape }}">
+<meta name="author" content="{{ site.author.name | xml_escape }}">
 <meta name="description" content="{{ description | xml_escape }}">
 <link rel="icon" href="/favicon.ico?v=1.0">
 
@@ -44,7 +40,7 @@
 <!-- OpenGraph meta tags -->
 <meta name="twitter:card" content="summary_large_image">
 
-<meta property="og:site_name" content="{{ site_name | xml_escape }}">
+<meta property="og:site_name" content="{{ site_title | xml_escape }}">
 
 <meta property="article:author" content="{{ site.url }}/about/">
 <meta name="twitter:site" content="{{ site.author.twitter }}">
@@ -86,7 +82,7 @@
 {% endif %}
 
 <!-- RSS -->
-<link rel="alternate" type="application/rss+xml" title="{{ site_name | xml_escape }}" href="{{ site.baseurl }}/feed.xml">
+<link rel="alternate" type="application/rss+xml" title="{{ site_title | xml_escape }}" href="{{ site.baseurl }}/feed.xml">
 
 {% include analytics.html %}
 
