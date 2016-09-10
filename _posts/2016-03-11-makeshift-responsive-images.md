@@ -3,6 +3,7 @@ title: "Waiting for browser support: makeshift responsive images"
 description: The new specification for responsive images isn't well supported, especially in the very devices that need it. Here's what we can do in the meantime.
 image: /images/hero/bench.jpg
 fallback-color: "#D4AB9B"
+edited: true
 ---
 
 I suffer from the most common responsive issue. As my [recent](/travis/) [post history](/web-performance-2.0/) [may attest to](/quick-cache-this/), performance matters to me. At the same time, though, I also want my images to look great on every screen, and that's not as trivial as it may sound. For a long time, it's been impossible to have high quality images of minimal size on every screen. This classic problem is *just* being solved right now by the [Responsive Issues Community Group](https://www.w3.org/community/respimg/), but the solution isn't quite ready for prime time yet.
@@ -16,7 +17,7 @@ Now, these new specifications are backwards-compatible (as in, they won't break 
 
 As you can see in the [caniuse.com](http://caniuse.com/) table below, the `<picture>`  element is barely supported on mobile. Now, in all fairness, it does say that the current version of the default Android browser supports it, but I'd argue against that: while the current listed version officially is a WebView of Chromium 47, it has 0% global usage, so I'd say that the *de facto* current version still is 4.4.4.
 
-![Support of the picture element in mobile browsers](/images/picture-support.png)
+![A chart of which mobile browsers support the picture element; most of them don't](/images/picture-support.png)
 
 Sure, I could use [a polyfill](http://scottjehl.github.io/picturefill/). But I'm interested in this new spec for performance reasons, so loading and running 1500 lines of Javascript is *not* going to cut it.
 
@@ -41,7 +42,7 @@ To see how far media queries could take us, I tried to implement them on the ban
 ## How I picked my breakpoints
 The web isn't just iPhones, iPads and iMacs. There is a huge ecosystem out there of weirdo screen sizes and resolutions, and it's important to support them all. A quick glance at my latest analytics report confirmed this. I don't have a whole lot of visitors, but look at the diversity in screen sizes!
 
-![Cold hard data: the screen sizes visitors have been sporting](/images/screensizes.png)
+![Cold hard data: a list of screen sizes visitors have been sporting](/images/screensizes.png)
 
 There are quite a few screens in the 300px width range, but there is also a healthy number of 500 to 800px screens, along with screens wider than 1280px. Who knows what devices these may correspond to, but at least we have some sort of idea of what breakpoints we might pick. 
 
@@ -204,6 +205,6 @@ See, what I've done here is to specify absolute rules, with breakpoints that are
 
 That's exactly what this new specification is all about. I can now just give the browser a discreet hint of what it could load, and it'll make the decision itself. But right now, no matter how obvious and forced I make my hints, almost half of all browsers will be completely oblivious to them.
 
-![A gif of me giving a hint](http://i.imgur.com/Exh8trU.gif)
+![A gif of what I look like giving a subtle hint](http://i.imgur.com/Exh8trU.gif)
 
 Don't get me wrong, I really do look forward to being able to implement `<picture>`, `srcset` and `image-set`. The reality is just that I wouldn't have been able to achieve the same results with them.
