@@ -1,0 +1,28 @@
+//---------------------------
+//
+// ## Table of contents
+// If a table of contents is defined in a post
+//
+//---------------------------
+
+#markdown-toc {
+	font-size: 0.9em;
+	padding: 1em;
+	display: inline-block;
+	background-color: lighten($light-grey, 10%);
+
+	&, ul {
+		counter-reset: section;
+		list-style: none;
+	}
+
+	li {
+		display: block;
+	}
+
+	li::before {
+		padding-right: 0.4em;
+		counter-increment: section;
+		content: counters(section, ".")" ";
+	}
+}
