@@ -58,11 +58,17 @@ This is the end of the article!
 ```
 
 ## Building the site
+### Development
 In a development environment, the following command should suffice:
 
     jekyll serve
 
-However, to prepare the site for production, a few additional steps are taken:
+### Production
+In production, we're not serving the site locally, we're building it. This is done through the following command:
+
+    jekyll build
+
+To prepare the site for production, a few additional steps are taken.
 
 - Autoprefixer ensures that all the CSS is compatible with the 2 last versions if every browser
 - Hero images are resized to the breakpoints defined in `_config.yml`
@@ -76,6 +82,7 @@ The last one is (for now) a simple bash command to the zopfli binary. It would b
 
     zopfli --i1000 $files
 
+Luckily, this is all done automagically with Travis CI. You can see the scripts it runs in the [`_scripts` folder](/tree/master/_scripts).
 
 ## Wishlist / Todo :star:
 - [ ] Rework `_config.yml` file to provide more optional switches
