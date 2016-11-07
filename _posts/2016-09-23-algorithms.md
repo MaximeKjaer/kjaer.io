@@ -1201,6 +1201,7 @@ def optimal-bst(p, q, n):
 The runtime is $$\Theta(n^3)$$: there are $$\Theta(n^2) cells to fill in, most of which take $$\Theta(n)$$ to fill in.
 
 ## Review of the course
+
 ### Growth of functions
 1. The logs: $$\log{N}, \log^2{N}, \dots$$
 2. The polynomials: $$\sqrt{N}, 20N, N^2, \dots$$
