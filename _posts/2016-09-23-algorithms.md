@@ -12,7 +12,7 @@ math: true
 
 ## Links and books
 - [Course homepage](http://theory.epfl.ch/courses/algorithms/)
-- Introduction to Algorithms, Third edition (2009), T. Cormen, C. Lerserson, R. Rivest, C. Stein (*important for this course*)
+- Introduction to Algorithms, Third edition (2009), T. Cormen, C. Lerserson, R. Rivest, C. Stein (*book on which the course is based*)
 - The Art of Computer Programming, Donald Knuth (*a classic*)
 
 ## Analyzing algorithms
@@ -171,17 +171,17 @@ $$ T(n) = aT(n/b) + f(n) $$
 
 Then, $$T(n)$$ has the following asymptotic bounds
 
-- If $$f(n) = \mathcal{O}(n^{\log_b{a}-\epsilon})$$ for some constant $$\epsilon > 0 $$, then $$T(n)=\Theta(n^{\log_b{a}}) $$
-- If $$ f(n) = \Theta(n^{\log_b{a}}) $$, then $$ T(n) = \Theta(n^{\log_b{a}} \log{n}) $$
-- If $$ f(n) = \Omega(n^{\log_b{a}+\epsilon}) $$ for some constant $$ \epsilon > 0 $$, and if $$a \cdot f(n/b) \leq c\cdot f(n)$$ for some constant $$c < 1$$ and all sufficiently large $$n$$, then $$T(n) = \Theta(f(n))$$
+1. If $$f(n) = \mathcal{O}(n^{\log_b{a}-\epsilon})$$ for some constant $$\epsilon > 0 $$, then $$T(n)=\Theta(n^{\log_b{a}}) $$
+2. If $$ f(n) = \Theta(n^{\log_b{a}}) $$, then $$ T(n) = \Theta(n^{\log_b{a}} \log{n}) $$
+3. If $$ f(n) = \Omega(n^{\log_b{a}+\epsilon}) $$ for some constant $$ \epsilon > 0 $$, and if $$a \cdot f(n/b) \leq c\cdot f(n)$$ for some constant $$c < 1$$ and all sufficiently large $$n$$, then $$T(n) = \Theta(f(n))$$
 
 ***
 
 The 3 cases correspond to the following cases in a recursion tree:
 
-- Leaves dominate
-- Each level has the same cost
-- Roots dominate
+1. Leaves dominate
+2. Each level has the same cost
+3. Roots dominate
 
 
 
@@ -388,13 +388,12 @@ def build_max_heap(A, n):
 
 This procedure operates in place. We can start at $$\lfloor{\frac{n}{2}}\rfloor$$ since all elements after that threshold are leaves, so we're not going to heapify those anyway.
 
-We have $$\mathcal{O}(n)$$ calls to `max_heapify`, each of which takes $$\mathcal{O}(\log{n})$$ time, so we have $$\mathcal{O}(n\log{n})$$ in total.
-
-However, we can give a tighter bound: the time to run `max_heapify` is linear in the height of the node it's run on. Hence, the time is bounded by:
+We have $$\mathcal{O}(n)$$ calls to `max_heapify`, each of which takes $$\mathcal{O}(\log{n})$$ time, so we have $$\mathcal{O}(n\log{n})$$ in total. 
+However, **we can give a tighter bound**: the time to run `max_heapify` is linear in the height of the node it's run on. Hence, the time is bounded by:
 
 $$ \sum_{h=0}^{\log{n}} \text{# of nodes of height h}\cdot\mathcal{O}(h) = \mathcal{O}\left( n \sum_{h=0}^{\log{n}} \frac{h}{2^h}\right) $$
 
-Which is $$\mathcal{O}(n)$$, since:
+Which is $$\Theta(n)$$, since:
 
 $$ \sum_{h=0}^\infty{\frac{h}{2^h}} = \frac{1/2}{(1-1/2)^2} = 2 $$
 
@@ -624,7 +623,7 @@ All of the following algorithms can be implemented in $$\mathcal{O}(h)$$.
 ##### Searching
 {% highlight python linenos %}
 def tree_search(x, k):
-    if x == Nil or k == key[x]:
+    if x == Nil or k == x.key:
         return x
     if k < x.key:
         return tree_search(x.left, k)
@@ -690,7 +689,9 @@ This would print:
 1, 2, 3, 4, 5, 6, 7, 8, 9 10, 11, 12
 {% endhighlight %}
 
-This runs in $$\Theta(n)$$. Let's prove it.
+This runs in $$\Theta(n)$$. 
+
+{% details Proof of runtime %}
 
 $$T(n) = $$ runtime of `inorder_tree_walk` on a tree with $$n$$ nodes.
 
@@ -717,6 +718,8 @@ $$ \leq (c+d)n + c + (c -d) \leq (c+d)n + c $$
 Therefore, we do indeed have $$\Theta(n)$$.
 
 Preorder and postorder follow a very similar idea.
+{% enddetails %}
+
 
 ##### Preorder
 - Print root
@@ -1030,6 +1033,7 @@ Essentially, to obtain an optimal solution, we need to parenthesize the two rema
 Hence, if we let $$m[i, j]$$ be the optimal value for chain multiplication of matrices $$A_i, ..., A_j$$ (meaning, how many multiplications we can do at best), we can express $$m[i, j]$$ *recursively* as follows:
 
 $$
+m[i, j] = 
 \begin{cases}
 0 & \text{if } i=j \\
 \min_{i \leq k < j} \{m[i, k] + m[k+1, j] + p_{i-1} p_k p_j\} & \text{otherwise if } i < j \\
@@ -1089,7 +1093,7 @@ Let $$Z = (z_1, z_2, ..., z_k)$$ be any LCS of $$X_i$$ and $$Y_j$$
 2. If $$x_i \neq y_j$$ then $$z_k \neq x_i$$ and $$Z$$ is an LCS of $$X_{i-1}$$ and $$Y_j$$
 3. If $$x_i \neq y_j$$ then $$z_k \neq y_i$$ and $$Z$$ is an LCS of $$X_i$$ and $$Y_{j-1}$$
 
-##### Proof
+{% details Proof %}
 1. If $$z_k \neq x_i$$ then we can just append $$x_i = y_j$$ to $$Z$$ to obtain a common subsequence of $$X$$ and $$Y$$ of length $$k+1$$, which would contradict the supposition that $$Z$$ is the *longest* common subsequence. Therefore, $$z_k = x_i = y_j$$
 
 Now onto the second part: $$Z_{k-1}$$ is an LCS of $$X_{i-1}$$ and $$Y_{j-1}$$ of length $$(k-1)$$. Let's prove this by contradiction; suppose that there exists a common subsequence $$W$$ with length greater than $$k-1$$. Then, appending $$x_i = y_j$$ to W produces a common subsequence of X and Y whose length is greater than $$k$$, which is a contradiction.
@@ -1097,6 +1101,7 @@ Now onto the second part: $$Z_{k-1}$$ is an LCS of $$X_{i-1}$$ and $$Y_{j-1}$$ o
 2. If there were a common subsequence $$W$$ of $$X_{i-1}$$ and $$Y$$ with length greater than $$k$$, then $$W$$ would also be a common subsequence of $$X$$ and $$Y$$ length greater than $$k$$, which contradicts the supposition that $$Z$$ is the LCS.
 
 3. This proof is symmetric to 2.
+{% enddetails %}
 
 ***
 
@@ -1128,7 +1133,7 @@ The diagonal arrows in the path correspond to the characters in the LCS. In our 
 
 
 {% highlight python linenos %}
-def lcs-length(X, Y, m, n):
+def lcs_length(X, Y, m, n):
     let b[1..m, 1..n] and c[0..m, 0..n] be new tables
     # Initialize 1st row and column to 0
     for i = 1 to m:
@@ -1149,7 +1154,7 @@ def lcs-length(X, Y, m, n):
     return b, c
 
 
-def print-lcs(b, X, i, j):
+def print_lcs(b, X, i, j):
     if i == 0 or j == 0:
         return
     if b[i, j] == "↖": # up left
@@ -1194,11 +1199,32 @@ We can fill out the table as follows:
 To compute something in this table, we should have already computed everything to the left, and everything below. We can start out by filling out the diagonal, and then filling out the diagonals to its right.
 
 {% highlight python linenos %}
-def optimal-bst(p, q, n):
-    # Copy the code here
+def optimal_bst(p, q, n):
+    let e[1..n+1, 0..n] be a new table
+    let w[1..n+1, 0..n] be a new table
+    let root[1..n, 1..n] be a new table
+    for i = 1 to n + 1:
+        e[i, i-1] = 0
+        w[i, i-1] = 0
+    for l = 1 to n:
+        for i = 1 to n - l + 1:
+            j = i + l - 1
+            e[i, j] = infinity
+            w[i, j] = w[i, j-1] + p[j]
+            for r = i to j:
+                t = e[i, r-1] + e[r+1, j] + w[i, j]
+                if t < e[i, j]:
+                    e[i, j] = t
+                    root[i, j] = r
+    return (e, root)
 {% endhighlight %}
 
-The runtime is $$\Theta(n^3)$$: there are $$\Theta(n^2) cells to fill in, most of which take $$\Theta(n)$$ to fill in.
+- `e[i, j]` records the expected search cost of optimal BST of $$k_i, \dots, k_j$$
+- `r[i, j]` records the best root of optimal BST of $$k_i, \dots, k_j$$
+- `w[i, j]` records $$\sum_{\ell=i}^j{p_\ell}$$
+
+
+The runtime is $$\Theta(n^3)$$: there are $$\Theta(n^2)$$ cells to fill in, most of which take $$\Theta(n)$$ to fill in.
 
 ## Review of the course
 
