@@ -205,7 +205,7 @@ We don't want to just buy at the lowest and sell at the highest, as the lowest p
 - **Combine** find a maximum subarray that crosses the midpoint, and use the best solution out of the three (that is, left, midpoint and right).
     + The merge is dominated by `find_max_crossing_subarray` so $$\Theta(n)$$
 
-The overall recursion is $$T(n) = 2T(n/2) + \Theta(n)$$, so the algorithm runs in $$\Theta(\log{n})$$
+The overall recursion is $$T(n) = 2T(n/2) + \Theta(n)$$, so the algorithm runs in $$\Theta(n\log{n})$$
 
 In pseudo-code the algorithm is:
 
