@@ -95,7 +95,7 @@
 	}
 	
 	// Text
-	p, li, dl, h4, h5, h6, figcaption {
+	p, li, dl, h4, h5, h6, figcaption, summary {
 		line-height: $large-line-height;
 		
 		@include media($medium-screen) {
@@ -108,7 +108,7 @@
 	}
 	
 	// Inline code
-	p, li, dl, h1, h2, h3, h4, h5, h6 {
+	p, li, dl, h1, h2, h3, h4, h5, h6, summary {
 		code {
 			padding: 1px 2px;
 			border: 1px solid $light-grey;
@@ -142,6 +142,23 @@
 			padding: 0 1em;
 			@include media($small-screen) {
 				padding: 0;
+			}
+		}
+	}
+
+	details {
+		margin-bottom: 1em;
+		
+		.details-content {
+			margin: 20px 0;
+			border-left: 3px solid $light-grey;
+			padding: 0 15px;
+		}
+
+		summary {
+			p {
+				font-style: italic;
+				display: inline;
 			}
 		}
 	}
