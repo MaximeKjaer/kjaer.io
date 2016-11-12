@@ -1,0 +1,97 @@
+//---------------------------
+//
+// ## Title styles
+// Styling of a post's headers, h1 to h6
+//
+//---------------------------
+
+.post {
+	// Header
+	header {
+		.date {
+			margin-top: 0;
+			-webkit-margin-before: 0;
+			
+			font-family: $title-font;
+			font-weight: $title-weight;
+			text-transform: uppercase;
+		}
+		
+		a:hover {
+			border-bottom: 0; // This fixes a weird IE bug that added like 50px because 1 px border-bottom was added.
+		}
+	}
+	
+	// Titles
+	header, h1, h2, h3, h4, h5, h6 {
+		margin-bottom: 0;
+		-webkit-margin-after: 0;
+		
+		font-family: $title-font;
+		font-weight: $title-weight;
+	}
+
+	h1, h2, h3, h4, h5, h6 {
+		line-height: $title-line-height;
+		
+		> a:hover {
+			border-bottom: 3px solid;
+		}
+	}
+	
+	h1, h2, h3 {
+		+ p {
+			margin-top: 0.5em;
+			-webkit-margin-before: 0.5em;
+		}
+	}
+	
+	h1 {
+		font-size: $xx-large;
+	}
+	
+	h2 {
+		font-size: $x-large;
+	}
+	
+	h3 {
+		font-size: $large;
+	}
+	
+	h4, h5, h6 { // Inline with the text
+		display: inline;
+		padding-right: 0.5rem;
+		margin-top: 1em;
+		-webkit-margin-before: 1em;
+		
+		+ p {
+			display: inline;
+			
+			&::after {
+				display: block;
+				margin-bottom: 1em;
+				-webkit-margin-after: 1em;
+				content: '';
+			}
+		}
+
+	}
+	
+	h4 {
+		font-size: $medium;
+		text-transform: uppercase;
+	}
+	
+	h5 {
+		font-size: $medium;
+		font-style: italic;
+		text-transform: uppercase;
+	}
+	
+	h6 {
+		font-size: $medium;
+		font-weight: $title-weight-light;
+		font-style: italic;
+	}
+
+}
