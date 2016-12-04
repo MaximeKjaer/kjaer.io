@@ -4,6 +4,7 @@ description: "My notes from the CS-250 Algorithms course given at EPFL, in the 2
 image: /images/hero/algorithms.jpg
 fallback-color: "#7c6850"
 unlisted: true
+edited: true
 math: true
 ---
 
@@ -182,8 +183,6 @@ The 3 cases correspond to the following cases in a recursion tree:
 1. Leaves dominate
 2. Each level has the same cost
 3. Roots dominate
-
-
 
 ## Maximum-Subarray Problem
 
@@ -1246,3 +1245,482 @@ $$T(n) = \begin{cases}
 2T(n/2)+\Theta(n) & \text{otherwise} \\
 \end{cases}
 $$
+
+<!-- Lecture 14-->
+
+## Graphs
+
+### Representation
+One way to store a graph is in an adjacency list. Every vertex has a list of vertices to which it is connected. In this representation, every edge is stored twice for undirected graphs, and once for directed graphs.
+
+![Example of an adjacency list](/images/algorithms/adjacency-list.png)
+
+- **Space**: $$\Theta(V+E)$$
+- **Time**: to list all vertices adjacent to $$u$$: $$\Theta(\text{degree}(u))$$
+- **Time**: to determine whether $$(u, v)\in E: \mathcal{O}(\text{degree}(u))$$
+
+The other way to store this data is in an adjacency matrix. This is a matrix where:
+
+$$a_{ij} = \begin{cases}
+1 & \text{if } (i, j)\in E \\
+0 & \text{otherwise} \\
+\end{cases}$$
+
+![Example of an adjacency matrix](/images/algorithms/adjacency-matrix.png)
+
+In an undirected graph, this makes for a symmetric matrix. The requirements of this implementation are:
+
+- **Space**: $$\Theta(V^2)$$
+- **Time**: to list all vertices adjacent to $$u$$: $$\Theta(V)$$
+- **Time**: to determine whether $$(u, v)\in E: \Theta(1)$$.
+
+We can extend both representations to include other attributes such as edge weights.
+
+### Traversing / Searching a graph
+
+#### Breadth-First Search (BFS)
+- **Input**: Graph $$G=(V, E)$$, either directed or undirected and source vertex $$s\in V$$.
+- **Output**: $$v.d = $$ distance (smallest number of edges) from s to v for all vertices v.
+
+The idea is to:
+
+- Send a wave out from $$s$$
+- First hits all vertices 1 edge from it
+- From there, it hits all vertices 2 edges from it...
+
+{% highlight python linenos %}
+def BFS(V, E, s):
+    # This is Theta(V):
+    for each u in V - {s}: # init all distances to infinity
+        u.d = infinity
+    # This is Theta(1):
+    s.d = 0
+    Q = Ø
+    enqueue(Q, s)
+    # This is Theta(E):
+    while Q != Ø:
+        u = dequeue(Q)
+        for each v in G.adj[u]:
+            if v.d == infinity
+            v.d = u.d + 1
+            enqueue(Q, v)
+{% endhighlight %}
+
+This is $$\mathcal(O)(V+E)$$:
+
+- $$\mathcal{O}(V)$$ because each vertex is enqueued at most once
+- $$\mathcal{O}(E)$$ because every vertex is dequeued at most once and we examine the edge $$(u, v)$$ only when $$u$$ is dequeued. Therefore, every edge is examined at most once if directed, and at most twice if undirected.
+
+BFS may not reach all vertices. We can save the shortest path tree by keeping track of the edge that discovered the vertex.
+
+#### Depth-first search (DFS)
+- **Input**: Graph $$G = (V, E)$$, either directed or undirected
+- **Output**: 2 timestamps on each vertex: discovery time `v.d` and finishing time `v.f`
+
+{% highlight python linenos %}
+def DFS(G):
+    for each u in G.V:
+        u.color = WHITE
+    time = 0                # global variable
+    for each u in G.V:
+        if u.color == WHITE:
+            DFS_visit(G, u)
+
+def DFS_visit(G, u):
+    time = time + 1
+    u.d = time
+    u.color = GRAY           # discover u
+    for each v in G.adj[u]:  # explore (u, v)
+        if v.color == WHITE
+            DFS_visit(G, v)
+    u.color = BLACK
+    time = time + 1
+    u.f = time               # finish u
+{% endhighlight %}
+
+This runs in $$\Theta(V+E)$$.
+
+![GIF of DFS in action](/images/algorithms/dfs.gif)
+
+### Classification of edges
+
+![Classification of edges: tree edge, back edge, forward edge, cross edge](/images/algorithms/edges-classification.png)
+
+In DFS of an undirected graph we get only tree and back edges; no forward or back-edges.
+
+### Parenthesis theorem
+$$\forall u, v$$, exactly one of the following holds:
+
+1. If *v* is a descendant of *u*: `u.d < v.d < v.f < u.f`
+2. If *u* is a descendant of *v*: `v.d < u.d < u.f < v.f`
+3. If neither *u* nor *v* are descendants of each other: `[u.d, u.f]` and `[v.d, v.f]` are disjoint (alternatively, we can say `u.d < u.f < v.d < v.f` or `v.d < v.f < u.d < u.f`)
+
+### White-path theorem
+Vertex *v* is a descendant of *u* **if and only if** at time `u.d` there is a path from *u* to *v* consisting of only white vertices (except for `u`, which has just been colored gray).
+
+### Topological sort
+- **Input**: A directed acyclic graph (DAG)
+- **Output**: a linear ordering of vertices such that if $$(u, v) \in E$$, then *u* appears somewhere before *v*
+
+{% highlight python linenos %}
+def topological sort(G):
+    DFS(G) # to compute finishing times v.f forall v
+    output vertices in order of decreasing finishing time
+{% endhighlight %}
+
+Same running time as DFS, $$\Theta(V+E)$$.
+
+{% details Proof of correctness %}
+We need to show that if $$(u, v) \in E$$ then `v.f < u.f`.  
+When we explore *(u, v)*, what are the colors of *u* and *v*?
+
+- *u* is gray
+- Is *v* gray too?
+    + **No** because then *v* would be an ancestor of *u* which implies that there is a back edge so the graph is not acyclic (view lemma below)
+- Is *v* white?
+    + Then it becomes a descendent of *u*, and by the parenthesis theorem, `u.d < v.d < v.f < u.f`
+- Is *v* black?
+    + Then *v* is already finished. Since we are exploring *(u, v)*, we have not yet finished *u*. Therefore, `v.f < u.f`
+{% enddetails %}
+
+<!-- Lecture 15 -->
+
+#### Lemma: When is a directed graph acyclic?
+A directed graph G is acyclic **if and only if** a DFS of G yields no back edges.
+
+### Strongly connected component
+A strongly connected component (SCC) of a directed graph is a **maximal** set of vertives $$C \subseteq V$$ such that $$\forall u, v\in C,  u \leadsto v \text{ and } v\leadsto u$$.
+
+Below is a depiction of all SCCs on a graph:
+
+![A depiction of all SCCs on a graph](/images/algorithms/scc.png)
+
+If two SCCs overlap, then they are actually one SCC (and the two parts weren't really SCCs because they weren't maximal). Therefore, there cannot be overlap between SCCs.
+
+#### Lemma
+$$G^{SCC}$$ is a [directed acyclic graph](lemma-when-is-a-directed-graph-acyclic).
+
+![G^SCC is the graph comprised of the SCCs and the links between them](/images/algorithms/gscc.png)
+
+#### Magic Algorithm
+The following algorithm computes SCC in a graph G:
+
+{% highlight python linenos %}
+def SCC(G):
+    DFS(G) # to  compute finishing times u.f for all u
+    compute G^T
+    DFS(G^T) but in the main loop consider vertices in order of decreasing u.f # as computed in first DFS
+    Output the vertices in each tree of the DFS forest formed in 2nd DFS as a separate SCC
+{% endhighlight %}
+
+![SCC algorithm gif](/images/algorithms/scc.gif)
+
+Where $$G^T$$ is *G* with all edges reversed. They have the same SCCs. Using adjacency lists, we can create $$G^T$$ in $$\Theta(V+E)$$ time.
+
+## Flow Networks
+A flow network is a directed graph with weighted edges: each edge has a capacity $$c(u, v) \geq 0,   (c(u, v) = 0 \text{ if } (u, v) \notin E)$$
+
+![Example of a flow between cities](/images/algorithms/flow.png)
+
+We talk about a source *s* and a sink *t*, where the flow goes from *s* to *t*.
+
+We assume that there are no antiparallel edges, but this is without loss of generality; we make this assumption to simplify our descriptions of our algorithms. In fact, we can just represent antiparallel edges by adding a "temporary" node to split one of the anti-parallel edges in two.
+
+![Replacement of antiparallel edges](/images/algorithms/antiparallel.png)
+
+Likewise, vertices can't have capacities *per se*, but we can simulate this by replacing a vertex *u* by vertices *u<sub>in</sub>* and *u<sub>out</sub>* linked by an edge of capacity *c<sub>u</sub>*.
+
+Possible applications include:
+
+- Fire escape plan: exits are sinks, rooms are sources
+- Railway networks
+- ...
+
+We can model the flow as a function $$f : V\times V \rightarrow \mathbb{R}$$. This function satisfies:
+
+**Capacity constraint**: We do not use more flow than our capacity:
+
+$$\forall u, v \in V : 0 \leq f(u, v) \leq c(u, v)$$
+
+**Flow conservation**: The flow into *u* must be equal to the flow out of *u*
+
+$$\forall u \in V \setminus (s, t) \sum_{v\in V}{f(v, u)} = \sum_{v\in V}{f(u, v)}$$
+
+The value of a flow is calculated by measuring at the source; it's the flow out of the source - the flow into the source:
+
+$$\| f \| = \sum_{v\in V}{f(s, v)} - \sum_{v\in V}{f(v, s)}$$
+
+### Ford-Fulkerson Method
+{% highlight python linenos %}
+def ford_fulkerson_method(G, s, t):
+    initialize flow f to 0
+    while exists(augmenting path p in residual network Gf):
+        augment flow f along p
+    return f
+{% endhighlight %}
+
+As long as there is a path from source to sink, with available capacity on all edges in the path, send flow along one of these paths and then we find another path and so on.
+
+#### Residual network
+The residual network network consists of edges with capacities that represent how we can change the flow on the edges. The residual capacity is:
+
+$$
+c_f(u, v) = \begin{cases}
+c(u, v) - f(u, v) & \text{if } (u, v) \in E \\
+f(v, u) & \text{if } (v, u) \in E \\
+0 & \text{otherwise} \end{cases}
+$$
+
+We can now define the residual network $$G_f = (V, E_f)$$, where:
+
+$$E_f =\{(u, v)\in V\times V : c_f(u, v) > 0\}$$
+
+See the diagram below for more detail:
+
+![Residual network along Ford-Fulkerson's method's steps](/images/algorithms/residual-network.png)
+
+### Cuts in flow networks
+A cut of a flow network is a partition of *V* into two groups of vertices, *S* and *T*.
+
+#### Net flow across a cut
+The **net flow across the cut** *(S, T)* is the flow leaving *S* minus the flow entering *S*.
+
+$$f(S, T) = \sum_{u\in S, v\in T}{f(u, v)} - \sum_{u\in S, v\in T}{f(v, u)}$$
+
+The **net flow across a cut** is always equal to the **value of the flow**, which is the flow out of the source &ndash; the flow into the source. For any cut $$(S, T), \| f \| = f(S, T)$$.
+
+The proof is done simply by induction using flow conservation.
+
+#### Capacity of a cut
+The capacity of a cut *(S, T)* is:
+
+$$ c(S, T) = \sum_{u\in S, v\in T}{c(u, v)} $$
+
+The flow is *at most* the capacity of a cut.
+
+#### Minimum cut
+A **minimum cut** of a network is a cut whose capacity is minimum over all cuts of the network.
+
+The left side of the minimum cut is found by running Ford-Fulkerson and seeing what nodes can be reached from the source in the residual graph; the right side is the rest.
+
+#### Max-flow min-cut theorem
+The max-flow is **equal** to the capacity of the min-cut.
+
+The proof is important and should be learned for the exam.
+
+{% details Proof of the max-flow min-cut theorem %}
+We'll prove equivalence between the following:
+
+1. $$f$$ has a maximum flow
+2. $$G_f$$ has no augmenting path
+3. $$\| f \| = c(S, T)$$ for a minimum cut $$(S, T)$$
+
+$$(1) \Rightarrow (2)$$: Suppose toward contradiction that $$G_f$$ has an augmenting path *p*. However, the Ford-Fulkerson method would augment *f* by *p* to obtain a flow if increased value which contradicts that *f* is a maximum flow.
+
+$$(2) \Rightarrow (3)$$: Let *S* be the set of nodes reachable from *s* in a residual network. Every edge flowing out of *S* in *G* must be at capacity, otherwise we can reach a node outside *S* in the residual network.
+
+$$(3) \Rightarrow (1)$$: Recall that $$\| f\| \leq c(S, T) \forall \text{cut } (S, T)$$. Therefore, if the value of a flow is equal to the capacity of some cut, then it cannot be further improved.
+{% enddetails %}
+
+### Time for finding max-flow (or min-cut)
+- It takes $$\mathcal{O}(E)$$ time to find a a path in the residual network (using for example BFS).
+- Each time the flow value is increased by at least 1
+- So running time is $$\mathcal{O}(E\cdot \| f_{\text{max}} \|)$$, where $$\| f_{\text{max}} \|$$ is the value of a max flow.
+
+If capacities are irrational then the Ford-Fulkerson might not terminate. However, if we take the **shortest path** or **fattest path** then this will not happen if the capacities are integers (without proof).
+
+| Augmenting path | Number of iterations |
+| :-------------- | :------------------- |
+| BFS Shortest path | $$ \leq\frac{1}{2}E\cdot V $$ |
+| Fattest path | $$ \leq E\cdot \log{(E\cdot U)} $$ |
+
+Where U is the maximum fow value, and the fattest path is chosen by augmenting the path with larges minimum capacity (the bottleneck).
+
+### Bipartite matching
+Say we have *N* students applying for *M* jobs. Each gets several offers. Is there a way to match all students to jobs?
+
+If we add a source and a sink, give all edges capacity 1, from left to right. If we run Ford-Fulkerson, we get a result.
+
+![Bipartite matching example](/images/algorithms/bipartite.png)
+
+#### Why does it work?
+Every matching defines a flow of value equal to the number of edges in the matching. We put flow 1 on the edges of the matching, and to edges to and from the source and sink. All other edges have 0 flow.
+
+Works because flow conservation is equivalent to: no student is matched more than once, no job is matched more than once.
+
+### Edmonds-Kart algorithm
+It's just like Ford-Ferguson, but we pick the **shortest** augmenting path (in the sense of the minimal number of edges, found with DFS).
+
+{% highlight python linenos %}
+def edmonds_kart(G):
+    while there exists an augmenting path (s, ..., t) in Gf:
+        find shortest augmenting path (e.g. using BFS)
+        compute botleneck = min capacity
+        augment
+{% endhighlight %}
+
+The runtime is $$\mathcal{O}(VE^2)$$
+
+#### Lemma
+Let $$\delta_f(s, u)$$ be the shortest path distance from *s* to *u* in $$G_f, u\in V$$.
+
+$$\forall u\in V,  S_f(s, u)$$ are monotonically non-decreasing thoughout the execution of the algorithm.
+
+{% details Proof of runtime %}
+Edmonds-Kart terminates in $$\mathcal{O}(V\cdot E)$$ iterations. An edge *(u, v)* is said to be **critical** if its capacity is smallest on the augmenting path.
+
+Every edge in G becomes critical $$\mathcal{O}(V)$$ times (a critical edge is removed, but it can reappear later).
+{% enddetails %}
+
+<!-- Lecture 18 -->
+## Data structures for disjoint sets
+- Also known as “union find”
+- Maintain collection $$\mathcal{S} = \{ S_1, \dots, S_k \}$$ of disjoint dynamic (changing over time) sets
+- Each set is identified by a representative, which is some member of the set. It doesn’t matter which member is the representative, as long as if we ask for the representative twice without modifying the set, we get the same answer both
+times
+
+We want to support the following operations:
+
+- `make_set(x)`: Makes a new set $$S_i=\{x\}$$ and add it to $$\mathcal{S}$$
+- `union(x, y)`: If $$x \in S_x, y \in S_y$$, then $$\mathcal{S} = \mathcal{S} - S_x - S_y \cup \{ S_x \cup S_y \}$$
+    + Representative of new set is any member in $$S_x \cup S_y$$, often the
+representative of one of $$S_x$$ and $$S_y$$
+    + Destroys $$S_x$$ and $$S_y$$ (since sets must be disjoint)
+- `find(x)`: Return the representative of the set containing `x`.
+
+### Application: Connected components
+{% highlight python linenos %}
+def connected_components(G):
+    for each vertex v in G.V:
+        make_set(v)
+    for each edge (u, v) in G.E:
+        if find_set(u) != find_set(v):
+            union(u, v)
+{% endhighlight %}
+
+![Connected components algorithm in action](/images/algorithms/connected-components.gif)
+
+### Implementation: Linked List
+This is not the fastest implementation, but it certainly is the easiest. Each set is a single linked list represented by a set object that has:
+
+- A pointer to the *head* of the list (assumed to be the representative)
+- A pointer to the *tail* of the list
+
+Each object in the list has attributes for the set member, a pointer to the set object and to next. Our operations are now:
+
+- `make_set(x)`: Create a singleton list in time $$\Theta(1)$$
+- `find(x)`: Follow the pointer back to the list object, and then follow the head pointer to the representative; time $$\Theta(1)$$.
+
+Union can be implemented in a couple of ways. We can either append `y`'s list onto the end of `x`'s list, and update `x`'s tail pointer to the end.
+
+Otherwise, we can use **weighted-union heuristic**: we always append the smaller list to the larger list. As a theorem, *m* operations on *n* elements takes $$\mathcal{O}(m+n\log{n})$$ time.
+
+### Forest of trees
+- One tree per set, where the root is the representative.
+- Each node only point to its parent (the root points to itself).
+
+The operations are now:
+
+- `make_set(x)`: make a single-node tree
+- `find(x)`: follow pointers to the root
+- `union(x, y)`: make one root a child of another
+
+*Didn't listen, take notes next time.*
+
+
+## Minimum Spanning Trees
+A spanning tree of a graph is a set of edges that is:
+
+1.  Acyclic
+2. Spanning (connects all vertices)
+
+We want to find the *minimum* spanning tree of a graph.
+
+- **Input**: an undirected graph G with weight *w(u, v)* for each edge $$(u, v)\in E$$.
+- **Output**: a spanning tree of minimum total weights
+
+There are 2 natural greedy algorithms for this.
+
+### Prim's algorithm
+Prim's algorithm is a greedy algorithm. It works by greedily growing the tree *T*  by adding a minimum weight crossing edge with respect to the cut induced by *T* at each step.
+
+See the slides for a proof.
+
+#### Implementation
+How do we find the minimum crossing edges at every iteration?
+
+We need to check all the outgoing edges of every node, so the running time could be as bad as $$\mathcal{O}(V E)$$. But there's a more clever solution!
+
+- For every node *w* keep value *dist(w)* that measures the "distance" of *w* from the current tree.
+- When a new node *u* is added to the tree, check whether neighbors of *u* decreases their distance to tree; if so, decrease distance
+- Maintain a [min-priority queue](#priority-queues) for the nodes and their distances
+
+{% highlight python linenos %}
+def prim(G, w, r):
+    Q = []
+    for each u in G.V:
+        u.key = infinity   # set all keys to infinity
+        u.pi = Nil
+        insert(Q, u)
+    decrease_key(Q, r, 0)  # root.key = 0
+    while !Q.isEmpty:
+        u = extract_min(Q)
+        for each v in G.adj[u]:
+            if v in Q and w(u, v) < v.key:
+                v.pi = u
+                decrease_key(Q, v, w(u, v))
+
+{% endhighlight %}
+
+When we start every node has the key `infinity` and our root has key 0, so we pick up the root. Now we need to find the edge with the minimal weight that crosses the cut.
+
+- Initialize *Q* and first for loop: $$\mathcal{O}(V\log{V})$$
+- `decrease_key` is $$\mathcal{O}(\log{V})$$
+- The while loop:
+    + We run *V* times `extract_min` ($$\mathcal{O}(V\log{V})$$)
+    + We run *E* times `decrease_key` ($$\mathcal{O}(E\log{V})$$)
+
+The total runtime is the max of the above, so $$\mathcal{O}(E\log{V})$$ (which can be made $$\mathcal{O}(V\log{V})$$ with careful queue implementation).
+
+### Kruskal's algorithm
+Start from an empty forest *T* and greedily maintain forest *T* which will become an MST at the end. At each step, add the cheapest edge that does not create a cycle.
+
+![Kruskal's algorithm in action](/images/algorithms/kruskal.gif)
+
+#### Implementation
+In each iteration, we need to check whether the cheapest edge creates a cycle.
+
+This is the same thing as checking whether its endpoints belong to the same component. Therefore, we can use a [disjoint sets](http://localhost:4000/algorithms/#data-structures-for-disjoint-sets) (union-find) data structure.
+
+{% highlight python linenos %}
+def kruskal(G, w):
+    A = []
+    for each v in G.V:
+        make_set(v)
+    sort the edges of G.E into nondecreasing order by weight w
+    for each (u, v) of the sorted list:
+        if find_set(u) != find_set(v): # do they belong to the same CC?
+            A = A union {(u, v)} # Add the edge to the MST
+            union(u, v) # add the new node to the CC
+    return A
+{% endhighlight %}
+
+- Initialize A: $$\mathcal{O}(1)$$
+- First for loop: *V* times `make_set`
+- Sort *E*: $$\mathcal{O}(E\log{E})$$
+- Second for loop: $$\mathcal{O}(E)$$ times `find_sets` and `unions`
+
+So this can run in $$\mathcal{O}(E\log{V})$$; runtime is dominated by the sorting algorithm.
+
+### Summary
+- Greedy is good (sometimes)
+- Prim's algorithm relies on priority queues for the implementation
+- Kruskal's algorithm uses union-find
+
+## Shortest Path Problem
+- **Input**: directed, weighted graph
+- **Output**: a path of minimal weight (there may be multiple solutions)
+
+The weight of a path $$(v_0, v1, \dots, v_k): \sum_{i=1}^k{w(v_{i-1}, v_i)}$$.
+
+### Negative weights
