@@ -1,6 +1,6 @@
 ---
 title: CS-250 Algorithms
-description: "My notes from the CS-250 Algorithms course given at EPFL, in the 2016 spring semester (BA3)"
+description: "My notes from the CS-250 Algorithms course given at EPFL, in the 2016 autumn semester (BA3)"
 image: /images/hero/algorithms.jpg
 fallback-color: "#7c6850"
 unlisted: true
@@ -1573,6 +1573,7 @@ Every edge in G becomes critical $$\mathcal{O}(V)$$ times (a critical edge is re
 {% enddetails %}
 
 <!-- Lecture 18 -->
+
 ## Data structures for disjoint sets
 - Also known as “union find”
 - Maintain collection $$\mathcal{S} = \{ S_1, \dots, S_k \}$$ of disjoint dynamic (changing over time) sets
@@ -1600,6 +1601,8 @@ def connected_components(G):
 
 ![Connected components algorithm in action](/images/algorithms/connected-components.gif)
 
+This algorithm runs in $$\mathcal{O}(V\log{(V)}+E)$$ in linked-lists with weighted union heuristic, and $$\mathcal{O}(V+E)$$ in forests with union-by-rank and path-compression.
+
 ### Implementation: Linked List
 This is not the fastest implementation, but it certainly is the easiest. Each set is a single linked list represented by a set object that has:
 
@@ -1625,8 +1628,31 @@ The operations are now:
 - `find(x)`: follow pointers to the root
 - `union(x, y)`: make one root a child of another
 
-*Didn't listen, take notes next time.*
+To implement the union, we can make the root of the smaller tree a child of the root of the larger tree. In a good implementation, we use the rank instead of the size to compare the trees, since measuring the size takes time, and rank is an upper bound on the height of a node anyway. Therefore, a proper implementation would make the root with the *smaller rank* a child of the root with the *larger rank*; this is **union-by-rank**.
 
+`find-set` can be implemented with path compression, where every node it meets is made a child of the root; this is **path-compression**.
+
+{% highlight python linenos %}
+def make_set(x):
+    x.parent = x
+    x.rank = 0
+
+def find_set(x):
+    if x != x.parent
+        x.parent = find_set(x.parent) # this flattens the tree, makes everything a child of the root.
+    return x.parent
+
+def union(x, y):
+    link(find_set(x), find_set(y))
+
+def link(x, y):
+    if x.rank > y.rank:
+        y.parent = x
+    else:
+        x.parent = y
+        if x.rank == y.rank:
+            y.rank = y.rank + 1
+{% endhighlight %}
 
 ## Minimum Spanning Trees
 A spanning tree of a graph is a set of edges that is:
