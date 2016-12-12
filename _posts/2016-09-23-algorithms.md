@@ -1657,13 +1657,13 @@ def link(x, y):
 ## Minimum Spanning Trees
 A spanning tree of a graph is a set of edges that is:
 
-1.  Acyclic
+1. Acyclic
 2. Spanning (connects all vertices)
 
-We want to find the *minimum* spanning tree of a graph.
+We want to find the *minimum* spanning tree of a graph, that is, a spanning tree of minimum total weights.
 
 - **Input**: an undirected graph G with weight *w(u, v)* for each edge $$(u, v)\in E$$.
-- **Output**: a spanning tree of minimum total weights
+- **Output**: an MST: a spanning tree of minimum total weights
 
 There are 2 natural greedy algorithms for this.
 
@@ -1749,4 +1749,169 @@ So this can run in $$\mathcal{O}(E\log{V})$$; runtime is dominated by the sortin
 
 The weight of a path $$(v_0, v1, \dots, v_k): \sum_{i=1}^k{w(v_{i-1}, v_i)}$$.
 
-### Negative weights
+### Problem variants
+- **Single-source**: Find shortest paths from source vertex to every vertex
+- **Single-destination**: Find shortest paths to given destination vertex. This can be solved by reversing edge directions in single-source.
+- **Single pair**: Find shortest path from *u* to *v*. No algorithm known that is better in worst case than solving single-source.
+- **All pairs**: Find shortest path from *u* to *v* for all pairs *u*, *v* of vertices. This *can* be solved with single-pair for each vertex, but better algorithms are knowns
+
+
+### Bellman-Ford algorithm
+- **Input**: Directed graph with weighted edges, source *s*, no negative cycles.
+- **Ouput**: The shortest path from *s* to *t*
+
+The algorithm starts by trivial initialization:
+
+{% highlight python linenos %}
+def init_single_source(G, s):
+    for each v in G.V:
+        v.d = infinity
+        v.predecessor = Nil
+    s.d = 0
+{% endhighlight %}
+
+Bellman-Ford updates shortest-path estimates iteratively by using `relax`. We allow negative weight, as long as no negative-weight cycle (a cycle where the weights add up to a negative number) is reachable from the source.
+
+{% highlight python linenos %}
+def relax(u, v, w):
+    if v.d > u.d + w(u, v):
+        v.d = u.d + w(u, v)
+        v.predecessor = u
+{% endhighlight %}
+
+This function reduces the distance of `v` if it is possible to reach it in a shorter path thanks to the `(u, v)` edge. It runs in $$\mathcal{O}(1)$$.
+
+{% highlight python linenos %}
+def bellman_ford(G, w, s):
+    init_single_source(G, s)
+    for i = 1 to |G.V| - 1:
+        for each edge (u, v) in G.E:
+            relax(u, v, w)
+    # Optional: detecting negative cycles
+    for each edge (u, v) in G.E:
+        if v.d > u.d + w(u, v):
+            return False
+    return True
+{% endhighlight %}
+
+![GIF of Bellman-Ford in action](/images/algorithms/bellman-ford.gif)
+
+The algorithm is easy to implement in distributed settings (e.g. IP routing): each vertex repeatedly ask their neighbors for the best path.
+
+Bellman-Ford runs in $$\Theta(E\cdot V)$$.
+
+#### Detecting negative cycles
+There is no negative cycle reachable from the source if and only if the $$\ell$$-value of no node changes if we run one more (n:th) iteration of Bellman-Ford.
+
+### Dijkstra's algorithm
+- This algorithm only works when all weights are nonnegative.
+- It's greedy, and faster than Bellman-Ford.
+- It's very similar to Prim's algorithm; could also be described as a weighted version of BFS.
+
+We start with a Source $$S = \{ s \}$$, and greedily grow *S*. At each step, we add to *S* the vertex that is closest to *S* (where distance is defined `u.d + w(u, v)`).
+
+![GIF of Dijkstra's algorithm in action](/images/algorithms/dijkstra.gif)
+
+This creates the shortest-path tree: we can give the shortest path between the source and any vertex in the tree.
+
+Since Dijkstra's algorithm is greedy (it doesn't have to consider all edges, only the ones in the immediate vicinity), it is more efficient. Using a binary heap, we can run in $$\mathcal{O}(E\log{V})$$ (though a more careful implementation can optimize it to $$\mathcal{O}(V\log{V}+E))$$.
+
+{% highlight python linenos %}
+def dijkstra(G, w, s):
+    init_single_source(G, s)
+    S = []
+    Q = G.V   # insert all vertices into Q
+    while Q != []:
+        u = extract_min(Q)
+        S = S union {u}
+        for each vertex in G.Adj[u]:
+            relax(u, v, w)
+{% endhighlight %}
+
+## Probabilistic analysis and randomized algorithms
+
+### Motivation
+- Worst case does not usually happen
+    + Average case analysis
+    + Amortized analysis
+- Randomization sometimes helps avoid worst-case and attacks by evil users
+    + Choosing the pivot in quick-sort at random
+- Randomization necessary in cryptography
+- Can we get randomness?
+    + How to extract randomness (extractors)
+    + Longer "random behaving" strings from small seed (pseudorandom generators)
+
+### Probabilistic Analysis: The Hiring Problem
+A basketball team wants to hire a new player. The taller the better. Each candidate that is taller than the current tallest is hired. How many players did we (temporarily) hire?
+
+{% highlight python linenos %}
+def hire_player(n):
+    best = 0
+    for i = 1 to n:
+        if candidate i is taller than best candidate so far:
+            best = i
+            hire i
+{% endhighlight %}
+
+Worst-case scenario is that the candidates come in sorted order, from lowest to tallest; in this case we hire *n* players.
+
+What is the expected number of hires we make over all the permutations of the candidates?
+
+There are $$n!$$ permutations, each equally likely. The expectation is the sum of hires in each permutation divided by $$n!$$:
+
+$$\frac{A_1 + A_2 + \dots + A_{n!}}{n!}$$
+
+For 5 players, we have 120 terms, but for 10 we have 3 628 800... We need to find a better way of calculating this than pure brute force.
+
+Given a sample space and an event A, we define the **indicator random variable**:
+
+$$I\{A\}= \begin{cases}
+1 & \text{if } A \text{ occurs} \\
+0 & \text{if } A \text{ does not occur} \\
+\end{cases}$$
+
+#### Lemma
+For an event A, let $$X_A = I\{A\}$$. Then $$\mathbb{E}[X_A] = Pr[A]$$
+
+{% details Proof %}
+$$\mathbb{E}[X_A] = I\cdot Pr[A] + 0\cdot Pr[\bar{A}] = Pr[A]$$
+{% enddetails %}
+
+#### Multiple Coin Flips
+What about multiple coin flips? We want to determine the expected number of heads when we flip *n* coins. Let $$X$$ be a random variable for the number of heads in *n* flips. We could calculate:
+
+$$\mathbb{E}[X] = \sum_{k=0}^n {k\cdot Pr\{X=k\}} $$
+
+... but that is cumbersone. Instead, we can use indicator variables.
+
+For $$i = 1, \dots, n$$, define $$X_i = I\{\text{the ith flip results in event H}\}$$. Then:
+
+$$\mathbb{E}[X] = \mathbb{E}[X_1 + X_2 + \dots + X_n]$$
+
+By linearity of expectation (which holds even if *X* and *Y* are independent), i.e. that $$\mathbb{E}[aX + bY] = a\mathbb{E}[X] + b\mathbb{E}[Y]$$, we have:
+
+$$\mathbb{E}[X] = \mathbb{E}[X_1 + X_2 + \dots + X_n] = \mathbb{E}[X_1] + \mathbb{E}[X_2] + \dots + \mathbb{E}[X_n]$$
+
+For *n* coin flips, the above yields $$\frac{n}{2}$$.
+
+#### Solving the Hiring Problem
+Back to our hiring problem:
+
+$$Pr[\text{candidate } i \text{ is hired}] = \frac{1}{i}$$
+
+$$\mathbb{E}[X] = Pr[\text{#} 1 \text{ hired}] + Pr[\text{#} 2 \text{ hired}] + \dots = \frac{1}{1} + \frac{1}{2} + \frac{1}{3} + \dots + \frac{1}{n} = H_n$$
+
+This is the harmonic number, which is $$\ln{n}+\mathcal{O}(1)$$.
+
+The probability of hiring one candidate is $$\frac{1}{n}$$ (this is the probability of the first being the tallest), while the probability of hiring all candidates is $$\frac{1}{n!}$$ (which is the probability of the exact permutation where all candidates come in decreasing sorted order).
+
+#### Bonus trivia
+Given a function `RANDOM` that return `1` with probability $$p$$ and `0` with probability $$1-p$$.
+
+$$\mathbb{E}[\text{# trials until success}] = \frac{1}{2p(1-p)}$$
+
+
+### Birthday Paradox
+
+#### Birthday Lemma
+If $$q > 1.78 \sqrt{\|M\|}$$ then the probability that a function chosen uniformly at random $$f: {1, 2, \dots, q} \rightarrow M$$ is injective is at most $$\frac{1}{2}$$
