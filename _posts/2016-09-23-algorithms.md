@@ -1670,6 +1670,8 @@ There are 2 natural greedy algorithms for this.
 ### Prim's algorithm
 Prim's algorithm is a greedy algorithm. It works by greedily growing the tree *T*  by adding a minimum weight crossing edge with respect to the cut induced by *T* at each step.
 
+![GIF of Prim's algorithm in action](/images/algorithms/prim.gif)
+
 See the slides for a proof.
 
 #### Implementation
@@ -1901,7 +1903,7 @@ $$Pr[\text{candidate } i \text{ is hired}] = \frac{1}{i}$$
 
 $$\mathbb{E}[X] = Pr[\text{#} 1 \text{ hired}] + Pr[\text{#} 2 \text{ hired}] + \dots = \frac{1}{1} + \frac{1}{2} + \frac{1}{3} + \dots + \frac{1}{n} = H_n$$
 
-This is the harmonic number, which is $$\ln{n}+\mathcal{O}(1)$$.
+This is the harmonic number, which is $$H_n = \ln{n}+\mathcal{O}(1)$$.
 
 The probability of hiring one candidate is $$\frac{1}{n}$$ (this is the probability of the first being the tallest), while the probability of hiring all candidates is $$\frac{1}{n!}$$ (which is the probability of the exact permutation where all candidates come in decreasing sorted order).
 
