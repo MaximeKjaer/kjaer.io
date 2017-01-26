@@ -118,7 +118,9 @@ def merge(A, p, q, r):
 
 {% endhighlight %}
 
-In the `merge` function, instead of checking whether either of the two lists that we're merging is empty, we can just add a **sentinel** to the bottom of the list, with value &infin;. This works because we're just picking the minimum value of the two. 
+In the `merge` function, instead of checking whether either of the two lists that we're merging is empty, we can just add a **sentinel** to the bottom of the list, with value &infin;. This works because we're just picking the minimum value of the two.
+
+![GIF of the merge step in action](/images/algorithms/insertion.gif)
 
 This algorithm works well in parallel, because we can split the lists on separate computers.
 
@@ -128,9 +130,14 @@ Assuming `merge` is correct, we can do a proof by strong induction on $$n = r - 
 - **Base case**, $$n = 0$$: In this case $$r = p$$ so `A[p..r]` is trivially sorted.
 - **Inductive case**: By  induction hypothesis `merge_sort(A, p, q)` and `merge_sort(A, q+1, r)` successfully sort the two subarrays. Therefore a correct merge procedure will successfully sort `A[p..q]` as required.
 
-#### Analysis
+## Recurrences
+Let's try to provide an analysis of the runtime of merge sort.
+
 - **Divide**: Takes contant time, i.e., $$D(n) = \Theta(1)$$
-- **Conquer**: Recursively solve two subproblems, each of size $$n/2$$, so we have $$2T(n/2)$$, where:
+- **Conquer**: Recursively solve two subproblems, each of size $$n/2$$, so we create a problem of size $$2T(n/2)$$ for each step.
+- **Combine**: Merge on an *n*-element subarray takes $$\Theta(n)$$ time, so $$C(n) = \Theta(n)$$
+
+Our recurrence therefore looks like this:
 
 $$ T(n) = 
 \begin{cases}
@@ -139,18 +146,15 @@ $$ T(n) =
 \end{cases}
 $$
 
-Trying to substitue $$T(n/2)$$ multiple times yields $$T(n) = 2^k T(n/2^k) + kcn$$. By now, a qualified guess would be that $$T(n) = \Theta(n \log{n})$$
-
-We'll prove this the [following way](http://moodle.epfl.ch/pluginfile.php/1735456/mod_resource/content/1/Lecture3.pdf):
+Trying to substitue $$T(n/2)$$ multiple times yields $$T(n) = 2^k T(n/2^k) + kcn$$. By now, a qualified guess would be that $$T(n) = \Theta(n \log{n})$$. We'll prove this the [following way](http://moodle.epfl.ch/pluginfile.php/1735456/mod_resource/content/1/Lecture3.pdf):
 
 <figure>
     <img src="/images/algorithms/merge-upper-bound.png" alt="Proof by induction of the upper bound">
     <img src="/images/algorithms/merge-lower-bound.png" alt="Proof by induction of the lower bound">
     <figcaption>When proving this, be careful: you're not allowed to change a. Ending with (a+1) is invalid.</figcaption>
+    <img src="/images/algorithms/special-upper-bound.png" alt="Alternative way of doing proof by induction">
+    <figcaption>If we do end up with (a+1) or something similarly invalid, we can try to prove something stronger.</figcaption>
 </figure>
-
-
-- **Combine**: Merge on an *n*-element subarray takes $$\Theta(n)$$ time, so $$C(n) = \Theta(n)$$
 
 All-in-all, merge sort runs in $$\Theta(n \log{n})$$, both in worst and best case.
 
@@ -191,20 +195,20 @@ You have the prices that a stock traded at over a period of *n* consecutive days
 
 ![An example of stock prices over a few days](/images/algorithms/stock-chart.png)
 
-We don't want to just buy at the lowest and sell at the highest, as the lowest price might occur *after* the highest.
+The naïve approach of buying at the lowest and selling at the highest won't work, as the lowest price might occur *after* the highest.
 
 - **Input**: An array `A[1..n]` of numbers
 - **Output**: Indices `i` and `j` such that `A[i..j]` has the greatest sum of any nonempty, contiguous subarray of `A`, along with the sum of the values in `A[i..j]`
 
 ### Divide and Conquer
-- **Divide** the subarray into two subarrays of as equal size as possible. Find the midpoint mid of the subarrays, and consider the subarrays `A[low..mid]` and `A[mid+1..high]`
+- **Divide** the subarray into two subarrays of as equal size as possible: Find the midpoint mid of the subarrays, and consider the subarrays `A[low..mid]` and `A[mid+1..high]`
     + This can run in $$\Theta(1)$$
 - **Conquer** by finding maximum subarrays of `A[low..mid]` and `A[mid+1..high]`
     + Recursively solve two subproblems, each of size $$n/2$$, so $$2T(n/2)$$
-- **Combine** find a maximum subarray that crosses the midpoint, and use the best solution out of the three (that is, left, midpoint and right).
+- **Combine**: Find a maximum subarray that crosses the midpoint, and use the best solution out of the three (that is, left, midpoint and right).
     + The merge is dominated by `find_max_crossing_subarray` so $$\Theta(n)$$
 
-The overall recursion is $$T(n) = 2T(n/2) + \Theta(n)$$, so the algorithm runs in $$\Theta(n\log{n})$$
+The overall recursion is $$T(n) = 2T(n/2) + \Theta(n)$$, so the algorithm runs in $$\Theta(n\log{n})$$.
 
 In pseudo-code the algorithm is:
 
@@ -248,6 +252,10 @@ def find_max_crossing_subarray(A, low, mid, high):
     # Return the indices and the sum of the two subarrays
     return (l_max, r_max, l_sum + r_sum)
 {% endhighlight %}
+
+
+![Example of how to solve the maximum subarray problem](/images/algorithms/maxsubarray.png)
+
 
 ## Matrix multiplication
 
@@ -1912,8 +1920,198 @@ Given a function `RANDOM` that return `1` with probability $$p$$ and `0` with pr
 
 $$\mathbb{E}[\text{# trials until success}] = \frac{1}{2p(1-p)}$$
 
+### Birthday Lemma
+If $$q > 1.78 \sqrt{\|M\|}$$ then the probability that a function chosen uniformly at random $$f: {1, 2, \dots, q} \rightarrow M$$ is injective is at most $$\frac{1}{2}$$.
 
-### Birthday Paradox
+{% details Proof %}
+Let $$m = \| M\|$$. The probability that the function is injective is:
 
-#### Birthday Lemma
-If $$q > 1.78 \sqrt{\|M\|}$$ then the probability that a function chosen uniformly at random $$f: {1, 2, \dots, q} \rightarrow M$$ is injective is at most $$\frac{1}{2}$$
+$$\frac{m}{m}\cdot\frac{m-1}{m}\cdot\frac{m-2}{m}\cdot\dots\cdot{m-(q-1)}{m}$$
+
+Since $$e^{-x} > 1-x$$ we have that this is less than:
+
+$$e^{-0}\cdot e^{-1/m}\cdot e^{-2/m}\dots e^{-(q-1)/m} = e^{-q(q-1)/(2m)}$$
+
+Which itself is less than &#189; if:
+
+$$q \geq\frac{1+\sqrt{1+8\ln{2}}}{2}\sqrt{m}\approx 1.78\sqrt{m}$$
+
+{% enddetails %}
+
+### Hash functions and tables
+We want to design a computer system for a library, where we can:
+
+- Insert a new book
+- Delete book
+- Search book
+- All operations in (expected) constant time
+
+There are multiple approaches to this; let's start with a very naive one: a direct-address table, in which we save an array/table T with a position for each possible book (for every possible ISBN). 
+
+This is terribly inefficient; sure, the running time of each of the above operations is $$\mathcal{O}(1)$$, but it takes space $$\mathcal{O}(U)$$, where U is the size of the universe.
+
+#### Hash tables
+Instead, let's use hash tables. Their running time is the same (constant, in average case), but their space requirement is $$\mathcal{O}(K)$$, the size of the key space (instead of the universe).
+
+In hash tables an element with key *k* is stored in slot *h(k)*. $$h: U \rightarrow\{0, 1, \dots, m-1\}$$ is called the **hash function**
+
+Good hash function is efficiently computable, should distribute keys uniformly (seemingly at random over our sample space, though the output should of course be deterministic, the same every time we run the function). This is the principle of **simple uniform hashing**:
+
+> *h* hashes a new key equally likely to any of the *m* slots independently of
+where any other has hashed to
+
+#### Collisions
+When two items with keys *k<sub>i</sub>* and *k<sub>j</sub>* have *h(k<sub>i</sub>) = h(k<sub>j</sub>)*. How big of a table do we need to avoid collisions with high probability? This is the same problem as the [Birthday Lemma](#birthday-lemma). It says that for *h* to be injective with good probability then we need $$m > K^2$$.
+
+This means that if a library has 10.000 books then it needs an array of size 10<sup>8</sup>.
+
+So we can't avoid collisions, but we can still deal with them. We can place all elements that hash to the same slot into the same linked list.
+
+![A hash collision and its representation in memory](/images/algorithms/hash-collision.png)
+
+{% highlight python linenos %}
+def chained_hash_search(T, k):
+    search for an element with key k in list T[h(k)]
+    # (this list will often only contain 1 element)
+
+def chained_hash_insert(T, x):
+    insert x at the head of list T[h(x.key)]
+
+def chained_hash_delete(T, x):
+    delete x in the list T[h(x.key)]
+{% endhighlight %}
+
+#### Running times
+- `Insert`: $$\mathcal{O}(1)$$
+- `Delete`: $$\mathcal{O}(1)$$
+- `Search`: Expected $$\mathcal{O}(\frac{n}{m})$$ (if good hash function)
+
+
+Insertion and deletion are $$\mathcal{O}(1)$$, and the space requirement is $$\mathcal{O}(m+K)$$.
+
+The worst case is that all *n* elements are hashed to the same slot, in which case seach takes $$\Theta(n)$$, since we're searching through a linked list. But this is *exceeedingly rare* with a correct *m* and *n* (we cannot avoid collisions without having $$m \gg n^2$$).
+
+Let the following be a **theorem** for running time of search: a search takes expected time $$\Theta(1+\alpha)$$, where $$\alpha = \frac{n}{m}$$ is the expected length of the list.
+
+See the slides for extended proof!
+
+
+If we choose the size of our hash table to be proportional to the number of elements stored, we have $$m = \Theta(n)$$. Insertion, deletion are then in constant time.
+
+#### Examples of Hash Functions
+- **Division method**: $$h(k) = k \text{ mod } m$$, where *m* often selected to be a prime not too close to a power of 2
+- **Multiplicative method**: $$h(k) = \lfloor m\times\text{ fractional part of}(Ak)\rfloor$$. Knut suggests chosing $$A\approx \frac{\sqrt{5}-1}{2}$$.
+
+
+
+## Quick Sort
+![GIF of Quicksort in action](/images/algorithms/quicksort.gif)
+
+We recursively select an element at random, the **pivot**, and split the list into two sublist; to the left, the smaller elements, to the right, the larger ones. When we only have single elements left, we can combine them with the pivot in the middle.
+
+This is a simple divide-and-conquer algorithm. The divide step looks like this:
+
+{% highlight python linenos %}
+def partition(A, p, r):
+    x = A[r]
+    i = p - 1
+    for j = p to r-1:
+        if A[j] <= x:
+            i = i + 1 
+            swap A[i] and A[j]
+    swap A[i+1] and A[r]
+    return i+1
+{% endhighlight %}
+
+The running time is $$\Theta(n)$$ for an array of length *n*; it's proportional to the number of comparisons we use (the number of times that line 5 is run).
+
+The loop invariant is:
+1. All entries in `A[p..i]` are $$\leq$$ pivot
+2. All entries in `A[i+1 .. j-1]` are $$>$$ pivot
+3. `A[r]` is the pivot
+
+The algorithm uses the above like so:
+
+{% highlight python linenos %}
+def quicksort(A, p, r):
+    if p < r:
+        q = partition(A, p, r)
+        quicksort(A, p, q-1) # to the left
+        quicksort(A, q+1, r) # to the right
+{% endhighlight %}
+
+Quicksort runs in $$\mathcal{O}(n \log{n})$$ if the split is balanced (two equal halves), that is, if we've chosen a good pivot. In this case we have our favorite recurrence:
+
+$$T(n) = 2T(n/2) + \Theta(n)$$
+
+Which indeed is $$\mathcal{O}(n \log{n})$$.
+
+But what if we choose a bad pivot every time? We would just have elements to the left of the pivot, and it would run in $$\mathcal{O}(n^2)$$. But this is very unlikely.
+
+If we select the pivot at random, the algorithm will perform well on *any* input. Therefore, as a small modification to the partitioning algorithm, we should select a random number in the list instead of the last number.
+
+Total running time is proportional to $$\mathbb{E}[\text{# comparisons}]$$. We can calculate this by using a **random indicator variable**:
+
+$$X_{ij} = \begin{cases}
+1 & \text{ if } i^\text{th}\text{ smallest number is compared with }j^\text{th}\text{ smallest number} \\
+0 & \text{ otherwise}
+\end{cases}$$
+
+**Note:** two numbers are only compared when one is the pivot; therefore, no nunmbers are compared to each other twice (we could also say that two numbers are compared at most once).
+
+$$\mathbb{E}[\text{# comparisons}] = \mathbb{E}\left[\sum_{i=1}^n{\sum_{j=i+1}^n{X_{ij}}}\right]$$
+
+Using linearity of expecation, this is equal to:
+
+$$\sum[X_{ij}] = Pr[i^\text{th} \text{ smallest is compared to }j^\text{th}\text{ smallest number}]$$
+
+<!-- TODO: correct this using the slides -->
+
+
+
+### Why always n log n?
+Let's look at all the sorting algorithms we've looked at or just mentionned during the course:
+
+- Quick Sort
+- Merge sort
+- Heap sort
+- Bubble sort
+- Insertion sort
+
+
+All algorithms we have seen so far have a running time based on the number of *comparisons* ($$a \leq b$$). Let's try to analyse the number of comparisons to give an absolute lower bound on sorting algorithms; we'll find out that it is impossible to do better than $$\mathcal{O}(n\log{n}).
+
+We need $$\Omega(n)$$ to even examine the inputs. If we look at the comparisons we need no make, we can represent them as a decision tree:
+
+![Decision tree of the list (1, 2, 3)](/images/algorithms/decision-tree.png)
+
+There are $$n!$$ leaves in the decision tree (this is the number of output permutations), and its height is $$\Omega(\log{n!})=\Omega(n\log{n})$$. Therefore, if we have an algorithm that takes all its information from comparisons (*comparison sorting*) gives us a decision tree, and **cannot run in better time than** $$\mathcal{O}(n\log{n})$$. In that sense, merge-sort, heapsort and quicksort are optimal.
+
+### Linear time sorting
+Also known as *non-comparison sort*.
+
+- **Input**: `A[1..n]`, where $$A[j]\in\left{0, 1, \dots, k\right}$$ for $$j = 1, 2, \dots, n$$. Array `A` and values `n` and `k` are given as parameters
+- **Output**: `B[1..n]` sorted
+
+{% highlight python linenos %}
+def counting_sort(A, B, n, k):
+    let C[0..k] be a new array
+    for i = 0 to k:
+        C[i] = 0
+    for j = 1 to n:
+        C[A[j]] = C[A[j]] + 1
+    for i = 1 to k:
+        C[i] = C[i] + C[i - 1]
+    for j = n downto 1:
+        B[C[A[j]]] = A[j]
+        C[A[j]] = C[A[j]] - 1
+{% endhighlight %}
+
+The for-loops run in $$\Theta(k), \Theta(n), \Theta(k), \Theta(n)$$ respectively, so runtmie is $$\Theta(n+k)$$.
+
+How big a *k* is practical?
+- 32-bit values? No
+- 16-bit values? Probably not
+- 8-bit values? Maybe depending on *n* (if it's big then yes)
+- 4-bit values? Probably, unless *n* is very small (if it's small then no, comparison sorting is fine)
+
