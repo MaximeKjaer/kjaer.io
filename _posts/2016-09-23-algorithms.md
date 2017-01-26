@@ -304,7 +304,7 @@ What really broke the Divide-and-Conquer approach is the fact that we had to do 
 
 There is a way to do only 7 recursive multiplications of $$n/2\times n/2$$ matrices, rather than 8. Our recurrence relation is now:
 
-$$ T(n) = 7\cdot T(n/2) + \Theta(n^{log_2(7)}) = \Theta(n^{2.807...}) $$
+$$ T(n) = 7\cdot T(n/2) + \Theta(n^2) = \Theta(n^{log_2(7)}) = \Theta(n^{2.807...}) $$
 
 Strassen's method is the following:
 
