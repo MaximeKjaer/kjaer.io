@@ -1288,12 +1288,12 @@ def BFS(V, E, s):
     while Q != Ø:
         u = dequeue(Q)
         for each v in G.adj[u]:
-            if v.d == infinity
-            v.d = u.d + 1
-            enqueue(Q, v)
+            if v.d == infinity:
+                v.d = u.d + 1
+                enqueue(Q, v)
 {% endhighlight %}
 
-This is $$\mathcal(O)(V+E)$$:
+This is $$\mathcal{O}(V+E)$$:
 
 - $$\mathcal{O}(V)$$ because each vertex is enqueued at most once
 - $$\mathcal{O}(E)$$ because every vertex is dequeued at most once and we examine the edge $$(u, v)$$ only when $$u$$ is dequeued. Therefore, every edge is examined at most once if directed, and at most twice if undirected.
@@ -1376,7 +1376,7 @@ When we explore *(u, v)*, what are the colors of *u* and *v*?
 A directed graph G is acyclic **if and only if** a DFS of G yields no back edges.
 
 ### Strongly connected component
-A strongly connected component (SCC) of a directed graph is a **maximal** set of vertives $$C \subseteq V$$ such that $$\forall u, v\in C,  u \leadsto v \text{ and } v\leadsto u$$.
+A strongly connected component (SCC) of a directed graph is a **maximal** set of vertices $$C \subseteq V$$ such that $$\forall u, v\in C,  u \leadsto v \text{ and } v\leadsto u$$.
 
 Below is a depiction of all SCCs on a graph:
 
@@ -1871,7 +1871,7 @@ What about multiple coin flips? We want to determine the expected number of head
 
 $$\mathbb{E}[X] = \sum_{k=0}^n {k\cdot Pr\{X=k\}} $$
 
-... but that is cumbersone. Instead, we can use indicator variables.
+... but that is cumbersome. Instead, we can use indicator variables.
 
 For $$i = 1, \dots, n$$, define $$X_i = I\{\text{the ith flip results in event H}\}$$. Then:
 
@@ -1968,7 +1968,7 @@ def chained_hash_delete(T, x):
 
 Insertion and deletion are $$\mathcal{O}(1)$$, and the space requirement is $$\mathcal{O}(m+K)$$.
 
-The worst case is that all *n* elements are hashed to the same slot, in which case seach takes $$\Theta(n)$$, since we're searching through a linked list. But this is *exceeedingly rare* with a correct *m* and *n* (we cannot avoid collisions without having $$m \gg n^2$$).
+The worst case is that all *n* elements are hashed to the same slot, in which case search takes $$\Theta(n)$$, since we're searching through a linked list. But this is *exceedingly rare* with a correct *m* and *n* (we cannot avoid collisions without having $$m \gg n^2$$).
 
 Let the following be a **theorem** for running time of search: a search takes expected time $$\Theta(1+\alpha)$$, where $$\alpha = \frac{n}{m}$$ is the expected length of the list.
 
@@ -2040,7 +2040,7 @@ $$X_{ij} = \begin{cases}
 
 $$\mathbb{E}[\text{# comparisons}] = \mathbb{E}\left[\sum_{i=1}^n{\sum_{j=i+1}^n{X_{ij}}}\right]$$
 
-Using linearity of expecation, this is equal to:
+Using linearity of expectation, this is equal to:
 
 $$\sum[X_{ij}] = Pr[i^\text{th} \text{ smallest is compared to }j^\text{th}\text{ smallest number}]$$
 
@@ -2049,7 +2049,7 @@ $$\sum[X_{ij}] = Pr[i^\text{th} \text{ smallest is compared to }j^\text{th}\text
 
 
 ### Why always n log n?
-Let's look at all the sorting algorithms we've looked at or just mentionned during the course:
+Let's look at all the sorting algorithms we've looked at or just mentioned during the course:
 
 - Quick Sort
 - Merge sort
@@ -2058,7 +2058,7 @@ Let's look at all the sorting algorithms we've looked at or just mentionned duri
 - Insertion sort
 
 
-All algorithms we have seen so far have a running time based on the number of *comparisons* ($$a \leq b$$). Let's try to analyse the number of comparisons to give an absolute lower bound on sorting algorithms; we'll find out that it is impossible to do better than $$\mathcal{O}(n\log{n}).
+All algorithms we have seen so far have a running time based on the number of *comparisons* ($$a \leq b$$). Let's try to analyze the number of comparisons to give an absolute lower bound on sorting algorithms; we'll find out that it is impossible to do better than $$\mathcal{O}(n\log{n}).
 
 We need $$\Omega(n)$$ to even examine the inputs. If we look at the comparisons we need no make, we can represent them as a decision tree:
 
@@ -2069,7 +2069,7 @@ There are $$n!$$ leaves in the decision tree (this is the number of output permu
 ### Linear time sorting
 Also known as *non-comparison sort*.
 
-- **Input**: `A[1..n]`, where $$A[j]\in\left{0, 1, \dots, k\right}$$ for $$j = 1, 2, \dots, n$$. Array `A` and values `n` and `k` are given as parameters
+- **Input**: `A[1..n]`, where $$A[j] \in \{ 0, 1, \dots, k \}$$ for $$j = 1, 2, \dots, n$$. Array `A` and values `n` and `k` are given as parameters
 - **Output**: `B[1..n]` sorted
 
 {% highlight python linenos %}
@@ -2086,9 +2086,10 @@ def counting_sort(A, B, n, k):
         C[A[j]] = C[A[j]] - 1
 {% endhighlight %}
 
-The for-loops run in $$\Theta(k), \Theta(n), \Theta(k), \Theta(n)$$ respectively, so runtmie is $$\Theta(n+k)$$.
+The for-loops run in $$\Theta(k), \Theta(n), \Theta(k), \Theta(n)$$ respectively, so runtime is $$\Theta(n+k)$$.
 
 How big a *k* is practical?
+
 - 32-bit values? No
 - 16-bit values? Probably not
 - 8-bit values? Maybe depending on *n* (if it's big then yes)
