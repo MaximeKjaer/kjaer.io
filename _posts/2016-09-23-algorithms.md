@@ -595,7 +595,7 @@ def list_insert(L, x):
     x.prev = nil
 {% endhighlight %}
 
-This runs in $$\mathcal{O}(1)$$. It's important to add the element to the start of the list and not the end, as this linked list doesn't implement a tail pointer, which would mean traversing the list before adding the element.
+This runs in $$\mathcal{O}(1)$$. This linked list doesn't implement a tail pointer, so it's important to add the element to the start of the list and not the end, as that would mean traversing the list before adding the element. 
 
 #### Deletion
 {% highlight python linenos %}
@@ -622,7 +622,7 @@ The key property of binary search trees is:
 - If `y` is in the left subtree of `x`, then `y.key < x.key`
 - If `y` is in the right subtree of `x`, then `y.key >= x.key`
 
-The tree `T` has a root `T.root`, and a height `h` (not necessarily the log of n, it can vary depending on the organization of the tree).
+The tree `T` has a root `T.root`, and a height `h` (not necessarily log(*n*), it can vary depending on the organization of the tree).
 
 #### Querying a binary search tree
 All of the following algorithms can be implemented in $$\mathcal{O}(h)$$.
@@ -1232,27 +1232,6 @@ def optimal_bst(p, q, n):
 
 
 The runtime is $$\Theta(n^3)$$: there are $$\Theta(n^2)$$ cells to fill in, most of which take $$\Theta(n)$$ to fill in.
-
-## Review of the course
-
-### Growth of functions
-1. The logs: $$\log{N}, \log^2{N}, \dots$$
-2. The polynomials: $$\sqrt{N}, 20N, N^2, \dots$$
-3. The exponentials: $$\sqrt{4^N}=2^N, 3^N, ...$$
-
-### Sorting
-- **Insertion sort**: Put the numers in their correct order one at a time. $$\Theta(n^2)$$, worst case occurs when the input is in reverse sorted order
-- **Merge sort**: A divide and conquer algorithm. The merge works by having two stacks of cards, adding a sentinel at the bottom, and then repeatedly  just taking the smallest of the two.
-    + *Time to divide*: $$\Theta(1)$$
-    + *Time to combine* $$\Theta(n), \text{ where } n=r-p$$
-    + *Number of subproblems and their size*: 2 subproblems of size $$n/2$$.
-    + *Recurrence*:
-
-$$T(n) = \begin{cases}
-\Theta(1) & \text{if } n \leq 1 \\
-2T(n/2)+\Theta(n) & \text{otherwise} \\
-\end{cases}
-$$
 
 <!-- Lecture 14-->
 
@@ -2115,3 +2094,23 @@ How big a *k* is practical?
 - 8-bit values? Maybe depending on *n* (if it's big then yes)
 - 4-bit values? Probably, unless *n* is very small (if it's small then no, comparison sorting is fine)
 
+## Review of the course
+
+### Growth of functions
+1. The logs: $$\log{N}, \log^2{N}, \dots$$
+2. The polynomials: $$\sqrt{N}, 20N, N^2, \dots$$
+3. The exponentials: $$\sqrt{4^N}=2^N, 3^N, ...$$
+
+### Sorting
+- **Insertion sort**: Put the numers in their correct order one at a time. $$\Theta(n^2)$$, worst case occurs when the input is in reverse sorted order
+- **Merge sort**: A divide and conquer algorithm. The merge works by having two stacks of cards, adding a sentinel at the bottom, and then repeatedly  just taking the smallest of the two.
+    + *Time to divide*: $$\Theta(1)$$
+    + *Time to combine* $$\Theta(n), \text{ where } n=r-p$$
+    + *Number of subproblems and their size*: 2 subproblems of size $$n/2$$.
+    + *Recurrence*:
+
+$$T(n) = \begin{cases}
+\Theta(1) & \text{if } n \leq 1 \\
+2T(n/2)+\Theta(n) & \text{otherwise} \\
+\end{cases}
+$$
