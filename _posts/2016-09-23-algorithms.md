@@ -1516,17 +1516,17 @@ $$(3) \Rightarrow (1)$$: Recall that $$\| f\| \leq c(S, T) \forall \text{cut } (
 
 If capacities are irrational then the Ford-Fulkerson might not terminate. However, if we take the **shortest path** or **fattest path** then this will not happen if the capacities are integers (without proof).
 
-| Augmenting path | Number of iterations |
-| :-------------- | :------------------- |
-| BFS Shortest path | $$ \leq\frac{1}{2}E\cdot V $$ |
-| Fattest path | $$ \leq E\cdot \log{(E\cdot U)} $$ |
+|  Augmenting path  |        Number of iterations        |
+| :---------------- | :--------------------------------- |
+| BFS Shortest path | $$ \leq\frac{1}{2}E\cdot V $$      |
+| Fattest path      | $$ \leq E\cdot \log{(E\cdot U)} $$ |
 
-Where U is the maximum fow value, and the fattest path is chosen by augmenting the path with larges minimum capacity (the bottleneck).
+Where $$U$$ is the maximum flow value, and the fattest path is the path with largest minimum capacity (the bottleneck).
 
 ### Bipartite matching
 Say we have *N* students applying for *M* jobs. Each gets several offers. Is there a way to match all students to jobs?
 
-If we add a source and a sink, give all edges capacity 1, from left to right. If we run Ford-Fulkerson, we get a result.
+If we add a source and a sink, give all edges capacity 1, from left to right. If we run [Ford-Fulkerson](#ford-fulkerson-method), we get a result.
 
 ![Bipartite matching example](/images/algorithms/bipartite.png)
 
@@ -1536,7 +1536,7 @@ Every matching defines a flow of value equal to the number of edges in the match
 Works because flow conservation is equivalent to: no student is matched more than once, no job is matched more than once.
 
 ### Edmonds-Kart algorithm
-It's just like Ford-Ferguson, but we pick the **shortest** augmenting path (in the sense of the minimal number of edges, found with DFS).
+It's just like [Ford-Fulkerson](#ford-fulkerson-method), but we pick the **shortest** augmenting path (in the sense of the minimal number of edges, found with DFS).
 
 {% highlight python linenos %}
 def edmonds_kart(G):
@@ -1605,7 +1605,7 @@ Union can be implemented in a couple of ways. We can either append `y`'s list on
 
 Otherwise, we can use **weighted-union heuristic**: we always append the smaller list to the larger list. As a theorem, *m* operations on *n* elements takes $$\mathcal{O}(m+n\log{n})$$ time.
 
-### Forest of trees
+### Implementation: Forest of trees
 - One tree per set, where the root is the representative.
 - Each node only point to its parent (the root points to itself).
 
@@ -1617,7 +1617,14 @@ The operations are now:
 
 To implement the union, we can make the root of the smaller tree a child of the root of the larger tree. In a good implementation, we use the rank instead of the size to compare the trees, since measuring the size takes time, and rank is an upper bound on the height of a node anyway. Therefore, a proper implementation would make the root with the *smaller rank* a child of the root with the *larger rank*; this is **union-by-rank**.
 
-`find-set` can be implemented with path compression, where every node it meets is made a child of the root; this is **path-compression**.
+`find-set` can be implemented with path compression, where every node it meets while making its way to the top is made a child of the root; this is **path-compression**.
+
+<figure>
+    <img src="/images/algorithms/path-compression.png" alt="Example of path compression">
+    <figcaption>The result of running <code class="highlighter-rouge">find_set(a)</code></figcaption>
+</figure>
+
+Below is one implementation of the operations on this data structure.
 
 {% highlight python linenos %}
 def make_set(x):
@@ -1626,16 +1633,16 @@ def make_set(x):
 
 def find_set(x):
     if x != x.parent
-        x.parent = find_set(x.parent) # this flattens the tree, makes everything a child of the root.
+        x.parent = find_set(x.parent) # path compression
     return x.parent
 
 def union(x, y):
-    link(find_set(x), find_set(y))
+    link(find_set(x), find_set(y)) # path compression here as well
 
 def link(x, y):
-    if x.rank > y.rank:
+    if x.rank > y.rank: # union by rank
         y.parent = x
-    else:
+    else: # if they have the same rank, the 2nd argument becomes parent
         x.parent = y
         if x.rank == y.rank:
             y.rank = y.rank + 1
@@ -1725,7 +1732,7 @@ def kruskal(G, w):
 - Sort *E*: $$\mathcal{O}(E\log{E})$$
 - Second for loop: $$\mathcal{O}(E)$$ times `find_sets` and `unions`
 
-So this can run in $$\mathcal{O}(E\log{V})$$; runtime is dominated by the sorting algorithm.
+So this can run in $$\mathcal{O}(E\log{V})$$ (or, equivalently, $$\mathcal{O}(E\log{E}$$ since $$E=V^2$$ at most); runtime is dominated by the sorting algorithm.
 
 ### Summary
 - Greedy is good (sometimes)
@@ -1746,29 +1753,33 @@ The weight of a path $$(v_0, v1, \dots, v_k): \sum_{i=1}^k{w(v_{i-1}, v_i)}$$.
 
 
 ### Bellman-Ford algorithm
+Bellman-Ford runs in $$\Theta(E\cdot V)$$. Unlike Dijkstra, it allows negative edge weights, as long as no negative-weight cycle (a cycle where the weights add up to a negative number) is reachable from the source. The algorithm is easy to implement in distributed settings (e.g. IP routing): each vertex repeatedly asks their neighbors for the best path.
+
 - **Input**: Directed graph with weighted edges, source *s*, no negative cycles.
 - **Ouput**: The shortest path from *s* to *t*
 
-The algorithm starts by trivial initialization:
+It starts by trivial initialization, in which the distance of every vertex is set to infinity, and their predecessor is non-existent:
 
 {% highlight python linenos %}
 def init_single_source(G, s):
     for each v in G.V:
-        v.d = infinity
+        v.distance = infinity
         v.predecessor = Nil
     s.d = 0
 {% endhighlight %}
 
-Bellman-Ford updates shortest-path estimates iteratively by using `relax`. We allow negative weight, as long as no negative-weight cycle (a cycle where the weights add up to a negative number) is reachable from the source.
+Bellman-Ford updates shortest-path estimates iteratively by using `relax`:
 
 {% highlight python linenos %}
 def relax(u, v, w):
-    if v.d > u.d + w(u, v):
-        v.d = u.d + w(u, v)
+    if v.distance > u.distance + w(u, v): # if our attempt improves the distance
+        v.distance = u.distance + w(u, v)
         v.predecessor = u
 {% endhighlight %}
 
 This function reduces the distance of `v` if it is possible to reach it in a shorter path thanks to the `(u, v)` edge. It runs in $$\mathcal{O}(1)$$.
+
+The entire algorithm is then:
 
 {% highlight python linenos %}
 def bellman_ford(G, w, s):
@@ -1777,20 +1788,31 @@ def bellman_ford(G, w, s):
         for each edge (u, v) in G.E:
             relax(u, v, w)
     # Optional: detecting negative cycles
+    # Essentially we're just checking whether relax()
+    # would change anything on an additional iteration
     for each edge (u, v) in G.E:
-        if v.d > u.d + w(u, v):
-            return False
-    return True
+        if v.distance > u.distance + w(u, v):
+            return False # there is a negative cycle
+    return True # there are no negative cycles
 {% endhighlight %}
 
 ![GIF of Bellman-Ford in action](/images/algorithms/bellman-ford.gif)
 
-The algorithm is easy to implement in distributed settings (e.g. IP routing): each vertex repeatedly ask their neighbors for the best path.
+A property of Bellman-Ford:
 
-Bellman-Ford runs in $$\Theta(E\cdot V)$$.
+- After one iteration, we have found all shortest paths that are one edge long
+- After two iterations, we have found all shortest paths that are two edges long
+- After three iterations, we have found all shortest paths that are three edges long
+- ...
+
+Let's assume that the longest shortest path (in terms of number of edges) is from source *s* to vertex *t*. Let's assume that there are *n* vertices in total; then the shortest path from *s* to *t* can at most be *n-1* edges long, which is why we terminate at *n-1* iterations in the above pseudocode.
+
+Indeed, if there are no negative cycles, Bellman-Ford returns the correct answer after *n-1* iterations. But we may in reality already be done before the *n-1<sup>st</sup>* iteration. If the longest shortest path (in terms of number of edges) is *m* edges long, then the *m<sup>th</sup>* iteration will produce the final result. The algorithm has no way of knowing the value of *m*, but what it could do is run an *m+1<sup>st</sup>* iteration and see if any distances change; if not, then it is done.
+
+At any iteration, if Bellman-Ford doesn't change any vertex distances, then it is done (it won't change anything after this point anyway).
 
 #### Detecting negative cycles
-There is no negative cycle reachable from the source if and only if the $$\ell$$-value of no node changes if we run one more (n:th) iteration of Bellman-Ford.
+There is no negative cycle reachable from the source if and only if no distances change when we run one more (*n<sup>th</sup>*) iteration of Bellman-Ford.
 
 ### Dijkstra's algorithm
 - This algorithm only works when all weights are nonnegative.
@@ -1863,7 +1885,7 @@ $$I\{A\}= \begin{cases}
 For an event A, let $$X_A = I\{A\}$$. Then $$\mathbb{E}[X_A] = Pr[A]$$
 
 {% details Proof %}
-$$\mathbb{E}[X_A] = I\cdot Pr[A] + 0\cdot Pr[\bar{A}] = Pr[A]$$
+$$\mathbb{E}[X_A] = 1\cdot Pr[A] + 0\cdot Pr[\bar{A}] = Pr[A]$$
 {% enddetails %}
 
 #### Multiple Coin Flips
@@ -1905,7 +1927,7 @@ If $$q > 1.78 \sqrt{\|M\|}$$ then the probability that a function chosen uniform
 {% details Proof %}
 Let $$m = \| M\|$$. The probability that the function is injective is:
 
-$$\frac{m}{m}\cdot\frac{m-1}{m}\cdot\frac{m-2}{m}\cdot\dots\cdot{m-(q-1)}{m}$$
+$$\frac{m}{m}\cdot\frac{m-1}{m}\cdot\frac{m-2}{m}\cdot\dots\cdot\frac{m-(q-1)}{m}$$
 
 Since $$e^{-x} > 1-x$$ we have that this is less than:
 
@@ -1932,19 +1954,18 @@ This is terribly inefficient; sure, the running time of each of the above operat
 #### Hash tables
 Instead, let's use hash tables. Their running time is the same (constant, in average case), but their space requirement is $$\mathcal{O}(K)$$, the size of the key space (instead of the universe).
 
-In hash tables an element with key *k* is stored in slot *h(k)*. $$h: U \rightarrow\{0, 1, \dots, m-1\}$$ is called the **hash function**
+In hash tables an element with key *k* is stored in slot *h(k)*. $$h: U \rightarrow\{0, 1, \dots, m-1\}$$ is called the **hash function**.
 
-Good hash function is efficiently computable, should distribute keys uniformly (seemingly at random over our sample space, though the output should of course be deterministic, the same every time we run the function). This is the principle of **simple uniform hashing**:
+A good hash function is efficiently computable, should distribute keys uniformly (seemingly at random over our sample space, though the output should of course be deterministic, the same every time we run the function). This is the principle of **simple uniform hashing**:
 
-> *h* hashes a new key equally likely to any of the *m* slots independently of
-where any other has hashed to
+> The hashing function **h** hashes a new key equally likely to any of the **m** slots, independently of where any other key has hashed to
 
 #### Collisions
-When two items with keys *k<sub>i</sub>* and *k<sub>j</sub>* have *h(k<sub>i</sub>) = h(k<sub>j</sub>)*. How big of a table do we need to avoid collisions with high probability? This is the same problem as the [Birthday Lemma](#birthday-lemma). It says that for *h* to be injective with good probability then we need $$m > K^2$$.
+When two items with keys *k<sub>i</sub>* and *k<sub>j</sub>* have *h(k<sub>i</sub>) = h(k<sub>j</sub>)*, we have a collision. How big of a table do we need to avoid collisions with high probability? This is the same problem as the [Birthday Lemma](#birthday-lemma). It says that for *h* to be injective with good probability (meaning that the expected number of collisions is lower than 1) then we need $$m > K^2$$.
 
-This means that if a library has 10.000 books then it needs an array of size 10<sup>8</sup>.
+This means that if a library has $$K = 10 000$$ books then it needs an array of size $$ m = K^2 = 10^8 $$ (at least).
 
-So we can't avoid collisions, but we can still deal with them. We can place all elements that hash to the same slot into the same linked list.
+Even then, we can't avoid collisions, but we can still deal with them. We can place all elements that hash to the same slot into the same **doubly linked list**.
 
 ![A hash collision and its representation in memory](/images/algorithms/hash-collision.png)
 
@@ -1960,11 +1981,12 @@ def chained_hash_delete(T, x):
     delete x in the list T[h(x.key)]
 {% endhighlight %}
 
+See [linked lists](#linked-lists) for details on how to do operations on the lists.
+
 #### Running times
 - `Insert`: $$\mathcal{O}(1)$$
 - `Delete`: $$\mathcal{O}(1)$$
 - `Search`: Expected $$\mathcal{O}(\frac{n}{m})$$ (if good hash function)
-
 
 Insertion and deletion are $$\mathcal{O}(1)$$, and the space requirement is $$\mathcal{O}(m+K)$$.
 
