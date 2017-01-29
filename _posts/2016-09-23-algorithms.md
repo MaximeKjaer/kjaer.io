@@ -1910,6 +1910,8 @@ Back to our hiring problem:
 
 $$Pr[\text{candidate } i \text{ is hired}] = \frac{1}{i}$$
 
+Therefore, the number of candidates we can expect to hire is:
+
 $$\mathbb{E}[X] = Pr[\text{#} 1 \text{ hired}] + Pr[\text{#} 2 \text{ hired}] + \dots = \frac{1}{1} + \frac{1}{2} + \frac{1}{3} + \dots + \frac{1}{n} = H_n$$
 
 This is the harmonic number, which is $$H_n = \ln{n}+\mathcal{O}(1)$$.
@@ -2006,23 +2008,25 @@ If we choose the size of our hash table to be proportional to the number of elem
 
 
 ## Quick Sort
-![GIF of Quicksort in action](/images/algorithms/quicksort.gif)
+![Quicksort example](/images/algorithms/quicksort.png)
 
-We recursively select an element at random, the **pivot**, and split the list into two sublist; to the left, the smaller elements, to the right, the larger ones. When we only have single elements left, we can combine them with the pivot in the middle.
+We recursively select an element at random, the **pivot**, and split the list into two sublist; the smaller or equal elements to the left, the larger ones to the right. When we only have single elements left, we can combine them with the pivot in the middle.
 
 This is a simple divide-and-conquer algorithm. The divide step looks like this:
 
 {% highlight python linenos %}
 def partition(A, p, r):
-    x = A[r]
-    i = p - 1
-    for j = p to r-1:
+    x = A[r] # pivot = last element
+    i = p - 1 # i is the separator between left and right
+    for j = p to r-1: # iterate over all elements
         if A[j] <= x:
-            i = i + 1 
-            swap A[i] and A[j]
+            i = i + 1
+            swap A[i] and A[j] # if it needs to go left, set it to 
     swap A[i+1] and A[r]
-    return i+1
+    return i+1 # pivot's new index
 {% endhighlight %}
+
+See [this visualization](https://visualgo.net/sorting) for a better idea of how this operates.
 
 The running time is $$\Theta(n)$$ for an array of length *n*; it's proportional to the number of comparisons we use (the number of times that line 5 is run).
 
@@ -2058,17 +2062,53 @@ $$X_{ij} = \begin{cases}
 0 & \text{ otherwise}
 \end{cases}$$
 
-**Note:** two numbers are only compared when one is the pivot; therefore, no nunmbers are compared to each other twice (we could also say that two numbers are compared at most once).
+**Note:** two numbers are only compared when one is the pivot; therefore, no nunmbers are compared to each other twice (we could also say that two numbers are compared at most once). The total number of comparisons formed by the algorithm is therefore:
 
-$$\mathbb{E}[\text{# comparisons}] = \mathbb{E}\left[\sum_{i=1}^n{\sum_{j=i+1}^n{X_{ij}}}\right]$$
+$$X = \sum_{i=1}^n {\sum_{j=i+1}^n {X_{ij}}} $$
+
+The expectancy is thus:
+
+$$
+\mathbb{E}[\text{# comparisons}] = \mathbb{E}\left[X\right[ = 
+\mathbb{E}\left[\sum_{i=1}^n{\sum_{j=i+1}^n{X_{ij}}}\right]
+$$
 
 Using linearity of expectation, this is equal to:
 
-$$\sum[X_{ij}] = Pr[i^\text{th} \text{ smallest is compared to }j^\text{th}\text{ smallest number}]$$
+$$ \sum_{i=1}^n {\sum_{j=i+1}^n {\mathbb{E}\left[X_{ij}\right]}} 
+=  \sum_{i=1}^n {\sum_{j=i+1}^n {Pr\left[z_i \text{ is compared to } z_j\right]}}
+$$
 
-<!-- TODO: correct this using the slides -->
+- If a pivot $$x$$ such that $$z_i < x < z_j$$ is chosen then $$z_i$$ and $$z_j$$ will never be compared at any later time.
+- If either $$z_i$$ or $$z_j$$ is chosen before any other element of $$Z_ij$$ then it will compared to all other elements of $$Z_ij$$.
+- The probability that $$z_i$$ is compared to $$z_j$$ is the probability that either $$z_i$$ or $$z_j$$ is the element first chosen
+- There are $$j-i+1$$ elements and pivots chosen at random, independently. Thus the probability that any one of them is the first chosen one is $$1 / (j-i+1)$$
 
+Therefore: 
 
+$$Pr\left[z_i \text{ is compared to } z_j\right] = \frac{2}{j-i+1}$$
+
+To wrap it up:
+
+$$
+\sum_{i=1}^n {\sum_{j=i+1}^n {Pr\left[z_i \text{ is compared to } z_j\right]}}
+$$
+
+$$
+= \sum_{i=1}^n {\sum_{j=i+1}^n {\frac{2}{j-i+1}}}
+$$
+
+$$
+= \sum_{i=1}^{n-1} {\sum_{k=1}^{n-i} {\frac{2}{k+1}}}
+$$
+
+$$
+< \sum_{i=1}^{n-1} {\sum_{k=1}^{n} {\frac{2}{k}}}
+= \sum_{i=1}^{n-1} {\mathcal{O}(\log{n})}
+= \mathcal{O}(n\log{n})
+$$
+
+Quicksort is $$\mathcal{O}(n\log{n})$$.
 
 ### Why always n log n?
 Let's look at all the sorting algorithms we've looked at or just mentioned during the course:
@@ -2080,7 +2120,7 @@ Let's look at all the sorting algorithms we've looked at or just mentioned durin
 - Insertion sort
 
 
-All algorithms we have seen so far have a running time based on the number of *comparisons* ($$a \leq b$$). Let's try to analyze the number of comparisons to give an absolute lower bound on sorting algorithms; we'll find out that it is impossible to do better than $$\mathcal{O}(n\log{n}).
+All algorithms we have seen so far have a running time based on the number of *comparisons* ($$a \leq b$$). Let's try to analyze the number of comparisons to give an absolute lower bound on sorting algorithms; we'll find out that it is impossible to do better than $$\mathcal{O}(n\log{n})$$.
 
 We need $$\Omega(n)$$ to even examine the inputs. If we look at the comparisons we need no make, we can represent them as a decision tree:
 
@@ -2097,18 +2137,22 @@ Also known as *non-comparison sort*.
 {% highlight python linenos %}
 def counting_sort(A, B, n, k):
     let C[0..k] be a new array
-    for i = 0 to k:
+    for i = 0 to k: # initialize C[i] to 0
         C[i] = 0
-    for j = 1 to n:
+    for j = 1 to n: # count elements of A
         C[A[j]] = C[A[j]] + 1
-    for i = 1 to k:
+    for i = 1 to k: # number of elements with value at most i
         C[i] = C[i] + C[i - 1]
-    for j = n downto 1:
+    for j = n downto 1: 
         B[C[A[j]]] = A[j]
-        C[A[j]] = C[A[j]] - 1
+        C[A[j]] = C[A[j]] - 1 # decrement number of el <= j
 {% endhighlight %}
 
 The for-loops run in $$\Theta(k), \Theta(n), \Theta(k), \Theta(n)$$ respectively, so runtime is $$\Theta(n+k)$$.
+
+
+![GIF of non-comparison sort in action](/images/algorithms/counting-sort.gif)
+
 
 How big a *k* is practical?
 
