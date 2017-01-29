@@ -956,7 +956,7 @@ def memoized_cut_rod_aux(p, n, r):
     else:
         q = - infinity
         for i = 1 to r:
-            q = max(q, p[i] + memoized_cut_rod_aux(p, n-1, r))
+            q = max(q, p[i] + memoized_cut_rod_aux(p, n-i, r))
     r[n] = q
     return q
 {% endhighlight %}
@@ -1333,7 +1333,7 @@ This runs in $$\Theta(V+E)$$.
 
 ![Classification of edges: tree edge, back edge, forward edge, cross edge](/images/algorithms/edges-classification.png)
 
-In DFS of an undirected graph we get only tree and back edges; no forward or back-edges.
+In <abbr title="Depth First Search">DFS</abbr> of an undirected graph we get only tree and back edges; no forward or back-edges.
 
 ### Parenthesis theorem
 $$\forall u, v$$, exactly one of the following holds:
@@ -1355,7 +1355,7 @@ def topological sort(G):
     output vertices in order of decreasing finishing time
 {% endhighlight %}
 
-Same running time as DFS, $$\Theta(V+E)$$.
+Same running time as <abbr title="Depth First Search">DFS</abbr>, $$\Theta(V+E)$$.
 
 {% details Proof of correctness %}
 We need to show that if $$(u, v) \in E$$ then `v.f < u.f`.  
@@ -1373,7 +1373,7 @@ When we explore *(u, v)*, what are the colors of *u* and *v*?
 <!-- Lecture 15 -->
 
 #### Lemma: When is a directed graph acyclic?
-A directed graph G is acyclic **if and only if** a DFS of G yields no back edges.
+A directed graph G is acyclic **if and only if** a <abbr title="Depth First Search">DFS</abbr> of G yields no back edges.
 
 ### Strongly connected component
 A strongly connected component (SCC) of a directed graph is a **maximal** set of vertices $$C \subseteq V$$ such that $$\forall u, v\in C,  u \leadsto v \text{ and } v\leadsto u$$.
@@ -1431,9 +1431,9 @@ $$\forall u, v \in V : 0 \leq f(u, v) \leq c(u, v)$$
 
 **Flow conservation**: The flow into *u* must be equal to the flow out of *u*
 
-$$\forall u \in V \setminus (s, t) \sum_{v\in V}{f(v, u)} = \sum_{v\in V}{f(u, v)}$$
+$$\forall u \in V \setminus (s, t), \quad \sum_{v\in V}{f(v, u)} = \sum_{v\in V}{f(u, v)}$$
 
-The value of a flow is calculated by measuring at the source; it's the flow out of the source - the flow into the source:
+The value of a flow is calculated by measuring at the source; it's the flow out of the source minus the flow into the source:
 
 $$\| f \| = \sum_{v\in V}{f(s, v)} - \sum_{v\in V}{f(v, s)}$$
 
@@ -1474,7 +1474,7 @@ The **net flow across the cut** *(S, T)* is the flow leaving *S* minus the flow 
 
 $$f(S, T) = \sum_{u\in S, v\in T}{f(u, v)} - \sum_{u\in S, v\in T}{f(v, u)}$$
 
-The **net flow across a cut** is always equal to the **value of the flow**, which is the flow out of the source &ndash; the flow into the source. For any cut $$(S, T), \| f \| = f(S, T)$$.
+The **net flow across a cut** is always equal to the **value of the flow**, which is the flow out of the source minus the flow into the source. For any cut $$(S, T), \| f \| = f(S, T)$$.
 
 The proof is done simply by induction using flow conservation.
 
@@ -1510,7 +1510,7 @@ $$(3) \Rightarrow (1)$$: Recall that $$\| f\| \leq c(S, T) \forall \text{cut } (
 {% enddetails %}
 
 ### Time for finding max-flow (or min-cut)
-- It takes $$\mathcal{O}(E)$$ time to find a a path in the residual network (using for example BFS).
+- It takes $$\mathcal{O}(E)$$ time to find a a path in the residual network (using for example <abbr title="Breadth First Search">BFS</abbr>).
 - Each time the flow value is increased by at least 1
 - So running time is $$\mathcal{O}(E\cdot \| f_{\text{max}} \|)$$, where $$\| f_{\text{max}} \|$$ is the value of a max flow.
 
@@ -1518,7 +1518,7 @@ If capacities are irrational then the Ford-Fulkerson might not terminate. Howeve
 
 |  Augmenting path  |        Number of iterations        |
 | :---------------- | :--------------------------------- |
-| BFS Shortest path | $$ \leq\frac{1}{2}E\cdot V $$      |
+| <abbr title="Breadth First Search">BFS</abbr> Shortest path | $$ \leq\frac{1}{2}E\cdot V $$      |
 | Fattest path      | $$ \leq E\cdot \log{(E\cdot U)} $$ |
 
 Where $$U$$ is the maximum flow value, and the fattest path is the path with largest minimum capacity (the bottleneck).
@@ -1536,13 +1536,13 @@ Every matching defines a flow of value equal to the number of edges in the match
 Works because flow conservation is equivalent to: no student is matched more than once, no job is matched more than once.
 
 ### Edmonds-Kart algorithm
-It's just like [Ford-Fulkerson](#ford-fulkerson-method), but we pick the **shortest** augmenting path (in the sense of the minimal number of edges, found with DFS).
+It's just like [Ford-Fulkerson](#ford-fulkerson-method), but we pick the **shortest** augmenting path (in the sense of the minimal number of edges, found with <abbr title="Depth First Search">DFS</abbr>).
 
 {% highlight python linenos %}
 def edmonds_kart(G):
     while there exists an augmenting path (s, ..., t) in Gf:
         find shortest augmenting path (e.g. using BFS)
-        compute botleneck = min capacity
+        compute bottleneck = min capacity
         augment
 {% endhighlight %}
 
@@ -1551,7 +1551,7 @@ The runtime is $$\mathcal{O}(VE^2)$$
 #### Lemma
 Let $$\delta_f(s, u)$$ be the shortest path distance from *s* to *u* in $$G_f, u\in V$$.
 
-$$\forall u\in V,  S_f(s, u)$$ are monotonically non-decreasing thoughout the execution of the algorithm.
+$$\forall u\in V,  S_f(s, u)$$ are monotonically non-decreasing throughout the execution of the algorithm.
 
 {% details Proof of runtime %}
 Edmonds-Kart terminates in $$\mathcal{O}(V\cdot E)$$ iterations. An edge *(u, v)* is said to be **critical** if its capacity is smallest on the augmenting path.
@@ -1596,7 +1596,15 @@ This is not the fastest implementation, but it certainly is the easiest. Each se
 - A pointer to the *head* of the list (assumed to be the representative)
 - A pointer to the *tail* of the list
 
-Each object in the list has attributes for the set member, a pointer to the set object and to next. Our operations are now:
+Each object in the list has:
+
+- Attributes for the set member (its value for instance)
+- A pointer to the set object
+- A pointer to the next object
+
+![Representation of disjoint sets using linked lists](/images/algorithms/linked-list-union-find.png)
+
+Our operations are now:
 
 - `make_set(x)`: Create a singleton list in time $$\Theta(1)$$
 - `find(x)`: Follow the pointer back to the list object, and then follow the head pointer to the representative; time $$\Theta(1)$$.
@@ -1657,7 +1665,7 @@ A spanning tree of a graph is a set of edges that is:
 We want to find the *minimum* spanning tree of a graph, that is, a spanning tree of minimum total weights.
 
 - **Input**: an undirected graph G with weight *w(u, v)* for each edge $$(u, v)\in E$$.
-- **Output**: an MST: a spanning tree of minimum total weights
+- **Output**: an <abbr title="Minimum Spanning Tree">MST</abbr>: a spanning tree of minimum total weights
 
 There are 2 natural greedy algorithms for this.
 
@@ -1705,7 +1713,7 @@ When we start every node has the key `infinity` and our root has key 0, so we pi
 The total runtime is the max of the above, so $$\mathcal{O}(E\log{V})$$ (which can be made $$\mathcal{O}(V\log{V})$$ with careful queue implementation).
 
 ### Kruskal's algorithm
-Start from an empty forest *T* and greedily maintain forest *T* which will become an MST at the end. At each step, add the cheapest edge that does not create a cycle.
+Start from an empty forest *T* and greedily maintain forest *T* which will become an <abbr title="Minimum Spanning Tree">MST</abbr> at the end. At each step, add the cheapest edge that does not create a cycle.
 
 ![Kruskal's algorithm in action](/images/algorithms/kruskal.gif)
 
@@ -1817,7 +1825,7 @@ There is no negative cycle reachable from the source if and only if no distances
 ### Dijkstra's algorithm
 - This algorithm only works when all weights are nonnegative.
 - It's greedy, and faster than Bellman-Ford.
-- It's very similar to Prim's algorithm; could also be described as a weighted version of BFS.
+- It's very similar to Prim's algorithm; could also be described as a weighted version of <abbr title="Breadth First Search">BFS</abbr>.
 
 We start with a Source $$S = \{ s \}$$, and greedily grow *S*. At each step, we add to *S* the vertex that is closest to *S* (where distance is defined `u.d + w(u, v)`).
 
@@ -1825,7 +1833,7 @@ We start with a Source $$S = \{ s \}$$, and greedily grow *S*. At each step, we 
 
 This creates the shortest-path tree: we can give the shortest path between the source and any vertex in the tree.
 
-Since Dijkstra's algorithm is greedy (it doesn't have to consider all edges, only the ones in the immediate vicinity), it is more efficient. Using a binary heap, we can run in $$\mathcal{O}(E\log{V})$$ (though a more careful implementation can optimize it to $$\mathcal{O}(V\log{V}+E))$$.
+Since Dijkstra's algorithm is greedy (it doesn't have to consider all edges, only the ones in the immediate vicinity), it is more efficient. Using a binary heap, we can run in $$\mathcal{O}(E\log{V})$$ (though a more careful implementation can optimize it to $$\mathcal{O}(V\log{V}+E)$$.
 
 {% highlight python linenos %}
 def dijkstra(G, w, s):
