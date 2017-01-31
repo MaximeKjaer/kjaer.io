@@ -1318,7 +1318,7 @@ def DFS_visit(G, u):
     u.d = time
     u.color = GRAY           # discover u
     for each v in G.adj[u]:  # explore (u, v)
-        if v.color == WHITE
+        if v.color == WHITE:
             DFS_visit(G, v)
     u.color = BLACK
     time = time + 1
@@ -1740,7 +1740,7 @@ def kruskal(G, w):
 - Sort *E*: $$\mathcal{O}(E\log{E})$$
 - Second for loop: $$\mathcal{O}(E)$$ times `find_sets` and `unions`
 
-So this can run in $$\mathcal{O}(E\log{V})$$ (or, equivalently, $$\mathcal{O}(E\log{E}$$ since $$E=V^2$$ at most); runtime is dominated by the sorting algorithm.
+So this can run in $$\mathcal{O}(E\log{V})$$ (or, equivalently, $$\mathcal{O}(E\log{E})$$ since $$E=V^2$$ at most); runtime is dominated by the sorting algorithm.
 
 ### Summary
 - Greedy is good (sometimes)
@@ -1833,7 +1833,7 @@ We start with a Source $$S = \{ s \}$$, and greedily grow *S*. At each step, we 
 
 This creates the shortest-path tree: we can give the shortest path between the source and any vertex in the tree.
 
-Since Dijkstra's algorithm is greedy (it doesn't have to consider all edges, only the ones in the immediate vicinity), it is more efficient. Using a binary heap, we can run in $$\mathcal{O}(E\log{V})$$ (though a more careful implementation can optimize it to $$\mathcal{O}(V\log{V}+E)$$.
+Since Dijkstra's algorithm is greedy (it doesn't have to consider all edges, only the ones in the immediate vicinity), it is more efficient. Using a binary heap, we can run in $$\mathcal{O}(E\log{V})$$ (though a more careful implementation can optimize it to $$\mathcal{O}(V\log{V}+E)$$).
 
 {% highlight python linenos %}
 def dijkstra(G, w, s):
@@ -1843,7 +1843,7 @@ def dijkstra(G, w, s):
     while Q != []:
         u = extract_min(Q)
         S = S union {u}
-        for each vertex in G.Adj[u]:
+        for each vertex v in G.Adj[u]:
             relax(u, v, w)
 {% endhighlight %}
 
@@ -1933,6 +1933,8 @@ $$\mathbb{E}[\text{# trials until success}] = \frac{1}{2p(1-p)}$$
 
 ### Birthday Lemma
 If $$q > 1.78 \sqrt{\|M\|}$$ then the probability that a function chosen uniformly at random $$f: {1, 2, \dots, q} \rightarrow M$$ is injective is at most $$\frac{1}{2}$$.
+
+Note that this is a weaker statement than finding the *q* and *m* for which *f* is 50% likely to be injective. The real probability of a such function being injective is $$e^{-q(q-1)/(2m)$$, as in the proof below (plugging in $$q=23, m=365$$ shows that in a group of 23, there's a 50% chance of two people having the same birthday).
 
 {% details Proof %}
 Let $$m = \| M\|$$. The probability that the function is injective is:
