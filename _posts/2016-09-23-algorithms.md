@@ -1934,7 +1934,7 @@ $$\mathbb{E}[\text{# trials until success}] = \frac{1}{2p(1-p)}$$
 ### Birthday Lemma
 If $$q > 1.78 \sqrt{\|M\|}$$ then the probability that a function chosen uniformly at random $$f: {1, 2, \dots, q} \rightarrow M$$ is injective is at most $$\frac{1}{2}$$.
 
-Note that this is a weaker statement than finding the *q* and *m* for which *f* is 50% likely to be injective. The real probability of a such function being injective is $$e^{-q(q-1)/(2m)$$, as in the proof below (plugging in $$q=23, m=365$$ shows that in a group of 23, there's a 50% chance of two people having the same birthday).
+Note that this is a weaker statement than finding the *q* and *m* for which *f* is 50% likely to be injective. The real probability of a such function being injective is $$e^{-q(q-1)/(2m)}$$, as in the proof below (plugging in $$q=23, m=365$$ shows that in a group of 23, there's a 50% chance of two people having the same birthday).
 
 {% details Proof %}
 Let $$m = \| M\|$$. The probability that the function is injective is:
