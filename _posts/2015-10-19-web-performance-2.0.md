@@ -3,9 +3,10 @@ title: Web Performance 2.0
 description: After a long lull, a surge of new web performance tools are coming out. From HTTP/2 to resource hints, the landscape of performance is changing.
 image: /images/hero/train.jpg
 fallback-color: "#d1c8c8"
+edited: true
 ---
 
-The web is changing. We've been calling it [Web 1.0](https://en.wikipedia.org/wiki/Web_2.0#.22Web_1.0.22), then [2.0](https://en.wikipedia.org/wiki/Web_2.0), [3.0](https://en.wikipedia.org/wiki/Semantic_Web#Web_3.0), [4.0](http://bigthink.com/big-think-tv/web-40-the-ultra-intelligent-electronic-agent-is-coming), [5.0](https://flatworldbusiness.wordpress.com/flat-education/previously/web-1-0-vs-web-2-0-vs-web-3-0-a-bird-eye-on-the-definition/)... Yet to this day, no one really knows what any of the above is supposed to mean! That's because arbitrarily assigning version numbers to the web is sensationalism at best. It's based on absolutely nothing. And yet, I'm going to talk about something that I actually believe in: Web Performance 2.0.
+The web is changing. We've been calling it [Web 1.0](https://en.wikipedia.org/wiki/Web_2.0#.22Web_1.0.22), then [2.0](https://en.wikipedia.org/wiki/Web_2.0), [3.0](https://en.wikipedia.org/wiki/Semantic_Web#Web_3.0), [4.0](http://bigthink.com/big-think-tv/web-40-the-ultra-intelligent-electronic-agent-is-coming), [5.0](https://flatworldbusiness.wordpress.com/flat-education/previously/web-1-0-vs-web-2-0-vs-web-3-0-a-bird-eye-on-the-definition/)... Yet to this day, no one really knows what any of the above is supposed to mean! To me, arbitrarily assigning version numbers to the web is sensationalism at best, it isn't based on anything tangible. And yet, I'm going to talk about something that I actually believe in: Web Performance 2.0.
 
 A couple of week ago, I went to [Paris Web](https://www.paris-web.fr/), a conference about the Web, held in (you guessed it!) Paris. I heard lots of talks, and coming back from it, there's a lot of food for thought. One talk stuck with me, though: in his [WebPerf 2.0](https://stefounet.github.io/webperf2.0/#/) talk, [Stephane Rios](https://twitter.com/stefounet) called for a new, metaphorical version 2.0 of Web performance.
 
