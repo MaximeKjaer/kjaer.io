@@ -6,6 +6,9 @@ fallback-color: "#9ea98f"
 unlisted: true
 ---
 
+* TOC
+{:toc}
+
 # [Le projet Imhof](http://cs108.epfl.ch/archive/15/p00_intro.html)
 
 Le but du projet de cette année est de dessiner des cartes topographiques au 1:50'000 dont le style s'inspire de celui des cartes suisses. Ce projet est nommé Imhof en l'honneur d'[Eduard Imhof](http://en.wikipedia.org/wiki/Eduard_Imhof) (1895–1986), cartographe suisse célèbre — entre autres — pour ses magnifiques cartes en relief.
