@@ -13,8 +13,6 @@ modzopfli=""
 # Functions
 function init {
 	echo "Initializing git"
-	mkdir _site 
-	cd _site
 	git init
 	git remote add deploy "deploy@kjaermaxi.me:/var/www/kjaermaxi.me"
 	git config user.name "Travis CI"
@@ -22,7 +20,6 @@ function init {
 	echo "Fetching from remote"
 	git fetch deploy
 	git checkout -b build
-	cd ..
 }
 
 function build {
@@ -30,15 +27,12 @@ function build {
 	bundle exec jekyll build # Build the site with Jekyll
 	grunt build # Build with Grunt; see Gruntfile.js for more details.
 	echo "Committing the build"
-	cd _site
 	git add .
 	git commit -q -m "Build #$TRAVIS_BUILD_NUMBER"
-	cd ..
 }
 
 function compare {
 	echo "Comparing this build to the previous one"
-	cd _site
 	git checkout master
 	
 	modfiles=$(git diff --name-only master..build | grep -v $gzip_ext)
@@ -46,16 +40,19 @@ function compare {
 	modzopfli=$(grep $zopfli_ext <<< "$modfiles" | tr '\n' ' ')
 	modfiles=$(echo $modfiles | tr '\n' ' ')
 
-	git merge -X theirs --commit -m "Merge build #$TRAVIS_BUILD_NUMBER" build
-	cd ..
+	git merge -X theirs --commit -m "Merge build #$TRAVIS_BUILD_NUMBER" build --allow-unrelated-histories
 }
 
+function compress {
+	# Compress assets with Zopfli (should always be the last command)
+	echo "Compressing the following assets using Zopfli: $modfiles"
+	../zopfli/zopfli --i1000 $modzopfli
+}
+
+mkdir _site 
+cd _site
 init
 build
 compare
-
-# Compress assets with Zopfli (should always be the last command)
-echo "Compressing the following assets using Zopfli: $modfiles"
-cd _site
-../zopfli/zopfli --i1000 $modzopfli
+compress
 cd ..
