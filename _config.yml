@@ -67,7 +67,7 @@ sass:
   style: :compressed # Can also be :expanded
 
 # Use the following gems when building the site
-gems:
+plugins:
   - jekyll-sitemap # Automatically create a sitemap on build
 
 prose:
