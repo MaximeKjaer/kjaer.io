@@ -1,7 +1,7 @@
 ---
 title: CS-108 – Pratique de la programmation orientée-objet
 description: "Mes notes de CS-108 pendant le semestre de printemps 2015 à l'EPFL."
-image: /images/hero/interlaken.png
+image: /images/hero/interlaken.jpg
 fallback-color: "#9ea98f"
 unlisted: true
 ---
