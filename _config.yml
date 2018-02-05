@@ -70,41 +70,6 @@ sass:
 plugins:
   - jekyll-sitemap # Automatically create a sitemap on build
 
-prose:
-  rooturl: '_posts'
-  siteurl: https://kjaer.io
-  metadata:
-    _posts:
-      - name: layout
-        field:
-          element: hidden
-          value: post
-      - name: title
-        field:
-          element: text
-          label: Title
-      - name: image
-        field:
-          element: text
-          label: Cover Image
-          help: "/images/hero/trees.jpg, for example"
-      - name: fallback-color
-        field:
-          element: text
-          label: Fallback color
-          help: "The color that will be behind the cover image as it loads. For the best effect, choose the average color of the cover image."
-          value: "#0f45b7"
-      - name: description
-        field:
-          element: textarea
-          label: Description
-      - name: comments
-        field:
-          element: button
-          on: Comments enabled
-          off: Comments disabled
-
-
 defaults:
   -
     scope:
