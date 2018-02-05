@@ -17,12 +17,12 @@ Now, I've been using [Jekyll](https://jekyllrb.com/), the static site generator,
 
 <!-- More -->
 
-##Variables for DRY and systematic code
+## Variables for DRY and systematic code
 One of the advantages of variables in any language whatsoever is of course that it can save you some typing while restricting all future changes to one point. For CSS, that means more maintainable and DRY code. As dull as that may sound, it's actually quite agreeable.
 
 But there's more to it than that obvious feature. Just the addition of variables forces me to think within the system that I've created. I have the bad habit of creating a new shade of gray whenever I need one; in a big CSS file, that easily becomes 6 or 7 shades, which just serves to confuse the reader. It may sound dumb, but having a `$light-gray` and a `$dark-gray` variable is something that has made it easier for me to stick to the system that I've created. The same goes for predefined breakpoints, font sizes, line heights, standard transition times... you name it. My design has gained in consistency thanks to Sass.
 
-##Mixins for readable and compatible code
+## Mixins for readable and compatible code
 I haven't really explored the world of mixin libraries just yet, but I've already seen their potential just from the ones I've written. Apart from drastically reducing the typing in some places, mixins make the code more readable. Assuming that the mixins and variables are predefined, I think this example will speak for itself; say we want to provide an image in a higher resolution for retina screens. The CSS might look like this:
 
 {% highlight css linenos %}
@@ -58,12 +58,12 @@ It's much better!
 
 The second way that mixins have proven themselves to be particularly useful is with all the damned vendor prefixes. Using mixins, it's possible to refer to them all using a single line of code. See, this is the kind of abstraction that I was hoping for!
 
-##Imports for modular and performant code
+## Imports for modular and performant code
 I've always liked to keep different CSS files for different purposes. On this page, for instance, I'd have one for general styling, another for the typography, and a third one for code highlighting. It just makes sense to me to keep these things separate. The only problem is that in some larger projects, I may require part of one stylesheet in another. Now, we know better than to copy-paste the code from one place to another and call it a day; imports can help us with that!
 
 Until [HTTP/2](https://www.youtube.com/watch?v=fJ0C4zN5uOQ) becomes the norm, importing Sass files into eachother using `@import` is pretty much the simplest way to keep things modular on my end while keeping performance on the reader's end in mind. Concatenating everything into one file admittedly breaks caching, but I still find it better than serving multiple files.
 
-###Speaking of performance...
+### Speaking of performance...
 The cool thing about Sass is that it's "just" a preprocessor, meaning that it doesn't really have an impact on the performance. I was afraid that Sass would create ugly CSS, but it turns out that as long you write sensible SCSS, your CSS will look just as fine.
 
 My single gripe is that Sass doesn't group media queries. I really like the way that Dan Cederholm writes his responsive declarations in his book: he uses a mixin that allows him to write declarations like these:
@@ -128,12 +128,12 @@ article {
 
 Why Sass won't group the media queries is beyond me. Even though it may not have much of a direct [impact on performance](https://stackoverflow.com/questions/11626174/is-there-an-advantage-in-grouping-css-media-queries-together), it's not exactly elegant, and it does make for bigger files, which does slow down the page as a whole. I'm really hoping that what Cederholm calls “aggregated media query bubbling” will make it into a future release of Sass &mdash; it's not like it's *that* complicated to implement.
 
-##Integrating it into a Jekyll workflow
+## Integrating it into a Jekyll workflow
 As I mentioned earlier on, I like working with Jekyll. Luckily for me, Sass and Jekyll play very well together, since Jekyll comes with built-in Sass support. There's not much to configure; here are the options that we can add to the `_config.yml` file:
 
-{% highlight yml linenos %}
+{% highlight yaml linenos %}
 sass:
-    style: :compressed # Either :compressed or :expanded.
+    style: :compressed # Either :compressed or :expanded
     sass_dir: _sass # This is the default value
 {% endhighlight %}
 

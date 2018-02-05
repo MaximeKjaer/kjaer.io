@@ -6,22 +6,22 @@ fallback-color: "#9ea98f"
 unlisted: true
 ---
 
-#[Le projet Imhof](http://cs108.epfl.ch/archive/15/p00_intro.html)
+# [Le projet Imhof](http://cs108.epfl.ch/archive/15/p00_intro.html)
 
 Le but du projet de cette année est de dessiner des cartes topographiques au 1:50'000 dont le style s'inspire de celui des cartes suisses. Ce projet est nommé Imhof en l'honneur d'[Eduard Imhof](http://en.wikipedia.org/wiki/Eduard_Imhof) (1895–1986), cartographe suisse célèbre — entre autres — pour ses magnifiques cartes en relief.
 
 [Voir slides](http://cs108.epfl.ch/archive/15/files/ppo15_01a_intro-cours-projet.pdf) pour un aperçu rapide du projet et de ses règles.
 
-##Rendu du projet
+## Rendu du projet
 Le rendu se fera [sur cette page](http://cs108.epfl.ch/archive/15/submit.html); le jeton a été envoyé par e-mail.
 
-#[Test unitaire](http://cs108.epfl.ch/archive/15/files/ppo15_01b_test-unitaire.pdf)
+# [Test unitaire](http://cs108.epfl.ch/archive/15/files/ppo15_01b_test-unitaire.pdf)
 Le test unitaire est un petit programme qui vérifie automatiquement que les classes se comportent comme on veut. Cela permet de rapidement détecter d'éventuels problèmes dans les petites parties isolées du programme.
 
 La bibliothèque utilisée dans le cadre de ce cours est JUnit.
 
 
-##Utilisation de JUnit
+## Utilisation de JUnit
 Pour utiliser JUnit, on doit marquer sa méthode avec la notation `@Test`.
 
 {% highlight java linenos %}
@@ -85,9 +85,9 @@ public class SortTest {
 }
 {% endhighlight %}
 
-#[Immuabilité](http://cs108.epfl.ch/archive/15/files/ppo15_01c_immuabilite.pdf)
+# [Immuabilité](http://cs108.epfl.ch/archive/15/files/ppo15_01c_immuabilite.pdf)
 
-##Exemple
+## Exemple
 
 On crée ci-dessous les classes Date et Person de façon assez classique, avec des getters et des setters.
 
@@ -184,7 +184,7 @@ public final class Person {
 }
 {% endhighlight %}
 
-###Quelques autres types de variables
+### Quelques autres types de variables
 - On n'a pas besoin de protéger la variable `name` car les variables de type  `String` sont **immuables**. 
 - Les tableaux, quant à eux, son **non-immuables**, donc il faut avoir recourt aux copies défensives. 
 - Les tableaux dynamiques `ArrayList<>` sont **non-modifiables** si ils sont *"enrobés"* dans `Collections.unmodifiableList();`:
@@ -202,35 +202,35 @@ Ici, `u` est un objet par lequel on passe pour accéder à `m`, et qui bloque le
 
 **Note:** La méthode `unmodifiableList` de la classe `java.util.Collections` permet d'obtenir une version non modifiable d'un tableau dynamique, dont toutes les méthodes de modification lèvent l'exception `UnsupportedOperationException` (abrégée UOE). Quiconque qui ait accès à la variable `m` peut cependent encore modifier l'`ArrayList`. C'est pourquoi on parle de liste **non-modifiable** plutôt qu'**immuable** (c'est le mieux qu'on puisse faire pour les tableaux).
 
-##Règle de l'immuabilité
+## Règle de l'immuabilité
 > Dans la mesure du possible, écrivez des classes immuables.
 
-##Inconvénients de l'immuabilité
+## Inconvénients de l'immuabilité
 - Si on change beacoup de variables, le fait de recréer un gros objet à chaque changement alourdit beacoup le programme.
 - Parfois, on veut qu'une modification à un endroit soit prise en compte à un autre, ce qui devient lourd à écrire.
 
-##Terminologie
+## Terminologie
 - Une classe est immuable si ses instances ne peuvent pas changer d'état une fois créées.
 - Une classe est non modifiable si un morceau de code ayant accès à l'une de ses instances n'a pas la possibilité d'appeler des méthodes modifiant son état.
 
 **Attention** : même si une classe immuable n'est jamais modifiable, l'inverse n'est pas forcément vrai
 
-##Pour faire une classe immuable
+## Pour faire une classe immuable
 1. Tous les champs doivent être déclarés en `final`, initialisés lors de la construction, et jamais modifiées par la suite.
 2. Toute valeur non immuable fournie à son constructeur doit être copiée en profondeur avant d'être stockée dans un des champs.
 3. Aucune valeur non immuable stockée dans un des champs ne doit être fournie de l'extérieur (soit la rendre non modifiable au préalable, soit fournir une copie profonde).
 
 
-##Tableaux et immuabilité
+## Tableaux et immuabilité
 1. Les tableaux reçus à la construction sont copiés défensivement, rendus non modifiables par unmodifiableList puis stockés ainsi dans des champs.
 2. Ces tableaux non modifiables sont directement retournés par les méthodes d'accès 
 
-#[Bâtisseurs](http://cs108.epfl.ch/archive/15/files/ppo15_01c_immuabilite.pdf)
+# [Bâtisseurs](http://cs108.epfl.ch/archive/15/files/ppo15_01c_immuabilite.pdf)
 Un défaut de l'immuabilité est qu'il devient difficile de construire des classes immuables (du fait de la finalité de ses champs). Il faut le faire d'un seul coup, et trouver soi-même une façon de stocker les données entre temps...
 
 C'est pourquoi on a des bâtisseurs.
 
-##Exemple
+## Exemple
 {% highlight java linenos %}
 public final class DateBuilder {
     private int y, m, d;
@@ -252,7 +252,7 @@ public final class DateBuilder {
 
 La méthode `.build()` construit et retourne l'objet créé.
 
-##Appels chaînés
+## Appels chaînés
 Plûtot que de retourner un `void`, les setters peuvent retourner le constructeur lui-même, c'est-à-dire `this`. On peut alors chaîner les appels:
 
 {% highlight java linenos %}
@@ -262,7 +262,7 @@ Date d = new Date.Builder(1903, 12, 28)
 {% endhighlight %}
 
 
-##Règle du bâtisseur
+## Règle du bâtisseur
 >S'il peut être utile de construire par étapes des instances d'une classe immuable, attachez-lui un bâtisseur
 
 En plus de cela (par convention):
@@ -272,7 +272,7 @@ En plus de cela (par convention):
 - Nommer sa classe de construction `build`
 - Retourner `this` pour les méthodes de modification (voir [appels chaînés](#appels-chans))
 
-#Classes imbriquées statiques
+# Classes imbriquées statiques
 On met les builders dans les classes qu'elles instantient (parce qu'un builder n'a pas de raison d'être sans).
 
 {% highlight java linenos %}
@@ -286,7 +286,7 @@ public final class Date {
 
 Une classe imbriquée statique a accès aux membres privés **statiques** de sa classe englobante, et peut être déclarée privée (`private`) ou protégée (`protected`).
 
-#[Généricité](http://cs108.epfl.ch/archive/15/files/ppo15_02_genericite.pdf)
+# [Généricité](http://cs108.epfl.ch/archive/15/files/ppo15_02_genericite.pdf)
 Admettons que l'on désire écrire une classe très simplemodélisant ce que nous appellerons une cellule(immuable), dont le but est de stocker un — et un seul — objet.
 
 Intuitivement, on utiliserait alors le type `Object` pour que la cellule fonctionne avec tous les types d'objets.
@@ -321,7 +321,7 @@ final class Cell<E> {
 
 Ceci est une classe **générique**. On utilise le **paramètre de type** `E`.
 
-##Utilisation
+## Utilisation
 
 En pratique, on peut remplacer le paramètre `e` par le type d'objet que l'on veut utiliser:
 
@@ -336,7 +336,7 @@ char c = o.get().charAt(0); // Aucun probleme avec la généricité
 Cell<String> o = new Cell<>("hello"); // Le type est inféré par Java. Permis depuis Java 7
 {% endhighlight %}
 
-##Paires
+## Paires
 Si on veut utiliser plus d'un type dans une classe générique:
 
 {% highlight java linenos %}
@@ -368,9 +368,9 @@ Pair<String, Integer> p = c.pairWith(12);
 Pair<String, Integer> p = c.<Integer>pairWith(12);
 {% endhighlight %}
 
-##[Généricité et types de base](http://cs108.epfl.ch/archive/15/files/ppo15_02_genericite.pdf)
+## [Généricité et types de base](http://cs108.epfl.ch/archive/15/files/ppo15_02_genericite.pdf)
 
-###Emballage & déballage
+### Emballage & déballage
 Jusqu'à présent, on ne pouvait qu'utiliser la généricité avec des types évolués. La solution est celle de *l'emballage*, c'est-à-dire utiliser les types évolués correspondant aux types de base. Il est aussi possible de déballer.
 
 {% highlight java linenos %}
@@ -385,7 +385,7 @@ Cell<Integer> c = new Cell<>(1);
 int succ = c.get() + 1;
 {% endhighlight %}
 
-###[Limitations de la généricité en Java](http://cs108.epfl.ch/archive/15/files/ppo15_02_genericite.pdf)
+### [Limitations de la généricité en Java](http://cs108.epfl.ch/archive/15/files/ppo15_02_genericite.pdf)
 
 Pour des raisons historiques, la généricité en Java possède
 les limitations suivantes:
@@ -415,7 +415,7 @@ class BadException<T> // interdit
     extends Exception {}
 {% endhighlight %}
 
-#[Collections](http://cs108.epfl.ch/archive/15/files/ppo15_03_listes.pdf)
+# [Collections](http://cs108.epfl.ch/archive/15/files/ppo15_03_listes.pdf)
 
 Une collection est un objet contenant d'autres objets. Nous étudierons ici:
 
@@ -423,12 +423,12 @@ Une collection est un objet contenant d'autres objets. Nous étudierons ici:
 2. Les **ensembles** (*sets*), collection non ordonnée dans laquelle un élément donné peut apparaître au plus une fois.
 3. Les **tables associatives** (*maps*) ou **dictionnaires** (*dictionaries*), collection associant des valeurs à des clef. 
 
-##Collections dans l'API Java
+## Collections dans l'API Java
 L'API Java fournit un certain nombre de collections (*Java Collections Framework (JCF)*). Son contenu est dans `java.util`.
 
 ![](http://i.imgur.com/eIezI6T.png)
 
-##Règle des collections
+## Règle des collections
 
 > Program to an interface, not an implementation.
 
@@ -440,13 +440,13 @@ List<String> l = new ArrayList<>(); // oui
 ArrayList<String> l = new ArrayList<>(); // non
 {% endhighlight %}
 
-##L'interface `Collection` (sans `s`)
+## L'interface `Collection` (sans `s`)
 
 `Collection` est la super-interface commune à `List` et `Set`. C'est une interface générique.
 
-###Méthodes importantes de `Collection`
+### Méthodes importantes de `Collection`
 
-####Méthodes de consultation
+#### Méthodes de consultation
 
 - `boolean isEmpty()`: retourne vrai ssi la collection est vide.
 - `int size()`: retourne le nombre d'éléments contenus dans la collection.
@@ -454,19 +454,19 @@ ArrayList<String> l = new ArrayList<>(); // non
 - `boolean containsAll(Collection<E> c)` : retourne vrai ssi la collection contient tous les éléments
 de la collection donnée.
 
-####Méthodes d'ajout
+#### Méthodes d'ajout
 
 - `boolean add(E e)`: ajoute l'élément donné à la collection, et retourne vrai ssi la collection a été modifiée
 - `boolean addAll(Collection<E> c)`: ajoute à la collection tous les éléments de la collection donnée, et retourne vrai ssi la collection a été modifiée
 
-####Méthodes de suppression
+#### Méthodes de suppression
 
 - `void clear()`: supprime tous les éléments de la collection
 - `boolean remove(E e)`: supprime l'élément donné, s'il se trouve dans la collection
 - `boolean removeAll(Collection<E> c)`: supprime tous les éléments de la collection donnée
 - `boolean retainAll(Collection<E> c)`: supprime tous les éléments qui ne se trouvent pas dans la collection donnée
 
-##Listes
+## Listes
 
 ![](http://i.imgur.com/F3vSI6d.png)
 
@@ -497,7 +497,7 @@ La classe `Collections` offre également des méthodes pour les listes:
 - `<T> List<T> singletonList(T e)` (liste immuable de longueur 1)
 - `<T> List<T> nCopies(int n, T e)` (liste immuable de longueur `n` contenant uniquement `e`)
 
-###Règle des listes immuables
+### Règle des listes immuables
 
 >Pour obtenir une liste immuable à partir d'une liste quelconque, obtenez une vue non modifiable d'une copie de cette liste.  
 
@@ -505,14 +505,14 @@ La classe `Collections` offre également des méthodes pour les listes:
 List<…> immutableList = Collections.unmodifiableList(new ArrayList<>(list));
 {% endhighlight %}
 
-###Complexité des listes
+### Complexité des listes
 
-####`ArrayList`
+#### `ArrayList`
 
 - **Accès**: O(1)
 - **Insertion**: O(n)
 
-####`LinkedList`
+#### `LinkedList`
 
 - **Accès**: O(n)
 - **Insertion**: O(1)
@@ -523,7 +523,7 @@ List<…> immutableList = Collections.unmodifiableList(new ArrayList<>(list));
 
 Voir [les slides](http://cs108.epfl.ch/archive/15/files/ppo15_03_listes.pdf) pour la liste des méthodes implémentées par l'interface `Queue`.
 
-###Règle des listes
+### Règle des listes
 
 >Pour représenter une pile, une queue ou un « deque », utilisez ArrayDeque. Pour représenter une liste dans toute sa généralité, utilisez ArrayList si les opérations d'indexation (get, set) dominent, sinon LinkedList.
 
@@ -548,12 +548,12 @@ L'interface `Iterator` a 3 méthodes:
 - `E next()`
 - `void remove()`
 
-#[Tables Associatives](http://cs108.epfl.ch/archive/15/files/ppo15_04_tables-associatives.pdf)
+# [Tables Associatives](http://cs108.epfl.ch/archive/15/files/ppo15_04_tables-associatives.pdf)
 Une collection qui associe des **valeurs** à des **clés**.
 
 ![](http://i.imgur.com/rSNnOfi.png)
 
-##Règle des tables immuables
+## Règle des tables immuables
 
 >Pour obtenir une table associative immuable à partir d'une table associative quelconque, obtenez une vue non modifiable d'une copie de cette table.
 
@@ -595,24 +595,24 @@ Elle est organisée comme ceci:
 
 Les éléments plus petits sont à gauche, plus grands à droite. La recherche est donc assez simple, puisqu'il s'agit d'une série de comparaisons.
 
-##Règle `HashMap` / `TreeMap`
+## Règle `HashMap` / `TreeMap`
 
 >Utilisez HashMap comme mise en œuvre des tables associatives en Java, sauf lorsqu'il est utile de parcourir les clefs en ordre croissant, auquel cas vous pourrez leur préférer TreeMap.
 
-##Egalité des clés
+## Egalité des clés
 Pour une table associative, il est important de pouvoir comparer la clé donnée à celle qui est stockée. Pour ce faire, deux formes d'identité existent:
 
 1. **Egalité par référence**: deux objets sont égaux ssi il s'agit du même objet. On utilise `==`.
 2. **Egalité par structure**: deux objets sont égaux ssi leurs champs ont la même valeur. On utilise le `.equals()`.
 
 
-###Egalité et immuabilité
+### Egalité et immuabilité
 Lors d'une redéfinition de equals, il est important de s'assurer que celle-ci est stable, dans le sens où deux objets considérés comme égaux à un instant donné le sont aussi à n'importe quel instant futur. Le seul moyen de garantir qu'une mise en œuvre de equals soit stable est qu'elle ne se base que sur des attributs immuables de la classe.
 
-###Règle de `equals`
+### Règle de `equals`
 >Toute redéfinition de equals ne doit se baser que sur des attributs immuables de la classe.
 
-###Règle de `hashCode`
+### Règle de `hashCode`
 >Si vous redéfinissez hashCode dans une classe, redéfinissez également equals — et inversement — afin que ces deux méthodes restent compatibles. 
 
 et
@@ -627,10 +627,10 @@ public int hashCode() {
 }
 {% endhighlight %}
 
-#Ordre en Java
+# Ordre en Java
 La possibilité d'ordonner les valeurs d'un type donné n'est pas prédéfinie en Java. Au lieu de cela, deux interfaces sont fournies pour ordonner des valeurs d'un type donné. L'une permet aux valeurs de se comparer elle-mêmes, tandis que l'autre permet à un objet externe de comparer deux valeurs
 
-##L'interface `Comparable`
+## L'interface `Comparable`
 L'interface `Comparable` peut être implémentée par toute classe dont les instances sont comparables entre elles. Elle contient une seule méthode qui compare deux objets. 
 
 {% highlight java linenos %}
@@ -649,17 +649,17 @@ public interface Comparable<T> {
 } 
 {% endhighlight %}
 
-###Exemples
+### Exemples
 
 - `"le".compareTo("la")` retourne un entier positif
 - `"le".compareTo("le")` retourne zéro
 - `"mont".compareTo("montagne")` retourne un entier
 négatif
 
-###Règle de `Comparable`
+### Règle de `Comparable`
 Lorsque vous définissez une classe qui implémente l'interface `Comparable`, assurez-vous que sa méthode `compareTo` soit compatible avec sa méthode `equals`.
 
-##L'interface `Comparator`
+## L'interface `Comparator`
 Cette interface décrit un comparateur, un objet capable de comparer deux objets.
 
 {% highlight java linenos %}
@@ -671,7 +671,7 @@ public interface Comparator<T> {
 La méthode compare doit retourner un entier négatif si le premier objet est  inférieur au second, nul si les deux sont égaux et positif dans les autres cas.
 
 
-###Différence entre `Comparator` et `Comparable`
+### Différence entre `Comparator` et `Comparable`
 Voir le code ci-dessous: la première variante ne prend qu'un seul argument — la liste à trier — et la trie selon l'ordre naturel de ses éléments, qui doivent donc en posséder un (voir page suivante) : 
 
 {% highlight java linenos %}
@@ -687,32 +687,32 @@ La seconde variante prend deux arguments — la liste à trier et un comparateur
 Cette variante est utilisable que les éléments aient un ordre naturel ou pas, car seul le comparateur est utilisé !
 
 
-##Règle des ensembles immuables
+## Règle des ensembles immuables
 >Pour obtenir un ensemble immuable à partir d'un ensemble quelconque, obtenez une vue non modifiable d'une copie de cet ensemble. 
 
 **Note**: *Je ne prendrai pas de notes. Le tout est assez simple et bien expliqué dans les slides*.
 
-##`ListSet`
+## `ListSet`
 - **Insertion**: O(n) (parce qu'il faut tout parcourir pour éviter les doublons)
 - **Recherche**: O(n)
 
-##`HashSet`
+## `HashSet`
 - **Hachage**: O(1)
 - **Insertion**: O(1)
 - **Recherche**: O(1)
 
-##`TreeSet`
+## `TreeSet`
 - **Insertion**: O(log(n))
 - **Recherche**: O(log(n))
 
 *La classe `TreeSet` est surtout intéressante dans le cas où il est important de pouvoir parcourir les éléments dans l'ordre.*
 
 
-##Règle `HashSet`/`TreeSet`
+## Règle `HashSet`/`TreeSet`
 > Utilisez HashSet comme mise en œuvre des ensembles en Java, sauf lorsqu'il est utile de parcourir les éléments en ordre croissant, auquel cas vous pourrez préférer TreeSet
 
 
-##Enumérations
+## Enumérations
 Exemple ci-dessous.
 
 {% highlight java linenos %}
@@ -733,14 +733,14 @@ public final class Card {
 {% endhighlight %}
 
 
-#[Input/Output](http://cs108.epfl.ch/archive/15/files/ppo15_06_entrees-sorties.pdf)
+# [Input/Output](http://cs108.epfl.ch/archive/15/files/ppo15_06_entrees-sorties.pdf)
 
 Deux paquetages Java: `java.io` et `java.nio`.  
 Dans `java.io`, l'abstraction de base est le **flot** (*stream*); dans `java.nio`, c'est surtout la **mémoire tampon** (*buffer*). Nous nous intéresserons aux flots.
 
 Les flots d'octets sont les *streams*, alors que les flots de caractères sont les *readers* ou *writers*.
 
-##`InputStream`
+## `InputStream`
 
 Il y a 3 variantes de la méthode `read`:
 
@@ -761,14 +761,14 @@ On peut fermer le flot quand on a terminé (utile pour l'optimisation).
 
 - `void close()`: ferme le flot, libérant ainsi les éventuelles resources associées et rendant par là même le flot inutilisable.
 
-###Octets `int` ou `byte`
+### Octets `int` ou `byte`
 
 `byte` stocke un entier entre -128 et +127, et il y a pour cela deux variantes de la méthode `read`:
 
 - Celle qui retourne le prochain octet comme un `int` entre 0 et 255, et -1 signifie la fin.
 - Celle qui retourne un octet comme un `byte[]` (entre -128 et +127), et -1 est une valeur valide.
 
-###Sous-classes de `InputStream`
+### Sous-classes de `InputStream`
 
 On peut soit avoir un flot d'entrée primaire (=brut), ou alors un flot d'entrée filtrant, dont les données proviennent d'un **flot sous-jacent**
 (*underlying stream*). Exemples ci-dessous:
@@ -778,7 +778,7 @@ On peut soit avoir un flot d'entrée primaire (=brut), ou alors un flot d'entré
 - `BufferedInputStream`: filtrant (qui ne filtre rien: rajoute juste une mémoire tampon)
 - `GZIPInputStream`: filtrant (décompresse à la volée)
 
-###Sous-classes de `OutputStream`
+### Sous-classes de `OutputStream`
 
 Comme `InputStream`, il y a deux sortes de sorties: primaires et filtrantes. Offre une méthode `write`:
 
@@ -791,7 +791,7 @@ Il y a aussi `close` (comme pour l'input), et une méthode `flush`:
 - `void flush()` force les données du flot à être écrites effectivement, p.ex. sur le disque ou sur la console
 
 
-###Exemple
+### Exemple
 
 {% highlight java linenos %}
 InputStream s = new GZIPInputStream(new BufferedInputStream(new FileInputStream("in.gz")));
@@ -804,10 +804,10 @@ s.close();
 System.out.println(c);
 {% endhighlight %}
 
-##Resources
+## Resources
 Les objets liés à une resource du système et quoi doivent être fermés en fin d'utilisations (comme les flots, par exemple).
 
-###Try-with-resource
+### Try-with-resource
 
 Depuis peu, on a des blocs try qui marchent avec des resources, qui "close" en cas d'exception.
 
@@ -833,11 +833,11 @@ public interface AutoCloseable {
 
 ## Représentation de caractères
 
-###ASCII
+### ASCII
 
 *American Standard Code for Information Interchange*: représente un caractère par un entier de 7 bits, donc 2<sup>7</sup> = 128 caractères différents. Inclut toutes les lettres non accentuées de l'alphabet anglais.
 
-####Extensions d'ASCII
+#### Extensions d'ASCII
 De nombreuses extensions d'ASCII à 8 bits ont donc été inventées, utilisant la plage des valeurs de 128 à 255 pour ces caractères manquants.
 
 Par exemple, on peut maintenant écire les € et les œ.
@@ -880,9 +880,9 @@ abstract public class Writer {
 }
 {% endhighlight %}
 
-###Quelques détails d'implémentation
+### Quelques détails d'implémentation
 
-####Terminaison des lignes
+#### Terminaison des lignes
 Il existe plusieurs types de fin de lignes:
 
 1. CR (retour de chariot)
@@ -891,7 +891,7 @@ Il existe plusieurs types de fin de lignes:
 
 Avec les writers, il est donc sage d'utiliser l'appel suivant: `System.getProperty("line.separator");`
 
-####Encodage
+#### Encodage
 Ci-dessous un programme qui fait la conversion d'UTF-8 en UTF-16:
 
 {% highlight java linenos %}
@@ -903,7 +903,7 @@ try (Reader i = new InputStreamReader(new FileInputStream(fi), StandardCharsets.
 }
 {% endhighlight %}
 
-#[Fonctions anonymes (lambdas)](http://cs108.epfl.ch/archive/15/files/ppo15_07_fonctions.pdf)
+# [Fonctions anonymes (lambdas)](http://cs108.epfl.ch/archive/15/files/ppo15_07_fonctions.pdf)
 
 Voici comment on trierait une liste par ordre lexiquographique inverse avec une fonction anonyme
 
@@ -943,10 +943,10 @@ public static void sortInv(List<String> l) {
 }
 {% endhighlight %}
 
-##Interface fonctionnelle
+## Interface fonctionnelle
 Une **interface fonctionnelle** (*functional interface*) ne possède qu'une seule méthode abstraite. `Comparator` est alors une interface fonctionnelle puisqu'elle ne contient que la méthode `compare`.
 
-##Fonction anonyme
+## Fonction anonyme
 Une **lambda expression** est une expression créant une instance d'une classe anonyme qui implémente une interface fonctionnelle, en utilisant la syntaxe `arguments -> corps`.
 
 {% highlight java linenos %}
@@ -958,7 +958,7 @@ Object c = (x, y) -> x.compareTo(y);
 
 *Note*: Lorsque la méthode ne prend qu'un seul paramètre, les parenthèses peuvent être omises.
 
-###Méthodes par défaut
+### Méthodes par défaut
 Depuis Java 8, les interfaces peuvent avoir des méthodes par défaut, non-statiques, héritées par toutes les classes qui implémentent l'interface.
 
 {% highlight java linenos %}
@@ -972,10 +972,10 @@ public interface Comparator<T> {
 {% endhighlight %}
 
 
-##Interfaces fonctionnelles de Java
+## Interfaces fonctionnelles de Java
 Il est utile d'avoir à disposition un certain nombre d'interfaces fonctionnelles, couvrant les principaux cas d'utilisation.
 
-###L'interface `Function`
+### L'interface `Function`
 Une fonction à un argument. Le type de cet argument et le type de retour de la fonction sont les paramètres de type de cette interface, nommés respectivement T et R:
 
 {% highlight java linenos %}
@@ -989,7 +989,7 @@ Function<String, Integer> stringLength = s -> s.length();
 stringLength.apply("bonjour"); // → 7
 {% endhighlight %}
 
-###Composition de fonctions
+### Composition de fonctions
 
 {% highlight java linenos %}
 Function<Integer,Integer> f = x -> x + x;
@@ -999,7 +999,7 @@ Function<Integer,Integer> fg = f.compose(g);
 fg.apply(10); // → 22
 {% endhighlight %}
 
-###L'interface `UnaryOperator`
+### L'interface `UnaryOperator`
 Le type de retour est le même que celui d'entrée
 
 {% highlight java linenos %}
@@ -1009,7 +1009,7 @@ abs.apply(-1.2); // → 1.2
 abs.apply(Math.PI); // → 3.1415…
 {% endhighlight %}
 
-###L'interface `BiFunction`
+### L'interface `BiFunction`
 2 arguments de types donnés par les paramêtres de la fonction générique.
 
 {% highlight java linenos %}
@@ -1017,7 +1017,7 @@ BiFunction<String,Integer,Character> charAt = (s, i) -> s.charAt(i);
 charAt.apply("hello", 2); // → l
 {% endhighlight %}
 
-###L'interface `Predicate`
+### L'interface `Predicate`
 Retourne un booléen:
 
 {% highlight java linenos %}
@@ -1027,7 +1027,7 @@ stringIsEmpty.test("not empty!"); // → false
 stringIsEmpty.test(""); // → true
 {% endhighlight %}
 
-###Composition de prédicats
+### Composition de prédicats
 On a les méthodes `and`, `or` et `negate`:
 {% highlight java linenos %}
 Predicate<Integer> p = x -> x >= 0;
@@ -1045,7 +1045,7 @@ Et:
 - `Consumer` (ne retourne rien, mais peut par exemple faire un print)
 - `Supplier` (aucun argument, retourne une valeur)
 
-##Fonctions et collections
+## Fonctions et collections
 - `Iterable.forEach` prend un consommateur en argument et l'applique à chaque élément de l'entité itérable.
 - `Collection.removeIf` prend un prédicat en argument et supprime tous les éléments de la collection qui le satisfont. 
 - `List.replaceAll` prend un opérateur unaire en argument et remplace chaque élément de la liste par le résultat de cet opérateur appliqué à l'élément en question.
@@ -1061,10 +1061,10 @@ if (!m.containsKey(k))
 m.get(k).add(v);
 {% endhighlight %}
 
-##Programmation par flots
+## Programmation par flots
 Le paquetage `java.util.stream` — nouveauté de la version 8 de Java — définit plusieurs classes et interfaces permettant de faire de la programmation par flots.
 
-###Exemple: Conversion °F en °C
+### Exemple: Conversion °F en °C
 
 1. Obtenir le flot des lignes du fichier d'entrées
 2. Filtrer ce flot pour ne garder que les lignes non vides
@@ -1087,20 +1087,20 @@ try(BufferedReader r = new BufferedReader(
 }
 {% endhighlight %}
 
-###Types de méthodes travaillant sur les flots
+### Types de méthodes travaillant sur les flots
 
 1. Les **méthodes sources**, qui produisent un flot de valeurs à partir d'une source qui peut p.ex. être une collection, un fichier, etc.
 2. Les **méthodes intermédiaires**, qui transforment les valeurs du flot
 3. Les **méthodes terminales**, qui consomment les valeurs du flot, p.ex. en les écrivant dans un fichier, en les réduisant à une valeur unique, etc.
 
-###Pipelines
+### Pipelines
 Une pipeline est formée de:
 
 - *Une* méthode source, qui produit un flot de valeurs
 - *Zero ou plusieurs méthodes* intermédiaires, qui transforment les valeurs
 - *Une* méthode terminale, qui consomme les valeurs
 
-###Méthodes de `Stream`
+### Méthodes de `Stream`
 - `Stream.of`: prend un nombre arbitraire d'arguments et en crée un flot.
 - `Stream.iterate`: produit un flot infini. Exemple:
 
@@ -1129,13 +1129,13 @@ int posInts10Sum = posInts10.reduce(0, (x, y) -> x + y);
 int posInts10Prod = posInts10.reduce(1, (x, y) -> x * y);
 {% endhighlight %}
 
-####Ponts vers les flots
+#### Ponts vers les flots
 
 - `Collection.stream`: La méthode stream de l'interface Collection retourne un flot avec les éléments de la collection. Elle sert donc de pont entre le monde des collections et celui des flots. 
 
 - `BufferedReader.lines`: La méthode lines de BufferedReader retourne le flot des lignes du lecteur auquel on l'applique. Elle sert donc de pont entre le monde des lecteurs et celui des flots.
 
-##Références de méthodes
+## Références de méthodes
 Il arrive souvent que l'on veuille écrire une fonction anonyme qui se contente d'appeler une méthode en lui passant les arguments qu'elle a reçus.
 
 Il y a une notation plus concise:
@@ -1215,9 +1215,9 @@ try(BufferedReader r = new BufferedReader(new FileReader("f.txt"));
 
 *Note:* A l'endroit marqué X, on pourrait réécrire avec `l::isEmpty` (ou un truc du genre) **si** on ne faisait pas un `!`.
 
-#[Généricité avancée](http://cs108.epfl.ch/archive/15/files/ppo15_08_genericite-avancee.pdf)
+# [Généricité avancée](http://cs108.epfl.ch/archive/15/files/ppo15_08_genericite-avancee.pdf)
 
-##Sous-types
+## Sous-types
 Lorsqu'une classe implémente ou étend une autre, alors son type est un sous-type de l'autre (String est un sous-type d'Object, par exemple).
 
 La relation de sous-typage est:
@@ -1228,7 +1228,7 @@ La relation de sous-typage est:
 
 (En maths, on parle *d'ordre partiel*).
 
-###Polymorphisme d'inclusion
+### Polymorphisme d'inclusion
 On peut substituer un sous-type à un type (exemple: utiliser un `Integer` et un `Double` lorsqu'une méthode demande deux `Number`s).
 
 Ceci est alors permis:
@@ -1293,27 +1293,27 @@ li.add(i);
 li.addAllInto(l);
 {% endhighlight %}
 
-##Règle des bornes
+## Règle des bornes
 >Lorsqu'on désire uniquement lire dans une structure, on utilise une borne supérieure (avec `extends`);  
 >lorsqu'on désire uniquement y écrire, on utilise une borne inférieure (avec `super`);  
 >lorsqu'on désire à la fois y lire et y écrire, on n'utilise aucune borne.
 
 En anglais, on s'en souvient avec l'acronyme **PECS** (*Producer `Extends`, Consumer `Super`*).
 
-#[Types bruts](http://cs108.epfl.ch/archive/15/files/ppo15_08_genericite-avancee.pdf)
+# [Types bruts](http://cs108.epfl.ch/archive/15/files/ppo15_08_genericite-avancee.pdf)
 
 L'introduction de généricité a été faite de façon *backwards-compatible*. `List` n'était pas générique avant, et pour que l'ancien code continue à être valide, alors `List` a été accepté comme un **type brut**.
 
-##Règle des types bruts
+## Règle des types bruts
 >N'utilisez jamais les types bruts dans votre code, ils n'existent que pour faciliter la migration du code écrit avant l'introduction de la généricité.
 
 
-#[Entiers et manipulation de bits](http://cs108.epfl.ch/archive/15/files/ppo15_09_entiers.pdf)
+# [Entiers et manipulation de bits](http://cs108.epfl.ch/archive/15/files/ppo15_09_entiers.pdf)
 
-##Types entiers
+## Types entiers
 En Java, les entiers peuvent être représentés par `byte`, `short`, `int` et `long`, mais ils sont limités (puisque numériques).
 
-###Complément à deux
+### Complément à deux
 1. Inverser tous les bits
 2. Ajouter 1
 3. On a le complément à deux
@@ -1323,12 +1323,12 @@ En Java, les entiers peuvent être représentés par `byte`, `short`, `int` et `
 - zéro
 
 
-####Exemple
+#### Exemple
 1. 00001100
 2. 11110011
 3. 11110100
 
-###Notation de grands nombres
+### Notation de grands nombres
 - Pour faciliter la lecture, on peut écrire les nombres avec un `_`.
 - On utilise le suffixe `L` pour les `long`
 - On utilise le préfixe `0b` pour le binaire
@@ -1352,7 +1352,7 @@ int thirty = 30; // vaut 30
 int notThirty = 030; // vaut 24 (!)
 {% endhighlight %}
 
-##Opérations arithmétiques
+## Opérations arithmétiques
 La plupart des opérations peuvent produire des valeurs non représentables dans le type entier concerné. On dit alors qu'il y a dépassement de *capacité* (**overflow**).
 
 Cela cause une multitude de problèmes:
@@ -1360,7 +1360,7 @@ Cela cause une multitude de problèmes:
 - De sécurité, si on donne le mauvais index du tableau.
 - Mathématiques, puisque `Math.abs` peut retourner un nombre négatif (il ne peut pas inverser `Integer.MIN_VALUE`).
 
-#Opérations bit à bit (*bitwise operations*)
+# Opérations bit à bit (*bitwise operations*)
 - `~x`: **inversion (ou complément)**: retourne l'inverse d'un bit
 - `x << y` : **décalage à gauche**: on rajoute `y` 0 du coté du poids faible de `x`, et on perd les bits de poids fort de `x` (attention, les valeurs de `y` sont prises en modulo 32). Equivalent à une multiplication par 2<sup>y</sup>.
 - `x >> y`: **décalage à droite arithmétique**: copie le bit de poids fort dans toutes les positions laissées libres par le décalage. Equivalent à une division **entière** par 2<sup>y</sup>, lorsque `x >= 0`.
@@ -1380,7 +1380,7 @@ int f = 0b11110000 & 0b00111100; // vaut 0b11001100
 
 `&`, `|` et `^` peuvent être utilisés sur des `boolean`: la différence avec `&&` et `||` est que ces-derniers n'évaluent que le deuxième argument si c'est strictrement nécessaire.
 
-##Masques
+## Masques
 Il est souvent utile de manipuler un ou plusieurs bits d'un entier sans toucher aux autres. Pour ce faire, on construit tout d'abord un entier — appelé le masque (mask) — dont seuls les bits à manipuler sont à 1. Ensuite, on utilise l'opération bit à bit appropriée (`&`, `|` ou `^`), appliquée au masque et à la valeur. Un masque peut soit s'écrire directement sous forme d'entier littéral — généralement en base 2 ou 16 — soit se construire en combinant décalages et disjonctions :
 
 {% highlight java linenos %}
@@ -1407,7 +1407,7 @@ int xWithBits13_17Cleared = x & ~mask13_17;
 int xWithBits13_17Toggled = x ^ mask13_17;
 {% endhighlight %}
 
-##Mathématiques et opérations bitwise
+## Mathématiques et opérations bitwise
 {% highlight java linenos %}
 // x * 2^n:
 int multiplyWith2PowN =  x << n;
@@ -1423,20 +1423,20 @@ boolean isXEven = (x & 1) == 0;
 boolean isXOdd = (x & 1) == 1;
 {% endhighlight %}
 
-##Entiers dans l'API Java
+## Entiers dans l'API Java
 Il y a dans l'API Java des classes qui correspondent à chaque type d'entier (`Byte` pour `byte`, `Integer` pour `int`...), que l'on peut utiliser dans les `List<>`, par exemple. Elles ont 2 buts:
 
 1. Servir de "classes d'emballage" pour la généricité.
 2. Offrir, sous forme de méthodes statiques, des opérations sur les valeurs du type qu'elles représentent (`MIN_VALUE` et `MAX_VALUE`, `SIZE`, `BYTES`...)
 
-###Auto-emballage (rappel)
+### Auto-emballage (rappel)
 {% highlight java linenos %}
 List<int> l = Arrays.asList(4); // incorrect !
 List<Integer> = Arrays.asList(new Integer(4));
 List<Integer> l = Arrays.asList(1); // Equivalent
 {% endhighlight %}
 
-###API Java
+### API Java
 `Integer` offre :
 
 - `int bitCount(int i)`: retourne le nombre de bits à 1 dans i;
@@ -1452,7 +1452,7 @@ List<Integer> l = Arrays.asList(1); // Equivalent
 (`Long` aussi, mais les arguments sont des `long`)
 
 
-##Somme de bits
+## Somme de bits
 
 {% highlight java linenos %}
 public static int bitCount(byte b) {
@@ -1466,17 +1466,17 @@ public static int bitCount(byte b) {
 Voir [les slides](http://cs108.epfl.ch/archive/15/files/ppo15_09_entiers.pdf) pour une description plus détaillée!
 
 
-#[Patrons](http://cs108.epfl.ch/archive/15/files/ppo15_10_patrons_builder-iterator-strategy-factory.pdf)
+# [Patrons](http://cs108.epfl.ch/archive/15/files/ppo15_10_patrons_builder-iterator-strategy-factory.pdf)
 
 Des modèles de programmation pour résoudre des problèmes récurrents (Cependant, attention à ne pas les surutiliser.)
 
-##Attributs d'un patron
+## Attributs d'un patron
 - son nom,
 - une description du problème résolu,
 - une description de la solution à ce problème,
 - une présentation des conséquences liées à l’utilisation du patron.
 
-##Diagrammes de classes
+## Diagrammes de classes
 Décrit visuellement un ensemble de classes ou d'interfaces. Il y a 3 types de relations entre les classes:
 
 - **héritage**: lorsqu'une classe hérite d'une autre ou implémente une interface,
@@ -1485,10 +1485,10 @@ Décrit visuellement un ensemble de classes ou d'interfaces. Il y a 3 types de r
 
 Voir les slides 13-15 pour les règles utilisées dans le cadre de ce cours.
 
-##Builder
+## Builder
 Pas de surprise.
 
-###Builder intelligent
+### Builder intelligent
 Construit un objet différent en fonction de l'input (par exemple, en fonction de la densité d'une matrice).
 
 
@@ -1503,10 +1503,10 @@ Honnêtement, voir les [slides](http://cs108.epfl.ch/archive/15/files/ppo15_10_p
 
 ## Adapter
 
-###Problème
+### Problème
 Comment peut-on utiliser `public static void shuffle(List<?> list)` sur un tableau d'entiers?
 
-###Solution
+### Solution
 Une classe qui adapte le tableau en le présentant comme une liste en implémentant l'interface `List`
 
 {% highlight java linenos %}
