@@ -33,16 +33,19 @@ git add .
 git commit -q -m "Build #$TRAVIS_BUILD_NUMBER"
 
 echo "Comparing this build to the previous one"
-ls
-echo "Checkout master"
 git checkout master
 modfiles=$(git diff --name-only master..build | grep -v $gzip_ext)
 modimg=$(grep $img_ext <<< "$modfiles" | tr '\n' ' ') # Not used right now, but this is a TODO.
 modzopfli=$(grep $zopfli_ext <<< "$modfiles" | tr '\n' ' ')
 modfiles=$(echo $modfiles | tr '\n' ' ')
+
+echo "Merging build into master"
 git merge --allow-unrelated-histories -X theirs --no-commit build
-git rm --ignore-unmatch $(git diff build --name-only)
-git commit --all -m "Merge build #$TRAVIS_BUILD_NUMBER" 
+# 'git merge -X theirs' does not remove deleted files in build, so we must do it manually:s
+deleted=$(git diff --name-only master..build | grep -v $gzip_ext) # deleted1.html deleted2.html
+deleted_gz=$(sed -e 's/ \|$/.gz /g' <<< $deleted) # deleted1.html.gz deleted2.html.gz
+git rm --ignore-unmatch $deleted $deleted_gz
+git commit --all -m "Merge build #$TRAVIS_BUILD_NUMBER"
 ls
 
 echo "Compressing the following assets using Zopfli: $modzopfli"
