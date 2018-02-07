@@ -40,17 +40,17 @@ modzopfli=$(grep $zopfli_ext <<< "$modfiles" | tr '\n' ' ')
 modfiles=$(echo $modfiles | tr '\n' ' ')
 
 echo "Merging build into master"
-git merge --allow-unrelated-histories -X theirs --no-commit build
-# 'git merge -X theirs' does not remove deleted files in build, so we must do it manually:s
-deleted=$(git diff --name-only master..build | grep -v $gzip_ext) # deleted1.html deleted2.html
+git merge --allow-unrelated-histories -X theirs --commit -m "Merge build #$TRAVIS_BUILD_NUMBER" build
+# 'git merge -X theirs' does not remove deleted files in build, so we must do it manually:
+deleted=$(git diff --name-only master..build | grep -v $gzip_ext | tr '\n' ' ') # deleted1.html deleted2.html
 deleted_gz=$(sed -e 's/ \|$/.gz /g' <<< $deleted) # deleted1.html.gz deleted2.html.gz
 echo "DELETED: $deleted"
 echo "DELETED.gz $deleted_gz"
 git rm --ignore-unmatch $deleted $deleted_gz
-
-echo "Committing merge"
-git commit --all -m "Merge build #$TRAVIS_BUILD_NUMBER"
+echo
+echo "After: "
 ls
+echo
 
 echo "Compressing the following assets using Zopfli: $modzopfli"
 ../zopfli/zopfli --i1000 $modzopfli
