@@ -33,12 +33,15 @@ git add .
 git commit -q -m "Build #$TRAVIS_BUILD_NUMBER"
 
 echo "Comparing this build to the previous one"
+ls
+echo "Checkout master"
 git checkout master
 modfiles=$(git diff --name-only master..build | grep -v $gzip_ext)
 modimg=$(grep $img_ext <<< "$modfiles" | tr '\n' ' ') # Not used right now, but this is a TODO.
 modzopfli=$(grep $zopfli_ext <<< "$modfiles" | tr '\n' ' ')
 modfiles=$(echo $modfiles | tr '\n' ' ')
 git merge --allow-unrelated-histories -X theirs --commit -m "Merge build #$TRAVIS_BUILD_NUMBER" build
+ls
 
 echo "Compressing the following assets using Zopfli: $modzopfli"
 ../zopfli/zopfli --i1000 $modzopfli
