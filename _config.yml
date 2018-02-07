@@ -91,6 +91,7 @@ exclude:
   - npm-debug.log
   - node_modules
   - package.json
+  - package-lock.json
   - README.md
   - serve.bat
   - vendor
