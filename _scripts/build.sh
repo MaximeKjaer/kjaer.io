@@ -40,7 +40,7 @@ function compare {
 	modzopfli=$(grep $zopfli_ext <<< "$modfiles" | tr '\n' ' ')
 	modfiles=$(echo $modfiles | tr '\n' ' ')
 
-	git merge -X theirs --commit -m "Merge build #$TRAVIS_BUILD_NUMBER" build --allow-unrelated-histories
+	git merge --allow-unrelated-histories -X theirs --commit -m "Merge build #$TRAVIS_BUILD_NUMBER" build
 }
 
 mkdir _site 
