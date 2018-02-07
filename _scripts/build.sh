@@ -40,6 +40,7 @@ modfiles=$(git diff --name-only master..build | grep -v $gzip_ext)
 modimg=$(grep $img_ext <<< "$modfiles" | tr '\n' ' ') # Not used right now, but this is a TODO.
 modzopfli=$(grep $zopfli_ext <<< "$modfiles" | tr '\n' ' ')
 modfiles=$(echo $modfiles | tr '\n' ' ')
+git rm .
 git merge --allow-unrelated-histories -X theirs --commit -m "Merge build #$TRAVIS_BUILD_NUMBER" build
 ls
 
