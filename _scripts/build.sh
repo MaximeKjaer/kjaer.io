@@ -46,11 +46,11 @@ function compare {
 mkdir _site 
 cd _site
 init
+cd ..
 build
+cd _site
 compare
-
-# Compress assets with Zopfli (should always be the last command)
-echo "Compressing the following assets using Zopfli: $modfiles"
+# Compress assets with Zopfli
+echo "Compressing the following assets using Zopfli: $modzopfli"
 ../zopfli/zopfli --i1000 $modzopfli
-
 cd ..
