@@ -43,16 +43,14 @@ function compare {
 	git merge -X theirs --commit -m "Merge build #$TRAVIS_BUILD_NUMBER" build --allow-unrelated-histories
 }
 
-function compress {
-	# Compress assets with Zopfli (should always be the last command)
-	echo "Compressing the following assets using Zopfli: $modfiles"
-	../zopfli/zopfli --i1000 $modzopfli
-}
-
 mkdir _site 
 cd _site
 init
 build
 compare
-compress
+
+# Compress assets with Zopfli (should always be the last command)
+echo "Compressing the following assets using Zopfli: $modfiles"
+../zopfli/zopfli --i1000 $modzopfli
+
 cd ..
