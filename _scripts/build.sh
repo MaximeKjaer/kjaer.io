@@ -44,7 +44,11 @@ git merge --allow-unrelated-histories -X theirs --no-commit build
 # 'git merge -X theirs' does not remove deleted files in build, so we must do it manually:s
 deleted=$(git diff --name-only master..build | grep -v $gzip_ext) # deleted1.html deleted2.html
 deleted_gz=$(sed -e 's/ \|$/.gz /g' <<< $deleted) # deleted1.html.gz deleted2.html.gz
+echo "DELETED: $deleted"
+echo "DELETED.gz $deleted_gz"
 git rm --ignore-unmatch $deleted $deleted_gz
+
+echo "Committing merge"
 git commit --all -m "Merge build #$TRAVIS_BUILD_NUMBER"
 ls
 
