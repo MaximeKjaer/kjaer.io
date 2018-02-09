@@ -16,10 +16,6 @@
 			font-weight: $title-weight;
 			text-transform: uppercase;
 		}
-		
-		a:hover {
-			border-bottom: 0; // This fixes a weird IE bug that added like 50px because 1 px border-bottom was added.
-		}
 	}
 	
 	// Titles
@@ -33,10 +29,6 @@
 
 	h1, h2, h3, h4, h5, h6 {
 		line-height: $title-line-height;
-		
-		> a:hover {
-			border-bottom: 3px solid;
-		}
 	}
 	
 	h1, h2, h3 {

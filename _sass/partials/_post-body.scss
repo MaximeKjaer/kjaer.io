@@ -125,6 +125,7 @@
 
 article, .post, footer nav { // applies to the footer too, now that we're at it!
 	a:hover {
-		border-bottom: 1px solid;
+		text-decoration: underline;
+		text-decoration-skip-ink: auto;
 	}
 }
