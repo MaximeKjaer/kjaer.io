@@ -1346,7 +1346,7 @@ $$\forall u, v$$, exactly one of the following holds:
 Vertex *v* is a descendant of *u* **if and only if** at time `u.d` there is a path from *u* to *v* consisting of only white vertices (except for `u`, which has just been colored gray).
 
 ### Topological sort
-- **Input**: A directed acyclic graph (DAG)
+- **Input**: a directed acyclic graph (DAG)
 - **Output**: a linear ordering of vertices such that if $$(u, v) \in E$$, then *u* appears somewhere before *v*
 
 {% highlight python linenos %}
@@ -1355,7 +1355,9 @@ def topological sort(G):
     output vertices in order of decreasing finishing time
 {% endhighlight %}
 
-Same running time as <abbr title="Depth First Search">DFS</abbr>, $$\Theta(V+E)$$.
+Same running time as <abbr title="Depth First Search">DFS</abbr>, $$\Theta(V+E)$$. 
+
+Topological sort can be useful for ordering dependencies, for instance. Given a dependency graph, it produces a sequential order in which to load them, so that no dependency is loaded before its prerequisite. However, this only works for acyclic dependency graphs; a sequential order cannot arise from cyclic dependencies.
 
 {% details Proof of correctness %}
 We need to show that if $$(u, v) \in E$$ then `v.f < u.f`.  
