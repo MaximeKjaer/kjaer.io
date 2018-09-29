@@ -1,6 +1,10 @@
 language: ruby
 rvm:
   - 2.4.3
+cache:
+  bundler: true
+  directories:
+    - node_modules
 env:
   global:
   - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
