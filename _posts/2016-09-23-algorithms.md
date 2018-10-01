@@ -5,7 +5,6 @@ image: /images/hero/algorithms.jpg
 fallback-color: "#7c6850"
 unlisted: true
 edited: true
-math: true
 ---
 
 * TOC

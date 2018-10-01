@@ -69,6 +69,13 @@ sass:
 # Use the following gems when building the site
 plugins:
   - jekyll-sitemap # Automatically create a sitemap on build
+  - jekyll-mathjax-csp # Server-side rendering of Mathjax
+
+mathjax_csp:
+  output: CommonHTML    # SVG, CommonHTML, or MML (default: SVG)
+  single_dollars: true  # allow single dollar delimiters for inline math (default: false)
+  ex_size: 10
+  strip_css: false
 
 defaults:
   -

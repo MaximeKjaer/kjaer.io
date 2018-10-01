@@ -10,6 +10,7 @@
 		"grunt": "^0.4.5",
 		"grunt-cli": "^0.1.13",
 		"grunt-postcss": "^0.7.1",
-		"grunt-responsive-images": "^0.1.7"
+		"grunt-responsive-images": "^0.1.7",
+		"mathjax-node-page": "^2.0.0"
 	}
 }
