@@ -28,8 +28,8 @@ We usually concentrate on finding the worst-case running time. This gives a guar
 ## Sorting
 The sorting problem's definition is the following:
 
-- **Input**: A sequence of $$n$$ numbers $$(a_1, a_2, \dots, a_n)$$
-- **Output**: A permutation (reordering) $$(a_1', a_2', \dots, a_n')$$ of the input sequence in increasing order
+- **Input**: A sequence of $n$ numbers $(a_1, a_2, \dots, a_n)$
+- **Output**: A permutation (reordering) $(a_1', a_2', \dots, a_n')$ of the input sequence in increasing order
 
 
 ### Insertion sort
@@ -65,12 +65,12 @@ We need to verify:
 
 ![Cost of each line of the insertion sort algorithm](/images/algorithms/insertion-analysis.png)
 
-- **Best case**: The array is already sorted, and we can do $$\Theta(n)$$
-- **Worst case**: The array is sorted in reverse, so $$j=t_j$$ and the algorithm runs in $$\Theta(n^2)$$:
+- **Best case**: The array is already sorted, and we can do $\Theta(n)$
+- **Worst case**: The array is sorted in reverse, so $j=t_j$ and the algorithm runs in $\Theta(n^2)$:
 
 
 <figure>
-    $$ c_5 \sum_{j=2}^{n} t_j = c_5 \frac{n(n-1)}{2}=\mathcal{O}(n^2) $$
+    $ c_5 \sum_{j=2}^{n} t_j = c_5 \frac{n(n-1)}{2}=\mathcal{O}(n^2) $
     <figcaption>The first equality is achieved using Gauss' summation formula</figcaption>
 </figure>
 
@@ -124,28 +124,29 @@ In the `merge` function, instead of checking whether either of the two lists tha
 This algorithm works well in parallel, because we can split the lists on separate computers.
 
 #### Correctness
-Assuming `merge` is correct, we can do a proof by strong induction on $$n = r - p$$.
+Assuming `merge` is correct, we can do a proof by strong induction on $n = r - p$.
 
-- **Base case**, $$n = 0$$: In this case $$r = p$$ so `A[p..r]` is trivially sorted.
+- **Base case**, $n = 0$: In this case $r = p$ so `A[p..r]` is trivially sorted.
 - **Inductive case**: By  induction hypothesis `merge_sort(A, p, q)` and `merge_sort(A, q+1, r)` successfully sort the two subarrays. Therefore a correct merge procedure will successfully sort `A[p..q]` as required.
 
 ## Recurrences
 Let's try to provide an analysis of the runtime of merge sort.
 
-- **Divide**: Takes contant time, i.e., $$D(n) = \Theta(1)$$
-- **Conquer**: Recursively solve two subproblems, each of size $$n/2$$, so we create a problem of size $$2T(n/2)$$ for each step.
-- **Combine**: Merge on an *n*-element subarray takes $$\Theta(n)$$ time, so $$C(n) = \Theta(n)$$
+- **Divide**: Takes contant time, i.e., $D(n) = \Theta(1)$
+- **Conquer**: Recursively solve two subproblems, each of size $n/2$, so we create a problem of size $2T(n/2)$ for each step.
+- **Combine**: Merge on an *n*-element subarray takes $\Theta(n)$ time, so $C(n) = \Theta(n)$
 
 Our recurrence therefore looks like this:
 
-$$ T(n) = 
+$$
+T(n) = 
 \begin{cases}
 \Theta(1) & \text{if } n = 1 \\
 2T(n/2) + \Theta(n) & \text{otherwise} \\
 \end{cases}
 $$
 
-Trying to substitue $$T(n/2)$$ multiple times yields $$T(n) = 2^k T(n/2^k) + kcn$$. By now, a qualified guess would be that $$T(n) = \Theta(n \log{n})$$. We'll prove this the [following way](http://moodle.epfl.ch/pluginfile.php/1735456/mod_resource/content/1/Lecture3.pdf):
+Trying to substitue $T(n/2)$ multiple times yields $T(n) = 2^k T(n/2^k) + kcn$. By now, a qualified guess would be that $T(n) = \Theta(n \log{n})$. We'll prove this the [following way](http://moodle.epfl.ch/pluginfile.php/1735456/mod_resource/content/1/Lecture3.pdf):
 
 <figure>
     <img src="/images/algorithms/merge-upper-bound.png" alt="Proof by induction of the upper bound">
@@ -155,7 +156,7 @@ Trying to substitue $$T(n/2)$$ multiple times yields $$T(n) = 2^k T(n/2^k) + kcn
     <figcaption>If we do end up with (a+1) or something similarly invalid, we can try to prove something stronger.</figcaption>
 </figure>
 
-All-in-all, merge sort runs in $$\Theta(n \log{n})$$, both in worst and best case.
+All-in-all, merge sort runs in $\Theta(n \log{n})$, both in worst and best case.
 
 For small instances, [insertion sort](#insertion-sort) can still be faster despite its quadratic runtime; but for bigger instances, merge sort is definitely faster.
 
@@ -169,15 +170,17 @@ Generally, we can solve recurrences in a black-box manner thanks to the Master T
 
 ***
 
-Let $$a \geq 1$$ and $$b > 1$$ be constants, let $$T(n)$$ be defined on the nonnegative integers by the recurrence:
+Let $a \geq 1$ and $b > 1$ be constants, let $T(n)$ be defined on the nonnegative integers by the recurrence:
 
-$$ T(n) = aT(n/b) + f(n) $$
+$$
+T(n) = aT(n/b) + f(n) 
+$$
 
-Then, $$T(n)$$ has the following asymptotic bounds
+Then, $T(n)$ has the following asymptotic bounds
 
-1. If $$f(n) = \mathcal{O}(n^{\log_b{a}-\epsilon})$$ for some constant $$\epsilon > 0 $$, then $$T(n)=\Theta(n^{\log_b{a}}) $$
-2. If $$ f(n) = \Theta(n^{\log_b{a}}) $$, then $$ T(n) = \Theta(n^{\log_b{a}} \log{n}) $$
-3. If $$ f(n) = \Omega(n^{\log_b{a}+\epsilon}) $$ for some constant $$ \epsilon > 0 $$, and if $$a \cdot f(n/b) \leq c\cdot f(n)$$ for some constant $$c < 1$$ and all sufficiently large $$n$$, then $$T(n) = \Theta(f(n))$$
+1. If $f(n) = \mathcal{O}(n^{\log_b{a}-\epsilon})$ for some constant $\epsilon > 0 $, then $T(n)=\Theta(n^{\log_b{a}}) $
+2. If $ f(n) = \Theta(n^{\log_b{a}}) $, then $ T(n) = \Theta(n^{\log_b{a}} \log{n}) $
+3. If $ f(n) = \Omega(n^{\log_b{a}+\epsilon}) $ for some constant $ \epsilon > 0 $, and if $a \cdot f(n/b) \leq c\cdot f(n)$ for some constant $c < 1$ and all sufficiently large $n$, then $T(n) = \Theta(f(n))$
 
 ***
 
@@ -201,13 +204,13 @@ The naïve approach of buying at the lowest and selling at the highest won't wor
 
 ### Divide and Conquer
 - **Divide** the subarray into two subarrays of as equal size as possible: Find the midpoint mid of the subarrays, and consider the subarrays `A[low..mid]` and `A[mid+1..high]`
-    + This can run in $$\Theta(1)$$
+    + This can run in $\Theta(1)$
 - **Conquer** by finding maximum subarrays of `A[low..mid]` and `A[mid+1..high]`
-    + Recursively solve two subproblems, each of size $$n/2$$, so $$2T(n/2)$$
+    + Recursively solve two subproblems, each of size $n/2$, so $2T(n/2)$
 - **Combine**: Find a maximum subarray that crosses the midpoint, and use the best solution out of the three (that is, left, midpoint and right).
-    + The merge is dominated by `find_max_crossing_subarray` so $$\Theta(n)$$
+    + The merge is dominated by `find_max_crossing_subarray` so $\Theta(n)$
 
-The overall recursion is $$T(n) = 2T(n/2) + \Theta(n)$$, so the algorithm runs in $$\Theta(n\log{n})$$.
+The overall recursion is $T(n) = 2T(n/2) + \Theta(n)$, so the algorithm runs in $\Theta(n\log{n})$.
 
 In pseudo-code the algorithm is:
 
@@ -258,25 +261,25 @@ def find_max_crossing_subarray(A, low, mid, high):
 
 ## Matrix multiplication
 
-- **Input**: Two $$n\times n$$ (square) matrices, $$A = (a_{ij})$$ and $$B = (b_{ij})$$
-- **Output**: $$n\times n$$ matrix $$C = (c_{ij})$$ where $$C=A\cdot B$$.
+- **Input**: Two $n\times n$ (square) matrices, $A = (a_{ij})$ and $B = (b_{ij})$
+- **Output**: $n\times n$ matrix $C = (c_{ij})$ where $C=A\cdot B$.
 
 ### Naive Algorithm
-The naive algorithm simply calculates $$c_{ij}=\sum_{k=1}^n a_{ik}b_{kj}$$. It runs in $$\Theta(n^3)$$ and uses $$\Theta(n^2)$$ space.
+The naive algorithm simply calculates $c_{ij}=\sum_{k=1}^n a_{ik}b_{kj}$. It runs in $\Theta(n^3)$ and uses $\Theta(n^2)$ space.
 
 We can do better.
 
 ### Divide-and-Conquer algorithm
-- **Divide** each of A, B and C into four $$n/2\times n/2$$ matrices so that:
+- **Divide** each of A, B and C into four $n/2\times n/2$ matrices so that:
 
 ![Matrix blocks](/images/algorithms/matrices.png)
 
-- **Conquer**: We can recursively solve 8 *matrix multiplications* that each multiply two $$n/2 \times n/2$$ matrices, since:
-    + $$ C_{11}=A_{11}B_{11} + A_{12}B_{21}, \qquad C_{12}=A_{11}B_{12} + A_{12}B_{22} $$.
-    + $$ C_{21}=A_{21}B_{11} + A_{22}B_{21}, \qquad C_{22}=A_{21}B_{12} + A_{22}B_{22} $$.
+- **Conquer**: We can recursively solve 8 *matrix multiplications* that each multiply two $n/2 \times n/2$ matrices, since:
+    + $ C_{11}=A_{11}B_{11} + A_{12}B_{21}, \qquad C_{12}=A_{11}B_{12} + A_{12}B_{22} $.
+    + $ C_{21}=A_{21}B_{11} + A_{22}B_{21}, \qquad C_{22}=A_{21}B_{12} + A_{22}B_{22} $.
 
 - **Combine**: Make the additions to get to C.
-    + $$ C_{11}=A_{11}B_{11} + A_{12}B_{21} $$ is $$\Theta(n^2)$$.
+    + $ C_{11}=A_{11}B_{11} + A_{12}B_{21} $ is $\Theta(n^2)$.
 
 
 #### Pseudocode and analysis
@@ -293,7 +296,7 @@ def rec_mat_mult(A, B, n):
     return C
 {% endhighlight %}
 
-The whole recursion formula is $$T(n) = 8\cdot T(n/2) + \Theta(n^2) = \Theta(n^3)$$. So we did all of this for something that doesn't even beat the naive implementation!!
+The whole recursion formula is $T(n) = 8\cdot T(n/2) + \Theta(n^2) = \Theta(n^3)$. So we did all of this for something that doesn't even beat the naive implementation!!
 
 ### Strassen's Algorithm for Matrix Multiplication
 What really broke the Divide-and-Conquer approach is the fact that we had to do 8 matrix multiplications. Could we do fewer matrix multiplications by increasing the number of additions?
@@ -301,40 +304,43 @@ What really broke the Divide-and-Conquer approach is the fact that we had to do 
 
 *Spoiler Alert*: Yes.
 
-There is a way to do only 7 recursive multiplications of $$n/2\times n/2$$ matrices, rather than 8. Our recurrence relation is now:
+There is a way to do only 7 recursive multiplications of $n/2\times n/2$ matrices, rather than 8. Our recurrence relation is now:
 
-$$ T(n) = 7\cdot T(n/2) + \Theta(n^2) = \Theta(n^{log_2(7)}) = \Theta(n^{2.807...}) $$
+$$ 
+T(n) = 7\cdot T(n/2) + \Theta(n^2) = \Theta(n^{log_2(7)}) = \Theta(n^{2.807\dots}) 
+$$
 
 Strassen's method is the following:
 
 ![Strassen's method](/images/algorithms/strassen.png)
 
-Note that when our matrix's size isn't a power of two, we can just pad our operands with zeros until we do have a power of two size. This still runs in $$\Theta(n^{log_2{(7)}})$$.
+Note that when our matrix's size isn't a power of two, we can just pad our operands with zeros until we do have a power of two size. This still runs in $\Theta(n^{log_2{(7)}})$.
 
 #### Notes about Strassen
-- First to beat $$\Theta(n^3)$$ time
+- First to beat $\Theta(n^3)$ time
 - Faster methods are known today: Coppersmith and Winograd's method runs in
-time $$\mathcal{O}(n^{2.376})$$, which has recently been improved by Vassilevska Williams to $$\mathcal{O}(n^{2.3727})$$.
+time $\mathcal{O}(n^{2.376})$, which has recently been improved by Vassilevska Williams to $\mathcal{O}(n^{2.3727})$.
 - How to multiply matrices in best way is still a big open problem 
 - The naive method is better for small instances because of hidden constants in Strassen's method's runtime.
 
-
-<!--
-
+{% comment %}<!--
 #### Karatsuba's algorithm
 Before we leave Divide-and-Conquer algorithms, we'll take a last look at an interesting one.
 
-**Problem**: Given two n-digit long integers x and y, base b, find $$x\cdot y$$
+**Problem**: Given two n-digit long integers x and y, base b, find $x\cdot y$
 
 The "grade school algorithm", the naive one, runs in:
 
-$$ T(n) = 4T(n/2) + \Theta(n) = \Theta(n^2) $$
+$$
+T(n) = 4T(n/2) + \Theta(n) = \Theta(n^2) 
+$$
 
 Karatsuba's algorithm runs in:
 
-$$ T(n) = 3T(n/2)+\Theta(n)=\Theta(n^{\log_2{3}})\approx\Theta(n^{1.58}) $$
-
--->
+$$ 
+T(n) = 3T(n/2)+\Theta(n)=\Theta(n^{\log_2{3}})\approx\Theta(n^{1.58}) 
+$$
+-->{% endcomment %}
 
 ## Heaps and Heapsort
 
@@ -348,7 +354,7 @@ In a max-heap, the maximum element is at the root, while the minimum element tak
 
 ![Max-heats and min-heats' ordering](/images/algorithms/heats.png)
 
-The height of a node is the number of edges on a longest simple path from the node down to a leaf. The height of the heap is therefore simply the height of the root, $$\Theta(\log{n})$$.
+The height of a node is the number of edges on a longest simple path from the node down to a leaf. The height of the heap is therefore simply the height of the root, $\Theta(\log{n})$.
 
 We can store the heap in a list, where:
 
@@ -381,7 +387,7 @@ def max_heapify(A, i, n):
         max_heapify(A, largest, n)
 {% endhighlight %}
 
-This runs in $$\Theta(\text{height of } i) = \mathcal{O}(\log{n})$$ and uses $$\Theta(n)$$ space.
+This runs in $\Theta(\text{height of } i) = \mathcal{O}(\log{n})$ and uses $\Theta(n)$ space.
 
 #### Building a heap
 Given an unordered array `A` of length `n`, `build_max_heap` outputs a heap.
@@ -392,21 +398,26 @@ def build_max_heap(A, n):
         max_heapify(A, i, n)
 {% endhighlight %}
 
-This procedure operates in place. We can start at $$\lfloor{\frac{n}{2}}\rfloor$$ since all elements after that threshold are leaves, so we're not going to heapify those anyway.
+This procedure operates in place. We can start at $\lfloor{\frac{n}{2}}\rfloor$ since all elements after that threshold are leaves, so we're not going to heapify those anyway.
 
-We have $$\mathcal{O}(n)$$ calls to `max_heapify`, each of which takes $$\mathcal{O}(\log{n})$$ time, so we have $$\mathcal{O}(n\log{n})$$ in total. 
+We have $\mathcal{O}(n)$ calls to `max_heapify`, each of which takes $\mathcal{O}(\log{n})$ time, so we have $\mathcal{O}(n\log{n})$ in total. 
 However, **we can give a tighter bound**: the time to run `max_heapify` is linear in the height of the node it's run on. Hence, the time is bounded by:
 
-$$ \sum_{h=0}^{\log{n}} \text{# of nodes of height h}\cdot\mathcal{O}(h) = \mathcal{O}\left( n \sum_{h=0}^{\log{n}} \frac{h}{2^h}\right) $$
+$$
+\sum_{h=0}^{\log{n}} \text{# of nodes of height h}\cdot\mathcal{O}(h) 
+= \mathcal{O}\left( n \sum_{h=0}^{\log{n}} \frac{h}{2^h}\right)
+$$
 
-Which is $$\Theta(n)$$, since:
+Which is $\Theta(n)$, since:
 
-$$ \sum_{h=0}^\infty{\frac{h}{2^h}} = \frac{1/2}{(1-1/2)^2} = 2 $$
+$$ 
+\sum_{h=0}^\infty{\frac{h}{2^h}} = \frac{1/2}{(1-1/2)^2} = 2 
+$$
 
 *See the slides for a proof by induction.*
 
 ### Heapsort
-Heapsort is the best of both worlds: it's $$O(n\log{n})$$ like merge sort, and sorts in place like insertion sort.
+Heapsort is the best of both worlds: it's $O(n\log{n})$ like merge sort, and sorts in place like insertion sort.
 
 - Starting with the root (the maximum element), the algorithm
 places the maximum element into the correct place in the array by
@@ -425,12 +436,12 @@ def heapsort(A, n):
         max_heapify(A, 1, i-1)
 {% endhighlight %}
 
-- `build_max_heap`: $$\mathcal{O}(n)$$
-- `for` loop: $$n-1$$ times
-- Exchange elements: $$\mathcal{O}(1)$$
-- `max_heapify`: $$\mathcal{O}(\log{n})$$
+- `build_max_heap`: $\mathcal{O}(n)$
+- `for` loop: $n-1$ times
+- Exchange elements: $\mathcal{O}(1)$
+- `max_heapify`: $\mathcal{O}(\log{n})$
 
-Total time is therefore $$\mathcal{O}(n\log{n})$$.
+Total time is therefore $\mathcal{O}(n\log{n})$.
 
 ### Priority queues
 In a priority queue, we want to be able to:
@@ -443,7 +454,7 @@ In a priority queue, we want to be able to:
 A heap efficiently implements priority queues.
 
 #### Finding maximum element
-This can be done in $$\Theta(1)$$ by simply returning the root element.
+This can be done in $\Theta(1)$ by simply returning the root element.
 
 {% highlight python linenos %}
 def heap_maximum(A):
@@ -452,7 +463,7 @@ def heap_maximum(A):
 
 
 #### Extracting maximum element
-We can use [max heapify](#max-heapify) to rebuild our heap after removing the root. This runs in $$\mathcal{O}(\log{n})$$, as every other operation than `max-heapify` runs in $$\mathcal{O}(1)$$.
+We can use [max heapify](#max-heapify) to rebuild our heap after removing the root. This runs in $\mathcal{O}(\log{n})$, as every other operation than `max-heapify` runs in $\mathcal{O}(1)$.
 
 {% highlight python linenos %}
 def heap_extract_max(A, n):
@@ -479,7 +490,7 @@ def heap_increase_key(A, i, key):
         i = Parent(i)
 {% endhighlight %}
 
-This traverses the tree upward, and runs in $$\mathcal{O}(\log{n})$$.
+This traverses the tree upward, and runs in $\mathcal{O}(\log{n})$.
 
 #### Inserting into the heap
 {% highlight python linenos %}
@@ -489,15 +500,15 @@ def max_heap_insert(A, key, n):
     heap_increase_key(A, n, key) # Increase the value to key
 {% endhighlight %}
 
-We know that this runs in the time for `heap_increase_key`, which is $$\mathcal{O}(\log{n})$$.
+We know that this runs in the time for `heap_increase_key`, which is $\mathcal{O}(\log{n})$.
 
 ### Summary
-- Heapsort runs in $$\mathcal{O}(n\log{n})$$ and is in-place. However, a well implemented quicksort usually beats it in practice.
+- Heapsort runs in $\mathcal{O}(n\log{n})$ and is in-place. However, a well implemented quicksort usually beats it in practice.
 - Heaps efficiently implement priority queues:
-    + `insert(S, x)`: $$\mathcal{O}(\log{n})$$
-    + `maximum(S)`: $$\mathcal{O}(1)$$
-    + `extract_max(S)`: $$\mathcal{O}(\log{n})$$
-    + `increase_key(S, x, k)`: $$\mathcal{O}(\log{n})$$
+    + `insert(S, x)`: $\mathcal{O}(\log{n})$
+    + `maximum(S)`: $\mathcal{O}(1)$
+    + `extract_max(S)`: $\mathcal{O}(\log{n})$
+    + `increase_key(S, x, k)`: $\mathcal{O}(\log{n})$
 
 ## More data structures
 
@@ -527,7 +538,7 @@ def pop(S):
         return S[S.top + 1] # Return what we've removed
 {% endhighlight %}
 
-These operations are all $$\mathcal{O}(1)$$.
+These operations are all $\mathcal{O}(1)$.
 
 ### Queues
 Queues are FIFO (first-in, first-out). They have two basic operations:
@@ -582,7 +593,7 @@ def list_search(L, k):
     return x
 {% endhighlight %}
 
-This runs in $$\mathcal{O}(n)$$. If no element with key `k` exists, it will return `nil`.
+This runs in $\mathcal{O}(n)$. If no element with key `k` exists, it will return `nil`.
 
 #### Insertion
 {% highlight python linenos %}
@@ -594,7 +605,7 @@ def list_insert(L, x):
     x.prev = nil
 {% endhighlight %}
 
-This runs in $$\mathcal{O}(1)$$. This linked list doesn't implement a tail pointer, so it's important to add the element to the start of the list and not the end, as that would mean traversing the list before adding the element. 
+This runs in $\mathcal{O}(1)$. This linked list doesn't implement a tail pointer, so it's important to add the element to the start of the list and not the end, as that would mean traversing the list before adding the element. 
 
 #### Deletion
 {% highlight python linenos %}
@@ -606,12 +617,12 @@ def list_delete(L, x):
         x.next.prev = x.prev
 {% endhighlight %}
 
-This is $$\mathcal{O}(1)$$.
+This is $\mathcal{O}(1)$.
 
 #### Summary
-- Insertion: $$\mathcal{O}(1)$$
-- Deletion: $$\mathcal{O}(1)$$
-- Search: $$\mathcal{O}(n)$$
+- Insertion: $\mathcal{O}(1)$
+- Deletion: $\mathcal{O}(1)$
+- Search: $\mathcal{O}(n)$
 
 Search in linear time is no fun! Let's see how else we can do this.
 
@@ -624,7 +635,7 @@ The key property of binary search trees is:
 The tree `T` has a root `T.root`, and a height `h` (not necessarily log(*n*), it can vary depending on the organization of the tree).
 
 #### Querying a binary search tree
-All of the following algorithms can be implemented in $$\mathcal{O}(h)$$.
+All of the following algorithms can be implemented in $\mathcal{O}(h)$.
 
 ##### Searching
 {% highlight python linenos %}
@@ -671,7 +682,7 @@ def tree_successor(x):
     return y
 {% endhighlight %}
 
-In the worst-case, this will have to traverse the tree upward, so it indeed runs in $$\mathcal{O}(h)$$.
+In the worst-case, this will have to traverse the tree upward, so it indeed runs in $\mathcal{O}(h)$.
 
 #### Printing a binary search tree
 ![A sample binary search tree](/images/algorithms/binary_tree.png)
@@ -695,33 +706,39 @@ This would print:
 1, 2, 3, 4, 5, 6, 7, 8, 9 10, 11, 12
 {% endhighlight %}
 
-This runs in $$\Theta(n)$$. 
+This runs in $\Theta(n)$. 
 
 {% details Proof of runtime %}
 
-$$T(n) = $$ runtime of `inorder_tree_walk` on a tree with $$n$$ nodes.
+We have $T(n) =$ runtime of `inorder_tree_walk` on a tree with $n$ nodes.
 
-$$T(n)\leq (c+d)n + c, \qquad c, d > 0$$
+$$
+T(n)\leq (c+d)n + c, \qquad c, d > 0
+$$
 
-**Base**: $$n = 0, \quad T(0) = c$$
+**Base**: $n = 0, \quad T(0) = c$
 
-**Induction**: Suppose that the tree rooted at $$x$$ has $$k$$ nodes in its left subtree, and $$n-k-1$$ nodes in the right.
+**Induction**: Suppose that the tree rooted at $x$ has $k$ nodes in its left subtree, and $n-k-1$ nodes in the right.
 
-$$ T(n) \leq T(k) + T(n-k-1) + c $$
-
-$$ T(k) \leq (c+d)k + c $$
-
-$$ T(n-k-1) \leq (c+d)(n-k-1) + c $$
+$$
+\begin{align}
+T(n)     & \leq T(k) + T(n-k-1) + c  \\
+T(k)     & \leq (c+d)k + c \\
+T(n-k-1) & \leq (c+d)(n-k-1) + c \\
+\end{align}
+$$
 
 Therefore:
 
-$$ T(n) \leq (c+d)k + c + (c+d)(n-k-1) + c + d $$
+$$
+\begin{align}
+T(n) & \leq (c+d)k + c + (c+d)(n-k-1) + c + d
+     & = (c+d)n + c - (c+d) + 2c $
+     & \leq (c+d)n + c + (c -d) \leq (c+d)n + c
+\end{align}
+$$
 
-$$ = (c+d)n + c - (c+d) + 2c $$
-
-$$ \leq (c+d)n + c + (c -d) \leq (c+d)n + c $$
-
-Therefore, we do indeed have $$\Theta(n)$$.
+Therefore, we do indeed have $\Theta(n)$.
 
 Preorder and postorder follow a very similar idea.
 {% enddetails %}
@@ -794,7 +811,7 @@ def tree_insert(T, z):
         y.right = z
 {% endhighlight %}
 
-This runs in $$\mathcal{O}(h)$$.
+This runs in $\mathcal{O}(h)$.
 
 ##### Deletion
 Conceptually, there are 3 cases:
@@ -836,16 +853,16 @@ def tree_delete(T, z):
 {% endhighlight %}
 
 #### Summary
-- **Query operations**: Search, max, min, predecessor, successor: $$\mathcal{O}(h)$$
-- **Modifying operations**: Insertion, deletion: $$\mathcal{O}(h)$$
+- **Query operations**: Search, max, min, predecessor, successor: $\mathcal{O}(h)$
+- **Modifying operations**: Insertion, deletion: $\mathcal{O}(h)$
 
 There are efficient procedures to keep the tree balanced (AVL trees, red-black trees, etc.).
 
 ### Summary
-- **Stacks**: LIFO, insertion and deletion in $$\mathcal{O}(1)$$, with an array implementation with fixed capacity
-- **Queues**: FIFO, insertion and deletion in $$\mathcal{O}(1)$$, with an array implementation with fixed capacity
-- **Linked Lists**: No fixed capcity, insertion and deletion in $$\mathcal{O}(1)$$, supports search but $$\mathcal{O}(n)$$ time.
-- **Binary Search Trees**: No fixed capacity, supports most operations (insertion, deletion, search, max, min) in time $$\mathcal{O}(h)$$.
+- **Stacks**: LIFO, insertion and deletion in $\mathcal{O}(1)$, with an array implementation with fixed capacity
+- **Queues**: FIFO, insertion and deletion in $\mathcal{O}(1)$, with an array implementation with fixed capacity
+- **Linked Lists**: No fixed capcity, insertion and deletion in $\mathcal{O}(1)$, supports search but $\mathcal{O}(n)$ time.
+- **Binary Search Trees**: No fixed capacity, supports most operations (insertion, deletion, search, max, min) in time $\mathcal{O}(h)$.
 
 ## Dynamic Programming
 The main idea is to remember calculations already made. This saves enormous amounts of computation, as we don't have to do the same calculations again and again.
@@ -874,7 +891,7 @@ def memoized_fib_aux(n, r):
     return r[n]
 {% endhighlight %}
 
-This runs in $$\Theta(n)$$.
+This runs in $\Theta(n)$.
 
 ### Bottom-up
 Sort the subproblems and solve the smaller ones first. That way, when solving a subproblem, we have already solved the smaller subproblems we need.
@@ -891,33 +908,33 @@ def bottom_up_fib(n):
     return r[n]
 {% endhighlight %}
 
-This is also $$\Theta(n)$$.
+This is also $\Theta(n)$.
 
 ### Rod cutting problem
 The instance of the problem is:
 
-- A length $$n$$ of a metal rods
-- A table of prices $$p_i$$ for rods of lengths $$i = 1, ..., n$$
+- A length $n$ of a metal rods
+- A table of prices $p_i$ for rods of lengths $i = 1, ..., n$
 
 ![List of prices for different rod lengths](/images/algorithms/rod_prices.png)
 
 The objective is to decide how to cut the rod into pieces and maximize the price.
 
-There are $$2^{n-1}$$ possible solutions (not considering symmetry), so we can't just try them all. Let's introduce the following theorem in an attempt at finding a better way:
+There are $2^{n-1}$ possible solutions (not considering symmetry), so we can't just try them all. Let's introduce the following theorem in an attempt at finding a better way:
 
 ***
 
 #### Structural Theorem
 If:
 
-- The leftmost cut in an optimal solution is after $$i$$ units
-- An optimal way to cut a solution of size $$n-i$$ is into rods of sizes $$s_1, s_2, ..., s_k$$
+- The leftmost cut in an optimal solution is after $i$ units
+- An optimal way to cut a solution of size $n-i$ is into rods of sizes $s_1, s_2, ..., s_k$
 
-Then, an optimal way to cut our rod is into rods of size $$i, s_1, s_2, ..., s_k$$.
+Then, an optimal way to cut our rod is into rods of size $i, s_1, s_2, ..., s_k$.
 
 ***
 
-Essentially, the theorem say that to obtain an optimal solution, we need to cut the remaining pieces in an optimal way. This is the [optimal substructure property](https://en.wikipedia.org/wiki/Optimal_substructure). Hence, if we let $$r(n)$$ be the optimal revenue from a rod of length $$n$$, we can express $$r(n)$$ *recursively* as follows:
+Essentially, the theorem say that to obtain an optimal solution, we need to cut the remaining pieces in an optimal way. This is the [optimal substructure property](https://en.wikipedia.org/wiki/Optimal_substructure). Hence, if we let $r(n)$ be the optimal revenue from a rod of length $n$, we can express $r(n)$ *recursively* as follows:
 
 $$
 r(n) = \begin{cases}
@@ -962,9 +979,11 @@ def memoized_cut_rod_aux(p, n, r):
 
 Every problem needs to check all the subproblems. Thanks to dynamic programming, we can just sum them instead of multiplying them, as every subproblem is computed once at most. As we've seen earlier on with [insertion sort](#analysis), this is:
 
-$$\sum_{i=1}^n {\Theta(i)} = \Theta(n^2)$$
+$$
+\sum_{i=1}^n {\Theta(i)} = \Theta(n^2)
+$$
 
-The total time complexity is $$\mathcal{O}(n^2)$$. This is even clearer with the bottom up approach:
+The total time complexity is $\mathcal{O}(n^2)$. This is even clearer with the bottom up approach:
 
 {% highlight python linenos %}
 def bottom_up_cut_rod(p, n):
@@ -978,7 +997,7 @@ def bottom_up_cut_rod(p, n):
     return r[n]
 {% endhighlight %}
 
-There's a for-loop in a for-loop, so we clearly have $$\Theta(n^2)$$.
+There's a for-loop in a for-loop, so we clearly have $\Theta(n^2)$.
 
 Top-down only solves the subproblems actually needed, but recursive calls introduce overhead.
 
@@ -1013,10 +1032,10 @@ def print_cut_rod_solution(p, n):
 
 
 ### Matrix-chain multiplication
-- **Input**: A chain $$(A_1, A_2, ..., A_n)$$ of $$n$$ matrices, where for $$i=1, 2, ..., n$$, matrix $$A_i$$ has dimension $$p_{i-1}\times p_i$$.
-- **Output**: A full parenthesization of the product $$A_1 A_2 ... A_n$$ in a way that minimizes the number of scalar multiplications.
+- **Input**: A chain $(A_1, A_2, ..., A_n)$ of $n$ matrices, where for $i=1, 2, ..., n$, matrix $A_i$ has dimension $p_{i-1}\times p_i$.
+- **Output**: A full parenthesization of the product $A_1 A_2 ... A_n$ in a way that minimizes the number of scalar multiplications.
 
-We are not asked to calculate the product, only find the best parenthesization. Multiplying a matrix of size $$p\times q$$ with one of $$q\times r$$ takes $$pqr$$ scalar multiplications.
+We are not asked to calculate the product, only find the best parenthesization. Multiplying a matrix of size $p\times q$ with one of $q\times r$ takes $pqr$ scalar multiplications.
 
 We'll have to use the following theorem:
 
@@ -1025,10 +1044,10 @@ We'll have to use the following theorem:
 #### Optimal substructure theorem
 If:
 
-- The outermost parenthesization in an optimal solution is $$(A_1 A_2 ... A_i)(A_{i+1}A_{i+2}...A_n)$$
-- $$P_L$$ and $$P_R$$ are optimal pernthesizations for $$A_1 A_2 ... A_i$$ and $$A_{i+1}A_{i+2}...A_n$$ respectively
+- The outermost parenthesization in an optimal solution is $(A_1 A_2 ... A_i)(A_{i+1}A_{i+2}...A_n)$
+- $P_L$ and $P_R$ are optimal pernthesizations for $A_1 A_2 ... A_i$ and $A_{i+1}A_{i+2}...A_n$ respectively
 
-Then $$((P_L)\cdot (P_R))$$ is an optimal parenthesization for $$A_1 A_2 ... A_n$$
+Then $((P_L)\cdot (P_R))$ is an optimal parenthesization for $A_1 A_2 ... A_n$
 
 ***
 
@@ -1036,7 +1055,7 @@ See [the slides](http://moodle.epfl.ch/pluginfile.php/1745790/mod_resource/conte
 
 Essentially, to obtain an optimal solution, we need to parenthesize the two remaining expressions in an optimal way. 
 
-Hence, if we let $$m[i, j]$$ be the optimal value for chain multiplication of matrices $$A_i, ..., A_j$$ (meaning, how many multiplications we can do at best), we can express $$m[i, j]$$ *recursively* as follows:
+Hence, if we let $m[i, j]$ be the optimal value for chain multiplication of matrices $A_i, ..., A_j$ (meaning, how many multiplications we can do at best), we can express $m[i, j]$ *recursively* as follows:
 
 $$
 m[i, j] = 
@@ -1069,11 +1088,11 @@ def matrix_chain_order(p):
     return m and s
 {% endhighlight %}
 
-The runtime of this is $$\Theta(n^3)$$.
+The runtime of this is $\Theta(n^3)$.
 
 ![Matrix multiplication tables, flipped by 45 degrees](/images/algorithms/matrix-mult-tables.png)
 
-To know how to split up $$A_i A_{i+1} ... A_j$$ we look in `s[i, j]`. This split corresponds to `m[i, j]` operations. To print it, we can do:
+To know how to split up $A_i A_{i+1} ... A_j$ we look in `s[i, j]`. This split corresponds to `m[i, j]` operations. To print it, we can do:
 
 {% highlight python linenos %}
 def print_optimal_parens(s, i, j):
@@ -1087,31 +1106,31 @@ def print_optimal_parens(s, i, j):
 {% endhighlight %}
 
 ### Longest common subsequence
-- **Input**: 2 sequences, $$X = (x_1, ..., x_m)$$ and $$Y = (y_1, ..., y_n)$$
+- **Input**: 2 sequences, $X = (x_1, ..., x_m)$ and $Y = (y_1, ..., y_n)$
 - **Output**: A subsequence common to both whose length is longest. A subsequence doesn't have to be consecutive, but it has to be in order.
 
 ***
 
 #### Theorem
-Let $$Z = (z_1, z_2, ..., z_k)$$ be any LCS of $$X_i$$ and $$Y_j$$
+Let $Z = (z_1, z_2, ..., z_k)$ be any LCS of $X_i$ and $Y_j$
 
-1. If $$x_i = y_j$$ then $$z_k = x_i = y_j$$ and $$Z_{k-1}$$ is an LCS of $$X_{i-1}$$ and $$Y_{j-1}$$
-2. If $$x_i \neq y_j$$ then $$z_k \neq x_i$$ and $$Z$$ is an LCS of $$X_{i-1}$$ and $$Y_j$$
-3. If $$x_i \neq y_j$$ then $$z_k \neq y_i$$ and $$Z$$ is an LCS of $$X_i$$ and $$Y_{j-1}$$
+1. If $x_i = y_j$ then $z_k = x_i = y_j$ and $Z_{k-1}$ is an LCS of $X_{i-1}$ and $Y_{j-1}$
+2. If $x_i \neq y_j$ then $z_k \neq x_i$ and $Z$ is an LCS of $X_{i-1}$ and $Y_j$
+3. If $x_i \neq y_j$ then $z_k \neq y_i$ and $Z$ is an LCS of $X_i$ and $Y_{j-1}$
 
 {% details Proof %}
-1. If $$z_k \neq x_i$$ then we can just append $$x_i = y_j$$ to $$Z$$ to obtain a common subsequence of $$X$$ and $$Y$$ of length $$k+1$$, which would contradict the supposition that $$Z$$ is the *longest* common subsequence. Therefore, $$z_k = x_i = y_j$$
+1. If $z_k \neq x_i$ then we can just append $x_i = y_j$ to $Z$ to obtain a common subsequence of $X$ and $Y$ of length $k+1$, which would contradict the supposition that $Z$ is the *longest* common subsequence. Therefore, $z_k = x_i = y_j$
 
-Now onto the second part: $$Z_{k-1}$$ is an LCS of $$X_{i-1}$$ and $$Y_{j-1}$$ of length $$(k-1)$$. Let's prove this by contradiction; suppose that there exists a common subsequence $$W$$ with length greater than $$k-1$$. Then, appending $$x_i = y_j$$ to W produces a common subsequence of X and Y whose length is greater than $$k$$, which is a contradiction.
+Now onto the second part: $Z_{k-1}$ is an LCS of $X_{i-1}$ and $Y_{j-1}$ of length $(k-1)$. Let's prove this by contradiction; suppose that there exists a common subsequence $W$ with length greater than $k-1$. Then, appending $x_i = y_j$ to W produces a common subsequence of X and Y whose length is greater than $k$, which is a contradiction.
 
-2. If there were a common subsequence $$W$$ of $$X_{i-1}$$ and $$Y$$ with length greater than $$k$$, then $$W$$ would also be a common subsequence of $$X$$ and $$Y$$ length greater than $$k$$, which contradicts the supposition that $$Z$$ is the LCS.
+2. If there were a common subsequence $W$ of $X_{i-1}$ and $Y$ with length greater than $k$, then $W$ would also be a common subsequence of $X$ and $Y$ length greater than $k$, which contradicts the supposition that $Z$ is the LCS.
 
 3. This proof is symmetric to 2.
 {% enddetails %}
 
 ***
 
-If $$c[i, j]$$ is the length of a LCS of $$X_i$$ and $$Y_i$$, then:
+If $c[i, j]$ is the length of a LCS of $X_i$ and $Y_i$, then:
 
 $$
 c[i, j] =
@@ -1123,7 +1142,7 @@ c[i-1, j-1] + 1 & \text{if } i,j>0 \text{ and } x_i = y_j \\
 $$
 
 
-Using this recurrence, we can fill out a table of dimensions $$i \times j$$. The first row and the first colum will obviously be filled with `0`s. Then we traverse the table row by row to fill out the values according to the following rules.
+Using this recurrence, we can fill out a table of dimensions $i \times j$. The first row and the first colum will obviously be filled with `0`s. Then we traverse the table row by row to fill out the values according to the following rules.
 
 1. If the characters at indices `i` and `j` are equal, then we take the diagonal value (above and left) and add 1.
 2. If the characters at indices `i` and `j` are different, then we take the max of the value above and that to the left.
@@ -1132,7 +1151,7 @@ Along with the values in the table, we'll also store where the information of ea
 
 <figure>
     <img src="/images/algorithms/lcs-table.png" alt="An i*j table of values and arrows, as generated by the LCS algorithm below">
-    <figcaption>$$X = (B, A, B, D, B, A), \quad Y = (D, A, C,B, C, B, A)$$</figcaption>
+    <figcaption>$X = (B, A, B, D, B, A), \quad Y = (D, A, C,B, C, B, A)$</figcaption>
 </figure>
 
 The diagonal arrows in the path correspond to the characters in the LCS. In our case, the LCS has length 4 and it is `ABBA`.
@@ -1172,20 +1191,23 @@ def print_lcs(b, X, i, j):
         print-lcs(b, X, i, j-1)
 {% endhighlight %}
 
-The runtime of `lcs-length` is dominated by the two nested loops; runtime is $$\Theta(m\cdot n)$$.
+The runtime of `lcs-length` is dominated by the two nested loops; runtime is $\Theta(m\cdot n)$.
 
-The runtime of `print-lcs` is $$\mathcal(O)(n)$$, where $$n=i+j$$.
+The runtime of `print-lcs` is $\mathcal(O)(n)$, where $n=i+j$.
 
 ### Optimal binary search trees
-Given a sequence of keys $$K=(k_1, k_2, \dots, k_n)$$ of distinct keys, sorted so that $$k_1 < k_2 < \dots < k_n$$. We want to build a BST. Some keys are more popular than others: key $$K_i$$ has probability $$p_i$$ of being searched for. Our BST should have a minimum expected search cost.
+Given a sequence of keys $K=(k_1, k_2, \dots, k_n)$ of distinct keys, sorted so that $k_1 < k_2 < \dots < k_n$. We want to build a BST. Some keys are more popular than others: key $K_i$ has probability $p_i$ of being searched for. Our BST should have a minimum expected search cost.
 
-The cost of searching for a key $$k_i$$ is $$\text{depth}_T (k_i) + 1$$ (we add one because the root is at height 0 but has a cost of 1). The expected search cost would then be:
+The cost of searching for a key $k_i$ is $\text{depth}_T (k_i) + 1$ (we add one because the root is at height 0 but has a cost of 1). The expected search cost would then be:
 
-$$\mathbb{E}[\text{seach cost in } T] = \sum_{i=1}^n {(\text{depth}_T(k_i) + 1)}p_i = 1 + \sum_{i=1}^n {\text{depth}_T(k_i)}\cdot p_i$$
+$$
+\mathbb{E}[\text{seach cost in } T] 
+    = \sum_{i=1}^n {(\text{depth}_T(k_i) + 1)}p_i = 1 + \sum_{i=1}^n {\text{depth}_T(k_i)}\cdot p_i
+$$
 
 Optimal BSTs might not have the smallest height, and optimal BSTs might not have highest-probability key at root.
 
-Let $$e[i, j]$$ denote the expected search cost of an optimal BST of $$k_i \dots k_j$$.
+Let $e[i, j]$ denote the expected search cost of an optimal BST of $k_i \dots k_j$.
 
 $$
 e[i, j] = \begin{cases}
@@ -1225,12 +1247,12 @@ def optimal_bst(p, q, n):
     return (e, root)
 {% endhighlight %}
 
-- `e[i, j]` records the expected search cost of optimal BST of $$k_i, \dots, k_j$$
-- `r[i, j]` records the best root of optimal BST of $$k_i, \dots, k_j$$
-- `w[i, j]` records $$\sum_{\ell=i}^j{p_\ell}$$
+- `e[i, j]` records the expected search cost of optimal BST of $k_i, \dots, k_j$
+- `r[i, j]` records the best root of optimal BST of $k_i, \dots, k_j$
+- `w[i, j]` records $\sum_{\ell=i}^j{p_\ell}$
 
 
-The runtime is $$\Theta(n^3)$$: there are $$\Theta(n^2)$$ cells to fill in, most of which take $$\Theta(n)$$ to fill in.
+The runtime is $\Theta(n^3)$: there are $\Theta(n^2)$ cells to fill in, most of which take $\Theta(n)$ to fill in.
 
 <!-- Lecture 14-->
 
@@ -1241,36 +1263,38 @@ One way to store a graph is in an adjacency list. Every vertex has a list of ver
 
 ![Example of an adjacency list](/images/algorithms/adjacency-list.png)
 
-- **Space**: $$\Theta(V+E)$$
-- **Time**: to list all vertices adjacent to $$u$$: $$\Theta(\text{degree}(u))$$
-- **Time**: to determine whether $$(u, v)\in E: \mathcal{O}(\text{degree}(u))$$
+- **Space**: $\Theta(V+E)$
+- **Time**: to list all vertices adjacent to $u$: $\Theta(\text{degree}(u))$
+- **Time**: to determine whether $(u, v)\in E: \mathcal{O}(\text{degree}(u))$
 
 The other way to store this data is in an adjacency matrix. This is a matrix where:
 
-$$a_{ij} = \begin{cases}
+$$
+a_{ij} = \begin{cases}
 1 & \text{if } (i, j)\in E \\
 0 & \text{otherwise} \\
-\end{cases}$$
+\end{cases}
+$$
 
 ![Example of an adjacency matrix](/images/algorithms/adjacency-matrix.png)
 
 In an undirected graph, this makes for a symmetric matrix. The requirements of this implementation are:
 
-- **Space**: $$\Theta(V^2)$$
-- **Time**: to list all vertices adjacent to $$u$$: $$\Theta(V)$$
-- **Time**: to determine whether $$(u, v)\in E: \Theta(1)$$.
+- **Space**: $\Theta(V^2)$
+- **Time**: to list all vertices adjacent to $u$: $\Theta(V)$
+- **Time**: to determine whether $(u, v)\in E: \Theta(1)$.
 
 We can extend both representations to include other attributes such as edge weights.
 
 ### Traversing / Searching a graph
 
 #### Breadth-First Search (BFS)
-- **Input**: Graph $$G=(V, E)$$, either directed or undirected and source vertex $$s\in V$$.
-- **Output**: $$v.d = $$ distance (smallest number of edges) from s to v for all vertices v.
+- **Input**: Graph $G=(V, E)$, either directed or undirected and source vertex $s\in V$.
+- **Output**: $v.d = $ distance (smallest number of edges) from s to v for all vertices v.
 
 The idea is to:
 
-- Send a wave out from $$s$$
+- Send a wave out from $s$
 - First hits all vertices 1 edge from it
 - From there, it hits all vertices 2 edges from it...
 
@@ -1292,15 +1316,15 @@ def BFS(V, E, s):
                 enqueue(Q, v)
 {% endhighlight %}
 
-This is $$\mathcal{O}(V+E)$$:
+This is $\mathcal{O}(V+E)$:
 
-- $$\mathcal{O}(V)$$ because each vertex is enqueued at most once
-- $$\mathcal{O}(E)$$ because every vertex is dequeued at most once and we examine the edge $$(u, v)$$ only when $$u$$ is dequeued. Therefore, every edge is examined at most once if directed, and at most twice if undirected.
+- $\mathcal{O}(V)$ because each vertex is enqueued at most once
+- $\mathcal{O}(E)$ because every vertex is dequeued at most once and we examine the edge $(u, v)$ only when $u$ is dequeued. Therefore, every edge is examined at most once if directed, and at most twice if undirected.
 
 BFS may not reach all vertices. We can save the shortest path tree by keeping track of the edge that discovered the vertex.
 
 #### Depth-first search (DFS)
-- **Input**: Graph $$G = (V, E)$$, either directed or undirected
+- **Input**: Graph $G = (V, E)$, either directed or undirected
 - **Output**: 2 timestamps on each vertex: discovery time `v.d` and finishing time `v.f`
 
 {% highlight python linenos %}
@@ -1324,7 +1348,7 @@ def DFS_visit(G, u):
     u.f = time               # finish u
 {% endhighlight %}
 
-This runs in $$\Theta(V+E)$$.
+This runs in $\Theta(V+E)$.
 
 ![GIF of DFS in action](/images/algorithms/dfs.gif)
 
@@ -1335,7 +1359,7 @@ This runs in $$\Theta(V+E)$$.
 In <abbr title="Depth First Search">DFS</abbr> of an undirected graph we get only tree and back edges; no forward or back-edges.
 
 ### Parenthesis theorem
-$$\forall u, v$$, exactly one of the following holds:
+$\forall u, v$, exactly one of the following holds:
 
 1. If *v* is a descendant of *u*: `u.d < v.d < v.f < u.f`
 2. If *u* is a descendant of *v*: `v.d < u.d < u.f < v.f`
@@ -1346,7 +1370,7 @@ Vertex *v* is a descendant of *u* **if and only if** at time `u.d` there is a pa
 
 ### Topological sort
 - **Input**: a directed acyclic graph (DAG)
-- **Output**: a linear ordering of vertices such that if $$(u, v) \in E$$, then *u* appears somewhere before *v*
+- **Output**: a linear ordering of vertices such that if $(u, v) \in E$, then *u* appears somewhere before *v*
 
 {% highlight python linenos %}
 def topological sort(G):
@@ -1354,12 +1378,12 @@ def topological sort(G):
     output vertices in order of decreasing finishing time
 {% endhighlight %}
 
-Same running time as <abbr title="Depth First Search">DFS</abbr>, $$\Theta(V+E)$$. 
+Same running time as <abbr title="Depth First Search">DFS</abbr>, $\Theta(V+E)$. 
 
 Topological sort can be useful for ordering dependencies, for instance. Given a dependency graph, it produces a sequential order in which to load them, so that no dependency is loaded before its prerequisite. However, this only works for acyclic dependency graphs; a sequential order cannot arise from cyclic dependencies.
 
 {% details Proof of correctness %}
-We need to show that if $$(u, v) \in E$$ then `v.f < u.f`.  
+We need to show that if $(u, v) \in E$ then `v.f < u.f`.  
 When we explore *(u, v)*, what are the colors of *u* and *v*?
 
 - *u* is gray
@@ -1377,7 +1401,7 @@ When we explore *(u, v)*, what are the colors of *u* and *v*?
 A directed graph G is acyclic **if and only if** a <abbr title="Depth First Search">DFS</abbr> of G yields no back edges.
 
 ### Strongly connected component
-A strongly connected component (SCC) of a directed graph is a **maximal** set of vertices $$C \subseteq V$$ such that $$\forall u, v\in C,  u \leadsto v \text{ and } v\leadsto u$$.
+A strongly connected component (SCC) of a directed graph is a **maximal** set of vertices $C \subseteq V$ such that $\forall u, v\in C,  u \leadsto v \text{ and } v\leadsto u$.
 
 Below is a depiction of all SCCs on a graph:
 
@@ -1386,7 +1410,7 @@ Below is a depiction of all SCCs on a graph:
 If two SCCs overlap, then they are actually one SCC (and the two parts weren't really SCCs because they weren't maximal). Therefore, there cannot be overlap between SCCs.
 
 #### Lemma
-$$G^{SCC}$$ is a [directed acyclic graph](lemma-when-is-a-directed-graph-acyclic).
+$G^{SCC}$ is a [directed acyclic graph](lemma-when-is-a-directed-graph-acyclic).
 
 ![G^SCC is the graph comprised of the SCCs and the links between them](/images/algorithms/gscc.png)
 
@@ -1403,10 +1427,10 @@ def SCC(G):
 
 ![SCC algorithm gif](/images/algorithms/scc.gif)
 
-Where $$G^T$$ is *G* with all edges reversed. They have the same SCCs. Using adjacency lists, we can create $$G^T$$ in $$\Theta(V+E)$$ time.
+Where $G^T$ is *G* with all edges reversed. They have the same SCCs. Using adjacency lists, we can create $G^T$ in $\Theta(V+E)$ time.
 
 ## Flow Networks
-A flow network is a directed graph with weighted edges: each edge has a capacity $$c(u, v) \geq 0,   (c(u, v) = 0 \text{ if } (u, v) \notin E)$$
+A flow network is a directed graph with weighted edges: each edge has a capacity $c(u, v) \geq 0,   (c(u, v) = 0 \text{ if } (u, v) \notin E)$
 
 ![Example of a flow between cities](/images/algorithms/flow.png)
 
@@ -1424,19 +1448,25 @@ Possible applications include:
 - Railway networks
 - ...
 
-We can model the flow as a function $$f : V\times V \rightarrow \mathbb{R}$$. This function satisfies:
+We can model the flow as a function $f : V\times V \rightarrow \mathbb{R}$. This function satisfies:
 
 **Capacity constraint**: We do not use more flow than our capacity:
 
-$$\forall u, v \in V : 0 \leq f(u, v) \leq c(u, v)$$
+$$
+\forall u, v \in V : 0 \leq f(u, v) \leq c(u, v)
+$$
 
 **Flow conservation**: The flow into *u* must be equal to the flow out of *u*
 
-$$\forall u \in V \setminus (s, t), \quad \sum_{v\in V}{f(v, u)} = \sum_{v\in V}{f(u, v)}$$
+$$
+\forall u \in V \setminus (s, t), \quad \sum_{v\in V}{f(v, u)} = \sum_{v\in V}{f(u, v)}
+$$
 
 The value of a flow is calculated by measuring at the source; it's the flow out of the source minus the flow into the source:
 
-$$\| f \| = \sum_{v\in V}{f(s, v)} - \sum_{v\in V}{f(v, s)}$$
+$$
+\| f \| = \sum_{v\in V}{f(s, v)} - \sum_{v\in V}{f(v, s)}
+$$
 
 ### Ford-Fulkerson Method
 {% highlight python linenos %}
@@ -1459,9 +1489,11 @@ f(v, u) & \text{if } (v, u) \in E \\
 0 & \text{otherwise} \end{cases}
 $$
 
-We can now define the residual network $$G_f = (V, E_f)$$, where:
+We can now define the residual network $G_f = (V, E_f)$, where:
 
-$$E_f =\{(u, v)\in V\times V : c_f(u, v) > 0\}$$
+$$
+E_f =\{(u, v)\in V\times V : c_f(u, v) > 0\}
+$$
 
 See the diagram below for more detail:
 
@@ -1473,16 +1505,20 @@ A cut of a flow network is a partition of *V* into two groups of vertices, *S* a
 #### Net flow across a cut
 The **net flow across the cut** *(S, T)* is the flow leaving *S* minus the flow entering *S*.
 
-$$f(S, T) = \sum_{u\in S, v\in T}{f(u, v)} - \sum_{u\in S, v\in T}{f(v, u)}$$
+$$
+f(S, T) = \sum_{u\in S, v\in T}{f(u, v)} - \sum_{u\in S, v\in T}{f(v, u)}
+$$
 
-The **net flow across a cut** is always equal to the **value of the flow**, which is the flow out of the source minus the flow into the source. For any cut $$(S, T), \| f \| = f(S, T)$$.
+The **net flow across a cut** is always equal to the **value of the flow**, which is the flow out of the source minus the flow into the source. For any cut $(S, T), \| f \| = f(S, T)$.
 
 The proof is done simply by induction using flow conservation.
 
 #### Capacity of a cut
 The capacity of a cut *(S, T)* is:
 
-$$ c(S, T) = \sum_{u\in S, v\in T}{c(u, v)} $$
+$$
+c(S, T) = \sum_{u\in S, v\in T}{c(u, v)}
+$$
 
 The flow is *at most* the capacity of a cut.
 
@@ -1499,30 +1535,30 @@ The proof is important and should be learned for the exam.
 {% details Proof of the max-flow min-cut theorem %}
 We'll prove equivalence between the following:
 
-1. $$f$$ has a maximum flow
-2. $$G_f$$ has no augmenting path
-3. $$\| f \| = c(S, T)$$ for a minimum cut $$(S, T)$$
+1. $f$ has a maximum flow
+2. $G_f$ has no augmenting path
+3. $\| f \| = c(S, T)$ for a minimum cut $(S, T)$
 
-$$(1) \Rightarrow (2)$$: Suppose toward contradiction that $$G_f$$ has an augmenting path *p*. However, the Ford-Fulkerson method would augment *f* by *p* to obtain a flow if increased value which contradicts that *f* is a maximum flow.
+$(1) \Rightarrow (2)$: Suppose toward contradiction that $G_f$ has an augmenting path *p*. However, the Ford-Fulkerson method would augment *f* by *p* to obtain a flow if increased value which contradicts that *f* is a maximum flow.
 
-$$(2) \Rightarrow (3)$$: Let *S* be the set of nodes reachable from *s* in a residual network. Every edge flowing out of *S* in *G* must be at capacity, otherwise we can reach a node outside *S* in the residual network.
+$(2) \Rightarrow (3)$: Let *S* be the set of nodes reachable from *s* in a residual network. Every edge flowing out of *S* in *G* must be at capacity, otherwise we can reach a node outside *S* in the residual network.
 
-$$(3) \Rightarrow (1)$$: Recall that $$\| f\| \leq c(S, T) \forall \text{cut } (S, T)$$. Therefore, if the value of a flow is equal to the capacity of some cut, then it cannot be further improved.
+$(3) \Rightarrow (1)$: Recall that $\| f\| \leq c(S, T) \forall \text{cut } (S, T)$. Therefore, if the value of a flow is equal to the capacity of some cut, then it cannot be further improved.
 {% enddetails %}
 
 ### Time for finding max-flow (or min-cut)
-- It takes $$\mathcal{O}(E)$$ time to find a a path in the residual network (using for example <abbr title="Breadth First Search">BFS</abbr>).
+- It takes $\mathcal{O}(E)$ time to find a a path in the residual network (using for example <abbr title="Breadth First Search">BFS</abbr>).
 - Each time the flow value is increased by at least 1
-- So running time is $$\mathcal{O}(E\cdot \| f_{\text{max}} \|)$$, where $$\| f_{\text{max}} \|$$ is the value of a max flow.
+- So running time is $\mathcal{O}(E\cdot \| f_{\text{max}} \|)$, where $\| f_{\text{max}} \|$ is the value of a max flow.
 
 If capacities are irrational then the Ford-Fulkerson might not terminate. However, if we take the **shortest path** or **fattest path** then this will not happen if the capacities are integers (without proof).
 
 |  Augmenting path  |        Number of iterations        |
 | :---------------- | :--------------------------------- |
-| <abbr title="Breadth First Search">BFS</abbr> Shortest path | $$ \leq\frac{1}{2}E\cdot V $$      |
-| Fattest path      | $$ \leq E\cdot \log{(E\cdot U)} $$ |
+| <abbr title="Breadth First Search">BFS</abbr> Shortest path | $ \leq\frac{1}{2}E\cdot V $      |
+| Fattest path      | $ \leq E\cdot \log{(E\cdot U)} $ |
 
-Where $$U$$ is the maximum flow value, and the fattest path is the path with largest minimum capacity (the bottleneck).
+Where $U$ is the maximum flow value, and the fattest path is the path with largest minimum capacity (the bottleneck).
 
 ### Bipartite matching
 Say we have *N* students applying for *M* jobs. Each gets several offers. Is there a way to match all students to jobs?
@@ -1547,34 +1583,34 @@ def edmonds_kart(G):
         augment
 {% endhighlight %}
 
-The runtime is $$\mathcal{O}(VE^2)$$
+The runtime is $\mathcal{O}(VE^2)$
 
 #### Lemma
-Let $$\delta_f(s, u)$$ be the shortest path distance from *s* to *u* in $$G_f, u\in V$$.
+Let $\delta_f(s, u)$ be the shortest path distance from *s* to *u* in $G_f, u\in V$.
 
-$$\forall u\in V,  S_f(s, u)$$ are monotonically non-decreasing throughout the execution of the algorithm.
+$\forall u\in V,  S_f(s, u)$ are monotonically non-decreasing throughout the execution of the algorithm.
 
 {% details Proof of runtime %}
-Edmonds-Kart terminates in $$\mathcal{O}(V\cdot E)$$ iterations. An edge *(u, v)* is said to be **critical** if its capacity is smallest on the augmenting path.
+Edmonds-Kart terminates in $\mathcal{O}(V\cdot E)$ iterations. An edge *(u, v)* is said to be **critical** if its capacity is smallest on the augmenting path.
 
-Every edge in G becomes critical $$\mathcal{O}(V)$$ times (a critical edge is removed, but it can reappear later).
+Every edge in G becomes critical $\mathcal{O}(V)$ times (a critical edge is removed, but it can reappear later).
 {% enddetails %}
 
 <!-- Lecture 18 -->
 
 ## Data structures for disjoint sets
 - Also known as “union find”
-- Maintain collection $$\mathcal{S} = \{ S_1, \dots, S_k \}$$ of disjoint dynamic (changing over time) sets
+- Maintain collection $\mathcal{S} = \{ S_1, \dots, S_k \}$ of disjoint dynamic (changing over time) sets
 - Each set is identified by a representative, which is some member of the set. It doesn’t matter which member is the representative, as long as if we ask for the representative twice without modifying the set, we get the same answer both
 times
 
 We want to support the following operations:
 
-- `make_set(x)`: Makes a new set $$S_i=\{x\}$$ and add it to $$\mathcal{S}$$
-- `union(x, y)`: If $$x \in S_x, y \in S_y$$, then $$\mathcal{S} = \mathcal{S} - S_x - S_y \cup \{ S_x \cup S_y \}$$
-    + Representative of new set is any member in $$S_x \cup S_y$$, often the
-representative of one of $$S_x$$ and $$S_y$$
-    + Destroys $$S_x$$ and $$S_y$$ (since sets must be disjoint)
+- `make_set(x)`: Makes a new set $S_i=\{x\}$ and add it to $\mathcal{S}$
+- `union(x, y)`: If $x \in S_x, y \in S_y$, then $\mathcal{S} = \mathcal{S} - S_x - S_y \cup \{ S_x \cup S_y \}$
+    + Representative of new set is any member in $S_x \cup S_y$, often the
+representative of one of $S_x$ and $S_y$
+    + Destroys $S_x$ and $S_y$ (since sets must be disjoint)
 - `find(x)`: Return the representative of the set containing `x`.
 
 ### Application: Connected components
@@ -1589,7 +1625,7 @@ def connected_components(G):
 
 ![Connected components algorithm in action](/images/algorithms/connected-components.gif)
 
-This algorithm runs in $$\mathcal{O}(V\log{(V)}+E)$$ in linked-lists with weighted union heuristic, and $$\mathcal{O}(V+E)$$ in forests with union-by-rank and path-compression.
+This algorithm runs in $\mathcal{O}(V\log{(V)}+E)$ in linked-lists with weighted union heuristic, and $\mathcal{O}(V+E)$ in forests with union-by-rank and path-compression.
 
 ### Implementation: Linked List
 This is not the fastest implementation, but it certainly is the easiest. Each set is a single linked list represented by a set object that has:
@@ -1607,12 +1643,12 @@ Each object in the list has:
 
 Our operations are now:
 
-- `make_set(x)`: Create a singleton list in time $$\Theta(1)$$
-- `find(x)`: Follow the pointer back to the list object, and then follow the head pointer to the representative; time $$\Theta(1)$$.
+- `make_set(x)`: Create a singleton list in time $\Theta(1)$
+- `find(x)`: Follow the pointer back to the list object, and then follow the head pointer to the representative; time $\Theta(1)$.
 
 Union can be implemented in a couple of ways. We can either append `y`'s list onto the end of `x`'s list, and update `x`'s tail pointer to the end.
 
-Otherwise, we can use **weighted-union heuristic**: we always append the smaller list to the larger list. As a theorem, *m* operations on *n* elements takes $$\mathcal{O}(m+n\log{n})$$ time.
+Otherwise, we can use **weighted-union heuristic**: we always append the smaller list to the larger list. As a theorem, *m* operations on *n* elements takes $\mathcal{O}(m+n\log{n})$ time.
 
 ### Implementation: Forest of trees
 - One tree per set, where the root is the representative.
@@ -1665,7 +1701,7 @@ A spanning tree of a graph is a set of edges that is:
 
 We want to find the *minimum* spanning tree of a graph, that is, a spanning tree of minimum total weights.
 
-- **Input**: an undirected graph G with weight *w(u, v)* for each edge $$(u, v)\in E$$.
+- **Input**: an undirected graph G with weight *w(u, v)* for each edge $(u, v)\in E$.
 - **Output**: an <abbr title="Minimum Spanning Tree">MST</abbr>: a spanning tree of minimum total weights
 
 There are 2 natural greedy algorithms for this.
@@ -1680,7 +1716,7 @@ See the slides for a proof.
 #### Implementation
 How do we find the minimum crossing edges at every iteration?
 
-We need to check all the outgoing edges of every node, so the running time could be as bad as $$\mathcal{O}(V E)$$. But there's a more clever solution!
+We need to check all the outgoing edges of every node, so the running time could be as bad as $\mathcal{O}(V E)$. But there's a more clever solution!
 
 - For every node *w* keep value *dist(w)* that measures the "distance" of *w* from the current tree.
 - When a new node *u* is added to the tree, check whether neighbors of *u* decreases their distance to tree; if so, decrease distance
@@ -1705,13 +1741,13 @@ def prim(G, w, r):
 
 When we start every node has the key `infinity` and our root has key 0, so we pick up the root. Now we need to find the edge with the minimal weight that crosses the cut.
 
-- Initialize *Q* and first for loop: $$\mathcal{O}(V\log{V})$$
-- `decrease_key` is $$\mathcal{O}(\log{V})$$
+- Initialize *Q* and first for loop: $\mathcal{O}(V\log{V})$
+- `decrease_key` is $\mathcal{O}(\log{V})$
 - The while loop:
-    + We run *V* times `extract_min` ($$\mathcal{O}(V\log{V})$$)
-    + We run *E* times `decrease_key` ($$\mathcal{O}(E\log{V})$$)
+    + We run *V* times `extract_min` ($\mathcal{O}(V\log{V})$)
+    + We run *E* times `decrease_key` ($\mathcal{O}(E\log{V})$)
 
-The total runtime is the max of the above, so $$\mathcal{O}(E\log{V})$$ (which can be made $$\mathcal{O}(V\log{V})$$ with careful queue implementation).
+The total runtime is the max of the above, so $\mathcal{O}(E\log{V})$ (which can be made $\mathcal{O}(V\log{V})$ with careful queue implementation).
 
 ### Kruskal's algorithm
 Start from an empty forest *T* and greedily maintain forest *T* which will become an <abbr title="Minimum Spanning Tree">MST</abbr> at the end. At each step, add the cheapest edge that does not create a cycle.
@@ -1736,12 +1772,12 @@ def kruskal(G, w):
     return A
 {% endhighlight %}
 
-- Initialize A: $$\mathcal{O}(1)$$
+- Initialize A: $\mathcal{O}(1)$
 - First for loop: *V* times `make_set`
-- Sort *E*: $$\mathcal{O}(E\log{E})$$
-- Second for loop: $$\mathcal{O}(E)$$ times `find_sets` and `unions`
+- Sort *E*: $\mathcal{O}(E\log{E})$
+- Second for loop: $\mathcal{O}(E)$ times `find_sets` and `unions`
 
-So this can run in $$\mathcal{O}(E\log{V})$$ (or, equivalently, $$\mathcal{O}(E\log{E})$$ since $$E=V^2$$ at most); runtime is dominated by the sorting algorithm.
+So this can run in $\mathcal{O}(E\log{V})$ (or, equivalently, $\mathcal{O}(E\log{E})$ since $E=V^2$ at most); runtime is dominated by the sorting algorithm.
 
 ### Summary
 - Greedy is good (sometimes)
@@ -1752,7 +1788,7 @@ So this can run in $$\mathcal{O}(E\log{V})$$ (or, equivalently, $$\mathcal{O}(E\
 - **Input**: directed, weighted graph
 - **Output**: a path of minimal weight (there may be multiple solutions)
 
-The weight of a path $$(v_0, v1, \dots, v_k): \sum_{i=1}^k{w(v_{i-1}, v_i)}$$.
+The weight of a path $(v_0, v1, \dots, v_k): \sum_{i=1}^k{w(v_{i-1}, v_i)}$.
 
 ### Problem variants
 - **Single-source**: Find shortest paths from source vertex to every vertex
@@ -1762,7 +1798,7 @@ The weight of a path $$(v_0, v1, \dots, v_k): \sum_{i=1}^k{w(v_{i-1}, v_i)}$$.
 
 
 ### Bellman-Ford algorithm
-Bellman-Ford runs in $$\Theta(E\cdot V)$$. Unlike Dijkstra, it allows negative edge weights, as long as no negative-weight cycle (a cycle where the weights add up to a negative number) is reachable from the source. The algorithm is easy to implement in distributed settings (e.g. IP routing): each vertex repeatedly asks their neighbors for the best path.
+Bellman-Ford runs in $\Theta(E\cdot V)$. Unlike Dijkstra, it allows negative edge weights, as long as no negative-weight cycle (a cycle where the weights add up to a negative number) is reachable from the source. The algorithm is easy to implement in distributed settings (e.g. IP routing): each vertex repeatedly asks their neighbors for the best path.
 
 - **Input**: Directed graph with weighted edges, source *s*, no negative cycles.
 - **Ouput**: The shortest path from *s* to *t*
@@ -1786,7 +1822,7 @@ def relax(u, v, w):
         v.predecessor = u
 {% endhighlight %}
 
-This function reduces the distance of `v` if it is possible to reach it in a shorter path thanks to the `(u, v)` edge. It runs in $$\mathcal{O}(1)$$.
+This function reduces the distance of `v` if it is possible to reach it in a shorter path thanks to the `(u, v)` edge. It runs in $\mathcal{O}(1)$.
 
 The entire algorithm is then:
 
@@ -1828,13 +1864,13 @@ There is no negative cycle reachable from the source if and only if no distances
 - It's greedy, and faster than Bellman-Ford.
 - It's very similar to Prim's algorithm; could also be described as a weighted version of <abbr title="Breadth First Search">BFS</abbr>.
 
-We start with a Source $$S = \{ s \}$$, and greedily grow *S*. At each step, we add to *S* the vertex that is closest to *S* (where distance is defined `u.d + w(u, v)`).
+We start with a Source $S = \{ s \}$, and greedily grow *S*. At each step, we add to *S* the vertex that is closest to *S* (where distance is defined `u.d + w(u, v)`).
 
 ![GIF of Dijkstra's algorithm in action](/images/algorithms/dijkstra.gif)
 
 This creates the shortest-path tree: we can give the shortest path between the source and any vertex in the tree.
 
-Since Dijkstra's algorithm is greedy (it doesn't have to consider all edges, only the ones in the immediate vicinity), it is more efficient. Using a binary heap, we can run in $$\mathcal{O}(E\log{V})$$ (though a more careful implementation can optimize it to $$\mathcal{O}(V\log{V}+E)$$).
+Since Dijkstra's algorithm is greedy (it doesn't have to consider all edges, only the ones in the immediate vicinity), it is more efficient. Using a binary heap, we can run in $\mathcal{O}(E\log{V})$ (though a more careful implementation can optimize it to $\mathcal{O}(V\log{V}+E)$).
 
 {% highlight python linenos %}
 def dijkstra(G, w, s):
@@ -1877,78 +1913,101 @@ Worst-case scenario is that the candidates come in sorted order, from lowest to 
 
 What is the expected number of hires we make over all the permutations of the candidates?
 
-There are $$n!$$ permutations, each equally likely. The expectation is the sum of hires in each permutation divided by $$n!$$:
+There are $n!$ permutations, each equally likely. The expectation is the sum of hires in each permutation divided by $n!$:
 
-$$\frac{A_1 + A_2 + \dots + A_{n!}}{n!}$$
+$$
+\frac{A_1 + A_2 + \dots + A_{n!}}{n!}
+$$
 
 For 5 players, we have 120 terms, but for 10 we have 3 628 800... We need to find a better way of calculating this than pure brute force.
 
 Given a sample space and an event A, we define the **indicator random variable**:
 
-$$I\{A\}= \begin{cases}
+$$
+I\{A\}= \begin{cases}
 1 & \text{if } A \text{ occurs} \\
 0 & \text{if } A \text{ does not occur} \\
-\end{cases}$$
+\end{cases}
+$$
 
 #### Lemma
-For an event A, let $$X_A = I\{A\}$$. Then $$\mathbb{E}[X_A] = Pr[A]$$
+For an event A, let $X_A = I\{A\}$. Then $\mathbb{E}[X_A] = Pr[A]$
 
 {% details Proof %}
-$$\mathbb{E}[X_A] = 1\cdot Pr[A] + 0\cdot Pr[\bar{A}] = Pr[A]$$
+$$
+\mathbb{E}[X_A] = 1\cdot Pr[A] + 0\cdot Pr[\bar{A}] = Pr[A]
+$$
 {% enddetails %}
 
 #### Multiple Coin Flips
-What about multiple coin flips? We want to determine the expected number of heads when we flip *n* coins. Let $$X$$ be a random variable for the number of heads in *n* flips. We could calculate:
+What about multiple coin flips? We want to determine the expected number of heads when we flip *n* coins. Let $X$ be a random variable for the number of heads in *n* flips. We could calculate:
 
-$$\mathbb{E}[X] = \sum_{k=0}^n {k\cdot Pr\{X=k\}} $$
+$$
+\mathbb{E}[X] = \sum_{k=0}^n {k\cdot Pr\{X=k\}}
+$$
 
 ... but that is cumbersome. Instead, we can use indicator variables.
 
-For $$i = 1, \dots, n$$, define $$X_i = I\{\text{the ith flip results in event H}\}$$. Then:
+For $i = 1, \dots, n$, define $X_i = I\{\text{the ith flip results in event H}\}$. Then:
 
-$$\mathbb{E}[X] = \mathbb{E}[X_1 + X_2 + \dots + X_n]$$
+$$
+\mathbb{E}[X] = \mathbb{E}[X_1 + X_2 + \dots + X_n]
+$$
 
-By linearity of expectation (which holds even if *X* and *Y* are independent), i.e. that $$\mathbb{E}[aX + bY] = a\mathbb{E}[X] + b\mathbb{E}[Y]$$, we have:
+By linearity of expectation (which holds even if *X* and *Y* are independent), i.e. that $\mathbb{E}[aX + bY] = a\mathbb{E}[X] + b\mathbb{E}[Y]$, we have:
 
-$$\mathbb{E}[X] = \mathbb{E}[X_1 + X_2 + \dots + X_n] = \mathbb{E}[X_1] + \mathbb{E}[X_2] + \dots + \mathbb{E}[X_n]$$
+$$
+\mathbb{E}[X] = \mathbb{E}[X_1 + X_2 + \dots + X_n] = \mathbb{E}[X_1] + \mathbb{E}[X_2] + \dots + \mathbb{E}[X_n]
+$$
 
-For *n* coin flips, the above yields $$\frac{n}{2}$$.
+For *n* coin flips, the above yields $\frac{n}{2}$.
 
 #### Solving the Hiring Problem
 Back to our hiring problem:
 
-$$Pr[\text{candidate } i \text{ is hired}] = \frac{1}{i}$$
+$$
+Pr[\text{candidate } i \text{ is hired}] = \frac{1}{i}
+$$
 
 Therefore, the number of candidates we can expect to hire is:
 
-$$\mathbb{E}[X] = Pr[\text{#} 1 \text{ hired}] + Pr[\text{#} 2 \text{ hired}] + \dots = \frac{1}{1} + \frac{1}{2} + \frac{1}{3} + \dots + \frac{1}{n} = H_n$$
+$$
+\mathbb{E}[X] = Pr[\text{#} 1 \text{ hired}] + Pr[\text{#} 2 \text{ hired}] + \dots = \frac{1}{1} + \frac{1}{2} + \frac{1}{3} + \dots + \frac{1}{n} = H_n
+$$
 
-This is the harmonic number, which is $$H_n = \ln{n}+\mathcal{O}(1)$$.
+This is the harmonic number, which is $H_n = \ln{n}+\mathcal{O}(1)$.
 
-The probability of hiring one candidate is $$\frac{1}{n}$$ (this is the probability of the first being the tallest), while the probability of hiring all candidates is $$\frac{1}{n!}$$ (which is the probability of the exact permutation where all candidates come in decreasing sorted order).
+The probability of hiring one candidate is $\frac{1}{n}$ (this is the probability of the first being the tallest), while the probability of hiring all candidates is $\frac{1}{n!}$ (which is the probability of the exact permutation where all candidates come in decreasing sorted order).
 
 #### Bonus trivia
-Given a function `RANDOM` that return `1` with probability $$p$$ and `0` with probability $$1-p$$.
+Given a function `RANDOM` that return `1` with probability $p$ and `0` with probability $1-p$.
 
-$$\mathbb{E}[\text{# trials until success}] = \frac{1}{2p(1-p)}$$
+$$
+\mathbb{E}[\text{# trials until success}] = \frac{1}{2p(1-p)}
+$$
 
 ### Birthday Lemma
-If $$q > 1.78 \sqrt{\|M\|}$$ then the probability that a function chosen uniformly at random $$f: {1, 2, \dots, q} \rightarrow M$$ is injective is at most $$\frac{1}{2}$$.
+If $q > 1.78 \sqrt{\|M\|}$ then the probability that a function chosen uniformly at random $f: {1, 2, \dots, q} \rightarrow M$ is injective is at most $\frac{1}{2}$.
 
-Note that this is a weaker statement than finding the *q* and *m* for which *f* is 50% likely to be injective. The real probability of a such function being injective is $$e^{-q(q-1)/(2m)}$$, as in the proof below (plugging in $$q=23, m=365$$ shows that in a group of 23, there's a 50% chance of two people having the same birthday).
+Note that this is a weaker statement than finding the *q* and *m* for which *f* is 50% likely to be injective. The real probability of a such function being injective is $e^{-q(q-1)/(2m)}$, as in the proof below (plugging in $q=23, m=365$ shows that in a group of 23, there's a 50% chance of two people having the same birthday).
 
 {% details Proof %}
-Let $$m = \| M\|$$. The probability that the function is injective is:
+Let $m = \| M\|$. The probability that the function is injective is:
 
-$$\frac{m}{m}\cdot\frac{m-1}{m}\cdot\frac{m-2}{m}\cdot\dots\cdot\frac{m-(q-1)}{m}$$
+$$
+\frac{m}{m}\cdot\frac{m-1}{m}\cdot\frac{m-2}{m}\cdot\dots\cdot\frac{m-(q-1)}{m}$$
 
-Since $$e^{-x} > 1-x$$ we have that this is less than:
+Since $e^{-x} > 1-x$ we have that this is less than:
 
-$$e^{-0}\cdot e^{-1/m}\cdot e^{-2/m}\dots e^{-(q-1)/m} = e^{-q(q-1)/(2m)}$$
+$$
+e^{-0}\cdot e^{-1/m}\cdot e^{-2/m}\dots e^{-(q-1)/m} = e^{-q(q-1)/(2m)}
+$$
 
 Which itself is less than &#189; if:
 
-$$q \geq\frac{1+\sqrt{1+8\ln{2}}}{2}\sqrt{m}\approx 1.78\sqrt{m}$$
+$$
+q \geq\frac{1+\sqrt{1+8\ln{2}}}{2}\sqrt{m}\approx 1.78\sqrt{m}
+$$
 
 {% enddetails %}
 
@@ -1962,21 +2021,21 @@ We want to design a computer system for a library, where we can:
 
 There are multiple approaches to this; let's start with a very naive one: a direct-address table, in which we save an array/table T with a position for each possible book (for every possible ISBN). 
 
-This is terribly inefficient; sure, the running time of each of the above operations is $$\mathcal{O}(1)$$, but it takes space $$\mathcal{O}(U)$$, where U is the size of the universe.
+This is terribly inefficient; sure, the running time of each of the above operations is $\mathcal{O}(1)$, but it takes space $\mathcal{O}(U)$, where U is the size of the universe.
 
 #### Hash tables
-Instead, let's use hash tables. Their running time is the same (constant, in average case), but their space requirement is $$\mathcal{O}(K)$$, the size of the key space (instead of the universe).
+Instead, let's use hash tables. Their running time is the same (constant, in average case), but their space requirement is $\mathcal{O}(K)$, the size of the key space (instead of the universe).
 
-In hash tables an element with key *k* is stored in slot *h(k)*. $$h: U \rightarrow\{0, 1, \dots, m-1\}$$ is called the **hash function**.
+In hash tables an element with key *k* is stored in slot *h(k)*. $h: U \rightarrow\{0, 1, \dots, m-1\}$ is called the **hash function**.
 
 A good hash function is efficiently computable, should distribute keys uniformly (seemingly at random over our sample space, though the output should of course be deterministic, the same every time we run the function). This is the principle of **simple uniform hashing**:
 
 > The hashing function **h** hashes a new key equally likely to any of the **m** slots, independently of where any other key has hashed to
 
 #### Collisions
-When two items with keys *k<sub>i</sub>* and *k<sub>j</sub>* have *h(k<sub>i</sub>) = h(k<sub>j</sub>)*, we have a collision. How big of a table do we need to avoid collisions with high probability? This is the same problem as the [Birthday Lemma](#birthday-lemma). It says that for *h* to be injective with good probability (meaning that the expected number of collisions is lower than 1) then we need $$m > K^2$$.
+When two items with keys *k<sub>i</sub>* and *k<sub>j</sub>* have *h(k<sub>i</sub>) = h(k<sub>j</sub>)*, we have a collision. How big of a table do we need to avoid collisions with high probability? This is the same problem as the [Birthday Lemma](#birthday-lemma). It says that for *h* to be injective with good probability (meaning that the expected number of collisions is lower than 1) then we need $m > K^2$.
 
-This means that if a library has $$K = 10 000$$ books then it needs an array of size $$ m = K^2 = 10^8 $$ (at least).
+This means that if a library has $K = 10 000$ books then it needs an array of size $ m = K^2 = 10^8 $ (at least).
 
 Even then, we can't avoid collisions, but we can still deal with them. We can place all elements that hash to the same slot into the same **doubly linked list**.
 
@@ -1997,24 +2056,24 @@ def chained_hash_delete(T, x):
 See [linked lists](#linked-lists) for details on how to do operations on the lists.
 
 #### Running times
-- `Insert`: $$\mathcal{O}(1)$$
-- `Delete`: $$\mathcal{O}(1)$$
-- `Search`: Expected $$\mathcal{O}(\frac{n}{m})$$ (if good hash function)
+- `Insert`: $\mathcal{O}(1)$
+- `Delete`: $\mathcal{O}(1)$
+- `Search`: Expected $\mathcal{O}(\frac{n}{m})$ (if good hash function)
 
-Insertion and deletion are $$\mathcal{O}(1)$$, and the space requirement is $$\mathcal{O}(m+K)$$.
+Insertion and deletion are $\mathcal{O}(1)$, and the space requirement is $\mathcal{O}(m+K)$.
 
-The worst case is that all *n* elements are hashed to the same slot, in which case search takes $$\Theta(n)$$, since we're searching through a linked list. But this is *exceedingly rare* with a correct *m* and *n* (we cannot avoid collisions without having $$m \gg n^2$$).
+The worst case is that all *n* elements are hashed to the same slot, in which case search takes $\Theta(n)$, since we're searching through a linked list. But this is *exceedingly rare* with a correct *m* and *n* (we cannot avoid collisions without having $m \gg n^2$).
 
-Let the following be a **theorem** for running time of search: a search takes expected time $$\Theta(1+\alpha)$$, where $$\alpha = \frac{n}{m}$$ is the expected length of the list.
+Let the following be a **theorem** for running time of search: a search takes expected time $\Theta(1+\alpha)$, where $\alpha = \frac{n}{m}$ is the expected length of the list.
 
 See the slides for extended proof!
 
 
-If we choose the size of our hash table to be proportional to the number of elements stored, we have $$m = \Theta(n)$$. Insertion, deletion are then in constant time.
+If we choose the size of our hash table to be proportional to the number of elements stored, we have $m = \Theta(n)$. Insertion, deletion are then in constant time.
 
 #### Examples of Hash Functions
-- **Division method**: $$h(k) = k \text{ mod } m$$, where *m* often selected to be a prime not too close to a power of 2
-- **Multiplicative method**: $$h(k) = \lfloor m\times\text{ fractional part of}(Ak)\rfloor$$. Knut suggests chosing $$A\approx \frac{\sqrt{5}-1}{2}$$.
+- **Division method**: $h(k) = k \text{ mod } m$, where *m* often selected to be a prime not too close to a power of 2
+- **Multiplicative method**: $h(k) = \lfloor m\times\text{ fractional part of}(Ak)\rfloor$. Knut suggests chosing $A\approx \frac{\sqrt{5}-1}{2}$.
 
 
 
@@ -2039,11 +2098,11 @@ def partition(A, p, r):
 
 See [this visualization](https://visualgo.net/sorting) for a better idea of how this operates.
 
-The running time is $$\Theta(n)$$ for an array of length *n*; it's proportional to the number of comparisons we use (the number of times that line 5 is run).
+The running time is $\Theta(n)$ for an array of length *n*; it's proportional to the number of comparisons we use (the number of times that line 5 is run).
 
 The loop invariant is:
-1. All entries in `A[p..i]` are $$\leq$$ pivot
-2. All entries in `A[i+1 .. j-1]` are $$>$$ pivot
+1. All entries in `A[p..i]` are $\leq$ pivot
+2. All entries in `A[i+1 .. j-1]` are $>$ pivot
 3. `A[r]` is the pivot
 
 The algorithm uses the above like so:
@@ -2056,26 +2115,32 @@ def quicksort(A, p, r):
         quicksort(A, q+1, r) # to the right
 {% endhighlight %}
 
-Quicksort runs in $$\mathcal{O}(n \log{n})$$ if the split is balanced (two equal halves), that is, if we've chosen a good pivot. In this case we have our favorite recurrence:
+Quicksort runs in $\mathcal{O}(n \log{n})$ if the split is balanced (two equal halves), that is, if we've chosen a good pivot. In this case we have our favorite recurrence:
 
-$$T(n) = 2T(n/2) + \Theta(n)$$
+$$
+T(n) = 2T(n/2) + \Theta(n)
+$$
 
-Which indeed is $$\mathcal{O}(n \log{n})$$.
+Which indeed is $\mathcal{O}(n \log{n})$.
 
-But what if we choose a bad pivot every time? We would just have elements to the left of the pivot, and it would run in $$\mathcal{O}(n^2)$$. But this is very unlikely.
+But what if we choose a bad pivot every time? We would just have elements to the left of the pivot, and it would run in $\mathcal{O}(n^2)$. But this is very unlikely.
 
 If we select the pivot at random, the algorithm will perform well on *any* input. Therefore, as a small modification to the partitioning algorithm, we should select a random number in the list instead of the last number.
 
-Total running time is proportional to $$\mathbb{E}[\text{# comparisons}]$$. We can calculate this by using a **random indicator variable**:
+Total running time is proportional to $\mathbb{E}[\text{# comparisons}]$. We can calculate this by using a **random indicator variable**:
 
-$$X_{ij} = \begin{cases}
+$$
+X_{ij} = \begin{cases}
 1 & \text{ if } i^\text{th}\text{ smallest number is compared with }j^\text{th}\text{ smallest number} \\
 0 & \text{ otherwise}
-\end{cases}$$
+\end{cases}
+$$
 
 **Note:** two numbers are only compared when one is the pivot; therefore, no nunmbers are compared to each other twice (we could also say that two numbers are compared at most once). The total number of comparisons formed by the algorithm is therefore:
 
-$$X = \sum_{i=1}^n {\sum_{j=i+1}^n {X_{ij}}} $$
+$$
+X = \sum_{i=1}^n {\sum_{j=i+1}^n {X_{ij}}}
+$$
 
 The expectancy is thus:
 
@@ -2090,36 +2155,31 @@ $$ \sum_{i=1}^n {\sum_{j=i+1}^n {\mathbb{E}\left[X_{ij}\right]}}
 =  \sum_{i=1}^n {\sum_{j=i+1}^n {Pr\left[z_i \text{ is compared to } z_j\right]}}
 $$
 
-- If a pivot $$x$$ such that $$z_i < x < z_j$$ is chosen then $$z_i$$ and $$z_j$$ will never be compared at any later time.
-- If either $$z_i$$ or $$z_j$$ is chosen before any other element of $$Z_ij$$ then it will compared to all other elements of $$Z_ij$$.
-- The probability that $$z_i$$ is compared to $$z_j$$ is the probability that either $$z_i$$ or $$z_j$$ is the element first chosen
-- There are $$j-i+1$$ elements and pivots chosen at random, independently. Thus the probability that any one of them is the first chosen one is $$1 / (j-i+1)$$
+- If a pivot $x$ such that $z_i < x < z_j$ is chosen then $z_i$ and $z_j$ will never be compared at any later time.
+- If either $z_i$ or $z_j$ is chosen before any other element of $Z_ij$ then it will compared to all other elements of $Z_ij$.
+- The probability that $z_i$ is compared to $z_j$ is the probability that either $z_i$ or $z_j$ is the element first chosen
+- There are $j-i+1$ elements and pivots chosen at random, independently. Thus the probability that any one of them is the first chosen one is $1 / (j-i+1)$
 
 Therefore: 
 
-$$Pr\left[z_i \text{ is compared to } z_j\right] = \frac{2}{j-i+1}$$
+$$
+Pr\left[z_i \text{ is compared to } z_j\right] = \frac{2}{j-i+1}
+$$
 
 To wrap it up:
 
 $$
-\sum_{i=1}^n {\sum_{j=i+1}^n {Pr\left[z_i \text{ is compared to } z_j\right]}}
+\begin{align}
+& \sum_{i=1}^n {\sum_{j=i+1}^n {Pr\left[z_i \text{ is compared to } z_j\right]}} \\
+& = \sum_{i=1}^n {\sum_{j=i+1}^n {\frac{2}{j-i+1}}}
+  = \sum_{i=1}^{n-1} {\sum_{k=1}^{n-i} {\frac{2}{k+1}}} \\
+& < \sum_{i=1}^{n-1} {\sum_{k=1}^{n} {\frac{2}{k}}} 
+  = \sum_{i=1}^{n-1} {\mathcal{O}(\log{n})} \\
+& = \mathcal{O}(n\log{n}) \\
+\end{align}
 $$
 
-$$
-= \sum_{i=1}^n {\sum_{j=i+1}^n {\frac{2}{j-i+1}}}
-$$
-
-$$
-= \sum_{i=1}^{n-1} {\sum_{k=1}^{n-i} {\frac{2}{k+1}}}
-$$
-
-$$
-< \sum_{i=1}^{n-1} {\sum_{k=1}^{n} {\frac{2}{k}}}
-= \sum_{i=1}^{n-1} {\mathcal{O}(\log{n})}
-= \mathcal{O}(n\log{n})
-$$
-
-Quicksort is $$\mathcal{O}(n\log{n})$$.
+Quicksort is $\mathcal{O}(n\log{n})$.
 
 ### Why always n log n?
 Let's look at all the sorting algorithms we've looked at or just mentioned during the course:
@@ -2131,18 +2191,18 @@ Let's look at all the sorting algorithms we've looked at or just mentioned durin
 - Insertion sort
 
 
-All algorithms we have seen so far have a running time based on the number of *comparisons* ($$a \leq b$$). Let's try to analyze the number of comparisons to give an absolute lower bound on sorting algorithms; we'll find out that it is impossible to do better than $$\mathcal{O}(n\log{n})$$.
+All algorithms we have seen so far have a running time based on the number of *comparisons* ($a \leq b$). Let's try to analyze the number of comparisons to give an absolute lower bound on sorting algorithms; we'll find out that it is impossible to do better than $\mathcal{O}(n\log{n})$.
 
-We need $$\Omega(n)$$ to even examine the inputs. If we look at the comparisons we need no make, we can represent them as a decision tree:
+We need $\Omega(n)$ to even examine the inputs. If we look at the comparisons we need no make, we can represent them as a decision tree:
 
 ![Decision tree of the list (1, 2, 3)](/images/algorithms/decision-tree.png)
 
-There are $$n!$$ leaves in the decision tree (this is the number of output permutations), and its height is $$\Omega(\log{n!})=\Omega(n\log{n})$$. Therefore, if we have an algorithm that takes all its information from comparisons (*comparison sorting*) gives us a decision tree, and **cannot run in better time than** $$\mathcal{O}(n\log{n})$$. In that sense, merge-sort, heapsort and quicksort are optimal.
+There are $n!$ leaves in the decision tree (this is the number of output permutations), and its height is $\Omega(\log{n!})=\Omega(n\log{n})$. Therefore, if we have an algorithm that takes all its information from comparisons (*comparison sorting*) gives us a decision tree, and **cannot run in better time than** $\mathcal{O}(n\log{n})$. In that sense, merge-sort, heapsort and quicksort are optimal.
 
 ### Linear time sorting
 Also known as *non-comparison sort*.
 
-- **Input**: `A[1..n]`, where $$A[j] \in \{ 0, 1, \dots, k \}$$ for $$j = 1, 2, \dots, n$$. Array `A` and values `n` and `k` are given as parameters
+- **Input**: `A[1..n]`, where $A[j] \in \{ 0, 1, \dots, k \}$ for $j = 1, 2, \dots, n$. Array `A` and values `n` and `k` are given as parameters
 - **Output**: `B[1..n]` sorted
 
 {% highlight python linenos %}
@@ -2159,7 +2219,7 @@ def counting_sort(A, B, n, k):
         C[A[j]] = C[A[j]] - 1 # decrement number of el <= j
 {% endhighlight %}
 
-The for-loops run in $$\Theta(k), \Theta(n), \Theta(k), \Theta(n)$$ respectively, so runtime is $$\Theta(n+k)$$.
+The for-loops run in $\Theta(k), \Theta(n), \Theta(k), \Theta(n)$ respectively, so runtime is $\Theta(n+k)$.
 
 
 ![GIF of non-comparison sort in action](/images/algorithms/counting-sort.gif)
@@ -2175,19 +2235,20 @@ How big a *k* is practical?
 ## Review of the course
 
 ### Growth of functions
-1. The logs: $$\log{N}, \log^2{N}, \dots$$
-2. The polynomials: $$\sqrt{N}, 20N, N^2, \dots$$
-3. The exponentials: $$\sqrt{4^N}=2^N, 3^N, ...$$
+1. The logs: $\log{N}, \log^2{N}, \dots$
+2. The polynomials: $\sqrt{N}, 20N, N^2, \dots$
+3. The exponentials: $\sqrt{4^N}=2^N, 3^N, ...$
 
 ### Sorting
-- **Insertion sort**: Put the numers in their correct order one at a time. $$\Theta(n^2)$$, worst case occurs when the input is in reverse sorted order
+- **Insertion sort**: Put the numers in their correct order one at a time. $\Theta(n^2)$, worst case occurs when the input is in reverse sorted order
 - **Merge sort**: A divide and conquer algorithm. The merge works by having two stacks of cards, adding a sentinel at the bottom, and then repeatedly  just taking the smallest of the two.
-    + *Time to divide*: $$\Theta(1)$$
-    + *Time to combine* $$\Theta(n), \text{ where } n=r-p$$
-    + *Number of subproblems and their size*: 2 subproblems of size $$n/2$$.
+    + *Time to divide*: $\Theta(1)$
+    + *Time to combine* $\Theta(n), \text{ where } n=r-p$
+    + *Number of subproblems and their size*: 2 subproblems of size $n/2$.
     + *Recurrence*:
 
-$$T(n) = \begin{cases}
+$$
+T(n) = \begin{cases}
 \Theta(1) & \text{if } n \leq 1 \\
 2T(n/2)+\Theta(n) & \text{otherwise} \\
 \end{cases}
