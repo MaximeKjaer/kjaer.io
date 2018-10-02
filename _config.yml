@@ -99,6 +99,8 @@ exclude:
   - node_modules
   - package.json
   - package-lock.json
+  - .sass-cache
+  - .git
   - README.md
   - serve.bat
   - vendor
