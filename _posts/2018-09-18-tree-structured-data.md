@@ -63,7 +63,7 @@ return /RAS/Members/Member[Topics/TopicRef/text() = $FRTopics]/Email
 
 There are a few basic functions: `last()`, `position()`, `count(node-set)`, `concat(string, string, ...string`), `contains(str1, str2)`, etc. These can be used within a qualifier.
 
-XPath also supports abbreviated syntax. For instance, `child::` is the default axis and can be omitted, `@` is a shorthand for `attribute::`, `[4]` is a shorthand for `[position()=4]`.
+XPath also supports abbreviated syntax. For instance, `child::` is the default axis and can be omitted, `@` is a shorthand for `attribute::`, `[4]` is a shorthand for `[position()=4]` (note that positions start at 1).
 
 XPath is used in XSLT, XQuery, XPointer, XLink, XML Schema, XForms, ...
 
@@ -82,7 +82,6 @@ There are three classes of languages that constraint XML content:
 - Constraints expressed by **a description** of each element, and potentially related attributes (DTD, XML Schema)
 - Constraints expressed by **patterns** defining the admissible elements, attributes and text nodes using regexes (Relax NG)
 - Constraints expressed by **rules** (Schematron)
-
 
 ### DTD
 
@@ -297,6 +296,8 @@ Some other tags include:
 - `<attribute>` inside an `<element>` specifies the schema for attributes. By itself, it's considered required, but it can be wrapped in an `<optional>` too.
 - `<group>` allows to, as the name implies, logically group elements. This is especially useful inside `<choice>` elements, as in the example above.
 
+The Relax NG book has a more detailed overview of these in [Chapter 3.2](http://books.xmlschemata.org/relaxng/relax-CHP-3-SECT-2.html)
+
 Relax NG allows to reference externally defined datatypes, such as [those defined in XML Schema](https://www.w3.org/2001/XMLSchema-datatypes). To include such a reference, we can specify a `datatypeLibrary` attribute on the root `<grammar>` element:
 
 {% highlight xml linenos %}
@@ -317,6 +318,19 @@ If we need to express those, we can make use of Schematron.
 ### Schematron
 [Schematron](http://schematron.com) is an assertion language making use of XPath for node selection and for encoding predicates. It is often used *in conjunction* with Relax NG to express more complicated constraints, that aren't easily expressed (or can't be expressed at all) in Relax NG. The common pattern is to build the structure of the schema in Relax NG, and the business logic in Schematron.
 
+They can be combined in the same file by declaring different namespaces. For instance, the example below allows us to write a Relax NG schema as usual, and some Schematron rules rules under the `sch` namespace.
+
+{% highlight xml linenos %}
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+    xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
+    xmlns:sch="http://purl.oclc.org/dsdl/schematron"
+    datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+    
+    ...
+
+</grammar>
+{% endhighlight %}
 
 As we can see in the example below, a Schematron schema is built from a series of assertions:
 
