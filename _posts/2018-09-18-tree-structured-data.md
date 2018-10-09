@@ -370,7 +370,7 @@ The purpose of [XML Information Set](https://msdn.microsoft.com/en-us/library/aa
 
 It specifies a standardized, abstract model to represent the properties of XML trees. The goal is to provide a standardized viewpoint for the implementation and description of various XML technologies.
 
-It functions like an AST for XML documents. It's abstract in the sense that it abstract away from the concrete encoding of data, and just retains the meaning. For instance, it doesn't distinguish between the two forms of the empty element; the following pairs are considered equivalent.
+It functions like an AST for XML documents. It's abstract in the sense that it abstract away from the concrete encoding of data, and just retains the meaning. For instance, it doesn't distinguish between the two forms of the empty element; the following are considered equivalent (pairwise):
 
 {% highlight xml linenos %}
 <element></element>
@@ -385,4 +385,169 @@ The Information Set is described as a tree of information items, which are simpl
 As such, at the root we have a document information item, which, most importantly, contains a list of children, which is a list of information items, in document order. Information items for elements contain a local name, the name of the namespace, a list of attribute information items, which contain the key and value of the attribute, etc.
 
 
+## XSLT
+
+XSLT is part of a more general language, XSL. The hierarchy is as follows:
+
+- **XSL**: eXtensible Stylesheet Language
+    - **XSLT**: XSL Transformation
+    - **XLS-FO**: XSL Formatting Objects
+
+An XSLT Stylesheet allows us to transform XML input into other formats. An XSLT Processor takes an XML input, and an XSLT stylesheet and produces a result, either in XML, XHTML, LaTeX, ...
+
+XSLT is a **declarative** and **functional** language, which uses XML and XPath. It's a [W3C recommendation](https://www.w3.org/TR/xslt/all/), often used for generating HTML views of XML content.
+
+The XSLT Stylesheet consists of a set of templates. Each of them matches specific elements in the XML input, and participates to the generation of data in the resulting output.
+
+{% highlight xml linenos %}
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xd="http://oxygenxml.com/ns/doc/xsl" version="1.0">
+    <xsl:template match="a">...</xsl:template>
+    <xsl:template match="b">...</xsl:template>
+    <xsl:template match="c">...</xsl:template>
+    <xsl:template match="d">...</xsl:template>
+</xsl:stylesheet>
+{% endhighlight %}
+
+Let's take a look at an individual XSLT template:
+
+{% highlight xml linenos %}
+<xsl:template match="e">
+    result: <xsl:apply-templates/>
+</xsl:template>
+{% endhighlight %}
+
+- `e` is an XPath expression that selects the nodes the XSLT processor will apply the template to
+- `result` specifies the content to be produces in the output for each node selected by `e`
+- `xsl:apply-templates` indicates that templates are to be applied on the selected nodes, in document order; to select nodes, it may have a `select` attribute, which is an XPath expression defaulting to `child::node()`.
+
+The XSLT execution is roughly as follows:
+
+{% highlight python linenos %}
+def process(node):
+    find most specific pattern
+    # instantiate template:
+    create result fragment
+    for (instruction selecting other nodes) in template:
+        for new_node in instruction:
+            process(new_node)
+
+process(xml.root)
+{% endhighlight %}  
+
+Recursion stops when no more source nodes are selected.
+
+### Default templates
+XSLT Stylesheets contain **default templates**:
+
+{% highlight xml linenos %}
+<xsl:template match="/ | *">
+    <xsl:apply-templates/>
+</xsl:template>
+{% endhighlight %}
+
+This recursively drives the matching process, starting from the root node. If templates are associated to the root node, then this default template is overridden; if the overridden version doesn't contain any `<xml: >` elements, then the matching process is stopped.
+
+Another default template is:
+
+{% highlight xml linenos %}
+<xsl:template match="text()|@*">
+    <xsl:value-of select="self::node()"/>
+</xsl:template>
+{% endhighlight %}
+
+This copies text and attribute nodes in the output.
+
+A third default is: 
+
+{% highlight xml linenos %}
+<xsl:template match="processing-instruction()|comment()"/>
+{% endhighlight %}
+
+This is a template that specifically matches processing instructions and comments; it is empty, so it does not generate anything for them. 
+
+### Example
+To get an idea of what XSLT could do, let's consider the following example of XML data representing a catalog of books and CDs:
+
+{% highlight xml linenos %}
+<Catalog>
+    <!-- Book Sample -->
+    <Product>
+        <ProductNo>bk-005</ProductNo>
+        <Book Language="FR">
+            <Price>
+                <Value>19</Value>
+                <Currency>EUR</Currency>
+            </Price>
+            <Title>Profecie</Title>
+            <Authors>
+                <Author>
+                    <FirstName>Jonathan</FirstName>
+                    <LastName>Zimmermann</LastName>
+                </Author>
+            </Authors>
+            <Year>2015</Year>
+            <Cover>profecie</Cover>
+        </Book>
+    </Product>
+
+    <!-- CD sample -->
+    <Product>
+        <ProductNo>cd-003</ProductNo>
+        <CD>
+            <Price>
+                <Value>18.90</Value>
+                <Currency>EUR</Currency>
+            </Price>
+            <Title>Witloof Bay</Title>
+            <Interpret>Witloof Bay</Interpret>
+            <Year>2010</Year>
+            <Sleeve>witloof</Sleeve>
+            <Opinion>
+                <Parag>Original ce groupe belge.</Parag>
+                <Parag>Une véritable prouesse technique.</Parag>
+            </Opinion>
+        </CD>
+    </Product>
+</Catalog>
+{% endhighlight %}
+
+For our example of books and CDs, we can create the following template:
+
+{% highlight xml linenos %}
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+xmlns:xs="http://www.w3.org/2001/XMLSchema"
+exclude-result-prefixes="xs"
+version="2.0">
+    <xsl:output method="html"/>
+
+    <xsl:template match="/">
+        <html>
+        <head>...</head>
+        <body>
+            <h2>Welcome to our catalog</h2>
+            <h3>Books</h3>
+            <ul>
+                <xsl:apply-templates select="Catalog/Product/Book/Title">
+                    <xsl:sort select="."/>
+                </xsl:apply-templates>
+        </ul>
+        </body>
+        </html>
+    </xsl:template>
+
+        <xsl:template match="Title">
+        <li>
+            <xsl:value-of select="."/>
+        </li>
+    </xsl:template>
+</xsl:stylesheet>
+{% endhighlight %}
+
+In the above, the `xsl:sort` element has the following possible attributes:
+
+- `select`: here, the attribute is `.`, which refers to the title in this context
+- `data-type`: gives the kind of order (e.g. text or number)
+- `order`: `ascending` or `descending`
 
