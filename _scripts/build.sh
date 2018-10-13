@@ -47,5 +47,5 @@ deleted_gz=$(sed -e 's/ \|$/.gz /g' <<< $deleted) # deleted1.html.gz deleted2.ht
 git rm --ignore-unmatch $deleted $deleted_gz
 
 echo "Compressing the following assets using Zopfli: $modzopfli"
-../zopfli/zopfli --i250 $modzopfli
+../zopfli/zopfli --i100 $modzopfli
 cd ..
