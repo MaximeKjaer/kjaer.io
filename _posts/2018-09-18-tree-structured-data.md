@@ -2,8 +2,10 @@
 title: CS-525 Foundations and tools for tree-structured data
 description: "My notes from the CS-525 course given at EPFL, in the 2018 autumn semester (MA1)"
 edited: true
-unlisted: true
+note: true
 ---
+
+⚠ *Work in progress*
 
 ## XPath
 XPath is the W3C standard language for traversal and navigation in XML trees.

@@ -87,6 +87,7 @@ defaults:
       comments: true
       unlisted: false
       edited: false
+      note: false
 
 # Exclude these files from your production _site
 exclude:

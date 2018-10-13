@@ -2,7 +2,7 @@
 title: CS-451 Distributed Algorithms
 description: "My notes from the CS-451 Distributed Algorithms course given at EPFL, in the 2018 autumn semester (MA1)"
 edited: true
-unlisted: true
+note: true
 ---
 
 * TOC

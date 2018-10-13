@@ -3,7 +3,7 @@ layout: default
 ---
 
 {% for post in site.posts %}
-    {% unless post.unlisted %}
+    {% unless post.unlisted or post.note %}
        <article class="post">
            <header>
                 <a href="{{ post.url }}">
