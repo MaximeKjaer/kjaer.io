@@ -10,6 +10,8 @@ note: true
 
 ⚠ *Work in progress*
 
+<!-- More -->
+
 ## Introduction
 - [Website](http://dcl.epfl.ch/site/education/da)
 - Course follows the book *Introduction to Reliable (and Secure) Distributed Programming*

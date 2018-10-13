@@ -5,7 +5,12 @@ edited: true
 note: true
 ---
 
+* TOC
+{:toc}
+
 ⚠ *Work in progress*
+
+<!-- More --> 
 
 ## XPath
 XPath is the W3C standard language for traversal and navigation in XML trees.

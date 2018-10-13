@@ -10,6 +10,8 @@ note: true
 * TOC
 {:toc}
 
+<!-- More --> 
+
 ## Links and books
 - [Course homepage](http://theory.epfl.ch/courses/algorithms/)
 - Introduction to Algorithms, Third edition (2009), T. Cormen, C. Lerserson, R. Rivest, C. Stein (*book on which the course is based*)
