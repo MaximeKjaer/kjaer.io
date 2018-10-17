@@ -394,6 +394,7 @@ As such, at the root we have a document information item, which, most importantl
 
 ## XSLT
 
+### Motivation
 XSLT is part of a more general language, XSL. The hierarchy is as follows:
 
 - **XSL**: eXtensible Stylesheet Language
@@ -557,4 +558,163 @@ In the above, the `xsl:sort` element has the following possible attributes:
 - `select`: here, the attribute is `.`, which refers to the title in this context
 - `data-type`: gives the kind of order (e.g. text or number)
 - `order`: `ascending` or `descending`
+
+## XQuery
+XQuery is a **strongly typed** and **functional** language that offers features to operate on XML input for searching, selecting, filtering, transforming, restructuring information, etc. It is an SQL-like language for XML. It wasn't defined with the same goals as XSLT, but has some overlap that we'll discuss later.
+
+It does not use the XML syntax. Instead, it offers a general purpose (Turing-complete) language that can be used for developing XML based applications.
+
+XQuery is a [W3C Recommendation](https://www.w3.org/TR/xquery/all/), and is therefore closely linked to [XML Schema](#xml-schema), as it uses the XML Schema type system. Note that there is for no support for XQuery with Relax NG or other non-W3C schema languages. A nice book on XQuery is [available at O'Reily](http://shop.oreilly.com/product/0636920035589.do).
+
+### Syntax
+A query is made up of three parts:
+
+{% highlight xquery linenos %}
+(: Comments are written in these smiley-like delimiters :)
+
+(: 1. Optional version declaration :)
+xquery version "3.0"; 
+
+(: 2. Optional query prolog :)
+(: This contains declarations such as namespaces, variables, etc. :)
+declare namespace html = "http://www.w3.org/1999/xhtml"; 
+
+(: 3. Query body :)
+substring("Welcome to the world of XML", 1, 7)
+{% endhighlight %}
+
+A query takes some kind of XML content: an XML file, an XML fragment retrieved online, a native XML database, etc. The output is a sequence of values, which are often XML elements (this is important: not a document, but elements). But it could also be an XML Schema type, such as a string, a list of integers, etc.
+
+The output can be serialized to a document, or just kept in-memory in the application for further processing.
+
+Queries are evaluated by an XQuery processor, which works in two phases. First, the analysis phase may raise errors (that do not depend on the input, only on the query). Then, there is an evaluation phase, which may raise dynamic errors (e.g. missing input).
+
+A query consists of one or more comma-separated **XQuery expressions**, which are composed of the following:
+
+- Primary expressions (literals, variables, function calls, etc)
+- Arithmetic expressions
+- Logical expressions
+- XPath (with `collection` and `doc` functions used to access resources)
+- XML constructors
+- Sequence constructors
+- [FLWOR statements](https://en.wikipedia.org/wiki/FLWOR) (pronounced "flower": for, let, where, order by, return). 
+- Conditional expressions
+- Quantified expressions
+
+### Creating XML content
+To build XML content, we can embed "escaped" XQuery code using curly brackets, within our template file, as follows:
+
+{% highlight xml linenos %}
+<report year="2018">
+    The value is {round (3.14)}
+</report>
+{% endhighlight %}
+
+### Sequences
+A sequence is an ordered collection of items, which may be of any type (atomic value, node, etc). Duplicates are allowed. A sequence can contain zero (empty), one (singleton) or many items. Sequences are comma-separated. We can add parentheses for clarity, but not for nesting; a sequence is always flat (even if we nest parentheses):
+
+{% highlight xquery linenos %}
+1, 2, <example/>
+(1, 2, <example/>)
+{% endhighlight %}
+
+### FLWOR
+A FLWOR expression is constructed as follows:
+
+{% highlight antlr linenos %}
+flwor ::=  ((for | let) expr)+ (where expr)? (order by expr)? return expr
+{% endhighlight %}
+
+For instance:
+
+{% highlight xquery linenos %}
+for $book in /Catalog/Product/Book
+where $book/@Language = "EN"
+return $book/Title
+
+(: equivalently written as :)
+
+for $book in /Catalog/Product/Book[@Language = "EN"]
+return $book/Title
+{% endhighlight %}
+
+This returns the book titles in the document:
+
+{% highlight xml linenos %}
+<Title>XSLT</Title>
+<Title>Electronic Publishing</Title>
+<Title>Making Sense of NoSQL</Title>
+{% endhighlight %}
+
+As we can see above, there is some overlap between XQuery and XPath; the `where` condition can also be written as an XPath selection condition. Which to use is a question of style; there is no difference in performance.
+
+The `order by` and `where` keywords work just like in SQL, so I won't go into details here.
+
+### Conditional expressions
+Like in any templating language, we can create conditional statements. It is mandatory to specify an `else` to every `if`, but if we do not want to return anything, we can return the empty sequence `()`.
+
+The condition of an `if` must be a boolean or a sequence. Empty sequences are falsey, and sequences of one or more elements are truthy.
+
+{% highlight xquery linenos %}
+for $book in /catalog/product/book
+order by $book/title
+return
+    <title>
+        {$book/title/text()}
+        {if ($book/@Language = 'EN') then '[English]' else ()}
+    </title>
+{% endhighlight %}
+
+This returns:
+
+{% highlight xml linenos %}
+<title>Electronic Publishing [English]</title>
+<title>Making Sense of NoSQL [English]</title>
+<title>Profecie</title>
+<title>XML - le langage et ses applications</title>
+<title>XSLT [English]</title>
+{% endhighlight %}
+
+### Quantified expressions
+A quantified expression allows us to express universal or existential quantifiers using `some` and `every`. The predicate is given with the keyword `satisfies`, as below:
+
+{% highlight xquery linenos %}
+some $dept in doc("catalog.xml")//product/@dept
+satisfies ($dept = "ACC")
+{% endhighlight %}
+
+### Updating XML Content
+Unlike SQL, standard XQuery only offers ways of querying data, and not of inserting, deleting or updating data. That's why the W3C developed an extension to XQuery called the [XQuery Update Facility](https://www.w3.org/TR/xquery-update-10/).
+
+Like SQL, the implementation of this Update Facility is often tied to specific database systems. In this course, we will use the [eXist-db](http://exist-db.org/exist/apps/homepage/index.html) variant. Updates are executed by specifying the `update` keyword in the `return` clause.
+
+{% highlight xquery linenos %}
+let $catalog := doc('db/catalog.xml')
+
+return update insert
+    <product>...</product>
+into $catalog
+{% endhighlight %}
+
+The keyword `into` places content after the last child of the element. We can also use `following`, placing it as the next sibling, or `preceding` to place it as the previous sibling.
+
+Instead of `update insert`, we can also do an `update delete`, or a `update replace XPATH with ELEMENT`.
+
+Updates can be chained as a sequence: 
+
+{% highlight xquery linenos %}
+let $cd := doc('db/catalog.xml')/Product[ProductNo = $no]/CD
+return
+(
+    update replace $cd/Price/Value with <value>18</value>,
+    update replace $cd/Year with <year>2010</year>
+)
+{% endhighlight %}
+
+### Advanced features
+As we mentionned earlier, XQuery is Turing complete. You can define your own functions, which may be grouped into modules, and may be higher-order functions.
+
+Schema awareness is an optional feature; if it is supported, the `validate` expression may be used, which is useful for optimization and error checking. However, as we mentioned earlier, there is only support for W3C standardized schemas, not Relax NG.
+
+While XQuery is mainly associated with XML, it is possible in newer versions to deal with text documents (like CSV, name/value config files, etc. since 3.0) and even JSON (since 3.1).
 
