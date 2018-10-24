@@ -683,6 +683,42 @@ some $dept in doc("catalog.xml")//product/@dept
 satisfies ($dept = "ACC")
 {% endhighlight %}
 
+### Functions
+User defined functions can be declared as follows:
+
+{% highlight xquery linenos %}
+declare function local:discountPrice(
+    $price as xs:decimal?,
+    $discount as xs:decimal?,
+    $maxDiscountPct as xs:integer?) as xs:decimal? 
+{
+    let $maxDiscount := ($price * $maxDiscountPct) div 100
+    let $actualDiscount := min(($maxDiscount, $discount))
+    return ($price - $actualDiscount)
+};
+{% endhighlight %}
+
+The types are sequence types, with both the number and types of items. For instance, `xs:string?` means a sequence of zero or one string. The return type is optional, but is strongly encouraged for readability, error checking and optimization.
+
+Functions can be overloaded with a different number of parameters.
+
+The body is enclosed in curly braces. It does not have to contain a `return` clause, it just needs to be an XQuery expression.
+
+### Modules
+Functions can be grouped into modules, which declare the target namespace and bind it to a prefix (here, the `strings` prefix):
+
+{% highlight xquery linenos %}
+module namespace strings = "https://example.com/strings"
+{% endhighlight %}
+
+Anything declared under that prefix can be accessed from the outside, when importing the module.
+
+Modules can be imported at a location using the `at` clause:
+
+{% highlight xquery linenos %}
+import module namespace search = "https://example.com/search" at "search.xqm"
+{% endhighlight %}
+
 ### Updating XML Content
 Unlike SQL, standard XQuery only offers ways of querying data, and not of inserting, deleting or updating data. That's why the W3C developed an extension to XQuery called the [XQuery Update Facility](https://www.w3.org/TR/xquery-update-10/).
 
@@ -718,3 +754,29 @@ Schema awareness is an optional feature; if it is supported, the `validate` expr
 
 While XQuery is mainly associated with XML, it is possible in newer versions to deal with text documents (like CSV, name/value config files, etc. since 3.0) and even JSON (since 3.1).
 
+### Coding guidelines
+MarkLogic has some [XQuery coding guidelines](https://developer.marklogic.com/blog/xquery-coding-guidelines) that are good to follow.
+
+For robustness, it is important to handle missing values (empty sequences) and data variations.
+
+## XML Based Webapps
+We've now learned to model (with schemas), transform (with XSLT), and query and process (with XQuery). How can we develop an XML based webapp combining these?
+
+We will take a look at the [Oppidum framework](https://github.com/ssire/oppidum), which targets the development of XML-REST-XQuery (XRX) applications, using the eXist-db XML database.
+
+### XML Databases
+An XML database looks quite a lot like a normal database; for instance, it uses a traditional, B-tree based indexing system, has a querying language, etc. The main difference is simply that data is XML instead of a table, and that we use XQuery instead of SQL.
+
+### REST
+REST stands for REpresentational State Transfer. It's an architectural style created by Roy Fieding in [his PhD thesis](https://www.ics.uci.edu/~fielding/
+
+In REST, we have resources, located by a URL on Web-based REST, that may be processed by a client. A collection is simply a set of resources. Interaction with a REST API happens with classical CRUD (Create, Read, Update, Delete) on URLs, which in HTTP are the `POST`, `GET`, `PUT` and `DELETE` requests.
+
+### Oppidum
+[Oppidum](https://github.com/ssire/oppidum) is an open source framework to build XML Web-based applications with an MVC approach. The [documentation](https://ssire.github.io/oppidum/docs/fr/guide.html) is only in French, but the core idea is as follows: HTTP requests are handed to Oppidum by eXist. The application logic is then detailed in a pipeline consisting of:
+
+- **Model**: XQuery script (`*.xql`) returning relevant XML content
+- **View**: XSLT transformation (`*.xsl`)
+- **Epilogue**: XQuery script (`epilogue.xql`) for templating common content in HTML pages; this works using tags with the `site` namespace
+
+To specify the REST architecture, Oppidum has a DSL that allows us to define the set of resources and actions, determine the URLs and associated HTTP verbs (`GET`, `POST`, etc) recognized by the application, and so on:
