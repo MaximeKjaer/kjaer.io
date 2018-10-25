@@ -1,0 +1,56 @@
+==================================================================
+https://keybase.io/mkjaer
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of https://kjaer.io
+  * I am mkjaer (https://keybase.io/mkjaer) on keybase.
+  * I have a public key ASCK7HbFowd9bcYCrN897ZwWDOPVJTYvNsgTMDrn5sWT9Qo
+
+To do so, I am signing this object:
+
+{
+  "body": {
+    "key": {
+      "eldest_kid": "0120604b6c279d63bec6f6dc50552cde37c2c68723c3878f9bd76d77e759286bd5110a",
+      "host": "keybase.io",
+      "kid": "01208aec76c5a3077d6dc602acdf3ded9c160ce3d525362f36c813303ae7e6c593f50a",
+      "uid": "6f7d571cffb323869fb71f0b5942c419",
+      "username": "mkjaer"
+    },
+    "merkle_root": {
+      "ctime": 1540464136,
+      "hash": "9d9bdb431d44f32d960a169f17b80e0788bec612dd726e8be652e84832c21683a7eddad18ae96aae040d8293a27dee4faee9c72a3263564ac763695a4574cab9",
+      "hash_meta": "a4b356027ff339f59593fccaea9b66192f65dc649ecfb3d7284ceda2c5aad10a",
+      "seqno": 3848309
+    },
+    "service": {
+      "entropy": "uhlmyO9FuGbjgIYzt6m0gks0",
+      "hostname": "kjaer.io",
+      "protocol": "https:"
+    },
+    "type": "web_service_binding",
+    "version": 2
+  },
+  "client": {
+    "name": "keybase.io go client",
+    "version": "2.8.0"
+  },
+  "ctime": 1540464156,
+  "expire_in": 504576000,
+  "prev": "05164f58885c6742ec0f23a3aa70d207f5b36ebbb61c2aa97b69dedac8473ea3",
+  "seqno": 12,
+  "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEgiux2xaMHfW3GAqzfPe2cFgzj1SU2LzbIEzA65+bFk/UKp3BheWxvYWTESpcCDMQgBRZPWIhcZ0LsDyOjqnDSB/Wzbru2HCqpe2ne2shHPqPEIB1GAFzV9ezM08Xc36xlLbQuWWUDXLm8JqmO6ORiqlGiAgHCo3NpZ8RAiAbpv3ih6TMDbI7cnO92MVq6ox4XitoOuJxkNY8boyihTaNxp1ASuZFAlO3jYLxSRXDrJrzhAQogLq//SrCwAahzaWdfdHlwZSCkaGFzaIKkdHlwZQildmFsdWXEIB05T9zymtSQtlERdP1JtEmnYlJQXI8iZPNXQDvALdnho3RhZ80CAqd2ZXJzaW9uAQ==
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/mkjaer
+
+==================================================================
