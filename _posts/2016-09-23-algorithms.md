@@ -1412,7 +1412,7 @@ Below is a depiction of all SCCs on a graph:
 If two SCCs overlap, then they are actually one SCC (and the two parts weren't really SCCs because they weren't maximal). Therefore, there cannot be overlap between SCCs.
 
 #### Lemma
-$G^{SCC}$ is a [directed acyclic graph](lemma-when-is-a-directed-graph-acyclic).
+$G^{SCC}$ is a [directed acyclic graph](#lemma-when-is-a-directed-graph-acyclic).
 
 ![G^SCC is the graph comprised of the SCCs and the links between them](/images/algorithms/gscc.png)
 
@@ -1759,7 +1759,7 @@ Start from an empty forest *T* and greedily maintain forest *T* which will becom
 #### Implementation
 In each iteration, we need to check whether the cheapest edge creates a cycle.
 
-This is the same thing as checking whether its endpoints belong to the same component. Therefore, we can use a [disjoint sets](http://localhost:4000/algorithms/#data-structures-for-disjoint-sets) (union-find) data structure.
+This is the same thing as checking whether its endpoints belong to the same component. Therefore, we can use a [disjoint sets](#data-structures-for-disjoint-sets) (union-find) data structure.
 
 {% highlight python linenos %}
 def kruskal(G, w):

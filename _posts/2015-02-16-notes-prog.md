@@ -275,7 +275,7 @@ En plus de cela (par convention):
 - Appeler la classe bâtisseur `Builder`
 - L'imbriquer statiquement dans la classe dont elle bâtit les instances
 - Nommer sa classe de construction `build`
-- Retourner `this` pour les méthodes de modification (voir [appels chaînés](#appels-chans))
+- Retourner `this` pour les méthodes de modification (voir [appels chaînés](#appels-chaînés))
 
 # Classes imbriquées statiques
 On met les builders dans les classes qu'elles instantient (parce qu'un builder n'a pas de raison d'être sans).
