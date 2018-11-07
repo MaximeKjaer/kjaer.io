@@ -5,6 +5,15 @@
 My personal blog. Built with Jekyll.
 
 [![Screenshot of my website](https://i.imgur.com/QVTzndb.jpg "Screenshot of my website")](https://i.imgur.com/QVTzndb.jpg)
+y
+## Installation
+
+The site builds with Jekyll, but also has a few NPM dependencies. To install all dependencies, you'll need Node and npm, as well as Ruby and bundler. You can then run:
+
+```
+bundle install
+npm install
+```
 
 ## Writing a post
 See the [Jekyll Documentation](https://jekyllrb.com/docs/posts/) for how to create a Jekyll post.
