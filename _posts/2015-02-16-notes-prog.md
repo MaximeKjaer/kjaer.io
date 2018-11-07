@@ -431,7 +431,7 @@ Une collection est un objet contenant d'autres objets. Nous étudierons ici:
 ## Collections dans l'API Java
 L'API Java fournit un certain nombre de collections (*Java Collections Framework (JCF)*). Son contenu est dans `java.util`.
 
-![](http://i.imgur.com/eIezI6T.png)
+![Graphe d'héritanche des collections dans l'API Java](/images/notes-prog/heritance-collections.png)
 
 ## Règle des collections
 
@@ -473,7 +473,7 @@ de la collection donnée.
 
 ## Listes
 
-![](http://i.imgur.com/F3vSI6d.png)
+![Graphe d'héritance des listes dans l'API Java](/images/notes-prog/heritance-listes.png)
 
 Listes et tableaux sont très similaires, mais la principale différence est:
 
@@ -524,7 +524,7 @@ List<…> immutableList = Collections.unmodifiableList(new ArrayList<>(list));
 
 ## Piles, Deques & Queues
 
-![](http://i.imgur.com/6AA3QWk.png)
+![Différence entre pile, deque et queue](/images/notes-prog/piles-deques-queues.png)
 
 Voir [les slides](http://cs108.epfl.ch/archive/15/files/ppo15_03_listes.pdf) pour la liste des méthodes implémentées par l'interface `Queue`.
 
@@ -556,7 +556,7 @@ L'interface `Iterator` a 3 méthodes:
 # [Tables Associatives](http://cs108.epfl.ch/archive/15/files/ppo15_04_tables-associatives.pdf)
 Une collection qui associe des **valeurs** à des **clés**.
 
-![](http://i.imgur.com/rSNnOfi.png)
+![Graphe d'héritance des Maps dans l'API Java](/images/notes-prog/heritance-map.png)
 
 ## Règle des tables immuables
 
@@ -586,7 +586,7 @@ for (Map.Entry<String,String> e: s.entrySet())
 ## `HashMap`
 Une fonction de hachage prend une donnée et retourne un entier dans un intervalle borné (un hash value, ou *valeur de hachage*). On peut ensuite prendre cette valeur modulo `n`, et ensuite aller chercher dans la `hash mod n`<sup>ieme</sup> liste. C'est ce qui se fait de mieux en termes de tables associatives, et les `HashMap` sont par conséquent plus utilisées.
 
-![](http://i.imgur.com/QP4OHGp.png)
+![Fonctionnement d'une HashMap](/images/notes-prog/hashmap.png)
 
 - **Fonction de hachage**: O(1)
 - **Insertion**: O(1)
@@ -596,7 +596,7 @@ Une fonction de hachage prend une donnée et retourne un entier dans un interval
 ## `TreeMap`
 Elle est organisée comme ceci: 
 
-![](http://i.imgur.com/BJfPRIC.png)
+![Organisation d'une TreeMap](/images/notes-prog/treemap.png)
 
 Les éléments plus petits sont à gauche, plus grands à droite. La recherche est donc assez simple, puisqu'il s'agit d'une série de comparaisons.
 
