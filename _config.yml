@@ -91,6 +91,7 @@ defaults:
 
 # Exclude these files from your production _site
 exclude:
+  - Rakefile
   - Gemfile
   - Gemfile.lock
   - Gruntfile.js
