@@ -112,10 +112,17 @@
 		margin: auto;
 	}
 
+	.footnotes{
+		margin: 3em 0;	
+		&::before {
+			content: 'Footnotes';
+			font-weight: bold;
+		}
+	}
+
 	.article-links {
 		padding: 0;
 		list-style: none;
-
 		svg {
 			fill: $black;
 			margin-right: .25em;
