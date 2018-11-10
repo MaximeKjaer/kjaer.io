@@ -18,16 +18,18 @@ $background-image-2x: url('/images/white_wall_hash_@2X.png');
 $background-2x-size: 500px 500px;
 
 @mixin background { // A mixin that sets the background to what's been specified above.
-	@if $background-color {
-		background-color: $background-color;
-	}
-	@if $background-image {
-		background-image: $background-image;
-	}
-	@if $background-image-2x {
-		@include retina {
-			background-image: $background-image-2x;
-			background-size: $background-2x-size;
+	@media screen {
+		@if $background-color {
+			background-color: $background-color;
+		}
+		@if $background-image {
+			background-image: $background-image;
+		}
+		@if $background-image-2x {
+			@include retina {
+				background-image: $background-image-2x;
+				background-size: $background-2x-size;
+			}
 		}
 	}
 }

@@ -5,6 +5,10 @@
 //---------------------------
 
 footer {
+	@media print {
+		display: none;
+	}
+	
 	text-align: center;
 	
 	color: $dark-grey;

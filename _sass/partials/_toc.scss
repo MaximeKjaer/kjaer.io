@@ -11,6 +11,28 @@
 	display: inline-block;
 	background-color: lighten($light-grey, 10%);
 
+	page-break-after: always;
+	@media print {
+		background: none;
+
+		&::before {
+			content: "Table of Contents";
+			margin: 1em auto;
+			font-family: $title-font;
+			font-weight: $title-weight;
+			font-size: $x-large;
+		}
+		
+		a {
+			text-decoration: none;
+
+			&::after {
+				content: target-counter(attr(href, url), page);
+				float: right;
+			}
+		}
+	}
+
 	&, ul {
 		counter-reset: section;
 		list-style: none;

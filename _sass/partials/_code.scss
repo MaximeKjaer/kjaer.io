@@ -30,6 +30,8 @@ $code_default-color: #ccc;
 	
 	background-color: $white;
 	border: 1px solid $light-grey;
+
+	page-break-inside: avoid;
 	
 	pre {
 		margin: 0;

@@ -6,6 +6,10 @@
 //---------------------------
 
 .hero {
+	@media print {
+		display: none;
+	}
+	
 	position: relative;
 	
 	height: 560px;
@@ -21,7 +25,7 @@
 	text-align: center;
 	text-shadow: 0 0 5px rgba($black, 0.8);
 	color: $white;
-	
+
 	a {
 		color: $white;
 		text-decoration: none;

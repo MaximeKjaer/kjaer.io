@@ -1,0 +1,21 @@
+//---------------------------
+//
+// ## Footnotes
+//
+//---------------------------
+
+.footnotes {
+	margin: 3em 0;
+
+	&::before {
+		content: 'Footnotes';
+		font-weight: bold;
+	}
+}
+
+
+@media print {
+	.reversefootnote {
+		display: none;
+	}
+}

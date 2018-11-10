@@ -1,0 +1,12 @@
+//---------------------------
+//
+// ## Comments section
+// Using Disqus. These shouldn't be displayed in the print
+//
+//---------------------------
+
+@media print {
+	.comments {
+		display: none;
+	}
+}
