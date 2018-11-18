@@ -779,4 +779,201 @@ In REST, we have resources, located by a URL on Web-based REST, that may be proc
 - **View**: XSLT transformation (`*.xsl`)
 - **Epilogue**: XQuery script (`epilogue.xql`) for templating common content in HTML pages; this works using tags with the `site` namespace
 
-To specify the REST architecture, Oppidum has a DSL that allows us to define the set of resources and actions, determine the URLs and associated HTTP verbs (`GET`, `POST`, etc) recognized by the application, and so on:
+To specify the REST architecture, Oppidum has a DSL that allows us to define the set of resources and actions, determine the URLs and associated HTTP verbs (`GET`, `POST`, etc) recognized by the application, and so on.
+
+
+## Foundations of XML types
+We've seen seen XML tools for validation (DTD, XML Schema, Relax NG), navigation and extraction (XPath) and transformation (XQuery, XSLT).
+
+Some essential questions about these tools are:
+
+- **Expressive power**: can I express requirement X using XML type language Y?
+- **Operations over XML types**: can I check forward-compatibility when my XML file format evolves? Type inclusion?
+- **Static type-checking**: can we make my XML manipulating programs will never output an invalid document?
+
+To answer this, we must know more about XML types, and dive into the theoretical foundations of XML types.
+
+### Tree Grammars
+XML documents can be modelled by finite, ordered, labeled trees of unbounded depth and arity. To describe a tree, we use a tree language, which can be specified by a tree grammar:
+
+{% highlight antlr linenos %}
+Person = person[Name, Gender, Children?]
+Name = name[String]
+Gender = gender[Male | Female]
+Male = male[]
+Female = female[]
+Children = children[Person+]
+{% endhighlight %}
+
+By convention, capitalized variables are **type variables** (non-terminals), and non-capitalized are terminals.
+
+A tree grammar defines a set of legal trees. As any grammar, tree grammars are defined within an alphabet $\Sigma$, with a set of type variables $X := \left\\{X_1 ::= T_1, \dots, X_N ::= T_n\right\\}$. A tree grammar is defined by the pair $(E, X)$, where $E$ represents the starting type variable. Each $T_i$ is a tree type expression:
+
+{% highlight antlr linenos %}
+T ::=
+      l[T]     // l ∈ Σ with content model T
+    | ()       // empty sequence
+    | T1, T2   // concatenation
+    | T1 | T2  // choice
+    | X        // reference
+{% endhighlight %}
+
+The usual regex operators `?`, `+` and `*` are syntactic sugar.
+
+To ensure that our tree grammar remains regular, we must introduce a syntactic restriction: every recursive use of a type variable $X$ (unless it is within the content model) must be in the tail. For instance, the following grammars are not acceptable:
+
+$$
+\left\{ X = a, X, b \right\} \\
+\left\{ X = a, Y, b; \quad Y = X \right\} \\
+$$
+
+But the following are fine:
+
+$$
+\left\{ X = a, c[X], b \right\} \\
+\left\{ X = a, Y; \quad Y = b, X | \epsilon \right\} \\
+$$
+
+A small reminder on regular vs. context-free grammars: regular grammars are decidable (we can check for inclusion with a DFA), while context-free grammars are undecidable (we cannot check for inclusion in $a^n b^n$ with a DFA, for instance).
+
+Within the class of regular grammars, there are three subclasses of interest, in order of specificity (each of these is a subset of the classes above):
+
+1. Context-free
+2. Regular
+3. Single Type
+4. Local
+
+Each subclass is defined by additional restrictions compared to its parent. The more restrictions we add, the more expressive power we lose. It turns out that these classes correspond to different XML technologies:
+
+1. **Context-free**: ?
+2. **Regular**: Relax NG
+3. **Single Type**: XML Schema 
+4. **Local**: DTD
+
+#### DTD & Local tree grammars
+As we said previously, the expressive power of a grammar class is defined by which restriction have been imposed. In DTD, the restriction is that each element name is associated with a regex. This means that for each $a[T_1]$ and $a[T_1]$ occuring in $X$, the content models are identical: $T_1 = T_2$.
+
+In other words, in DTDs, the content of an XML tag cannot depend on the context of the tag. This removes some expressive power.
+
+To construct a DTD validator, we just use a word automaton associated with each terminal. This automaton is a DFA, as DTD requires regular expressions to be deterministic. That is, the matched regexp must be able to be determined without lookahead to the next symbol. `a(bc | bb)` is not deterministic, but `ab(c | b)` is.
+
+As a corollary, the union of two DTDs may not be a DTD. Indeed, the two DTDs could define different content models for the same terminal, which would be illegal. We say that the class is not closed composition (here, we showed that it isn't closed under union).
+
+#### XML Schema & Single-Type tree grammars
+In XML Schema, it is possible to have different content models for elements of the same name when they are in different contexts (unlike for DTD). But still, for each $a[T_1]$ and $a[T_2]$ occuring *under the same parent*, the content models must be identical ($T_1 = T_2$).
+
+Still, this bring us more expressive power, so we have $\mathcal{L}\_{\text{DTD}} \subset \mathcal{L}\_{\text{xmlschema}}$. This inclusion is strict, as we can construct grammars that are single-type (and not local) in XML Schema:
+
+{% highlight antlr linenos %}
+Dealer = dealer[Used, New]
+Used = used[UsedCar]
+New = new[NewCar]
+UsedCar = car[Model, Year] // here, car can have different content models
+NewCar  = car[Model]       // this is allowed as they have different parents
+...
+{% endhighlight %}
+
+But XML schemas also have weaknesses: we cannot encode more advanced restrictions in it. For instance, with our car dealership example, we cannot encode something like "at least one car has a discount", as it is not a *single-type*; we would require two different content models for a car within the same parent.
+
+Consequently, this class is still not closed under union.
+
+#### Relax NG & Regular tree grammars
+Relax NG does not have any of the previously discussed restrictions. The content model does not have to depend on the label of the parent; it can also depend on the ancestor's siblings, for instance. This allows us to have much more expressive power. Relax NG places itself in the class of regular tree grammars, and $\mathcal{L}\_{\text{xmlschema}} \subset \mathcal{L}\_{\text{r}}$.
+
+For instance, we can now encode what we couldn't with XML Schema:
+
+{% highlight antlr linenos %}
+Dealer = dealer[Used, New]
+Used = used[UsedCar]
+New = new[NewCar, DNewCar]
+UsedCar = car[Model, Year]
+NewCar  = car[Model]  // the same terminal used within 'new'
+DNewCar = car[Model, Discount] // but with different content models
+...
+{% endhighlight %}
+
+Regular tree grammars are more robust (closed under set operations like union and intersection), give us high expressive power, while still remaining simply defined and well-characterized (inclusion can still be verified in linear time by DFA).
+
+### Tree automata
+
+#### Definition
+A tree automaton (plural automata) is a state machine dealing with tree structure instead of strings (like a word automaton would). Introducing these will allow us to provide a general framework for XML type languages by giving us a tool with which we can reason about regular tree languages.
+
+A ranked tree can be thought of as the AST representation of a function call. For instance, `f(a, b)` can be represented as a tree with parent node `f` and two children `a` and `b` (in that order). We can also represent more complex trees with these notations (`f(g(a, b, c), h(i))` gives us the full structure of a tree, for instance).
+
+We define a ranked alphabet symbol as a formalization of a function call. It is a symbol $a$, associated with an integer representing the number of children, $\text{arity}(a)$. We write $a^{(k)}$ for the symbol $a$ with $\text{arity}(a) = k$. 
+
+This allows us to fix an arity to different tree symbols. Our alphabet could then be, for instance, $\left\\{ a^{(2)}, b^{(2)}, c^{(3)}, \sharp^{(0)} \right\\}$. In this alphabet, `#` would always be the leaves.
+
+A ranked tree automaton A consists of:
+
+- $F$, a finite ranked alphabet of symbols
+- $Q$, a finite set of states
+- $\Delta$, a finite set of transition rules
+- $Q_f \subseteq Q$, a finite set of final states
+
+In a word automaton, we write transitions as $\text{even} \overset{1}{\rightarrow} \text{odd}$. In a (bottom-up) tree automaton, the transitions are from the children's state to the parents' state. If a tree node has arity 2, a transition could be $(q_0, q_1) \overset{a}{\rightarrow} q_0$. If the arity is $k=0$, we write $\epsilon \overset{a^{(0)}}{\rightarrow} q$. 
+
+#### Example
+As an example, we can think of a tree of boolean expressions. Let's consider the following:
+
+$$
+((0 \land 1) \lor (1 \lor 0)) \land ((0 \lor 1) \land (1 \land 1))
+$$
+
+We can construct this as a binary tree by treating the logical operators as infix notation of a function call:
+
+$$
+\land(\lor(\land(0, 1), \lor(1, 0)), \land(\lor(0, 1), \land(1, 1)))
+$$
+
+In this case, our alphabet is $F = \left\\{\land, \lor, 0, 1\right\\}$. Our states are $Q = \left\\{ q_0, q_1\right\\}$ (either true or false). The accepting state is $Q_f = \left\\{ q_1 \right\\}$. Our transition rules are:
+
+$$
+\begin{align}
+\epsilon   \overset{0}{\rightarrow}     q_0 & \quad & \epsilon   \overset{1}{\rightarrow} q_0 \\
+(q_1, q_1) \overset{\land}{\rightarrow} q_1 & \quad & (q_1, q_1) \overset{\lor}{\rightarrow} q_1 \\
+(q_0, q_1) \overset{\land}{\rightarrow} q_0 & \quad & (q_0, q_1) \overset{\lor}{\rightarrow} q_1 \\
+(q_1, q_0) \overset{\land}{\rightarrow} q_0 & \quad & (q_1, q_0) \overset{\lor}{\rightarrow} q_1 \\
+(q_0, q_0) \overset{\land}{\rightarrow} q_0 & \quad & (q_0, q_0) \overset{\lor}{\rightarrow} q_0 \\
+\\
+\end{align}
+$$
+
+With these rules in place, we can evaluate binary expressions with a tree automaton.
+
+#### Properties
+The language of A is the set of trees accepted by A. For a tree automaton, the language is a **regular tree language**.
+
+A tree automaton is **deterministic** as long as there aren't too rules pointing us to different states:
+
+$$
+(q_1, \dots q_k) \overset{a^{(k)}}{\rightarrow} q, \quad
+(q_1, \dots q_k) \overset{a^{(k)}}{\rightarrow} q'
+\qquad q \ne q'
+$$
+
+With word automata, we know that we can build a DFA from any NFA. The same applies to tree automata: from a given non-deterministic (bottom-up) tree automaton, we can build a deterministic tree automaton.
+
+As a corollary, this tells us that non-deterministic tree automata do not give us more expressive power; deterministic and non-deterministic automata recognize the same languages. However, non-deterministic automata tend to allow us to represent languages more compactly (conversion can turn a non-deterministic tree automaton of size $N$ into a deterministic tree automaton of size $\mathcal{O}(2^N$), so we'll use those freely.
+
+### Validation
+
+#### Inclusion
+Given a tree automaton A and a tree t, how do we check $t\in\text{Language}(A)$?
+
+What we do is to just mechanically apply the transition rules. If the automaton is non-deterministic, we can keep track of the set of possible states, and see if the root of the tree contains a finishing state. 
+
+This mechanism of membership checking is linear in the size of the tree.
+
+#### Closure
+Tree automata are closed under set theoretic operations (we can just compute the union/intersection/product of the tuples defining the trees).
+
+
+#### Emptiness
+We can also do emptiness checking with tree automata (that is, checking if $\text{Language}(A) = \emptyset$). To do so, we compute the set of reachable states, and see if any of them are in $Q_f$. This process is linear in the size of the automaton.
+
+#### Type inclusion
+Given two automata $A_1$ and $A_2$, how can we check $\text{Language}(A_1) \subseteq \text{Language}(A_2)$? 
+
+Containment of a non-deterministic automata can be decided in exponential time. We do this by checking whether $\text{Language}(A_1 \cap \bar{A_2}) = \emptyset$. For this, we must make $A_2$ deterministic (which is an exponential process).
