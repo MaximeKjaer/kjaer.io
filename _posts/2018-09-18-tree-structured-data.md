@@ -977,3 +977,81 @@ We can also do emptiness checking with tree automata (that is, checking if $\tex
 Given two automata $A_1$ and $A_2$, how can we check $\text{Language}(A_1) \subseteq \text{Language}(A_2)$? 
 
 Containment of a non-deterministic automata can be decided in exponential time. We do this by checking whether $\text{Language}(A_1 \cap \bar{A_2}) = \emptyset$. For this, we must make $A_2$ deterministic (which is an exponential process).
+
+## Dealing with non-textual content
+So far, we've just been dealing with text. In the following, we'll see how we can deal with images, graphics, sound, video, animations, etc. For these types of data, semi-structured tree data is commonly used for its flexibility, while retaining rigorous structures and data typing. 
+
+For instance, there are many application-specific markup languages (MathML, CML for chemistry, GraphML, SVG tables, etc).
+
+### MathML
+MathML actually has two possible structures: a presentation structure, telling us how to display math, and a mathematical structure, telling us how to apply or compute the result of a mathematical expression. It's possible to go from mathematical to presentation structure, but not the other way (the other way is too ambiguous, it's not a bijection).
+
+### Tables
+This distinction between content and presentation also exists within tables. For instance, creating the presentation and layout of a calendar, or of a complex table, is quite difficult because of the discrepancy between the presentation and structural forms.
+
+The main issues with tables are:
+
+- How can we model it in such a way that variations in presentation only depends on values of the formatting attributes? 
+- How can we edit a table? (How do we modify the structure and update the backing content?)
+
+From a logical point of view, we can view a table as a d-dimensional space. A simple row-column table is 2D, but we can "add dimensions" by adding subdivision headers. Each cell in the table is described by a d-dimensional tuple of coordinates. How can we use a tree model to represent this? 
+
+We can use tree of height d, but more efficiently (or at least, flatly), we could encode each dimension as a direct child of the root, and link each data point to the relevant axes.
+
+This is what HTML 4 proposes:
+
+{% highlight html linenos %}
+<tr>
+    <th></th>
+    <th id="a2" axis="expenses">Meals</th>
+    <th id="a3" axis="expenses">Hotels</th>
+    <th id="a4" axis="expenses">Transport</th>
+    <td>subtotals</td>
+</tr>
+<tr>
+    <th id="a6" axis="location">San Jose</th>
+    <th></th>
+    <th></th>
+    <th></th>
+    <td></td>
+</tr>
+<tr>
+    <td id="a7" axis="date">25-Aug-97</td>
+    <td headers="a6 a7 a2">37.74</td>
+    <td headers="a6 a7 a3">112.00</td>
+    <td headers="a6 a7 a4">45.00</td>
+    <td></td>
+</tr>
+{% endhighlight %}
+
+## XML Processing
+When working with XML, there's no need to write a parser. General-purpose XML parsers are widely available (e.g. Apache Xerces). Incidentally, an XML parser can be validating or non-validating.
+
+XML parsers can communicate the XML tree structure to applications using it; there are two approaches for this:
+
+- DOM: the parser stores the XML input to a fixed data structure, and exposes an API
+- SAX: parser trigger events. The input isn't stored, the application must specify how to store and process events triggered by the parser.
+
+### DOM
+DOM (Document Object Model) is a W3C standard. An application generates DOM library calls to manipulate the parsed XML input. There are multiple DOM levels, that have been introduced successively to expand the capabilities of DOM.
+
+- DOM Level 1 provided basic API to access and manipulate tree structures (`getParentNode()`, `getFirstChild()`, `insertBefore()`, `replaceChild()`, ...)
+- DOM Level 2 introduces specialized interfaces dedicated to XM Land namespace-related methods, dynamic access and update of the content of style sheets, an event system, ...
+- DOM Level 3 introduces the ability to dynamically load the content of an XML document into a DOM document, serialize DOM into XML, dynamically update the content while ensureing validation, access the DOM using XPath, ...
+
+DOM allows us to abstract away from the syntactical details of the XML structure, and allows us to ensure well-formedness (no missing tags, non-matching tags, etc). Thanks to that, document manipulation is considerably simplified.
+
+However, the DOM approach is not without its flaws. The main disadvantage is that we must maintain a data structure representing the whole XML input, which can be problematic for big documents. To remedy this situation, we can preprocess to filter the document, reducing its overall size, but that only takes us so far. Alternatively, we can use a different approach for XML processing: SAX.
+
+### SAX
+SAX, the [Simple API for XML](http://www.saxproject.org/) is not a W3C standard; it's more of a de facto standard that started out as a Java-only API.
+
+It's very efficient, using only constant space, regardless of the XML input size. However, it means that we must also write more code. Indeed, we must specify callbacks for certain events, write our own code to store what we need, etc.
+
+The SAX processor reads the input sequentially (while the DOM afforded us with random access), and once only. It sends events like `startDocument`, `startElement`, `characters`, etc. White spaces and tabs are reported too, so this also potentially means more code to write.
+
+### DOM and web applications
+DOM is language and platform independent, with DOM APIs for all major programming languages. Most common though, is the DOM API used with JavaScript. 
+
+### XForms: an alternative to HTML forms
+XForms give us a declarative approach to capture information from the user, and place it into XML documents, with constraint checking. XForms are a W3C standard, but are not implemented in the browsers.
