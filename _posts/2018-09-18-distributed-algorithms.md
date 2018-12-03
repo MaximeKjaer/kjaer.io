@@ -438,4 +438,57 @@ Unlike previous algorithms, this relies on perfect failure detection.
 ## Atomic commit
 ## Leader election
 ## Terminating reliable broadcast
-## Blockchain
+
+
+
+## Byzantine failures
+So far, we've only considered situations in which nodes crash. In this section, we'll consider a new case: the one where nodes go "evil", a situation we call **byzantine failures**.
+
+Suppose that our nodes are arranged in a grid. $S$ sends a message $m$ to $R$ by broadcasting $(S, m)$. With a simple broadcast algorithm, we just broadcast the message to the neighbor, which may be a byzantine node $B$ that alters the message before rebroadcasting it. Because $B$ can simply do that, we see that this simple algorithm is not enough to deal with byzantine failures. 
+
+To deal with this problem, we'll consider some other algorithms. 
+
+First, consider the case where there are $n$ intermediary nodes between $S$ and $R$ (this is not a daisy chain of nodes, but instead just $m$ paths of length 2 between $S$ and $R$). We assume that $S$ and $R$ are both correct (non-Byzantine) nodes, but the intermediary nodes may be.
+
+For this algorithm, we define $k = \frac{n}{2} - 1$ if $n$ is even, and $k = \frac{n - 1}{2}$ if it is odd. The idea is to have $k+1$ be the smallest number of nodes to have a majority among the $n$ intermediary nodes. Let's also assume that $R$ has a set $\Omega$ that acts as its memory, and a variable $x$, initially set to $x = 0$. Our goal is to have $x = m$.
+
+$S$ simply sends out the message $m$ to its neighbors. The intermediary nodes forward messages that they receive to $R$. Finally, when $R$ receives a message $m$ from $p$, it adds it to the set $\Omega$. When there are $k+1$ nodes in the set, it can set $x = m$ (essentially, deliver the message).
+
+We'll prove properties on this. The main point to note is that these proofs make no assumption on the potentially Byzantine nodes.
+
+- **Safety**: if the number of Byzantine nodes $f$ is $f \le k$, then $x = 0$ or $x = m$.
+  
+  The proof is by contradiction. Let's suppose that the opposite is true, i.e. that $x = m'$, where $m' \ne m$. Then, according to the algorithm, this means that there must be $k+1$ nodes such that $\forall i \in \left\\{ 1, \dots, k+1 \right\\}$, we have $(p_i, m) \in \Omega$. But according to the algorithm, there are only two reasons for such a message being in the set; that is, either $p_i$ operates in good faith, receiving $m'$ from $S$, or it operates in bad faith, being a Byzantine node. The first case is impossible, as $S$ is correct. The alternative case can only happen if there are $k+1$ byzantine nodes, which is also impossible (since by assumption $f \le k$. This contradiction proves the safety property. 
+  
+- **Liveness**: if $f \le k$, we eventually have $x = m$.
+  
+  To prove this, we first define a set of $k+1$ correct (non-Byzantine) intermediary nodes. These nodes all receive $m$ from $S$, send it to $R$, which places it in $\Omega$. Eventually, we'll have $k+1$ nodes in the set, and then $x=m$.
+  
+  By the liveness and safety property, we know that initially $x=0, eventually $x=m$, and we never have $x=m'$.
+  
+- **Optimality**: if $f \ge k + 1$, it is impossible to ensure the safety property.
+  
+  Assume we have $k+1$ Byzantine nodes sending $m'$ to $R$. According to the algorithm, we get $x = m'$, so no safety.
+  
+  We can conclude that we can tolerate at most $k$ Byzantine nodes.
+
+But here we only considered the specific case of length 2 paths. Let's now consider the general case, which is the $(2k+1)$ connected graph. In this case, we consider any graph, and each node needs to broadcast a message $m_p$. Every node has a set $p_R$ to send messages, and a set $p_X$ of received messages.
+
+The algorithm is as follows. Initially, the nodes send $(p, \emptyset, m_p)$ to their neighbors. When a node $p$ receives $(u, \Omega, m)$ from a neighbor $q$, with $p\notin\Omega$ and $q\notin\Omega$, the node sends $(u, \Omega\cup u, m)$ to its neighbors, and add that to $p_X$. When there exists a node $q$, a message $m$ and $k+1$ sets $\Omega_1, \dots, \Omega_{k+1}$ such that $\bigcup_{i=1}^{k+1} \Omega_i = \left\\{ q \right\\}$, and we have $k+1$ message in $p_X$, we can add $(q, m)$ to $p_R$.
+
+We'll prove the following properties under the hypotheses that we have at most $k$ Byzantine nodes (a minority), and that the graph is connected (otherwise we couldn't broadcast messages between the nodes)
+
+- **Safety**: If $p$ and $q$ are two correct nodes, we never have $(p, m_p')\in q_R$ (where $m_p' \ne m_p$). In other words, no fake messages are accepted.
+  
+  The proof is by contradiction, in which we use induction to arrive to a contradictory conclusion. We'll try to prove the opposite of our claim, namely that there are two correct nodes $p$ and $q$ such that $(p, m_p') \in q_R$.
+  
+  According to our algorithm, we have $k+1$ disjoint sets whose intersection is $p$, and $k+1$ elements $(p, \Omega_i, m) \in q_X$.
+  
+  To prove this, we'll need to prove a sub-property: that each set $\Omega_i$ contains at least one byzantine node. We prove this by contradiction. We'll suppose the opposite, namely that $\Omega_i$ contains no byzantine node (i.e. that they are all correct). I won't write down the proof of this, but it's in the lecture notes if ever (it's by induction).
+  
+  
+  
+  
+  
+## Blockchain
+
