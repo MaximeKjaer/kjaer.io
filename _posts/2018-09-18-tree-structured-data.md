@@ -55,18 +55,6 @@ Qualifiers may include comparisons (`=`, `<`, `<=`, ...). The comparison is done
 
 XPaths can be a union of location paths separated by `|`. Qualifiers can include boolean expressions (`or`, `not`, `and`, ...). 
 
-XPath also has support for for variables, denoted `$x` (which are more like constants):
-
-
-
-{% highlight xpath linenos %}
-let $FREvents := /RAS/Events/Event[Canton/text() = "FR"],
-    $FRTopics := $FREvents/TopicRef/text() 
-
-return /RAS/Members/Member[Topics/TopicRef/text() = $FRTopics]/Email
-{% endhighlight %}
-
-> 👉 This gives us the email addresses of reporters who may deal with events in the canton of Fribourg. See exercises 01 for more context.
 
 There are a few basic functions: `last()`, `position()`, `count(node-set)`, `concat(string, string, ...string`), `contains(str1, str2)`, etc. These can be used within a qualifier.
 
@@ -626,6 +614,19 @@ flwor ::=  ((for | let) expr)+ (where expr)? (order by expr)? return expr
 {% endhighlight %}
 
 For instance:
+
+XQuery also has support for for variables, denoted `$x` (which are more like constants):
+
+{% highlight xquery linenos %}
+let $FREvents := /RAS/Events/Event[Canton/text() = "FR"],
+    $FRTopics := $FREvents/TopicRef/text() 
+
+return /RAS/Members/Member[Topics/TopicRef/text() = $FRTopics]/Email
+{% endhighlight %}
+
+> 👉 This gives us the email addresses of reporters who may deal with events in the canton of Fribourg. See exercises 01 for more context.
+
+Let's take a look at another XQuery expression: 
 
 {% highlight xquery linenos %}
 for $book in /Catalog/Product/Book
