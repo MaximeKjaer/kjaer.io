@@ -11,4 +11,4 @@ I'm fascinated by everything that has to do with technology, science and program
 
 Introductions aside, the goal of this site is to be an outlet for my thoughts, ideas and work, should anyone want to read into that.
 
-You can shoot me an email at [maxime.kjaer@gmail.com](mailto:maxime.kjaer@gmail.com) anytime you want! [Here's my PGP key]({{ site.baseurl }}/Maxime_Kjaer_pub.asc), should you wish to [use it](https://xkcd.com/1553/). I also read my university email, [maxime.kjaer@epfl.ch](mailto:maxime.kjaer@epfl.ch), and reply to tweets [@maximekjaer](https://twitter.com/maximekjaer).
+You can shoot me an email at [maxime.kjaer@gmail.com](mailto:maxime.kjaer@gmail.com) anytime you want! All my public profiles and PGP keys are on [Keybase](https://keybase.io/mkjaer), so check that out if you'd like to get in touch.
