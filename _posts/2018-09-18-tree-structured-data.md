@@ -1056,3 +1056,45 @@ DOM is language and platform independent, with DOM APIs for all major programmin
 
 ### XForms: an alternative to HTML forms
 XForms give us a declarative approach to capture information from the user, and place it into XML documents, with constraint checking. XForms are a W3C standard, but are not implemented in the browsers.
+
+## Web Services
+Service oriented applications (SOA) is an architectural pattern in software design, in which each component provides services to other components via communication protocols. XML has an answer to this:
+
+### Web Service Description Language (WSDL)
+WSDL is a language to create descriptions of a web service. That is, describe the operations it can perform, the structure of its messages, communication mechanisms it understands, etc. This is a [W3C recommendation](https://www.w3.org/TR/2007/REC-wsdl20-20070626/) since 2007.
+
+Inside a `<wsdl:description>` tag, we can use:
+
+- Optional documentation (`<wsdl:documentation/>`), with a human readable description of the web service
+- Definition of data types (`<wsdl:types/>`) exchanged between client and web service 
+- Description of the interface (`<wsdl:interface/>`), i.e. what operations and messages are defined
+- Binding (`<wsdl:binding/>`) describing how the web service is accessed over the network
+- Service tag (`<wsdl:service`) describing where the service can be accessed
+
+### Simple Object Access Protocol (SOAP)
+SOAP is a W3C standard protocolSOAP is a W3C standard protocol, with strict rules and advanced security features. However, it comes with substantial complexity, leading to slow page load times.
+
+{% highlight plain linenos %}
+POST /Quotation HTTP/1.0
+Host: www.xyz.org
+Content-Type: text/xml; charset = utf-8
+Content-Length: nnn
+
+<?xml version = "1.0"?>
+<SOAP-ENV:Envelope
+    xmlns:SOAP-ENV = "http://www.w3.org/2001/12/soap-envelope"
+    SOAP-ENV:encodingStyle = "http://www.w3.org/2001/12/soap-encoding">
+        <SOAP-ENV:Body xmlns:m = "http://www.xyz.org/quotations">
+            <m:GetQuotation>
+                <m:QuotationsName>MiscroSoft</m:QuotationsName>
+            </m:GetQuotation>
+        </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+{% endhighlight %}
+
+Note that while REST is an architectural style, and SOAP is a protocol. REST allows using any format (HTML, JSON, XML, plain text, ...), while SOAP explicitly only allows XML. 
+
+In the days of web apps (instead of web services), the idea of WDSL may be a little outdated. But WADL (Web **Application** Description Language) may be an answer to WSDL; this is a more concise language, with support for Relax NG, but which also has a slightly different goal. [Open API](https://www.openapis.org/) is another contender in this field, specifying a way to describe web services in JSON or YAML, with documentation in Markdown.
+
+### Universal Description, Discovery and Integration (UDDI)
+UDDI defines a standard method for **publishing** and **discovering** the software components of a service-oriented architecture. This mechanism still exists, although it never had the success people had been hoping for. Nowadays, it's mostly just used internally for some XML based applications, instead of in public UDDI repositories of components.
