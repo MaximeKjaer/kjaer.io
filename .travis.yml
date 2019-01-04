@@ -1,6 +1,6 @@
 language: ruby
 rvm:
-  - 2.4.3
+  - 2.5.1
 
 sudo: false # use container-based infrastructure for a faster build
 
@@ -24,6 +24,8 @@ addons:
     - libcurl4-openssl-dev  # to avoid SSL errors
 
 before_install:
+  - gem update --system
+  - gem install bundler
   - bash _scripts/install.sh
 
 script:
