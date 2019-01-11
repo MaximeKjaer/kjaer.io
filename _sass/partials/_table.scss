@@ -1,0 +1,16 @@
+table {
+	border-collapse: collapse;
+	margin: 0 auto;
+	
+	&, td, th {
+		border: 1px solid $black;
+	}
+	
+	td, th {
+		padding: 0.5rem;
+	}
+	
+	tr:hover {
+		background-color: $light-grey;
+	}
+}
