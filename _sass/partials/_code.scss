@@ -8,19 +8,21 @@
 $code_default-padding: 5px;
 $code_default-color: #ccc;
 
-.lineno {
-	display: inline-block;
-
-	color: $code_default-color;	
-}
-
-.gutter { // The parent of the linenos.
+// Line numbers:
+.gutter {
 	user-select: none;
 	cursor: default;
 	
 	::selection {
 		color: $code_default-color;
 		background-color: transparent;
+	}
+
+	.lineno {
+		display: inline-block;
+		text-align: right;
+
+		color: $code_default-color;	
 	}
 }
 
