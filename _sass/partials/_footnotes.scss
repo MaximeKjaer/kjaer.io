@@ -4,8 +4,25 @@
 //
 //---------------------------
 
+.footnote {
+	&::before {
+		content: '[';
+		user-select: text;
+	}
+	
+	&::after {
+		content: ']';
+		user-select: text;
+	}
+}	
+
 .footnotes {
 	margin: 3em 0;
+
+	ol {
+		font-size: 0.8em;
+		padding-left: 1em !important;
+	}
 
 	&::before {
 		content: 'Footnotes';
