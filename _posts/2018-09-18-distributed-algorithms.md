@@ -5,34 +5,48 @@ edited: true
 note: true
 ---
 
+{% comment %}
+Useful:
+
+Π
+∅
+∉
+∈
+∪
+⊆
+{% endcomment %}
+
+- [Course website](http://dcl.epfl.ch/site/education/da)
+- The course follows the book [*Introduction to Reliable (and Secure) Distributed Programming*](https://www.springer.com/gp/book/9783642152597) (available from the library or through SpringerLink)
+- Final exam is 60%
+- Projects in teams of 2-3 are 40%. The project is the implementation of various broadcast algorithms
+- No midterm
+
+$$
+\newcommand{\abs}[1]{\left\lvert#1\right\rvert}
+\newcommand{\set}[1]{\left\{#1\right\}}
+$$
+
+<!-- More -->
+
 * TOC
 {:toc}
 
 ⚠ *Work in progress*
 
-<!-- More -->
-
 ## Introduction
-- [Website](http://dcl.epfl.ch/site/education/da)
-- Course follows the book *Introduction to Reliable (and Secure) Distributed Programming*
-- Final exam is 60%
-- Projects in teams of 2-3 are 40%
-  - The project is the implementation of a blockchain
-  - Send team members to matej.pavlovic@epfl.ch
-- No midterm
-
-Distributed algorithms are between the application and the channel. 
-
-We have a few commonly used abstractions:
+In terms of abstraction layers, distributed algorithms are sandwiched between the application layer (processes) the network layer (channels). We have a few commonly used abstractions in this course:
 
 - **Processes** abstract computers
-- **Channels** abstract networks
+- **Channels** (or communication *links*) abstract networks
 - **Failure detectors** abstract time
+
+We consider that a distributed system is composed of $N$ processes making up a static set $\Pi$ (i.e. it doesn't change over time). These processes communicate by sending messages over the network channel. The distributed algorithm consists of a set of distributed automata, one for each process. All processes implement the same automaton.
 
 When defining a problem, there are two important properties that we care about:
 
 - **Safety** states that nothing bad should happen
-- **Liveness** states that something good should happen
+- **Liveness** states that something good should happen eventually
 
 Safety is trivially implemented by doing nothing, so we also need liveness to make sure that the correct things actually happen.
 
@@ -41,8 +55,8 @@ Two nodes can communicate through a link by passing messages. However, this mess
 
 A link has two basic types of events:
 
-- Send
-- Deliver
+- **Send**: we place a message on the link
+- **Deliver**: the link gives us a message
 
 #### Fair loss link (FLL)
 A fair loss link is a link that may lose or repeat some packets. This is the weakest type of link we can assume. In practice, it corresponds to UDP.  
@@ -51,67 +65,120 @@ Deliver can be thought of as a reception event on the receiver end. The terminol
 
 For a link to be considered a fair-loss link, we must respect the following three properties:
 
-- **Fair loss**: if the sender sends infinitely many times, the receiver must deliver infinitely many times. This does not guarantee that all messages get through, but at least ensures that some messages get through.
-- **No creation**: every delivery must be the result of a send; no message must be created out of the blue. 
-- **Finite duplication**: a message can only be repeated by the link a finite number of times.
+- **FLL1. Fair loss**: If a correct process $p$ infinitely often sends a message $m$ to a correct process $q$, then $q$ delivers $m$ an infinite number of times.
+- **FLL2. No creation**: If a correct process $p$ sends a message $m$ a finite number of times to process $q$, then $m$ cannot be delivered an infinite number of times by $q$.
+- **FLL3. Finite duplication**: If some process $q$ delivers a message $m$ with sender $p$, then $m$ was previously sent to $q$ by process $p$.
 
-#### Stubborn link
-A stubborn link is one that stubbornly delivers messages; that is, it ensures that the message is received, with no regard to performance.
+todo fll1 and fll2 names switched
 
-A stubborn link can be implemented with a FLL as follows:
+Let's try to get some intuition for what these properties mean:
 
-{% highlight python linenos %}
-upon send(m):
-  while True:
-    FLL.send(m)
+- FLL1 does not guarantee that all messages get through, but at least ensures that some messages get through. 
+- FLL2 means that every delivery must be the result of a send; no message must be created out of the blue.
+- FLL3 means that message can only be repeated by the link a finite number of times.
 
-upon FLL.deliver(m):
-  trigger deliver(m)
+There's no real algorithm to implement here; we have only placed assumptions on the link itself. Still, let's take a look at the interface.
+
+{% highlight dapseudo linenos %}
+Module:
+    Name: FairLossLinks (flp2p)
+
+Events:
+    Request: <flp2pSend, dest, m>: requests to send message m to process dest
+    Indication: <flp2pDeliver, src, m>: delivers messages m sent by src
+
+Properties:
+    FLL1
+    FLL2
+    FLL3
 {% endhighlight %}
 
-The above uses generic pseudocode, but the syntax we'll use in this course is as follows:
+#### Stubborn link (SL)
+A stubborn link is one that stubbornly delivers messages; that is, it ensures that the message is received. Here, we'll disregard performance, and just keep sending the message.
+
+The properties that we look for in a stubborn link are:
+
+- **SL1. Stubborn delivery**: If a correct process $p$ sends a message $m$ once to a correct process $q$, then $q$ delivers $m$ an infinite number of times.
+- **SL2. No creation**: If some process $q$ delivers a message $m$ with sender $p$, then $m$ was previously sent to $q$ by $p$.
+
+A stubborn link can be implemented with a FLL as the following algorithm, which we could call "retransmit forever". We could probably make it more efficient with the use of timeouts, but since we're mainly concerned with correctness for now, we'll just keep it simple.
 
 {% highlight python linenos %}
-Implements: SubbornLinks (sp2p)
-Uses: FairLossLinks (flp2p)
+def send(m):
+    """ 
+    Keep sending the same message
+    over and over again on the FLL 
+    """
+    while True:
+        FLL.send(m)
 
-upon event <sp2pSend, dest, m> do
-  while True do:
-    trigger <flp2p, dest, m>;
-
-upon event <flp2pDeliver, src, m> do
-  trigger <sp2pDeliver, src, m>;
+# When the underlying FLL delivers, deliver to the layer above
+FLL.on_delivery(lambda m: deliver(m))
 {% endhighlight %}
 
-Note that this piece of code is meant to sit between two abstraction levels; it is between the channel and the application. As such, it receives sends from the application and forwards them to the link, and receives delivers from the link and forwards them to the application. 
+The above is written in Python, but the syntax we'll use in this course is as follows:
 
-It must respect the interface of the underlying FLL, and as such, only specifies send and receive hooks.
+{% highlight dapseudo linenos %}
+Implements: 
+    StubbornLinks (sp2p)
+Uses:
+    FairLossLinks (flp2p)
+Events:
+    Request: <sp2pSend, dest, m>: requests to send message m to dest
+    Indication: <sp2pDeliver, src, m>: delivers message m sent by src
+Properties:
+    SL1
+    SL2
 
-#### Perfect link 
+upon event <sp2pSend, dest, m> do:
+    while (true) do:
+        trigger <flp2p, dest, m>;
+
+upon event <flp2pDeliver, src, m> do:
+    trigger <sp2pDeliver, src, m>;
+{% endhighlight %}
+
+Note that this piece of code is meant to sit between two abstraction levels; it is between the channel and the application. As such, it receives sends from the application and forwards them to the link, and receives delivers from the link and forwards them to the application. It must respect the interface of the underlying FLL, and as such, only specifies send and receive hooks.
+
+Note that a stubborn link will deliver the same message infinitely many times, according to SL1. Wanting to only deliver once will lead us to perfect links.
+
+#### Perfect link  (PL)
 Here again, we respect the send/deliver interface. The properties are:
 
-- **Validity** or reliable delivery: if both peers are correct, then every message sent is eventually delivered 
-- **No duplication**
-- **No creation**
+- **PL1. Reliable delivery**: If a correct process $p$ sends a message $m$ to a correct process $q$, then $q$ eventually delivers $m$
+- **PL2. No duplication**: No message is delivered by a process more than once
+- **PL3. No creation**: If some process $q$ delivers a message $m$ with sender $p$, then $m$ was previously sent to $q$ by $p$.
 
-This is the type of link that we usually use: TCP is a perfect link, although it also has more guarantees (notably on message ordering, which this definition of a perfect link does not have). TCP keeps retransmitting a message stubbornly, until it gets an acknowledgement, which means that it can stop transmitting. Acknowledgements aren't actually needed *in theory*, it would still work without them, but we would also completely flood the network, so acknowledgements are a practical consideration for performance; just note that the theorists don't care about them.
+This is the type of link that we usually use: TCP is a perfect link, although it also has more guarantees (notably on message ordering, which this definition of a perfect link does not have). TCP keeps retransmitting a message stubbornly, until it gets an acknowledgment, which means that it can stop transmitting. Acknowledgments aren't actually needed *in theory*, it would still work without them, but we would also completely flood the network, so acknowledgments are a practical consideration for performance; just note that the theorists don't care about them.
 
-{% highlight python linenos %}
-Implements: PerfectLinks (pp2p)
-Uses: StubbornLinks (sp2p)
+Compared to the stubborn link, the perfect link algorithm could be called "eliminate duplicates". In addition to what the stubborn links do, it keeps track of messages that 
 
-upon event <Init> do delivered := Ø;
+{% highlight dapseudo linenos %}
+Implements: 
+    PerfectLinks (pp2p)
+Uses:
+    StubbornLinks (sp2p)
+Events:
+    Request: <pp2pSend, dest, m>: requests to send message m to process q
+    Indication: <pp2pDeliver, src, m>: delivers message m sent by src
+Properties:
+    PL1
+    PL2
+    PL3
 
-upon event <pp2pSend, dest, m> do
-  trigger <sp2pSend, dest, m>;
+upon event <pp2p, Init> do:
+    delivered := ∅;
 
-upon event <sp2pDeliver, src, m> do
-  if m not in delivered then
-    trigger <pp2pDeliver, src, m>;
-    add m to delivered;
+upon event <pp2pSend, dest, m> do:
+    trigger <sp2pSend, dest, m>;
+
+upon event <sp2pDeliver, src, m> do:
+    if m ∉ delivered:
+        delivered := delivered ∪ {m};
+        trigger <pp2pDeliver, src, m>;
 {% endhighlight %}
 
-
+Throughout the course, we'll use perfect links as the underlying link (unless otherwise specified).
 
 ### Impossibility of consensus
 Suppose we'd like to compute prime numbers on a distributed system. Let *P* be the producer of prime numbers. Whenever it finds one, it notifies two servers, *S1* and *S2* about it. A client *C* may request the full list of known prime numbers from either server.
@@ -128,17 +195,37 @@ Now assume that we have two prime number producers *P1* and *P2*. This introduce
 
 This is **impossible** to solve; we won't prove it, but universality of Turing is lost (unless we make very strong assumptions). This is known as the [*impossibility of consensus*](https://groups.csail.mit.edu/tds/papers/Lynch/jacm85.pdf).
 
+### Timing assumptions
+An important element for describing distributed algorithms is how the system behaves with respect to the passage of time. Often, we need to be able to make assumptions about time bounds.
+
+Measuring time in absolute terms with a physical clock (measuring seconds, minutes and hours) is a bit of a dead end for discussing algorithms. Instead, we'll use the concept of *logical time*, which is defined with respect to communications. This clock is just an abstraction we use to reason about algorithms; it isn't accessible to the processes or algorithms.
+
+The three time-related models are:
+
+- **Synchronous**: assuming a synchronous system comes down to assuming the following properties:
+    + **Synchronous computation**: receiving a message can imply a local computation, and this computation can result in sending back a message. This assumption simply states that all the time it takes to do this is bounded and known.
+    + **Synchronous communication**: there is a known upper bound limit on message transmission delays; the time between sending and delivering a message on the other end of the link is smaller that the bound
+    + **Synchronous clocks**: the drift between a local clock and the global, real-time clock is bounded and known
+- **Eventually synchronous**: the above assumptions hold eventually
+- **Asynchronous**: no assumptions
+
+We can easily see how a distributed system would be synchronous: placing bounds on computation and message transmission delays should be possible most of the time. But network overload and message loss may lead the system to become partially synchronous, which is why we have the concept of eventually synchronous.
+
+To abstract these timing assumptions, we will introduce failure detectors in the following section.
+
 ### Failure detection
 A **failure detector** is a distributed oracle that provides processes with suspicions about crashed processes. There are two kinds of failure detectors, with the following properties
 
-- **Perfect**
-    + **Strong completeness**: eventually, every process that crashed is permanently suspected by every correct process
-    + **Strong accuracy**: no process is suspected before it crashes
-- **Eventually perfect**
-    + **Strong completeness**
-    + **Eventual strong accuracy**: eventually, no correct process is ever suspsected
+- **Perfect failure detector** $\mathcal{P}$
+    + **PFD1. Strong completeness**: eventually, every process that crashes is permanently suspected by every correct process
+    + **PFD2. Strong accuracy**: if a process $p$ is detected by any process, then $p$ has crashed
+- **Eventually perfect failure detector** $\diamond\mathcal{P}$
+    + **EPFD1. Strong completeness = PFD1**
+    + **EPFD2. Eventual strong accuracy**: eventually, no correct process is ever suspected by any correct process
 
-An eventually perfect detector may make mistakes and may operate under a delay. But eventually, it will tell us the truth.
+A perfect failure detector tells us when a process $p$ has crashed by emitting a `<Crash, p>` event. It never makes mistakes, never changes its mind; decisions are permanent and accurate.
+
+An eventually perfect detector may make mistakes, falsely suspecting a correct process to be crashed. If it does so, it will eventually change its mind and tell us the truth. When it suspects a process $p$, it emits a `<Suspect, p>` event; if it changes its mind, it emits a `<Restore, p>` event. In aggregate, eventually perfect failure detectors are accurate.
 
 A failure detector can be implemented by the following algorithm:
 
@@ -147,295 +234,221 @@ A failure detector can be implemented by the following algorithm:
 3. A process suspects another process has failed if it timeouts that process
 4. A process that delivers a message from a suspected process revises its suspicion and doubles the time-out
 
-Failure detection algorithms are all designed under certain **timing assumptions**. The following timing assumptions are possible:
-
-- **Synchronous**
-    + **Processing**: the time it takes for a process to execute is bounded and known.
-    + **Delays**: there is a known upper bound limit on the time it takes for a message to be received
-    + **Clocks**: the drift between a local clock and the global, real-time clock is bounded and known
-- **Eventually synchronous**: the timing assumptions hold eventually
-- **Asynchronous**: no assumptions
-
-These 3 possible assumption levels mean that the world is divised into 3 kinds of failure algorithms. The algorithm above is based on the eventually synchronous assumption (I think?).
-
-{% details Not exam material %}
-## Mathematically robust distributed systems
-Some bugs in distributed systems can be very difficult to catch (it could involve long and costly simulation; with $n$ computers, it takes time $2^n$ to simulate all possible cases), and can be very costly when it happens.
-
-The only way to be sure that there are no bugs is to *prove* it formally and mathematically.
-
-### Definition of the distributed system graph
-
-Let $G(V, E)$ be a graph, where $V$ is the set of process nodes, and $E$ is the set of channel edges connecting the processes. 
-
-Two nodes $p$ and $q$ are **neighbors** if and only if there is an edge $\left\\{ p, q \right\\} \in E$.
-
-Let $X \subseteq V$ be the set of **crashed nodes**. The other nodes are **correct nodes**.
-
-We'll define the **path** as the sequence of nodes $(p_1, p_2, \dots, p_n)$ such that $\forall i \in \left\\{i, \dots, n-1\right\\}$, $p_i$ and $p_{i+1}$ are neighbors.
-
-Two nodes $p$ and $q$ are **connected** if we have a path $(p_1, p_2, \dots, p_n)$ such that $p_1 = p$ and $p_2 = q$. 
-
-They are **n-connected** if there are $n$ disjoint paths connecting them; two paths $A = \left\\{ p_1, \dots, p_n \right\\}$ and $B = \left\\{ p_1, \dots, p_n \right\\}$ are disjoint if $A \cap B = \left\\{ p, q \right\\}$ (i.e. $p$ and $q$ are the two only nodes in common in the path).
-
-The graph is **k-connected** if, $\forall \left\\{ p, q \right\\} \subseteq V$ there are $k$ disjoint paths between $p$ and $q$.
-
-### Example on a simple algorithm
-
-Each node $p$ holds a message $m_p$ and a set $p.R$. The goal is for two nodes $p$ and $q$ to have $(p, m_p) \in q.R$ and $(q, m_q) \in p.R$; that is, they want to exchange messages, to *communicate reliably*. The algorithm is as follows:
-
-{% highlight python linenos %}
-for each node p:
-  initially:
-    send (p, m(p)) to all neighbors
-
-  upon reception of of (v, m):
-    add (v, m) to p.R
-    send (v, m) to all neighbors
-{% endhighlight %}
-
-#### Reliable communication
-
-Now, let's prove that if two nodes $p$ and $q$ are connected, then they communicate reliably. We'll do this by induction; formally, we'd like to prove that the proposition $\mathcal{P}_k$, defined as "$p_k \text{ receives } (p, m_p)$", is true for $k\in \left\\{ 1, \dots, n \right\\}$. 
-
-- **Base case**
-  
-  According to the algorithm, $p=p_1$ initially sends $(p, m_p)$ to $p_2$. So $p_2$ receives $(p, m_p)$ from $p_1$, and $\mathcal{P}_2$ is true.
-
-- **Induction step**
-  
-  Suppose that the induction hypothesis $\mathcal{P}$ is true for $k \in \left\\{2, \dots, n-1 \right\\}$.
-
-  Then, according to the algorithm, $p_k$ sends $(p, m_p)$ to $p_{k+1}$, meaning that $p_{k+1}$ receives $(p, m_p)$ from $p_k$, which means that $\mathcal{P}_{k+1}$ is true.
-
-Thus $\mathcal{P}_k$ is true.
-
-### Robustness property
-If at most $k$ nodes are crashed, and the graph is $(k+1)$-connected, then all correct nodes **communicate reliably**.
-
-We prove this by contradiction. We want to prove $\mathcal{P}$, so let's suppose that the opposite, $\bar{\mathcal{P}}$ is true; to prove this, we must be able to conclude that the graph is $(k+1)$-connected, but there are 2 correct nodes $p$ and $q$ that *do not* communicate reliably. Hopefully, doing so will lead us to a paradoxical conclusion that allows us to assert $\mathcal{P}$.
-
-As we are $(k+1)$-connected, there exists $k+1$ paths $(P_1, P_2, \dots, P_{k+1})$ paths connecting any two nodes $p$ and $q$. We want to prove that $p$ and $q$ do not communicate reliably, meaning that all paths between them are "cut" by at least one crashed node. As the paths are disjoint, this requires at least $k+1$ crashed nodes to cut them all.
-
-This is a contradiction: we were working under the assumption that $k$ nodse were crashed, and proved that $k+1$ nodes were crashed. This disproves $\bar{\mathcal{P}}$ and proves $\mathcal{P}$.
-
-### Random failures
-Let's assume that $p$ and $q$ are connected by a single path of length 1, only separated by a node $n$. If each node has a probability $f$ of crashing, then the probability of communicating reliably is $1-f$.
-
-Now, suppose that the path is of length $n$; the probability of communicating reliably is the probability that none of the nodes crashing; individually, that is $1-f$, so for the whole chain, the probability is $(1-f)^n$.
-
-However, if we have $n$ paths of length 1 (that is, instead of setting them up serially like previously, we set them up in parallel), the probability of not communicating reliably is that of all intermediary nodes crashing, which is $f^n$; thus, the probability of actually communicating reliably is $1-f^n$.
-
-If our nodes are connecting by $n$ paths of length $m$, the probability of not communicating reliably is that of all lines being cut. The probability of a single line being cut is $1 - (1 - f)^m$. The probability of any line being cut is one minus the probability of no line being cut, so the final probability is $1 - (1 - (1 - f)^m)^n$.
-
-
-### Example proof
-Assume an infinite 2D grid of nodes. Nodes $p$ and $q$ are connected, with the distance in the shortest path being $D$. What is the probability of communicating reliably when this distance tends to infinity?
-
-$$
-\newcommand{\abs}[1]{\left\lvert#1\right\rvert}
-
-\lim_{D \rightarrow \infty} = \dots
-$$
-
-First, let's define a sequence of grids $G_k$. $G_0$ is a single node, $G_{k+1}$ is built from 9 grids $G_k$.
-
-$G_{k+1}$ is **correct** if at least 8 of its 9 grids are correct.
-
-We'll introduce the concept of a "meta-correct" node; this is not really anything official, just something we're making up for the purpose of this proof. Consider a grid $G_n$. A node $p$ is "meta-correct" if:
-
-- It is in a correct grid $G_n$, and
-- It is in a correct grid $G_{n-1}$, and
-- It is in a correct grid $G_{n-2}$, ...
-
-For the sake of this proof, let's just admit that all meta-correct nodes are connected; if you take two nodes $p$ and $q$ that are both meta-correct, there will be a path of nodes connecting them.
-
-#### Step 1
-If $x$ is the probability that $G_k$ is correct, what is the probability $P(x)$ that $G_{k+1}$ is correct?
-
-$G_{k+1}$ is built up of 9 subgrids $G_k$. Let $P_i$ be the probability of $i$ nodes failing; the probability of $G_k$ being correct is the probability at most one subgrid being incorrect.
-
-$$
-\begin{align}
-P_0 & = x^9 \\
-P_1 & = 9(1-x)x^8 \\
-P(x) & = P_0 + P_1 = x^9 + 9(1-x)x^8 \\
-\end{align}
-$$
-
-#### Step 2
-Let $\alpha = 0.9$, and $z(x) = 1 + \alpha (x-1)$. 
-
-We will admit the following: if $x \in [0.99, 1]$ then $z(x) \le P(x)$.
-
-Let $P_k$ be the result of applying $P$ (as defined in step 1) to $1-f$, $k$ times: $P_k = P(P(P(\dots P(1-f))))$. We will prove that $P_k \ge 1 - \alpha^k, \forall k > 0$, by induction:
-
-- **Base case**: $P_0 = 1-f = 0.99$ and $1-\alpha^0 = 1-1 = 0$, so $P_0 \ge 1-\alpha^0$.
-- **Induction step**:
-  
-  Let's suppose that $P_k \ge 1-\alpha^k$. We want to prove this for $k+1$, namely $P_{k+1} \ge 1 - \alpha^{k+1}$.
-
-  $$
-  P_{k+1} \ge P(P_k) \ge z(P_k) \ge z(1 - \alpha^k) \\
-  P_{k+1} \ge 1 + \alpha(1 - \alpha^k - 1) \\
-  P_{k+1} \ge 1 - \alpha^{k+1}
-  $$
-
-This proves the result that $\forall k, P_k \ge 1 - \alpha^k$.
-
-#### Step 3
-Todo.
-
-{% enddetails %}
-
 ## Reliable broadcast
-Broadcast is useful for some applications with pubsub-like mechanisms, where the subscribers might need some reliability guarantees from the publisher (we sometimes say quality of service QoS). 
+Broadcast is useful for applications with pubsub-like mechanisms, where some processes subscribe to events published by others (e.g. stock prices). 
 
-### Best-effort broadcast
-Best-effort broadcast (beb) has the following properties:
+The subscribers might need some reliability guarantees from the publisher (these guarantees are called "quality of service", or QoS). These quality guarantees are typically not offered by the underlying network, so we'll see different broadcasting algorithms with different guarantees.
 
-- **BEB1 Validity**: if $p_i$ and $p_j$ are correct then every message broadcast by $p_i$ is eventually delivered by $p_j$
-- **BEB2 No duplication**: no message is delivered more than once
-- **BEB3 No creation**: no message is delivered unless it was broadcast
+A broadcast operation is an operation in which a process sends a message to all processes in a system, including itself. We consider broadcasting to be a single operation, but it of course may take time to send all the messages over the network.
 
-The broadcasting machine may still crash in the middle of a broadcast, where it hasn't broadcast the message to everyone yet. It offers no guarantee against that.
+### Best-effort broadcast (BEB)
+In best-effort broadcast (BEB), the sender is the one ensuring the reliability; the receivers do not have to be concerned with enforcing the reliability. On the other hand, if the sender fails, all guarantees go out the window.
 
-{% highlight python linenos %}
-Implements: BestEffortBroadcast (beb)
-Uses: PerfectLinks (pp2p)
+#### Properties
+The guarantees of BEB are as follows:
 
-Upon event <bebBroadcast, m> do:
-    forall pi in S, the set of all nodes in the system, do:
-        trigger <pp2pSend, pi, m>
+- **BEB1. Validity**: if $p$ and $q$ are correct, then every message broadcast by $p$ is eventually delivered by $q$
+- **BEB2. No duplication**: no message is delivered more than once
+- **BEB3. No creation**: if a process delivers a message $m$ with sender $p$, then $m$ was previously broadcast by $p$
 
-Upon event <pp2pDeliver, pi, m> do:
-    trigger <bebDeliver, pi, m>
+BEB1 is a liveness property, while no BEB2 and BEB3 are safety properties.
+
+As we said above, the broadcasting machine may still crash in the middle of a broadcast, where it hasn't broadcast the message to everyone yet, and it's important to note that BEB offers no guarantee against that.
+
+#### Algorithm
+The algorithm for BEB is fairly straightforward: it just sends the message to all processes in the network using perfect links (remember that perfect links use stubborn links, sending the same message continuously). Perfect links already guarantees no duplication (PL2), so we can just forward delivered messages to the application layer above BEB. 
+
+{% highlight dapseudo linenos %}
+Implements: 
+    BestEffortBroadcast (beb)
+Uses: 
+    PerfectLinks (pp2p)
+Events:
+    Request: <bebBroadcast, m>: broadcasts a message m to all processes
+    Indication: <bebDeliver, src, m>: delivers a message m sent by src
+
+upon event <bebBroadcast, m> do:
+    forall q ∈ Π do:
+        trigger <pp2pSend, q, m>;
+
+upon event <pp2pDeliver, src, m> do:
+    trigger <bebDeliver, src, m>;
 {% endhighlight %}
 
+#### Correctness
 This is not the most efficient algorithm, but we're not concerned about that. We just care about whether it's correct, which we'll sketch out a proof for:
 
-- **Validity**: By the validity property of perfect links and the very facts that:
-    + the sender sends the message to all
-    + every correct process that `pp2pDelivers` delivers a message to, `bebDelivers` it too
-- **No duplication**: by the no duplication property of perfect links
-- **No creation**: by the no creation property of perfect links
+- **Validity**: By PL1 (the validity property of perfect links), and the very facts that:
+    + the sender `pp2Send`s the message to all processes in $\Pi$
+    + every correct process that `pp2pDeliver`s a message `bebDeliver`s it too
+- **No duplication**: by PL2 (the no duplication property of perfect links)
+- **No creation**: by PL3 (the no creation property of perfect links)
 
-### Reliable broadcast
-Reliable broadcast has the following properties:
+### Reliable broadcast (RB)
+As we said above, BEB offers no guarantees if the sender crashes while sending. If it does fail while sending, we may end up in a situation where some processes deliver the messages, and others don't. In other words, not all processes *agree* on the delivery.
 
-- **RB1 Validity**: if $p_i$ and $p_j$ are correct then every message broadcast by $p_i$ is eventually delivered by $p_j$
-- **RB2 No duplication**: no message is delivered more than once
-- **RB3 No creation**: no message is delivered unless it was broadcast
-- **RB4 Agreement**: for any message $m$, if a **correct** process delivers $m$, then every correct process delivers $m$
+As it turns out, it's even more subtle than that: the sender may already have done a `bebSend` and `pp2pSend`, and so on, placed all messages on the wire, and then crash. Because the underlying perfect link do not guarantee delivery when the sender crashes, we have no guarantee that the messages have been delivered.
 
-Notice that RB has the same properties as best-effort, but also adds a guarantee RB4: even if the broadcaster crashes in the middle of a broadcast and is unable to send to other processes, we'll honor the agreement property. This is done by distinguishing receiving and delivering; the broadcaster may not have sent to everyone, but in that case, reliable broadcast makes sure that no one delivers.
+#### Properties
+To address this, we want an additional property compared to BEB, *agreement*:
 
-Note that a process may still deliver and crash before others deliver; it is then incorrect, and we have no guarantees that the message will be delivered to others.
+- **RB1. Validity = BEB1**
+- **RB2. No duplication = BEB2**
+- **RB3. No creation = BEB3**
+- **RB4. Agreement**: for any message $m$, if a **correct** process delivers $m$, then every correct process delivers $m$
 
-{% highlight python linenos %}
-Implements: ReliableBroadcast (rb)
+RB4 tells us that even if the broadcaster crashes in the middle of a broadcast and is unable to send to other processes, we'll honor the agreement property. This is done by distinguishing receiving and delivering; the broadcaster may not have sent to everyone, but in that case, reliable broadcast makes sure that no one delivers.
+
+#### Algorithm
+For the first time, we'll use a perfect failure detector $\mathcal{P}$ in our implementation of RB. Since we're aiming to do the same as BEB but with the added agreement property, we'll use BEB as the underlying link. 
+
+{% highlight dapseudo linenos %}
+Implements:
+    ReliableBroadcast (rb)
 Uses:
     BestEfforBroadcast (beb)
     PerfectFailureDetector (P)
+Events:
+    Request: <rbBroadcast, m>: broadcasts a message m to all processes
+    Indication: <rbDeliver, src, m>: delivers a message m sent by src
+Properties:
+    RB1
+    RB2
+    RB3
+    RB4
 
-Upon event <Init> do:
-    delivered := Ø
-    correct := S
-    forall pi in S do:
-        from[pi] := Ø
+upon event <rb, Init> do:
+    delivered := ∅;
+    correct := Π;
+    from := [];
+    forall p ∈ Π do:
+        from[p] := ∅;
 
-Upon event <rbBroadcast, m> do:   # application tells us to broadcast
-    delivered := delivered U {m}
-    trigger <rbDeliver, self, m>            # deliver to itself
-    trigger <bebBroadcast, [Data, self, m]> # broadcast to others using beb
+upon event <rbBroadcast, m> do:
+    delivered := delivered ∪ {m};
+    trigger <rbDeliver, self, m>; # deliver to self
+    trigger <bebBroadcast, [Data, self, m]>; # broadcast to others using beb
 
-Upon event <bebDeliver, pi, [Data, pj, m]> do:
-    if m not in delivered:
-        delivered := delivered U {m}
-        trigger <rbDeliver, pj, m>
-        if pi not in correct: # echo if sender not in correct
-            trigger <bebBroadcast, [Data, pj, m]> 
+# Here, it's important to distinguish the sender (at the other 
+# side of the link) from the src (original broadcaster):
+upon event <bebDeliver, sender, [Data, src, m]> do:
+    if m ∉ delivered:
+        delivered := delivered ∪ {m};
+        # deliver m from src:
+        trigger <rbDeliver, src, m>;
+        # echo to others if src no longer correct:
+        if src ∉ correct:
+            trigger <bebBroadcast, [Data, src, m]>;
         else:
-            from[pi] := from[pi] U {[pj, m]}
+            from[sender] := from[sender] ∪ {[src, m]};
 
-Upon event <crash, pi> do:
-    correct := correct \ {pi}
-    forall [pj, m] in from[pi] do: # echo all previous messages from crashed pi
-        trigger <bebBroadcast, [Data, pj, m]>
+upon event <crash, p> do:
+    correct := correct \ {p};
+    # echo all previous messages from crashed p:
+    forall [src, m] ∈ from[p] do:
+        trigger <bebBroadcast, [Data, src, m]>
 {% endhighlight %}
 
-The idea is to echo all messages from a node that has crashed. From the moment we get the crash message from the oracle, we may have received messages from an actually crashed node, even though we didn't know it was crashed yet. This is because our failure detector is eventually correct, which means that the crash notification may eventually come. To solve this, we also send all the old messages.
+The idea is to echo all messages from a process that has crashed. From the moment we get the crash message from the perfect failure predictor $\mathcal{P}$, we forward all subsequent messages from the crashed sender to all nodes. But we  may also have received messages from the sender before knowing that it was crashed. To solve this, we keep track of all broadcasts, and rebroadcast all old messages when we find out the sender crashed.
 
+#### Correctness
 We'll sketch a proof for the properties:
 
-- **Validity**: as above
-- **No duplication**: as above
-- **No creation**: as above
-- **Agreement**: Assume some correct process $p_i$ `rbDelivers` a message $m$ that was broadcast through `rbBroadcast` by some process $p_k$. If $p_k$ is correct, then by the validity property of best-effort broadcast, all correct processes will get the message through `bebDeliver`, and then deliver $m$ through `rebDeliver`. If $p_k$ crashes, then by the completeness property of the failure detector $P$, $p_i$ detects the crash and broadcasts $m$ with `bebBroadcast` to all. Since $p_i$ is correct, then by the validity property of best effort, all correct processes `bebDeliver` and then `rebDeliver` $m$. 
+- **Validity**: as for RB
+- **No duplication**: as for RB
+- **No creation**: as for RB
+- **Agreement**: Assume some correct process $p$ `rbDelivers` a message $m$ that was `rbBroadcast` by some process $q$.
+  + If $q$ is correct, then by BEB1 (BEB validity), all correct processes will `bebDeliver` $m$, and ATTA deliver $m$ through `rbDeliver`. 
+  + If $q$ crashes, then by PFD1 (strong completeness of $\mathcal{P}$), $p$ detects the crash and ATTA echoes $m$ with `bebBroadcast` to all. Since $p$ is correct, then by BEB1 (BEB validity), all correct processes `bebDeliver` and then, ATTA, `rbDeliver` $m$.
 
-Note that the proof only uses the completeness property of the failure detector, not the accuracy. Therefore, the predictor can either be perfect or eventually perfect.
+Note that the proof only uses the completeness property of the failure detector (PFD1), not the accuracy property (PFD2). Therefore, the predictor can either be perfect $\mathcal{P}$ or eventually perfect $\diamond\mathcal{P}$.
 
-### Uniform reliable broadcast
-Uniform broadcast satisfies the following properties:
+### Uniform reliable broadcast (URB)
+In RB, we only required that *correct* processes should agree on the set of messages to deliver. We made no requirements on what messages we allow faulty processes to deliver.
 
-- **URB1 Validity**: if $p_i$ and $p_j$ are correct then every message broadcast by $p_i$ is eventually delivered by $p_j$
-- **URB2 No duplication**: no message is delivered more than once
-- **URB3 No creation**: no message is delivered unless it was broadcast
-- **URB4 Uniform agreement**: for any message $m$, if a process delivers $m$, then every correct process delivers $m$
+For instance, a scenario possible under RB is that we want to `rbBroadcast` from a process $p$. It could `rbDeliver` it to itself, and then crash before it had time to `bebBroadcast` it to others (see lines 24 and 25 of the RB algorithm). In this scenario, all *correct* nodes still agree not to deliver the message (after all, none of them have received it), but $p$ has already delivered it.
 
-We've removed the word "correct" in the agreement, and this changes everything. This is the strongest assumption, which guarantees that all messages are delivered to everyone, no matter their future correctness status.
+#### Properties
+Uniform reliable broadcast solves this problem, by ensuring that *all* processes agree. Its properties are:
 
+- **URB1. Validity = BEB1**
+- **URB2. No duplication = BEB2**
+- **URB3. No creation = BEB3**
+- **URB4. Uniform agreement**: for any message $m$, if a process delivers $m$, then every correct process delivers $m$
+
+We've removed the word "correct" in agreement, and this changes things quite a bit. Uniform agreement is a stronger assertion, which ensures that the set of messages delivered by faulty processes is a *subset* of those delivered by correct processes.
+
+#### Algorithm
 The algorithm is given by:
 
-{% highlight python linenos %}
-Implements: uniformBroadcast (urb).
+{% highlight dapseudo linenos %}
+Implements: 
+    uniformBroadcast (urb)
 Uses:
-    BestEffortBroadcast (beb).
-    PerfectFailureDetector (P).
+    BestEffortBroadcast (beb)
+    PerfectFailureDetector (P)
+Events:
+    Request: <rbBroadcast, m>: broadcasts a message m to all processes
+    Indication: <rbDeliver, src, m>: delivers a message m sent by src
+Properties:
+    URB1
+    URB2
+    URB3
+    URB4
 
-Upon event <Init> do:
-    correct := S # set of correct nodes, initiated to all nodes
-    delivered := forward := Ø # set of delivered and already forwarded messages
-    ack[Message] := Ø   # set of nodes that have acknowledged Message
+upon event <urb, Init> do:
+    correct := Π;
+    delivered := ∅;
+    pending := ∅; # set of [src, msg] that we have sent (broadcast or echoed)
+    ack[Message] := ∅; # set of nodes that have acknowledged Message
 
-upon event <crash, pi> do:
-    correct := correct \ {pi}
+upon event <crash, p> do:
+    correct := correct \ {p};
 
-# before broadcasting, save message in forward
+# before broadcasting, save message in pending
 upon event <urbBroadcast, m> do:
-    forward := forward U {[self,m]}
-    trigger <bebBroadcast, [Data,self,m]>
+    pending := pending ∪ {[self, m]};
+    trigger <bebBroadcast, [Data, self, m]>;
 
-# if I haven't sent the message, echo it
-# if I've already sent it, don't do it again
-upon event <bebDeliver, pi, [Data,pj,m]>:
-    ack[m] := ack[m] U {pi}
-    if [pj,m] not in forward:
-        forward := forward U {[pj,m]};
-        trigger <bebBroadcast, [Data,pj,m]>
+# If I haven't sent the message, echo it
+# If I've already sent it, don't do it again
+upon event <bebDeliver, sender, [Data, src, m]> do:
+    ack[m] := ack[m] ∪ {sender};
+    if [src, m] ∉ pending:
+        pending := pending ∪ {[src, m]};
+        trigger <bebBroadcast, [Data, src, m]>;
 
-# deliver the message when we know that all correct processes have delivered
-# (and if we haven't delivered already)
-upon event (for any [pj,m] in forward) can_deliver(m) and m not in delivered:
-    delivered := delivered U {m}
-    trigger <urbDeliver, pj, m>
+# Deliver the message when we know that all correct processes
+# have delivered (and if we haven't delivered already)
+upon event (exists [src, m] ∈ pending) 
+  such that (can_deliver(m) and m ∉ delivered) do:
+    delivered := delivered ∪ {m};
+    trigger <urbDeliver, src, m>;
 
+# We can deliver if all correct nodes have acknowledged m:
 def can_deliver(m):
-    return correct ⊆ ack[m]
+    return correct ⊆ ack[m];
 {% endhighlight %}
 
-To prove the correctness, we must first have a simple lemma: if a correct process $p_i$ `bebDeliver`s a message $m$, then $p_i$ eventually `urbDeliver`s the message $m$.
+When a process sees a message (that is, `bebDeliver`s it), it relays it once; this relay serves as an acknowledgment, but also as a way to forward the message to other nodes. All processes keep track of who they have received messages from (either acks or the original message). Once all correct nodes have sent it the message (again, either an ack or the original), it can `urbDeliver`.
 
-This can be proven as follows: any process that `bebDeliver`s $m$ `bebBroadcast`s $m$. By the completeness property of the failure detector $P$, and the validity property of best-effort broadcasting, there is a time at which $p_i$ `bebDeliver`s $m$ from every correct process and hence `urbDeliver`s it.
+Because all nodes all echo the message to each other once, the number of messages sent is $N^2$.
+
+Because the algorithm waits for confirmation from all correct nodes, it only `urbDeliver`s messages that it knows that all correct nodes have seen.
+
+#### Correctness
+To prove the correctness, we must first have a simple lemma: if a correct process $p$ `bebDeliver`s a message $m$, then $p$ eventually `urbDeliver`s the message $m$. 
+
+This can be proven as follows: ATTA, any process that `bebDeliver`s $m$ `bebBroadcast`s $m$. By the PFD1 (completeness of $\mathcal{P}$), and BEB1 (validity of BEB), there is a time at which $p$ `bebDeliver`s $m$ from every correct process and hence, ATTA, `urbDeliver`s it.
 
 The proof is then:
 
-- **Validity**: If a correct process $p_i$ `urbBroadcast`s a message $m$, then $p_i$ eventually `bebBroadcast`s and `bebDeliver`s $m$. By our lemma, $p_i$ `urbDeliver`s it.
-- **No duplication**: as best-effort
-- **No creation**: as best-effort
-- **Uniform agreement**: Assume some process $p_i$ `urbDeliver`s a message $m$. By the algorithm and the completeness *and* accuracy properties of the failure detector, every correct process `bebDeliver`s $m$. By our lemma, every correct process will `urbDeliver` $m$.
+- **Validity**: If a correct process $p$ `urbBroadcast`s a message $m$, then $p$ eventually `bebBroadcast`s and `bebDeliver`s $m$. Then, by our lemma, $p$ `urbDeliver`s it.
+- **No duplication**: as BEB
+- **No creation**: as BEB
+- **Uniform agreement**: Assume some process $p$ `urbDeliver`s a message $m$. ATTA, and by PFD1 and PFD2 (completeness *and* accuracy of $\mathcal{P}$), every correct process `bebDeliver`s $m$. By our lemma, every correct process will therefore `urbDeliver` $m$.
 
-Unlike previous algorithms, this relies on perfect failure detection. But under the assumption that the majority of processes stay correct, we can do with an eventually perfect failure detector. To do so, we remove the crash event above, and replace the `can_deliver` method with the following:
+Unlike previous algorithms, this relies on perfect failure detection. But under the assumption that the majority of processes stay correct, we can do with an eventually perfect failure detector $\diamond\mathcal{P}$. To do so, we remove the crash event above, and replace the `can_deliver` method with the following:
 
 {% highlight python linenos %}
 def can_deliver(m):
@@ -443,174 +456,274 @@ def can_deliver(m):
 {% endhighlight %}
 
 ## Causal order broadcast
+So far, we didn't consider ordering among messages. In particular, we considered messages to be independent. 
 
-### Motivation
-So far, we didn't consider ordering among messages. In particular, we considered messages to be independent. Two messages from the same process might not be delivered in the order they were broadcast. 
+Two messages from the same process might not be delivered in the order they were broadcast. This could be problematic: imagine a message board implemented with (uniform) reliable broadcast. For instance, in a message board application, a broadcaster $p$ could send out a message $m_1$, immediately change its mind and send out a rectification $m_2$. But due to network delays, messages may come out of order, and $m_2$ may be delivered before $m_1$ by the receiving node $q$. This is problematic, because the modification $m_2$ won't make sense to $q$ as long as it hasn't delivered $m_1$.
 
-### Causality
-The above means that **causality** is broken: a message $m_1$ that causes $m_2$ might be delivered by some process after $m_1$.
+A nice property to have in these cases is *causal order*, where we don't necessarily impose a total ordering constraint, but do want certain groups of messages to be ordered in a way that makes sense for the applications. 
 
-Let $m_1$ and $m_2$ be any two messages. $m_1\longrightarrow m_2$ ($m_1$ **causally precedes** $m_2$) if and only if:
+### Causal order
+We say that  $m_1$ *causally precedes* $m_2$, denoted as $m_1 \longrightarrow m_2$, if any of the properties below hold:
 
-- **C1 (FIFO Order)**: Some process $p_i$ broadcasts $m_1$ before broadcasting $m_2$
-- **C2 (Causal Order)**: Some process $p_i$ delivers $m_1$ and then broadcasts $m_2$ 
-- **C3 (Transitivity)**: There is a message $m_3$ such that $m_1 \longrightarrow m_3$ and $m_3 \longrightarrow m_2$.
+- **C1. FIFO Order**: Some process $p$ broadcasts $m_1$ before broadcasting $m_2$
+- **C2. Causal Order**: Some process $p$ delivers $m_1$ and then broadcasts $m_2$ 
+- **C3. Transitivity**: There is a message $m_3$ such that $m_1 \longrightarrow m_3$ and $m_3 \longrightarrow m_2$.
 
-The **causal order property (CO)** is given by the following: if any process $p_i$ delivers a message $m_2$, then $p_i$ must have delivered every message $m_1$ such that $m_1 \longrightarrow m_2$.
+Note that $m_1 \longrightarrow m_2$ doesn't mean that $m_1$ *caused* $m_2$; it only means that it *may potentially have caused* $m_2$. But without any input from the application layer about what messages are logically dependent on each other, we can still enforce the above causal order.
 
-### Algorithm
-We get reliable causal broadcast by using reliable broadcast, uniform causal broadcast using uniform reliable broadcast.
+The **causal order property (CO)** guarantees that messages are delivered in a way that respects all causality relations. It is respected when we can guarantee that any process $p$ delivering a message $m_2$ has already delivered every message $m_1$ such that $m_1 \longrightarrow m_2$.
 
-{% highlight python linenos %}
-Implements: ReliableCausalOrderBroadcast (rco)
-Uses: ReliableBroadcast (rb)
+### No-waiting Algorithm
+The following uses reliable broadcast, but we could also use [uniform reliable broadcast](#uniform-reliable-broadcast-urb) to obtain uniform causal broadcast.
 
-upon event <Init> do:
-    delivered := past := Ø
+{% highlight dapseudo linenos %}
+Implements: 
+    ReliableCausalOrderBroadcast (rcb)
+Uses: 
+    ReliableBroadcast (rb)
+Events:
+    Request: <rcbBroadcast, m>: broadcasts a message m to all processes
+    Indication: <rcbBroadcast, sender, m>: delivers a message m sent by sender
+Properties:
+    RB1
+    RB2
+    RB3
+    RB4
+    CO
 
-upon event <rcoBroadcast, m> do:
+upon event <rcb, Init> do:
+    delivered := ∅;
+    past := ∅; # contains all past [src, m] pairs
+
+upon event <rcbBroadcast, m> do:
     trigger <rbBroadcast, [Data, past, m]>
-    past := past U {[self, m]}
+    past := past ∪ {[self, m]};
 
-upon event <rbDeliver, pi, [Data, pastm, m]> do:
-    if m not in delivered:
-        for [sn, n] in pastm:
-            if n not in delivered:
-                trigger <rcoDeliver, sn, n>
-                delivered := delivered U {n}
-                past := past U {[sn, n]}
-        trigger <rcoDeliver, pi, m>
-        delivered := delivered U {m}
-        past := past U {[pi, m]}
+upon event <rbDeliver, src_m, [Data, past_m, m]> do:
+    if m ∉ delivered:
+        # Deliver all undelivered, past messages that caused m:
+        forall [src_n, n] ∈ past_m do: # in list order
+            if n ∉ delivered:
+                trigger <rcbDeliver, src_n, n>;
+                delivered := delivered ∪ {n};
+                past := past ∪ {[src_n, n]};
+        # Then deliver m:
+        trigger <rcbDeliver, src_m, m>;
+        delivered := delivered ∪ {m};
+        past := past ∪ {[src_m, m]};
 {% endhighlight %}
 
 This algorithm ensures causal reliable broadcast. The idea is to re-broadcast all past messages every time, making sure we don't deliver twice. This is obviously not efficient, but it works in theory.
 
-To improve this, we can implement a form of garbage collection. We can delete the `past` only when all others have delivered. To do this, we need a perfect failure detector. 
+An important point to note here is that this algorithm doesn't wait. At no point is the `rcbDeliver`y delayed in order to respect causal order.
 
-{% highlight python linenos %}
-Implements GarbageCollection + previous algorithm
+### Garbage collection
+A problem with this algorithm is that the size of the `past` grows linearly. A simple optimization is to add a kind of distributed garbage collection to clean the `past`.
+
+The idea is that we can delete the `past` when all other processes have delivered. To do this, whenever a process `rcbDelivers`, we also need to send an acknowledgment to all other processes. When we have received an acknowledgment from all correct processes, then we can purge the corresponding message $m$ from the `past`. 
+
+This implies using a perfect failure detector, as the implementation below shows.
+
+{% highlight dapseudo linenos %}
+Implements:
+    GarbageCollection, ReliableCausalOrderBroadcast (rcb)
 Uses:
     ReliableBroadcast (rb)
     PerfectFailureDetector (P)
+Events:
+    Request: <rcbBroadcast, m>: broadcasts a message m to all processes
+    Indication: <rcbBroadcast, sender, m>: delivers a message m sent by sender
+Properties:
+    RB1
+    RB2
+    RB3
+    RB4
+    CO
 
-upon event <Init>:
-    delivered := past := Ø
-    correct := S # set of all nodes
-    ack[m] := Ø # forall m
+upon event <rcb, Init> do:
+    delivered := ∅;
+    past := ∅;
+    correct := Π;
+    ack[m] := ∅; # for all possible messages m
 
-upon event <crash, pi>:
-    correct := correct \ {pi}
+upon event <crash, p> do:
+    correct := correct \ {p};
 
-upon for some m in delivered, self not in ack[m]:
-    ack[m] = ack[m] U {self}
-    trigger <rbBroadcast, [ACK, m]>
+# Broadcast as before:
+upon event <rcbBroadcast, m> do:
+    trigger <rbBroadcast, [Data, past, m]>
+    past := past ∪ {[self, m]};
 
-upon event <rbDeliver, [ACK, m]>:
-    ack[m] := ack[m] U {pi}
-    if correct.forall(lambda pj: pj in ack[m]): # if all correct in ack
-        past := past \ {[sm, m]} # remove message from past
+# Deliver messages as before:
+upon event <rbDeliver, src_m, [Data, past_m, m]> do:
+    if m ∉ delivered:
+        # Deliver all undelivered, past messages that caused m:
+        forall [src_n, n] ∈ past_m do: # (in list order)
+            if n ∉ delivered:
+                trigger <rcbDeliver, src_n, n>;
+                delivered := delivered ∪ {n};
+                past := past ∪ {[src_n, n]};
+        
+        # Then deliver m:
+        trigger <rcbDeliver, src_m, m>;
+        delivered := delivered ∪ {m};
+        past := past ∪ {[src_m, m]};
+
+# Ack delivered messages that haven't been acked yet:
+upon event (exists m ∈ delivered) such that (self ∉ ack[m]) do:
+    ack[m] := ack[m] ∪ {self};
+    trigger <rbBroadcast, [ACK, m]>;
+
+# Register delivered acks:
+upon event <rbDeliver, sender, [ACK, m]> do:
+    ack[m] := ack[m] ∪ {sender};
+
+# Delete past once everybody has acked:
+upon event correct ⊆ ack[m] do:
+    forall [src_n, n] ∈ past such that n = m:
+        past := past \ {[src_n, m]};
 {% endhighlight %}
 
-We need the perfect failure detector's strong accuracy property to prove the causal order property. We don't need the failure detector's completeness property; if we don't know that a process is crashed, it has no impact on correctness, only on performance, since it just means that we won't delete the past.
+We need the perfect failure detector's strong accuracy property to prove the causal order property. 
 
+However, we don't need the failure detector's completeness property; if we don't know that a process is crashed, it has no impact on correctness, only on performance, since it just means that we won't delete the past.
 
-Another algorithm is given below. It uses a ["vector clock" VC](https://en.wikipedia.org/wiki/Vector_clock) as an alternative, more efficient encoding of the past. A VC is updated under the following rules:
+### Waiting Algorithm
+Another algorithm is given below. It uses a ["vector clock" (VC)](https://en.wikipedia.org/wiki/Vector_clock) as an alternative, more efficient encoding of the past.
+
+A VC is simply a vector with one entry for each process in $\Pi$. Each entry is a sequence number (also called *logical clock*) for the corresponding process. Each process $p$ maintains its own VC. Its own VC entry counts the number of times it has `rcbBroadcast`. The entries for other processes $q$ count the number of times $p$ has `rcbDeliver`ed from $q$.
+
+ A VC is updated under the following rules:
 
 - Initially all clocks are empty
-- Each time a process sends a message, it increments its own logical clock in the vector by one and then sends a copy of its own vecto.
+- Each time a process sends a message, it increments its own logical clock in the vector by one, and sends a copy of its own vector.
 - Each time a process receives a message, it increments its own logical clock in the vector by one and updates each element in its vector by taking the maximum of the value in its own vector clock and the value in the vector in the received message (for every element).
 
 
-{% highlight python linenos %}
-Implements: ReliableCausalOrderBroadcast (rco)
-Uses: ReliableBroadcast (rb)
+{% highlight dapseudo linenos %}
+Implements:
+    ReliableCausalOrderBroadcast (rcb)
+Uses:
+    ReliableBroadcast (rb)
 
-upon event <Init>:
-    for all pi in S:
-        VC[pi] := 0
-    pending := Ø
+upon event <rcb, Init> do:
+    pending := ∅;
+    for all p ∈ Π:
+        VC[p] := 0;
 
-upon event<rcoBroadcast, m>:
-    trigger <rcoDeliver, self, m>
-    trigger <rbBroadcast, [Data,VC,m]>
-    VC[self] := VC[self] + 1; # we have seen the message, so increment VC
+upon event <rcbBroadcast, m> do:
+    trigger <rcbDeliver, self, m>; # todo is this necessary?
+    trigger <rbBroadcast, [Data, VC, m]>; 
+    VC[self] := VC[self] + 1;
 
-upon event <rbDeliver, pj, [Data,VCm,m]>:
-    if pj != self:
-        pending := pending U (pj, [Data,VCm,m])
-        deliver-pending()
-
-def deliver-pending():
-    while (s, [Data,VCm,m]) in pending:
-        forall pk such that (VC[pk] <= VCm[pk]):
-            pending := pending U (s, [Data,VCm,m])
-            trigger <rcoDeliver, self, m>
-            VC[s] := VC[s] + 1
+upon event <rbDeliver, src, [Data, VC_m, m]>:
+    if src != self:
+        pending := pending ∪ {(src, VC_m, m)};
+        # Deliver pending:
+        while exists (src_n, VC_n, n) ∈ pending
+          such that VC_n <= VC do:
+            pending := pending \ {(src_n, VC_n, n)};
+            trigger <rcbDeliver, self, n>; # self, can this be true?
+            VC[src_n] := VC[src_n] + 1
 {% endhighlight %}
 
+The $\le$ comparison operation on vector clocks is defined as follows: $VC_a \le VC_b$ iff it is less or equal in all positions, and at least one position is strictly less.
 
-## Total order broadcast
-In [reliable broadcast](#reliable-broadcast), the processes are free to deliver in any order they wish. In [causal broadcast](#causal-broadcast), the processes must deliver in causal order. But causal order is only partial: some message may be delivered in a different order by the processes.
+## Total order broadcast (TOB)
+In [reliable broadcast](#reliable-broadcast), the processes are free to deliver in any order they wish. In [causal broadcast](#causal-broadcast), we restricted this a little: the processes must deliver in causal order. But causal order is only partial: some messages are causally unrelated, and may therefore be delivered in a different order by the processes.
 
-In **total order** broadcast, the processes must deliver all messages according to the same order. Note that this is orthogonal to causality, or even FIFO ordering. It can be *made* to respect causal or FIFO ordering, but at its core, it is only concerned with all processes delivering in the same order. 
+In **total order broadcast** (TOB), the processes must deliver all messages according to the same order. Note that this is orthogonal to causality, or even FIFO ordering. It can be *made* to respect causal or FIFO ordering, but at its core, it is only concerned with all processes delivering in the same order, no matter the actual ordering of messages.
 
-An application using total order broadcast would be Bitcoin; for the blockchain, we want to make sure that everybody gets messages in the same order, for consistency.
+TOB is also sometimes called *atomic broadcast*, as the delivery occurs as if broadcast was an indivisible, atomic action
 
-The properties are:
+An application using TOB would be Bitcoin; for the blockchain, we want to make sure that everybody gets messages in the same order, for consistency. More generally though, total ordering is useful for any replicated state machine where replicas need to treat requests in the same order to preserve consistency.
 
-- **RB1 Validity**: if $p_i$ and $p_j$ are correct then every message broadcast by $p_i$ is eventually delivered by $p_j$
-- **RB2 No duplication**: no message is delivered more than once
-- **RB3 No creation**: no message is delivered unless it was broadcast
-- **RB4 Agreement**: for any message $m$, if a **correct** process delivers $m$, then every correct process delivers $m$
-- **TO1 (Uniform) Total Order**: Let $m$ and $m'$ be any two messages. Let $p_i$ be any (correct) process that delivers $m$ without having delivered $m'$ before. Then no (correct) process delivers $m'$ before $m$
+#### Properties
+The properties are the same as those of (uniform) reliable broadcast, but with an added total order property.
 
-The algorithm can be implemented as:
+- **RB1. Validity**
+- **RB2. No duplication**
+- **RB3. No creation**
+- **(U)RB4. (Uniform) Agreement**
+- **(U)TO1. (Uniform) Total Order**: Let $m$ and $m'$ be any two messages. Let $p$ be any (correct) process that delivers $m$ without having delivered $m'$ before. Then no (correct) process delivers $m'$ before $m$.
 
-{% highlight python linenos %}
-Implements: TotalOrder (to)
+#### Consensus-based Algorithm
+The algorithm can be implemented with consensus, which is the next section[^read-both].
+
+[^read-both]: Consensus and TOB are very interdependent, so it can be a good idea to read both twice.
+
+The intuition of the algorithm is that we first disseminate messages using RB. This imposes no particular order, so the processes simply store the messages in `unordered`. At this point, we have no guarantees of dissemination or ordering; it's even possible that no processes have the same sets.
+
+To solve this, we use consensus to decide on a single set; we order the messages in that set, and then deliver.
+
+There are multiple rounds of this consensus, which we count in the `round` variable. The consensus helps us decide on a set of messages to *deliver* in that round. We use the `wait` variable to make sure that we only hold one instance of consensus at once.
+
+Note that while one consensus round is ongoing, we may amass multiple messages in `unordered`. This means that consensus may lead us to decide on multiple messages to deliver at once.
+
+{% highlight dapseudo linenos %}
+Implements:
+    TotalOrderBroadcast (tob)
 Uses:
     ReliableBroadcast (rb)
     Consensus (cons)
+Events:
+    Request: <tobBroadcast, m>: broadcasts a message m to all processes
+    Indication: <tobDeliver, src, m>: delivers a message m broadcast by src
+Properties:
+    RB1
+    RB2
+    RB3
+    (U)RB4
+    (U)TO1
 
-upon event <init>:
-    unordered := delivered := Ø # two sets
-    wait := False
-    sn := 1 # sequence number
+upon event <tob, Init>:
+    unordered := ∅;
+    delivered := ∅;
+    wait := false;
+    round := 1;
 
-upon event <toBroadcast, m>:
+upon event <tobBroadcast, m> do:
     trigger <rbBroadcast, m>
 
-upon event <rbDeliver, sm, m> and m not in delivered:
-    unordered.add((sm, m)) 
+# Save received broadcasts for later:
+upon event <rbDeliver, src_m, m> and (m ∉ delivered) do:
+    unordered := unordered ∪ {(src_m, m)};
 
-upon unordered not empty and not wait:
-    wait := True
-    trigger <propose, unordered> with sn
+# When no consensus is ongoing and we have 
+# unordered messages to propose:
+upon (unordered != ∅) and (not wait) do:
+    wait := true;
+    initialize instance of consensus;
+    trigger <propose, unordered>;
 
-upon event <decide, decided> with sn:
-    unordered.remove(decided)
-    ordered = sort(decided)
-    for sm, m in ordered:
-        trigger <toDeliver, sm, m>
-        delivered.add(m)
-    sn += 1
-    wait = False
+# When consensus is done:
+upon event <decide, decided> do:
+    unordered := unordered \ {decided};
+    ordered = sort(decided);
+    for (src_m, m) in ordered:
+        trigger <tobDeliver, src_m, m>;
+        delivered := delivered ∪ {m};
+    round := round + 1;
+    wait = false;
 {% endhighlight %}
+
+We assume that the `sort` function is deterministic and that all processes run the exact same sorting routine.
 
 Our total order broadcast is based on consensus, which we describe below.
 
 ## Consensus
-In the (uniform) consensus problem, the processes all propose values, and need to agree on one of these. This gives rise to two basic events: a proposition, and a decision. Solving consensus is key to solving many problems in distributed computing (total order broadcast, atomic commit, ...).
+In the (uniform) consensus problem, the processes all propose values, and need to agree on one of these propositions. This gives rise to two basic events: a proposition (`<propose, v>`), and a decision (`<decide, v>`). Solving consensus is key to solving many problems in distributed computing (total order broadcast, atomic commit, ...).
 
 The properties that we would like to see are:
 
-- **C1 Validity**: if a value is decided, it has been proposed
-- **C2 (Uniform) Agreement**: no two correct (any) processes decide differently
-- **C3 Termination**: every correct process eventually decides
-- **C4 Integrity**: Every process decides at most once
+- **C1. Validity**: if a value is decided, it has been proposed
+- **(U)C2. (Uniform) Agreement**: no two correct (any) processes decide differently
+- **C3. Termination**: every correct process eventually decides
+- **C4. Integrity**: every process decides at most once
 
-If C2 is Uniform Agreement, then we talk about uniform consensus.
+Termination and integrity together imply that every correct process decides exactly once. Validity ensures that the consensus may not invent a value by itself. Agreement is the main feature of consensus, that every two correct processes decide on the same value. 
+
+When we have uniform agreement (UC2), we want no processes to decide differently, no matter if they are faulty or correct. In this case, we talk about *uniform consensus*.
 
 Todo: write about consensus and fairness, does it violate validity?
 
@@ -618,27 +731,196 @@ We can build consensus using total order broadcast, which is described above. Bu
 
 Blockchain is based on consensus. Bitcoin mining is actually about solving consensus: a leader is chosen to decide on the broadcast order, and this leader gains 50 bitcoin. Seeing that this is a lot of money, many people want to be the leader; but we only want a single leader. Nakamoto's solution is to choose the leader by giving out a hard problem. The computation can only be done with brute-force, there are no smart tricks or anything. So people put [enormous amounts of energy](https://digiconomist.net/bitcoin-energy-consumption) towards solving this. Usually, only a single person will win the mining block; the probability is small, but the [original Bitcoin paper](https://bitcoin.org/bitcoin.pdf) specifies that we should wait a little before rewarding the winner, in case there are two winners.
 
-### Consensus algorithm
-Suppose that there are $n$ processes. At the beginning, every process proposes a value; to decide, the processes go through $n$ rounds incrementally. At each round, the process with the id corresponding to the round number is the leader of the round. Note that the rounds are not global time; we may make them so in examples for the sake of simplicity, but rounds are simply a local thing, which are somewhat synchronized by message passing from the leader.
+### Algorithm 1: Fail-Stop Consensus
+Suppose that there are $N$ processes in $\Pi$, with IDs $1, \dots, N$. At the beginning, every process proposes a value; to decide, the processes go through $N$ rounds incrementally. At each round, the process with the ID corresponding to the round number is the leader of the round.
 
-The leader decides its current proposal and broadcasts it to all. A process that is not the leader waits. It can either deliver the proposal of the leader to adopt it, or suspect the leader. In any case, we can move on to the next round at that moment. Note that processes don't need to move on at the same time, they can do so at different moments.
+The leader decides its current proposal and broadcasts it to all. A process that is not the leader waits. This means that in a given round $i$, only the leader process $i$ is broadcasting. Additionally, a process only decides when it is the leader. 
 
-{% highlight python linenos %}
-todo
+The non-leader processes can either deliver the proposal of the leader to adopt it, or detect that the leader has crashed. In any case, we can move on to the next round at that moment.
+
+Now that we understand the properties of the algorithm, let's take a look at an example run.
+
+Process 1 is the first to be the leader. Once it gets a proposal from the application layer, it decides on it, and broadcasts it to the others. However, let's suppose it crashes before getting to broadcast (BEB fails in this case). Then, the other processes will detect the crash with $\mathcal{P}$, and go to the next round. 
+
+Process 2 is now the leader. Since it doesn't have a proposal from process 1, it will have to get one from the application layer. Once it has it, it can broadcast it to the others. Let's assume this goes smoothly, and all processes receive it. They can all go to the next round; from now on, whatever the application layer proposes, they have to obey the decision from the previous leader.
+
+This should make it clear why the algorithm is also known as "hierarchical consensus": every process must obey the decisions of the process above it (with a smaller index), as long as they don't crash. We can think of this as a sort of line to the throne: we use the proposal of whoever is on the throne. If they die, number 2 in line decides, and so on.
+
+Note that the rounds are not global time; we may make them so in examples for the sake of simplicity, but rounds are simply a local thing, which are somewhat synchronized by message passing from the leader.
+
+{% highlight dapseudo linenos %}
+Implements:
+    Consensus (cons)
+Uses:
+    BestEffortBroadcast (beb)
+    PerfectFailureDetector (P)
+Events:
+    Request: <propose, v>: proposes value v for consensus
+    Indication: <decide, v>: outputs a decided value v of consensus
+Properties:
+    C1
+    C2
+    C3
+    C4
+
+upon event <cons, Init> do:
+    suspected := ∅;     # list of suspected processes
+    round := 1;         # current round number
+    proposal := nil;    # current proposal
+    broadcast := false; # whether we've already broadcast
+    delivered := [];    # whether we've received a proposal from a process
+
+upon event <crash, p> do:
+    suspected := suspected ∪ {p};
+
+# If we don't already have a decision from the leader,
+# take our own proposal
+upon event <Propose, v> do:
+    if proposal = nil:
+        proposal := v;
+
+# When we receive a decision from the leader, use that:
+upon event <bebDeliver, leader, [Decided, v]> do:
+    proposal := v;
+    delivered[leader] := true;
+
+# If we've received a proposal from the leader, 
+# or if the leader has crashed, go to the next round:
+upon event delivered[round] = true or round ∈ suspected do:
+    round := round + 1;
+
+# When we are the leader and we have a value to propose
+# (which may be ours, or one that we have from the previous leader),
+# we broadcast it, and deliver the decision to the application layer
+upon event round = self and broadcast = false and proposal != nil do:
+    trigger <decide, proposal>;
+    trigger <bebBroadcast, [Decided, proposal]>;
+    broadcast = true;
 {% endhighlight %}
 
-correctness argument todo
+Since this algorithm doesn't aim for *uniform* consensus (but only regular consensus), it can tolerate $f < N$ failures; as long as one process remains correct, it will decide on a value.
 
-### Uniform consensus algorithm
-The idea is here is to do the same thing, but instead of deciding at the beginning of the round, we wait until round n.
+Let's formulate a short correctness argument for the algorithm:
 
-not taking notes today, don't feel like it.
+- *Validity* follows from the algorithm and BEB1 (validity)
+- *Agreement* can be proven as follows. Let $p_i$ with ID $i$ be the correct process with the smallest ID in a run. Suppose it decides on some value $v$.
+    + If $i = N$, then $p_i$ is the only correct process
+    + Otherwise, in round $i$, ATTA, all correct processes $p_j$ with $j > i$ receive $v$ and will not decide differently from $v$
+- *Termination* follows from PFD1 (strong completeness) and BEB1 (validity): no process will remain indefinitely blocked in a round; every correct process $p$ will eventually reach round $p$ and decide in that round
+- *Integrity* follows from the algorithm and BEB1 (validity)
 
-### Uniform consensus algorithm with eventually perfect failure detector
-This assumes a correct majority, and an eventually perfect failure detector.
+### Algorithm 2: Fail-Stop Uniform Consensus
+The previous algorithm does not guarantee *uniform* agreement. The problem is that that some of the processes decide too early, without making sure that their decision has been seen by enough processes (remember that if the broadcaster fails in BEB, then we have no guarantee that all processes receive the broadcast). It could therefore decide on a value, and then crash before anybody receives it. The other processes might then have no choice but to decide on a different value.
 
-When you suspect a process, you send them a message. When a new leader arrives, he asks what the previous value was, and at least one process will respond.
+To fix this, the idea is to do the same thing as before, but instead of $p_i$ deciding at round $i$, we wait until the last round $N$. The resulting algorithm is simply called "hierarchical uniform consensus".
 
+{% highlight dapseudo linenos %}
+Implements:
+    Consensus (cons)
+Uses:
+    BestEffortBroadcast (beb)
+    PerfectFailureDetector (P)
+Events:
+    Request: <propose, v>: proposes value v for consensus
+    Indication: <decide, v>: outputs a decided value v of consensus
+Properties:
+    C1
+    UC2
+    C3
+    C4
+
+upon event <cons, Init> do:
+    suspected := ∅;     # list of suspected processes
+    round := 1;         # current round number
+    proposal := nil;    # current proposal
+    broadcast := false; # whether we've already broadcast
+    decided := false;   # whether we've already decided
+    delivered := [];    # whether we've received a proposal from a process
+
+upon event <crash, p> do:
+    suspected := suspected ∪ {p};
+
+# If we don't already have a decision from the leader,
+# take our own proposal
+upon event <Propose, v> do:
+    if proposal = nil:
+        proposal := v;
+
+# When we receive a decision from the leader, use that:
+upon event <bebDeliver, leader, [Decided, v]> do:
+    proposal := v;
+    delivered[leader] := true;
+
+# If we've received a proposal from the leader,  
+# or if the leader has crashed, go to the next round.
+# If it's the last round, we can deliver the decision 
+# to the application layer.
+upon event delivered[round] = true or round ∈ suspected do:
+    if round = N and not decided:
+        trigger <decide, proposal>;
+        decided := true;
+    else:
+        round := round + 1;
+
+# When we are the leader and we have a value to propose
+# (which may be ours, or one that we have from the previous leader),
+# we broadcast it
+upon event round = self and broadcast = false and proposal != nil do:
+    trigger <bebBroadcast, [Decided, proposal]>;
+    broadcast = true;
+{% endhighlight %}
+
+For the correctness argument, we'll need to introduce a short lemma: if $p_j$ completes round $i$ without receiving any message from $p_i$, and $j > i$, then $p_i$ crashes by the end of round $j$.
+
+{% details Proof of the lemma %}
+We'll do a proof by contradiction: suppose $p_j$ completes round $i$ without receiving a message from $p_i$, $j>i$ and $p_i$ completes round $j$.
+
+Since $p_j$ completed round $i$ without hearing from $p_i$, ATTA, it must be because $p_j$ suspects $p_i$ in round $i$. We're using a perfect failure detector $\mathcal{P}$. So in round $j$, we either have:
+
+- $p_i$ suspects $p_j$, which is impossible because $p_i$ crashes before $p_j$
+- $p_i$ receives the round $j$ message from $p_j$, which is also impossible because $p_i$ crashed before $p_j$ completes round $i < j$
+
+We have proved the contradiction in the inverse, and thus the lemma.
+{% enddetails %}
+
+- *Validity* follows from the algorithm and BEB1 (validity)
+- *Termination* follows from PFD1 (strong completeness) and BEB1 (validity): no process will remain indefinitely blocked in a round; every correct process $p$ will eventually reach round $p$ and decide in that round
+- *Uniform Agreement* can be proven as follows. 
+  
+  Let $p_i$ with ID $i$ be the process with the smallest ID which decides on some value. This implies that it completes round $N$.
+
+  By the above lemma, in round $i$, every $p_j$ with $j > i$ receives and adopts the proposal of $p_i$. Thus, every process which sends a message after round $i$, or which decides, has the same proposal at the end of round $i$.
+
+- *Integrity* follows from the algorithm and BEB1 (validity)
+
+### Algorithm 3: Uniform Consensus with Eventually Perfect Failure Detector
+The two previous algorithms relied on perfect failure detectors. What happens if we use an eventually perfect failure detector $\diamond\mathcal{P}$ instead?
+
+The problem is that that $\diamond\mathcal{P}$ only has *eventual* strong accuracy (EPFD2). This means that correct processes may be *falsely* suspected a finite number of time, which breaks the two previous algorithms: if a process is falsely suspected by everyone, and it falsely suspects everyone, then all the others would do consensus without it, and decide differently from it.
+
+This algorithm relies on a majority of processes being correct (i.e. it can handle $f < \frac{N}{2}$ failures). The solution is a little involved, so we won't give pseudo-code for it. Instead, we'll just try to get an overarching idea of what goes on.
+
+The algorithm is also round-based: processes still move incrementally from one round to the next. Process $p_i$ is the leader at round $k$, where $i = k \mod n$. In such a round, $p_i$ *tries* to decide:
+
+- It succeeds if it is not suspected. 
+- It fails if it is suspected. Processes that suspect $p_i$ inform it (with a negative acknowledgment, NACK, message), and everybody moves on to the next round (including $p_i$).
+
+If it succeeds, it uses RB to send the decision to all. It's important to use RB at this step (not BEB) to preclude the case where $p_i$ crashes while broadcasting. This would allow for a situation where some nodes have delivered, and others haven't.
+
+Within a round $k$, $p_i$ decides on a value in three steps:
+
+1. It collects propositions from the other processes, and chooses a value proposed by the majority.
+2. It broadcasts the chosen value back, and processes change their proposal to the value broadcast by $p_i$. The processes send an acknowledgment.
+3. If everyone acks, it decides, and broadcasts the decision. When others receive the decision, they decide on the given value.
+
+If a process suspects it at any point, it sends a NACK and everyone moves on. But the decided value may still have disseminated among the processes, since $p_i$ broadcasts the value before deciding. Thus, we have progress (because we went with the majority value, so we're advancing towards consensus, or at worst, not moving).
+
+Let's take a look at a correctness argument:
+
+- *Validity* is trivial
+- *Uniform agreement*: Let $k$ be the first round in which some leader process $p_i$ decides on a value $v$. This means that, in round $k$, a majority of processes have adopted $v$. ATTA, no value other than $v$ will be proposed, and therefore decided, henceforth.
+- *Termination* states that every correct process eventually decides. If a correct process decides, it uses RB to send the decision to all, so every correct process decides. 
+- *Integrity* is trivial
 
 ## Atomic commit
 The unit of data processing in a distributed system is the *transaction*. A transaction describes the actions to be taken, and can be terminated either by **committing** or **aborting**.
@@ -678,7 +960,8 @@ Events:
 Properties:
     NBAC1, NBAC2, NBAC3, NBAC4
 
-Implements: nonBlockingAtomicCommit (nbac)
+Implements:
+    nonBlockingAtomicCommit (nbac)
 Uses:
     BestEffortBroadcast (beb)
     PerfectFailureDetector (P)
@@ -692,7 +975,7 @@ upon event <Init>:
 upon event <Crash, pi>:
     correct := correct \ {pi}
 
-upon event <Propose, v>:
+upon event <nbac, Propose, v>:
     trigger <bebBroadcast, pi>
 
 upon event <bebDeliver, pi, v>:
@@ -728,7 +1011,7 @@ If $p$ crashes, all processes are blocked, waiting for its response.
 ## Terminating reliable broadcast (TRB)
 Like reliable broadcast, terminating reliable broadcast (TRB) is a communication primitive used to disseminate a message among a set of processes in a reliable way. However, TRB is stricter than URB.
 
-In TRB, there si a specific broadcaster process $p_{\text{src}}$, known by all processes. It is supposed to broadcast a message $m$. We'll also define a distinct message $\phi \ne m$. The other processes need to deliver $m$ if $p_{\text{src}}$ is correct, but may deliver $\phi$ if $p_{\text{src}}$ crashes.
+In TRB, there is a specific broadcaster process $p_{\text{src}}$, known by all processes. It is supposed to broadcast a message $m$. We'll also define a distinct message $\phi \ne m$. The other processes need to deliver $m$ if $p_{\text{src}}$ is correct, but may deliver $\phi$ if $p_{\text{src}}$ crashes.
 
 The idea is that if $p_{\text{src}}$ crashes, the other processes may detect that it's crashed, without having ever received $m$. But this doesn't mean that $m$ wasn't sent; $p_{\text{src}}$ may have crashed while it was in the process of sending $m$, so some processes may have delivered it while others might never do so.
 
@@ -819,8 +1102,133 @@ The Cloud is an example of shared memory, with which we interact by message pass
 A register contains integers....
 
 
+## Guest Lecture 1: Mathematically robust distributed systems
+Some bugs in distributed systems can be very difficult to catch (it could involve long and costly simulation; with $n$ computers, it takes time $2^n$ to simulate all possible cases), and can be very costly when it happens.
 
-## Byzantine failures
+The only way to be sure that there are no bugs is to *prove* it formally and mathematically.
+
+### Definition of the distributed system graph
+
+Let $G(V, E)$ be a graph, where $V$ is the set of process nodes, and $E$ is the set of channel edges connecting the processes. 
+
+Two nodes $p$ and $q$ are **neighbors** if and only if there is an edge $\left\\{ p, q \right\\} \in E$.
+
+Let $X \subseteq V$ be the set of **crashed nodes**. The other nodes are **correct nodes**.
+
+We'll define the **path** as the sequence of nodes $(p_1, p_2, \dots, p_n)$ such that $\forall i \in \left\\{i, \dots, n-1\right\\}$, $p_i$ and $p_{i+1}$ are neighbors.
+
+Two nodes $p$ and $q$ are **connected** if we have a path $(p_1, p_2, \dots, p_n)$ such that $p_1 = p$ and $p_2 = q$. 
+
+They are **n-connected** if there are $n$ disjoint paths connecting them; two paths $A = \left\\{ p_1, \dots, p_n \right\\}$ and $B = \left\\{ p_1, \dots, p_n \right\\}$ are disjoint if $A \cap B = \left\\{ p, q \right\\}$ (i.e. $p$ and $q$ are the two only nodes in common in the path).
+
+The graph is **k-connected** if, $\forall \left\\{ p, q \right\\} \subseteq V$ there are $k$ disjoint paths between $p$ and $q$.
+
+### Example on a simple algorithm
+
+Each node $p$ holds a message $m_p$ and a set $p.R$. The goal is for two nodes $p$ and $q$ to have $(p, m_p) \in q.R$ and $(q, m_q) \in p.R$; that is, they want to exchange messages, to *communicate reliably*. The algorithm is as follows:
+
+{% highlight python linenos %}
+for each node p:
+  initially:
+    send (p, m(p)) to all neighbors
+
+  upon reception of of (v, m):
+    add (v, m) to p.R
+    send (v, m) to all neighbors
+{% endhighlight %}
+
+#### Reliable communication
+
+Now, let's prove that if two nodes $p$ and $q$ are connected, then they communicate reliably. We'll do this by induction; formally, we'd like to prove that the proposition $\mathcal{P}_k$, defined as "$p_k \text{ receives } (p, m_p)$", is true for $k\in \left\\{ 1, \dots, n \right\\}$. 
+
+- **Base case**
+  
+  According to the algorithm, $p=p_1$ initially sends $(p, m_p)$ to $p_2$. So $p_2$ receives $(p, m_p)$ from $p_1$, and $\mathcal{P}_2$ is true.
+
+- **Induction step**
+  
+  Suppose that the induction hypothesis $\mathcal{P}$ is true for $k \in \left\\{2, \dots, n-1 \right\\}$.
+
+  Then, according to the algorithm, $p_k$ sends $(p, m_p)$ to $p_{k+1}$, meaning that $p_{k+1}$ receives $(p, m_p)$ from $p_k$, which means that $\mathcal{P}_{k+1}$ is true.
+
+Thus $\mathcal{P}_k$ is true.
+
+### Robustness property
+If at most $k$ nodes are crashed, and the graph is $(k+1)$-connected, then all correct nodes **communicate reliably**.
+
+We prove this by contradiction. We want to prove $\mathcal{P}$, so let's suppose that the opposite, $\bar{\mathcal{P}}$ is true; to prove this, we must be able to conclude that the graph is $(k+1)$-connected, but there are 2 correct nodes $p$ and $q$ that *do not* communicate reliably. Hopefully, doing so will lead us to a paradoxical conclusion that allows us to assert $\mathcal{P}$.
+
+As we are $(k+1)$-connected, there exists $k+1$ paths $(P_1, P_2, \dots, P_{k+1})$ paths connecting any two nodes $p$ and $q$. We want to prove that $p$ and $q$ do not communicate reliably, meaning that all paths between them are "cut" by at least one crashed node. As the paths are disjoint, this requires at least $k+1$ crashed nodes to cut them all.
+
+This is a contradiction: we were working under the assumption that $k$ nodse were crashed, and proved that $k+1$ nodes were crashed. This disproves $\bar{\mathcal{P}}$ and proves $\mathcal{P}$.
+
+### Random failures
+Let's assume that $p$ and $q$ are connected by a single path of length 1, only separated by a node $n$. If each node has a probability $f$ of crashing, then the probability of communicating reliably is $1-f$.
+
+Now, suppose that the path is of length $n$; the probability of communicating reliably is the probability that none of the nodes crashing; individually, that is $1-f$, so for the whole chain, the probability is $(1-f)^n$.
+
+However, if we have $n$ paths of length 1 (that is, instead of setting them up serially like previously, we set them up in parallel), the probability of not communicating reliably is that of all intermediary nodes crashing, which is $f^n$; thus, the probability of actually communicating reliably is $1-f^n$.
+
+If our nodes are connecting by $n$ paths of length $m$, the probability of not communicating reliably is that of all lines being cut. The probability of a single line being cut is $1 - (1 - f)^m$. The probability of any line being cut is one minus the probability of no line being cut, so the final probability is $1 - (1 - (1 - f)^m)^n$.
+
+
+### Example proof
+Assume an infinite 2D grid of nodes. Nodes $p$ and $q$ are connected, with the distance in the shortest path being $D$. What is the probability of communicating reliably when this distance tends to infinity?
+
+$$
+\lim_{D \rightarrow \infty} = \dots
+$$
+
+First, let's define a sequence of grids $G_k$. $G_0$ is a single node, $G_{k+1}$ is built from 9 grids $G_k$.
+
+$G_{k+1}$ is **correct** if at least 8 of its 9 grids are correct.
+
+We'll introduce the concept of a "meta-correct" node; this is not really anything official, just something we're making up for the purpose of this proof. Consider a grid $G_n$. A node $p$ is "meta-correct" if:
+
+- It is in a correct grid $G_n$, and
+- It is in a correct grid $G_{n-1}$, and
+- It is in a correct grid $G_{n-2}$, ...
+
+For the sake of this proof, let's just admit that all meta-correct nodes are connected; if you take two nodes $p$ and $q$ that are both meta-correct, there will be a path of nodes connecting them.
+
+#### Step 1
+If $x$ is the probability that $G_k$ is correct, what is the probability $P(x)$ that $G_{k+1}$ is correct?
+
+$G_{k+1}$ is built up of 9 subgrids $G_k$. Let $P_i$ be the probability of $i$ nodes failing; the probability of $G_k$ being correct is the probability at most one subgrid being incorrect.
+
+$$
+\begin{align}
+P_0 & = x^9 \\
+P_1 & = 9(1-x)x^8 \\
+P(x) & = P_0 + P_1 = x^9 + 9(1-x)x^8 \\
+\end{align}
+$$
+
+#### Step 2
+Let $\alpha = 0.9$, and $z(x) = 1 + \alpha (x-1)$. 
+
+We will admit the following: if $x \in [0.99, 1]$ then $z(x) \le P(x)$.
+
+Let $P_k$ be the result of applying $P$ (as defined in step 1) to $1-f$, $k$ times: $P_k = P(P(P(\dots P(1-f))))$. We will prove that $P_k \ge 1 - \alpha^k, \forall k > 0$, by induction:
+
+- **Base case**: $P_0 = 1-f = 0.99$ and $1-\alpha^0 = 1-1 = 0$, so $P_0 \ge 1-\alpha^0$.
+- **Induction step**:
+  
+  Let's suppose that $P_k \ge 1-\alpha^k$. We want to prove this for $k+1$, namely $P_{k+1} \ge 1 - \alpha^{k+1}$.
+
+  $$
+  P_{k+1} \ge P(P_k) \ge z(P_k) \ge z(1 - \alpha^k) \\
+  P_{k+1} \ge 1 + \alpha(1 - \alpha^k - 1) \\
+  P_{k+1} \ge 1 - \alpha^{k+1}
+  $$
+
+This proves the result that $\forall k, P_k \ge 1 - \alpha^k$.
+
+#### Step 3
+Todo.
+
+
+## Guest lecture 2: Byzantine failures
 So far, we've only considered situations in which nodes crash. In this section, we'll consider a new case: the one where nodes go "evil", a situation we call **byzantine failures**.
 
 Suppose that our nodes are arranged in a grid. $S$ sends a message $m$ to $R$ by broadcasting $(S, m)$. With a simple broadcast algorithm, we just broadcast the message to the neighbor, which may be a byzantine node $B$ that alters the message before rebroadcasting it. Because $B$ can simply do that, we see that this simple algorithm is not enough to deal with byzantine failures. 
@@ -864,3 +1272,4 @@ We'll prove the following properties under the hypotheses that we have at most $
   According to our algorithm, we have $k+1$ disjoint sets whose intersection is $p$, and $k+1$ elements $(p, \Omega_i, m) \in q_X$.
   
   To prove this, we'll need to prove a sub-property: that each set $\Omega_i$ contains at least one byzantine node. We prove this by contradiction. We'll suppose the opposite, namely that $\Omega_i$ contains no byzantine node (i.e. that they are all correct). I won't write down the proof of this, but it's in the lecture notes if ever (it's by induction).
+
