@@ -51,13 +51,13 @@ module Rouge
 				
 				rule digits, Num::Integer
 
-				rule /[\[\]{}:(),;\>]/, Punctuation
+				rule /[\[\]{}:(),\.;\>]/, Punctuation
 
 				rule %r(#(.*)?\n?), Comment::Single
 
 				rule /(in|is|and|or|not)\b/, Operator::Word
 				rule /(\\|:=|!=|<=)/, Operator
-				rule /[∉∈∪⊆=\-\+\*\/]/, Operator
+				rule /[∉∈∪⊆⊂=\-\+\*\/]/, Operator
 
 				rule identifier do |m|
 					if self.class.keywords.include? m[0]

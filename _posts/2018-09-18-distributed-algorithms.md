@@ -88,9 +88,7 @@ Events:
     Indication: <flp2pDeliver, src, m>: delivers messages m sent by src
 
 Properties:
-    FLL1
-    FLL2
-    FLL3
+    FLL1, FLL2, FLL3
 {% endhighlight %}
 
 #### Stubborn link (SL)
@@ -127,8 +125,7 @@ Events:
     Request: <sp2pSend, dest, m>: requests to send message m to dest
     Indication: <sp2pDeliver, src, m>: delivers message m sent by src
 Properties:
-    SL1
-    SL2
+    SL1, SL2
 
 upon event <sp2pSend, dest, m> do:
     while (true) do:
@@ -162,9 +159,7 @@ Events:
     Request: <pp2pSend, dest, m>: requests to send message m to process q
     Indication: <pp2pDeliver, src, m>: delivers message m sent by src
 Properties:
-    PL1
-    PL2
-    PL3
+    PL1, PL2, PL3
 
 upon event <pp2p, Init> do:
     delivered := ∅;
@@ -312,10 +307,7 @@ Events:
     Request: <rbBroadcast, m>: broadcasts a message m to all processes
     Indication: <rbDeliver, src, m>: delivers a message m sent by src
 Properties:
-    RB1
-    RB2
-    RB3
-    RB4
+    RB1, RB2, RB3, RB4
 
 upon event <rb, Init> do:
     delivered := ∅;
@@ -391,10 +383,7 @@ Events:
     Request: <rbBroadcast, m>: broadcasts a message m to all processes
     Indication: <rbDeliver, src, m>: delivers a message m sent by src
 Properties:
-    URB1
-    URB2
-    URB3
-    URB4
+    URB1, URB2, URB3, URB4
 
 upon event <urb, Init> do:
     correct := Π;
@@ -485,11 +474,7 @@ Events:
     Request: <rcbBroadcast, m>: broadcasts a message m to all processes
     Indication: <rcbBroadcast, sender, m>: delivers a message m sent by sender
 Properties:
-    RB1
-    RB2
-    RB3
-    RB4
-    CO
+    RB1, RB2, RB3, RB4, CO
 
 upon event <rcb, Init> do:
     delivered := ∅;
@@ -534,11 +519,7 @@ Events:
     Request: <rcbBroadcast, m>: broadcasts a message m to all processes
     Indication: <rcbBroadcast, sender, m>: delivers a message m sent by sender
 Properties:
-    RB1
-    RB2
-    RB3
-    RB4
-    CO
+    RB1, RB2, RB3, RB4, CO
 
 upon event <rcb, Init> do:
     delivered := ∅;
@@ -670,11 +651,7 @@ Events:
     Request: <tobBroadcast, m>: broadcasts a message m to all processes
     Indication: <tobDeliver, src, m>: delivers a message m broadcast by src
 Properties:
-    RB1
-    RB2
-    RB3
-    (U)RB4
-    (U)TO1
+    RB1, RB2, RB3, (U)RB4, (U)TO1
 
 upon event <tob, Init>:
     unordered := ∅;
@@ -758,10 +735,7 @@ Events:
     Request: <propose, v>: proposes value v for consensus
     Indication: <decide, v>: outputs a decided value v of consensus
 Properties:
-    C1
-    C2
-    C3
-    C4
+    C1, C2, C3, C4
 
 upon event <cons, Init> do:
     suspected := ∅;     # list of suspected processes
@@ -810,13 +784,13 @@ Let's formulate a short correctness argument for the algorithm:
 - *Integrity* follows from the algorithm and BEB1 (validity)
 
 ### Algorithm 2: Fail-Stop Uniform Consensus
-The previous algorithm does not guarantee *uniform* agreement. The problem is that that some of the processes decide too early, without making sure that their decision has been seen by enough processes (remember that if the broadcaster fails in BEB, then we have no guarantee that all processes receive the broadcast). It could therefore decide on a value, and then crash before anybody receives it. The other processes might then have no choice but to decide on a different value.
+The previous algorithm does not guarantee *uniform* agreement. The problem is that that some of the processes decide too early, without making sure that their decision has been seen by enough processes (remember that if the broadcaster fails in BEB, then we have no guarantee that all processes receive the broadcast). It could therefore decide on a value, and then crash before anybody receives it, which would violate uniform agreement (UC2). The other processes might then have no choice but to decide on a different value.
 
 To fix this, the idea is to do the same thing as before, but instead of $p_i$ deciding at round $i$, we wait until the last round $N$. The resulting algorithm is simply called "hierarchical uniform consensus".
 
 {% highlight dapseudo linenos %}
 Implements:
-    Consensus (cons)
+    UniformConsensus (ucons)
 Uses:
     BestEffortBroadcast (beb)
     PerfectFailureDetector (P)
@@ -824,12 +798,9 @@ Events:
     Request: <propose, v>: proposes value v for consensus
     Indication: <decide, v>: outputs a decided value v of consensus
 Properties:
-    C1
-    UC2
-    C3
-    C4
+    C1, UC2, C3, C4
 
-upon event <cons, Init> do:
+upon event <ucons, Init> do:
     suspected := ∅;     # list of suspected processes
     round := 1;         # current round number
     proposal := nil;    # current proposal
@@ -930,7 +901,7 @@ The **nonblocking atomic commit (NBAC)** abstraction is used to solve this probl
 
 The properties of NBAC are:
 
-- **NBAC1. Agreement**: no two processes decide differently
+- **NBAC1. Uniform Agreement**: no two processes decide differently
 - **NBAC2. Termination**: every correct process eventually decides
 - **NBAC3. Commit-validity**: 1 can only be decided if all processes propose 1
 - **NBAC4. Abort-validity**: 0 can only be decided if some process crashes or votes 0
@@ -939,7 +910,7 @@ Note that here, NBAC must decide to abort if some process crashes, even though a
 
 We can implement NBAC using three underlying abstractions:
 
-- A perfect failure detector P
+- A perfect failure detector $\mathcal{P}$
 - Uniform consensus
 - Best-effort broadcast BEB
 
@@ -948,54 +919,59 @@ It works as follows: every process $p$ broadcasts its initial vote (0 or 1, abor
 - If $p$ gets 0 (abort) from any other process, or if it detects a crash, it invokes consensus with a proposal to abort (0). 
 - Otherwise, if it receives the vote to commit (1) from all processes, then it invokes consensus with a proposal to commit (1).
 
-Once the consensus is over, every process nbac decides according to the outcome of the consensus.
+Once the consensus is over, every process NBAC-decides according to the outcome of the consensus.
 
 We can write this more formally:
 
-{% highlight python linenos %}
-Events:
-    Request: <Propose, v1>
-    Indication: <Decide, v2>
-
-Properties:
-    NBAC1, NBAC2, NBAC3, NBAC4
-
+{% highlight dapseudo linenos %}
 Implements:
     nonBlockingAtomicCommit (nbac)
 Uses:
     BestEffortBroadcast (beb)
     PerfectFailureDetector (P)
-    UniformConsensus (uc)
+    UniformConsensus (ucons)
+Events:
+    Request: <nbacPropose, v>
+    Indication: <nbacDecide, v>
+Properties:
+    NBAC1, NBAC2, NBAC3, NBAC4
 
-upon event <Init>:
-    prop := 1
-    delivered := Ø
-    correct := all_processes
 
-upon event <Crash, pi>:
-    correct := correct \ {pi}
+upon event <nbac, Init> do:
+    prop := 1;
+    delivered := ∅;
+    correct := Π;
 
-upon event <nbac, Propose, v>:
-    trigger <bebBroadcast, pi>
+upon event <crash, p> do:
+    correct := correct \ {p};
 
-upon event <bebDeliver, pi, v>:
-    delivered := delivered U {pi}
-    prop := prop * v
+# Broadcast proposals to others:
+upon event <propose, v> do:
+    trigger <bebBroadcast, v>;
 
-upon event correct \ delivered = Ø:
-    if correct != all_processes:
-        prop := 0
-    trigger <ucPropose, prop>
+# Register proposal broadcasts from others:
+upon event <bebDeliver, src, v> do:
+    delivered := delivered ∪ {src};
+    prop := prop * v;
 
-upon event <ucDecide, decision>:
-    trigger <Decide, decision>
+# When all correct processes have delivered,
+# initialize consensus by proposing prop
+upon event correct ⊆ delivered do:
+    if correct != Π:
+        prop := 0;
+    trigger <uconsPropose, prop>;
+
+upon event <uconsDecide, decision> do:
+    trigger <nbacDecide, decision>;
 {% endhighlight %}
 
-We use multiplication to factor in the decisions we get from other processes; if we get a single 0, the final proposition will be 0 too. If we get only 1s, the final proposition will be 1 too. Otherwise, this should be a fairly straight-forward implementation of the description we gave. 
+We use multiplication to factor in the decisions we get from other processes; if we get a single 0, the final proposition will be 0 too. If we only get ones, the final proposition will be 1 too. Otherwise, this should be a fairly straight-forward implementation of the description we gave. 
 
-We need a perfect failure detector $P$. An eventually perfect failure detector $\diamond P$ is not enough (todo why?).
+We need a perfect failure detector $\mathcal{P}$. An eventually perfect failure detector $\diamond\mathcal{P}$ is not enough, because we may suspect a process: this leads us to run uniform consensus with a proposal to abort, and consequently decide to abort. After this whole ordeal, we may find out that it wasn't crashed after all, and the previously suspected process would never decide, which violates termination. 
 
 ### 2-Phase Commit
+
+
 This is a *blocking* algorithm. Unlike NBAC, this algorithm does not use consensus. It operates under a relaxed set of constraints; the termination property has been replaced with weak termination, which just says that if a process $p$ doesn't crash, then all correct processes eventually decide.
 
 In 2PC, we have a leading coordinator process $p$ which takes the decision. It asks everyone to vote, makes a decision, and notifies everyone of the decision.
@@ -1006,7 +982,6 @@ As the name indicates, there are two phases in this algorithm:
 2. **Commit phase**: Again, just as before, it decides to abort if it receives any abort proposals, or if it detects any crashes with its perfect failure detector. Otherwise, if it receives proposals to commit from everyone, it will decide to commit. It then sends this decision to all processes with BEB.
 
 If $p$ crashes, all processes are blocked, waiting for its response. 
-
 
 ## Terminating reliable broadcast (TRB)
 Like reliable broadcast, terminating reliable broadcast (TRB) is a communication primitive used to disseminate a message among a set of processes in a reliable way. However, TRB is stricter than URB.
@@ -1020,86 +995,435 @@ For a process $p$, the following cases cannot be distinguished:
 - Some other process $q$ has delivered $m$; this means that $p$ should keep waiting for it
 - No process will ever deliver $m$; this means that $p$ should **not** keep waiting for it
 
-TRB solves this by adding this missing piece of information to (uniform) reliable broadcast. It ensures that every process either delivers the messaeg $m$ or sends a failure indicator $\phi$. 
+TRB solves this by adding this missing piece of information to (uniform) reliable broadcast. It ensures that every process either delivers the message $m$ or sends a failure indicator $\phi$. 
 
-
+### Properties
 The properties of TRB are:
 
 - **TRB1. Integrity**: If a process delivers a message $m$, then either $m$ is $\phi$ or $m$ was broadcast by $p_{\text{src}}$
 - **TRB2. Validity**: If the sender $p_{\text{src}}$ is correct and broadcasts a message $m$, then $p_{\text{src}}$ eventually delivers $m$
-- **TRB3. (Uniform) Agreement**: For any message $m$, if a correct process (any process) delivers $m$, then every correct process delivers $m$
+- **(U)TRB3. (Uniform) Agreement**: For any message $m$, if a correct process (any process) delivers $m$, then every correct process delivers $m$
 - **TRB4. Termination**: Every correct process eventually delivers exactly one message
 
-Unlike reliable broadcast, every correct process delivers a message, even if the broadcaster crashes. Indeed, with (uniform) reliable broadcast, when the broadcaster crashes, the other processes may deliver *nothing*. 
+Unlike reliable broadcast, every correct process delivers a message, even if the broadcaster crashes. Indeed, with (uniform) reliable broadcast, when the broadcaster crashes, the other processes may deliver *nothing*.
 
-{% highlight python linenos %}
-Events:
-    Request: <trbBroadcast, m>  # broadcasts a message m to all processes
-    Indication: <trbDeliver, m> # delivers a message m, or the failure ϕ
+### Algorithm
+The following algorithm implements consensus-based uniform terminating reliable broadcast. To implement regular (non-uniform) TRB, we can just use regular (non-uniform) consensus.
 
-Properties:
-    TRB1, TRB2, TRB3, TRB4
+All processes wait until they receive a message from the source $p_{\text{src}}$, or until they detect that it has crashed. By the validity property of BEB, and the properties of a perfect failure detector, no process is ever left waiting forever. 
 
+They then invoke uniform consensus to know whether to deliver $m$ or $\phi$.
+
+{% highlight dapseudo linenos %}
 Implements:
     trbBroadcast (trb)
-
 Uses:
     BestEffortBroadcast (beb)
     PerfectFailureDetector (P)
-    Consensus (cons)
+    Consensus (ucons)
+Events:
+    Request: <trbBroadcast, m>:  broadcasts a message m to all processes
+    Indication: <trbDeliver, m>: delivers a message m, or the failure ϕ
+Properties:
+    TRB1, TRB2, TRB3, TRB4
 
-upon event <Init>:
-    proposal := null
-    correct := S
+upon event <trb, Init>:
+    proposal := nil;
+    correct := Π;
 
 # When application broadcasts:
-upon event <trbBroadcast, m>:
-    trigger <bebBroadcast, m>
+upon event <trbBroadcast, m> do:
+    trigger <bebBroadcast, m>;
 
-# When the perfect failure detector detects a crash
-upon event <Crash, pi> and (proposal = null):
-    if pi == p_src:
-        proposal := ϕ
+# When the perfect failure detector detects that
+# the broadcaster p_src has crashed:
+upon event <crash, p> and (proposal = nil) do:
+    if p = p_src:
+        proposal := ϕ;
 
-upon event <bebDeliver, src, m> and (proposal = null):
-    proposal := m
+# Otherwise, if we successfully receive from p_src:
+upon event <bebDeliver, p, m> and (proposal = nil) do:
+    if p = p_src:
+        proposal := m;
 
-upon event (proposal != null):
-    trigger <Propose, proposal>
+# Start consensus as soon as we have a proposal:
+upon event (proposal != nil) do:
+    trigger <propose, proposal>;
 
-upon event <Decide, decision>:
-    trigger <trbDeliver, src, decision>
+# Deliver results of consensus:
+upon event <decide, decision> do:
+    trigger <trbDeliver, p_src, decision>;
 {% endhighlight %}
 
-todo explain how we use consensus, and why P is necessary.
+Let's take a look at the scenario where $p_{\text{src}}$ broadcasts $m$ to processes $q$, $r$ and $s$. It broadcasts using BEB, so it can crash while broadcasting, and some processes wouldn't receive the message. Suppose $q$ and $r$ got the message, but $s$ did not; instead it detects that $p_{\text{src}}$ has crashed. In the consensus round, $s$ will propose $\phi$, while the two other processes propose $m$. Since they are in the majority, the result of the consensus will be a decision to deliver $m$. But in this scenario, $\phi$ would also have been a valid result.
 
+### Failure detector
+The TRB algorithm uses the perfect failure detector $\mathcal{P}$, which means that is is sufficient. Is it also sufficient? We'll argue that it is, because we can implement $\mathcal{P}$ with TRB (meaning that it's necessary):
+
+Assume that every process $p_i$ is the broadcaster $p_{\text{src}}$, and can use an infinite number of instances of TRB. The algorithm is as follows:
+
+1. Every process keeps broadcasting messages with TRB
+2. If a process $p_k$ delivers $\phi_i$, it suspects $p_i$ 
+
+This algorithm uses non-uniform TRB, i.e. just respecting agreement (not uniform agreement).
 
 ## Group membership
-Every view is a pair $(i, M)$, where $i$ is the numbering of the view, and $M$ is a set of processes.
+Many of the algorithms we've seen so far require some knowledge of the state of other processes in the network $\Pi$. In other words, we need to know which processes are *participating* in the computation and which are not. So far, we've used failure detectors to get this information.
 
-Properties:
+The problem with failure detectors is that they are not coordinated, even when the failure detector is perfect. The outputs of failure detectors in different processes are not always the same: we may get notifications about crashes in different orders and at different times (because of delays in the network), and thus obtain different perspectives of the system's evolution.
+
+The group membership abstraction solves this problem, giving us consistent, accurate and better coordinated information about the state of processes. 
+
+In this course, we'll only use group membership to give coordinated information about crashes, but it's useful to know that it can also be used to coordinate processes *joining* or *leaving* the set $\Pi$ explicitly (i.e. without crashing, but instead leaving voluntarily). This  enables dynamic changes in the set of processes $\Pi$. So far, we've assumed that $\Pi$ is a static set of $N$ processes, but group membership allows us to handle dynamic sets.
+
+### Properties
+A group is the set of processes participating in the computation. The current membership is called a *view*. A view $V$ is a pair $V = (i, M)$, where $i$ is the numbering of the view, and $M$ is a set of processes.
+
+The views are numbered by the number of changes the set of processes has gone through previously. As such, the first view is identified by $i=0$, and $M = \Pi$ (so $V_0 = (0, \Pi)$).
+
+When the view changes, we get an indication event `<membView, V>`; we say that processes *install* this new view.
+
+The properties for the group membership abstraction in this course are:
 
 - **Memb1. Local Monotonicity**: If a process installs view $(j, M)$ after $(k, N)$, then $j > k$ and $\abs{M} < \abs{N}$ (the only reason to change a view is to remove a process from the set when it crashes).
-- **Memb2. Agreement**: No two processes install views $(j, M)$ and $(j, M')$ such that $M \ne M'$.
+- **Memb2. Uniform Agreement**: No two processes install views $(j, M)$ and $(j, M')$ such that $M \ne M'$.
 - **Memb3. Completeness**: If a process $p$ crashes, then there is an integer $j$ such that every correct process installs view $(j, M)$ in which $p\notin M$
 - **Memb4. Accuracy**: If some process installs a view $(i, M)$ and $p\notin M$ then $p$ has crashed.
 
-The implementation uses consensus and a perfect failure detector.
+### Algorithm
+The implementation uses uniform consensus and a perfect failure detector.
 
-{% highlight python linenos %}
-todo
+{% highlight dapseudo linenos %}
+Implements:
+    GroupMembership (memb)
+Uses:
+    UniformConsensus (ucons)
+    PerfectFailureDetector (P)
+Events:
+    Indication: <membView, V>
+Properties:
+    Memb1, Memb2, Memb3, Memb4
+
+upon event <memb, Init> do:
+    view := (0, Π);
+    correct := Π;
+    wait := true;
+
+upon event <crash, p> do:
+    correct := correct \ {p};
+
+# When we've detected a crash and we aren't waiting for
+# consensus, trigger new consensus for view.
+upon event (correct ⊂ view.memb) and (not wait) do:
+    wait := true;
+    trigger <uconsPropose, (view.id + 1, correct)>;
+
+# When consensus is done, install the new view:
+upon event <uconsDecide, (id, memb)> do:
+    view := (id, memb);
+    wait := false;
+    trigger <membView, view>;
 {% endhighlight %}
 
-We use a `wait` variable, just like in total order. This allows to prevent a process from triggering a new view installation before the previous one has been done.
+We use a `wait` variable: this allows to prevent a process from triggering a new view installation before the previous one has been done.
 
-## View-Synchronous (VS) communication
-This abstraction brings together reliable broadcast and group membership. However, this introduces a subtle problem, justifying the introduction of a solution as a new abstraction. Indeed, if a message is broadcast right as we're installing a view, we're breaking things. To solve this, we must introduce some notion of phases in which messages can or cannot be sent.
+## View-Synchronous broadcast (VS)
+View-synchronous broadcast is the abstraction resulting from the combination of group membership and reliable broadcast. It ensures that the delivery of messages is coordinated by the installation of views.
 
+### Properties
+We aim to ensure all the properties of group membership (Memb1, Memb2, Memb3, Memb4) and of reliable broadcast (RB1, RB2, RB3, RB4). On top of this, we also aim to ensure the following property:
+
+- **VS1. View inclusion**: A message is `vsDeliver`ed in the view where it is `vsBroadcast`.
+
+Unfortunately, this property doesn't come for free. Combining VS and GM introduces a subtle problem that we'll have to solve, justifying the introduction of a solution as a new abstraction. Indeed, if a message is broadcast right as we're installing a view, we're breaking things. 
+
+Consider that a group of processes are exchanging messages, and process $q$ crashes. This failure is detected, and the other processes install a new view $V = (i, M)$, with $q \notin M$. After that, suppose that process $p$ delivers a message $m$ that was originally broadcast by $q$ (this can happen because of delays in the network). But it doesn't make sense to deliver messages from processes that aren't in the view to the application layer.
+
+At this point, the solution may seem straightforward: allow $p$ to discard messages from $q$. Unfortunately, it's possible that a third process $r$ has delivered $m$ before the view $V$ was installed. At this point, process $p$ must essentially chose between two conflicting goals: either deliver $m$ to ensure agreement (RB4), or discard it and guarantee view inclusion (VS1).
+
+To solve this, we must introduce some notion of phases in which messages can or cannot be sent. 
+
+### Algorithm 1: TRB-based VS
+VS broadcast extends both RB and GM, so its interface must have events of both primitives. In addition to that, we need to add two more events for blocking communications when we're about to install a view.
+
+Note that these events for blocking communications aren't between processes: they're a contract between the VS algorithm and the layer above (i.e. the application layer). If the application layer keeps broadcasting messages, installing a view may be postponed indefinitely. Therefore, when we need to install a view, we ask the application layer to stop broadcasting in the current view by indicating a `<vsBlock>` event. When the higher level module agrees, it replies by the requests of `<vsBlockOk>`.
+
+We assume that the application layer indeed is well-behaved, and does not broadcast any further in the current view after the `<vsBlockOk>`. It can start broadcasting again once a new view is installed (`<vsView, V>`).
+
+The key element of this algorithm is a flush procedure, which the processes execute when the GM changes the view. This procedure uses uniform TRB to rebroadcast messages that it has `vsDeliver`ed in the current view.
+
+For normal data transfer within a view, we attach the view id to each message, and use BEB to broadcast. On the opposite side, when messages are BEB delivered (with a view id matching the current view), it can immediately `vsDeliver`. It's also important the receiver saves the message to `delivered`, so that it can replay it during the flush procedure.
+
+We start the flush procedure when GM installs a view. We first ask the application to stop broadcasting; when we receive the OK, we stop `vsDeliver`ing, and discard all BEB messages. We can then resend all messages we `vsDeliver`ed previously (which are saved in `delivered`) using an instance of TRB for each destination process.
+
+We then receive all flush messages from the other processes. When we have received all flushes, we can move on to the next view.
+
+{% highlight dapseudo linenos %}
+Implements:
+    ViewSynchrony (vs)
+Uses:
+    GroupMembership (memb)
+    UniformTerminatingReliableBroadcast (utrb)
+    BestEffortBroadcast (beb)
+Events:
+    Request: <vsBroadcast, m>: broadcasts m to all processes
+    Indication: <vsDeliver, src, m>: delivers message m broadcast by src
+    Indication: <vsView, V>: Installs a view V = (id, M)
+    Indication: <vsBlock>: requests that no new messages are 
+                           broadcast temporarily, until next view is installed
+    Request: <vsBlockOk>: confirms that no new messages will be
+                          broadcast until next view is installed
+Properties:
+    RB1, RB2, RB3, RB4
+    Memb1, Memb2, Memb3, Memb4
+    VS1
+
+upon event <vs, Init> do:
+    view := (0, Π);    # currently installed view
+    nextView := nil;   # next view to install after flushing
+    pending := [];     # FIFO queue of pending views
+    delivered := ∅;    # set of delivered messages in current view
+    trbDone := ∅;      # set of processes done flushing with uTRB
+    flushing := false; # whether we're currently flushing
+                       # messages in order to install a view
+    blocked := false;  # whether the application layer is blocked
+
+#############################
+# Part 1: Data transmission #
+#############################
+
+# Attach view ID to all messages we will broadcast:
+upon event <vsBroadcast, m> and (not blocked) do:
+    delivered := delivered ∪ {m};
+    trigger <vsDeliver, self, m>;
+    trigger <bebBroadcast, [Data, view.id, m]>;
+
+# Deliver new messages from same view:
+upon event <bebDeliver, src, [Data, view_id, m]> do:
+    if (view.id = view_id) and (m ∉ delivered) and (not blocked):
+        delivered := delivered ∪ {m};
+        trigger <vsDeliver, src, m>;
+
+#######################
+# Part 2: View change #
+#######################
+
+# Append new view to pending:
+upon event <membView, V> do:
+    pending.append(V);
+
+# When we need to switch view, initiate flushing by
+# requesting vsBlock from application layer:
+upon event (pending != ∅) and (not flushing) do:
+    nextView := pending.pop(); # get head of queue
+    flushing := true;
+    trigger <vsBlock>;
+
+# When application layer replies OK, block and flush:
+upon event <vsBlockOk> do:
+    blocked := true;
+    trbDone := ∅;
+    trigger <trbBroadcast, self, (view.id, delivered)>;
+
+# Get flushes and deliver missing messages:
+upon event <trbDeliver, src, (view_id, view_delivered)> do:
+    trbDone := trbDone ∪ {src};
+    forall m ∈ view_delivered and m ∉ delivered do:
+        delivered := delivered ∪ {m};
+        trigger <vsDeliver, src, m>;
+
+# Once we have all flushes, we can go to the next view:
+upon event (trbDone = view.memb) and (blocked = true) do:
+    view := nextView;
+    flushing := false;
+    blocked := false;
+    delivered := ∅;
+    trigger <vsView, view>;
+{% endhighlight %}
+
+### Algorithm 2: Consensus-based VS
+The previous algorithm is uniform in the sense that no two processes install different views. But it isn't uniform in terms of message delivery, as one process may `vsDeliver` a message and crash, while no other processes deliver that message.
+
+So we need to revise the previous algorithm to get uniform VS. Instead of launching parallel instances of TRB, plus a group membership, we can use a consensus instance and parallel broadcasts for every view change.
+
+The idea is that when $\mathcal{P}$ detects a failure, the processes exchange the messages they have delivered, and use consensus to agree on the membership and message set.
+
+The data transmission works as previously. However, for the view change, we use consensus to agree on the message set (stored in `dset`).
+
+{% highlight dapseudo linenos %}
+Implements:
+    ViewSynchrony (vs)
+Uses:
+    UniformConsensus (ucons)
+    BestEffortBroadcast (beb)
+    PerfectFailureDetector (P)
+Events:
+    Request: <vsBroadcast, m>: broadcasts m to all processes
+    Indication: <vsDeliver, src, m>: delivers message m broadcast by src
+    Indication: <vsView, V>: Installs a view V = (id, M)
+    Indication: <vsBlock>: requests that no new messages are 
+                           broadcast temporarily, until next view is installed
+    Request: <vsBlockOk>: confirms that no new messages will be
+                          broadcast until next view is installed
+Properties:
+    RB1, RB2, RB3, RB4
+    Memb1, Memb2, Memb3, Memb4
+    VS1
+
+upon event <vs, Init> do:
+    view := (0, Π);
+    correct := Π;
+    flushing := false;
+    blocked := false;
+    delivered := ∅;
+    dset := ∅;
+
+#############################
+# Part 1: Data transmission #
+#############################
+
+# Same as before
+
+upon event <vsBroadcast, m> and (not blocked) do:
+    delivered := delivered ∪ {m};
+    trigger <vsDeliver, self, m>;
+    trigger <bebBroadcast, [Data, view.id, m]>;
+
+upon event <bebDeliver, src, [Data, view_id, m]> do:
+    if (view.id = view_id) and (m ∉ delivered) and (not blocked):
+        delivered := delivered ∪ {m};
+        trigger <vsDeliver, src, m>;
+
+#######################
+# Part 2: View change #
+#######################
+
+upon event <crash, p> do:
+    correct := correct \ {p};
+    if not flushing:
+        flushing := true;
+        trigger <vsBlock>;
+
+upon event <vsBlockOk> do:
+    blocked := true;
+    trigger <bebBroadcast, [DSET, view.id, delivered]>;
+
+upon event <bebDeliver, src, [DSET, view_id, m_set]> do:
+    dset := dset ∪ (src, m_set);
+    if forall p ∈ correct, (p, _) ∈ dset:
+        trigger <uconsPropose, view.id + 1, correct, dset>;
+
+upon event <uconsDecide, view_id, view_members, view_dset> do:
+    forall (p, mset) ∈ view_dset such that p ∈ view_members do:
+        forall (src, m) ∈ mset such that m ∉ delivered do:
+            delivered := delivered ∪ {m};
+            trigger <vsDeliver, src, m>;
+    view := (view_id, view_members);
+    flushing := false;
+    blocked := false;
+    dset := ∅;
+    delivered := ∅;
+    trigger <vsView, view>;
+{% endhighlight %}
+
+### Algorithm 3: Consensus-based Uniform VS
+Using URB instead of BEB does not ensure uniformity. Therefore, a few changes are necessary.
+
+As in algorithm 1 and 2, to `vsBroadcast`, we simply `bebBroadcast` and attach the view ID in a `Data` message. But now, when receiving these `bebBroadcast`, we mark the source as having acknowledged, and we acknowledge ourselves by re-broadcasting the message. We also add the message $m$ to the set of messages that have been broadcast in `pending`. This variable contains all messages that have been received in the current view. The set of processes that have acknowledged a message $m$ is stored in `ack[m]`.
+
+We also maintain a variable `delivered` containing all messages ever `vsDeliver`ed. We can `vsDeliver` and add to `delivered` when all processes in the current view are contained in `ack[m]` (this is similar to what we did for URB).
+
+When $\mathcal{P}$ detects a crash, we initiate a flush. This process first `bebBroadcast`s the contents of `pending` (which contains all messages from the current view). It's possible that not all messages in this set have been `vsDeliver`ed, so as soon as we've collected all other uncrashed processes' `pending`, we can initiate a consensus about the new view, and about the union of all the `pending` sets it has received.
+
+When consensus decides, we `vsDeliver` all the `pending` messages in the consensus decision, and install the new view.
+
+{% highlight dapseudo linenos %}
+Implements:
+    UniformViewSynchrony (uvs)
+Uses:
+    UniformConsensus (ucons)
+    BestEffortBroadcast (beb)
+    PerfectFailureDetector (P)
+Events:
+    Request: <uvsBroadcast, m>: broadcasts m to all processes
+    Indication: <uvsDeliver, src, m>: delivers message m broadcast by src
+    Indication: <uvsView, V>: Installs a view V = (id, M)
+    Indication: <uvsBlock>: requests that no new messages are 
+                            broadcast temporarily, until next view is installed
+    Request: <uvsBlockOk>: confirms that no new messages will be
+                           broadcast until next view is installed
+Properties:
+    URB1, URB2, URB3, URB4
+    Memb1, Memb2, Memb3, Memb4
+    VS1
+
+upon event <uvs, Init> do:
+    view := (0, Π);
+    correct := Π;
+    flushing := false;
+    blocked := false;
+    pending := ∅;
+    delivered := ∅;
+    dset := ∅;
+    ack[m] := ∅; # set of processes having ack'ed m
+
+#############################
+# Part 1: Data transmission #
+#############################
+
+upon event <uvsBroadcast, m> and (not blocked) do:
+    pending := pending ∪ {(self, m)};
+    # do not vsDeliver to self yet!
+    trigger <bebBroadcast, [Data, view.id, self, m]>;
+
+upon event <bebDeliver, sender, [Data, view_id, src, m]> and (not blocked) do:
+    if view.id = view_id:
+        ack[m] := ack[m] ∪ {sender};
+        if m ∉ pending:
+            pending := pending ∪ {(src, m)};
+            trigger <bebBroadcast, [Data, view.id, src, m]>; # ack! 
+
+# When all processes have acked a pending, undelivered message:
+upon exists (src, m) ∈ pending 
+  such that (view.members ⊆ ack[m]) and (m ∉ delivered) do:
+    delivered := delivered ∪ {m};
+    trigger <uvsDeliver, src, m>;
+
+#######################
+# Part 2: View change #
+#######################
+
+upon event <crash, p> do:
+    correct := correct \ {p};
+    if not flushing:
+        flushing := true;
+        trigger <uvsBlock>;
+
+upon event <uvsBlockOk> do:
+    blocked := true;
+    trigger <bebBroadcast, [DSET, view.id, pending]>;
+
+upon event <bebDeliver, src, [DSET, view_id, m_set]> do:
+    dset := dset ∪ (src, m_set);
+    if forall p ∈ correct, (p, _) ∈ dset:
+        trigger <uconsPropose, view.id + 1, correct, dset>;
+
+upon event <uconsDecide, view_id, view_members, view_dset> do:
+    forall (p, mset) ∈ view_dset such that p ∈ view_members do:
+        forall (src, m) ∈ mset such that m ∉ delivered do:
+            delivered := delivered ∪ {m};
+            trigger <uvsDeliver, src, m>;
+    view := (view_id, view_members);
+    flushing := false;
+    blocked := false;
+    dset := ∅;
+    pending := ∅;
+    delivered := ∅;
+    trigger <uvsView, view>;
+{% endhighlight %}
 
 ## From message passing to Shared memory
 The Cloud is an example of shared memory, with which we interact by message passing.
-
-A register contains integers....
 
 
 ## Guest Lecture 1: Mathematically robust distributed systems
