@@ -32,8 +32,6 @@ $$
 * TOC
 {:toc}
 
-⚠ *Work in progress*
-
 ## Introduction
 In terms of abstraction layers, distributed algorithms are sandwiched between the application layer (processes) the network layer (channels). We have a few commonly used abstractions in this course:
 
@@ -66,16 +64,14 @@ Deliver can be thought of as a reception event on the receiver end. The terminol
 For a link to be considered a fair-loss link, we must respect the following three properties:
 
 - **FLL1. Fair loss**: If a correct process $p$ infinitely often sends a message $m$ to a correct process $q$, then $q$ delivers $m$ an infinite number of times.
-- **FLL2. No creation**: If a correct process $p$ sends a message $m$ a finite number of times to process $q$, then $m$ cannot be delivered an infinite number of times by $q$.
-- **FLL3. Finite duplication**: If some process $q$ delivers a message $m$ with sender $p$, then $m$ was previously sent to $q$ by process $p$.
-
-todo fll1 and fll2 names switched
+- **FLL2. Finite duplication**: If a correct process $p$ sends a message $m$ a finite number of times to process $q$, then $m$ cannot be delivered an infinite number of times by $q$.
+- **FLL3. No creation**: If some process $q$ delivers a message $m$ with sender $p$, then $m$ was previously sent to $q$ by process $p$.
 
 Let's try to get some intuition for what these properties mean:
 
 - FLL1 does not guarantee that all messages get through, but at least ensures that some messages get through. 
-- FLL2 means that every delivery must be the result of a send; no message must be created out of the blue.
-- FLL3 means that message can only be repeated by the link a finite number of times.
+- FLL2 means that message can only be repeated by the link a finite number of times.
+- FLL3 means that every delivery must be the result of a send; no message must be created out of the blue.
 
 There's no real algorithm to implement here; we have only placed assumptions on the link itself. Still, let's take a look at the interface.
 
@@ -454,13 +450,22 @@ A nice property to have in these cases is *causal order*, where we don't necessa
 ### Causal order
 We say that  $m_1$ *causally precedes* $m_2$, denoted as $m_1 \longrightarrow m_2$, if any of the properties below hold:
 
-- **C1. FIFO Order**: Some process $p$ broadcasts $m_1$ before broadcasting $m_2$
-- **C2. Causal Order**: Some process $p$ delivers $m_1$ and then broadcasts $m_2$ 
-- **C3. Transitivity**: There is a message $m_3$ such that $m_1 \longrightarrow m_3$ and $m_3 \longrightarrow m_2$.
+- **FIFO Order**: Some process $p$ broadcasts $m_1$ before broadcasting $m_2$
+- **Causal Order**: Some process $p$ delivers $m_1$ and then broadcasts $m_2$ 
+- **Transitivity**: There is a message $m_3$ such that $m_1 \longrightarrow m_3$ and $m_3 \longrightarrow m_2$.
 
 Note that $m_1 \longrightarrow m_2$ doesn't mean that $m_1$ *caused* $m_2$; it only means that it *may potentially have caused* $m_2$. But without any input from the application layer about what messages are logically dependent on each other, we can still enforce the above causal order.
 
+### Properties
 The **causal order property (CO)** guarantees that messages are delivered in a way that respects all causality relations. It is respected when we can guarantee that any process $p$ delivering a message $m_2$ has already delivered every message $m_1$ such that $m_1 \longrightarrow m_2$.
+
+So all in all, the properties we want from CB are:
+
+- **CB1. Validity = RB1 = BEB1**
+- **CB2. No duplication = RB2 = BEB2**
+- **CB3. No creation = RB3 = BEB3**
+- **CB4. Agreement = RB4**
+- **CB5. Causal order**: if $m_1 \longrightarrow m_2$ then any process $p$ delivering $m_2$ has already delivered $m_1$.
 
 ### No-waiting Algorithm
 The following uses reliable broadcast, but we could also use [uniform reliable broadcast](#uniform-reliable-broadcast-urb) to obtain uniform causal broadcast.
@@ -593,7 +598,7 @@ upon event <rcb, Init> do:
         VC[p] := 0;
 
 upon event <rcbBroadcast, m> do:
-    trigger <rcbDeliver, self, m>; # todo is this necessary?
+    trigger <rcbDeliver, self, m>;
     trigger <rbBroadcast, [Data, VC, m]>; 
     VC[self] := VC[self] + 1;
 
@@ -611,7 +616,7 @@ upon event <rbDeliver, src, [Data, VC_m, m]>:
 The $\le$ comparison operation on vector clocks is defined as follows: $VC_a \le VC_b$ iff it is less or equal in all positions, and at least one position is strictly less.
 
 ## Total order broadcast (TOB)
-In [reliable broadcast](#reliable-broadcast), the processes are free to deliver in any order they wish. In [causal broadcast](#causal-broadcast), we restricted this a little: the processes must deliver in causal order. But causal order is only partial: some messages are causally unrelated, and may therefore be delivered in a different order by the processes.
+In [reliable broadcast](#reliable-broadcast), the processes are free to deliver in any order they wish. In [causal broadcast](#causal-order-broadcast), we restricted this a little: the processes must deliver in causal order. But causal order is only partial: some messages are causally unrelated, and may therefore be delivered in a different order by the processes.
 
 In **total order broadcast** (TOB), the processes must deliver all messages according to the same order. Note that this is orthogonal to causality, or even FIFO ordering. It can be *made* to respect causal or FIFO ordering, but at its core, it is only concerned with all processes delivering in the same order, no matter the actual ordering of messages.
 
@@ -622,11 +627,11 @@ An application using TOB would be Bitcoin; for the blockchain, we want to make s
 #### Properties
 The properties are the same as those of (uniform) reliable broadcast, but with an added total order property.
 
-- **RB1. Validity**
-- **RB2. No duplication**
-- **RB3. No creation**
-- **(U)RB4. (Uniform) Agreement**
-- **(U)TO1. (Uniform) Total Order**: Let $m$ and $m'$ be any two messages. Let $p$ be any (correct) process that delivers $m$ without having delivered $m'$ before. Then no (correct) process delivers $m'$ before $m$.
+- **TOB1. Validity = RB1 = BEB1**
+- **TOB2. No duplication = RB2 = BEB2**
+- **TOB3. No creation = RB3 = BEB3**
+- **(U)TOB4. (Uniform) Agreement = (U)RB4**
+- **(U)TOB5. (Uniform) Total Order**: Let $m$ and $m'$ be any two messages. Let $p$ be any (correct) process that delivers $m$ without having delivered $m'$ before. Then no (correct) process delivers $m'$ before $m$.
 
 #### Consensus-based Algorithm
 The algorithm can be implemented with consensus, which is the next section[^read-both].
@@ -651,7 +656,7 @@ Events:
     Request: <tobBroadcast, m>: broadcasts a message m to all processes
     Indication: <tobDeliver, src, m>: delivers a message m broadcast by src
 Properties:
-    RB1, RB2, RB3, (U)RB4, (U)TO1
+    TOB1, TOB2, TOB3, TOB4, TOB5
 
 upon event <tob, Init>:
     unordered := ∅;
@@ -701,8 +706,6 @@ The properties that we would like to see are:
 Termination and integrity together imply that every correct process decides exactly once. Validity ensures that the consensus may not invent a value by itself. Agreement is the main feature of consensus, that every two correct processes decide on the same value. 
 
 When we have uniform agreement (UC2), we want no processes to decide differently, no matter if they are faulty or correct. In this case, we talk about *uniform consensus*.
-
-Todo: write about consensus and fairness, does it violate validity?
 
 We can build consensus using total order broadcast, which is described above. But total broadcast can be built with consensus. It turns out that **consensus and total order broadcast are equivalent problems in a system with reliable channels**.
 
@@ -1000,7 +1003,7 @@ TRB solves this by adding this missing piece of information to (uniform) reliabl
 ### Properties
 The properties of TRB are:
 
-- **TRB1. Integrity**: If a process delivers a message $m$, then either $m$ is $\phi$ or $m$ was broadcast by $p_{\text{src}}$
+- **TRB1. Integrity**: If a process delivers a message $m$, then either $m=\phi$, or $m$ was broadcast by $p_{\text{src}}$
 - **TRB2. Validity**: If the sender $p_{\text{src}}$ is correct and broadcasts a message $m$, then $p_{\text{src}}$ eventually delivers $m$
 - **(U)TRB3. (Uniform) Agreement**: For any message $m$, if a correct process (any process) delivers $m$, then every correct process delivers $m$
 - **TRB4. Termination**: Every correct process eventually delivers exactly one message
@@ -1423,8 +1426,202 @@ upon event <uconsDecide, view_id, view_members, view_dset> do:
 {% endhighlight %}
 
 ## From message passing to Shared memory
-The Cloud is an example of shared memory, with which we interact by message passing.
+In this section, we'll take a look at shared memory through a series of distributed algorithms that enable distributed data storage through read and write operations. These shared memory abstractions are called *registers*, since they resemble one.
 
+The variations we'll look at vary in the number of processes that can read or write. Specifically, we'll look at:
+
+- $(1, N)$ regular register
+- $(1, N)$ atomic register
+- $(N, N)$ atomic register
+
+The tuple notation above represents the supported number of writers and readers, respectively, so $(1, N)$ means one process can write, and $N$ can read.
+
+### (1, N) Regular register
+This register assumes only one writer, but an arbitrary number of readers. This means that one specific process $p$ can write, but any process can read.
+
+#### Properties
+First of all, we'd like to provide property **ONRR1 Termination**: if a correct process invokes an operation, then the operation eventually completes.
+
+We can provide strong guarantees about the values returned by reads as long as there are no concurrent operations: with only a single reader, any `read()` that isn't concurrent with a `write()` returns the last value written. 
+
+However, when the `read()` *is* concurrent with a `write()`, we can only offer minimal guarantees: the returned value can either be the last value written, or the value concurrently being written.
+
+If the writer crashes during a `write()`, the `write()` on which it crashed is considered to be concurrent with all concurrent and future reads (i.e. any read that did not precede it). Therefore, a read after a failed write can return the value that was supposed to be written, or the last value written before that.
+
+Let's recap these three properties, which we can think of as **ONRR2 Validity**:
+
+- Any read not concurrent with a write returns the last value written
+- Reads concurrent with a write return the last value written *or* the value concurrently being written
+- If the writer crashes, the failed write is considered to be concurrent with all concurrent and future reads
+
+In any case, reads always return values that have been, are being, or have been attempted to be written. In other words, read values can't be created out of thin air, they must come from somewhere.
+
+#### Algorithm 1: fail-stop with perfect failure detection
+Let's take a look at how we can implement this with a message passing model. This is a fail-stop algorithm with a perfect failure detector:
+
+{% highlight dapseudo linenos %}
+Implements:
+    (1, N)-RegularRegister (onrr)
+Uses:
+    BestEffortBroadcast (beb)
+    PerfectLinks (pp2p)
+    PerfectFailureDetector (P)
+Events:
+    Request: <onrrRead>: invokes a read on the register
+    Request: <onrrWrite, v>: invokes a write with value v on the register
+    Indication: <onrrReadReturn, v>: completes a read, returns v
+    Indication: <onrrWriteReturn>: completes a write on the register
+Properties:
+    ONRR1, ONRR2
+
+upon event <onrr, Init> do:
+    val := nil;    # register value
+    correct := Π;  # set of correct processes 
+    writeset := ∅; # set of processes that have ACK'ed the write
+
+upon event <crash, p> do:
+    correct := correct \ {p};
+
+upon event <onrrRead> do:
+    trigger <onrrReadReturn, val>;
+
+upon event <onrrWrite, v> do:
+    trigger <bebBroadcast [Write, v]>;
+
+upon event <bebDeliver, src, [Write, v]> do:
+    val := v;
+    trigger <plSend, src, ACK>;
+
+upon event <plDeliver, src, ACK> do:
+    writeset := writeset ∪ {src};
+
+upon correct ⊆ writeset do:
+    writeset := ∅;
+    trigger <onrrWriteReturn>;
+{% endhighlight %}
+
+The above algorithm is correct, as:
+
+- **ONRR1 Termination**
+    + ATTA, all reads are local and eventually return, so termination for reads is trivial.
+    + ATTA, writes eventually return, because and any process that doesn't send back an ack crashes, and any process that crashes is detected. ATTA, both cases are handled, so we will eventually return. This is proven by:
+        * PFD1, the strong completeness property of $\mathcal{P}$
+        * PL1, the reliable delivery of the perfect link channels
+- **ONRR2 Validity**:
+    + In the absence of concurrent or failed operation, a read returns the last value written. To prove this, assume that a `write(x)` terminates, and no other `write` is invoked.
+    
+    By PFD2 (strong accuracy of $\mathcal{P}$), the value of the register at all processes that didn't crash is `x`. Any subsequent `read()` at process $p$ returns the value at $p$, which is the last written value. 
+
+    + A read returns the value concurrently written or last value written. This should be fairly clear ATTA, but the book has a more detailed proof.
+
+Since we used PFD2 of $\mathcal{P}$ in the above proof, we need a perfect failure detector. Without that, we may violate the ONRR2 validity property of the register. 
+
+#### Algorithm 2: Fail-silent without failure detectors
+Under the assumption that a majority of the processes are correct, we can actually implement (1, N) registers without failure detectors.
+
+The key idea is that the writer process $p$ and all reader processes $q_i$ should use a set of witnesses that keep track of the most recent value of the register. Each set of witnesses must overlap: this forms *quorums* (defined as a collection of sets so that no two sets' intersection is empty). In our case, we consider a very simple form of quorum, namely a majority.
+
+Like the previous algorithm, we store the register value in `val`; in addition to it, we also store a timestamp `ts`, counting the number of write operations. When the writer process $p$ writes, it increments the timestamp, and `bebBroadcast`s a write message to all processes. The processes can adopt the value by storing it locally if the timestamp is larger than the current one, and acknowledging. Once $p$ has such an acknowledgment from a majority of processes, it completes the write.
+
+{% highlight dapseudo linenos %}
+Implements:
+    (1, N)-RegularRegister (onrr)
+Uses:
+    BestEffortBroadcast (beb)
+    PerfectLinks (pp2p)
+Events:
+    Request: <onrrRead>: invokes a read on the register
+    Request: <onrrWrite, v>: invokes a write with value v on the register
+    Indication: <onrrReadReturn, v>: completes a read, returns v
+    Indication: <onrrWriteReturn>: completes a write on the register
+Properties:
+    ONRR1, ONRR2
+
+upon event <onrr, Init> do:
+    ts := 0;
+    val := nil;
+    write_ts := 0;
+    acks := 0;
+    read_id := 0;
+    readlist := [nil] * N;
+
+##################
+# Part 1: Writes #
+##################
+
+upon event <onrrWrite, v> do:
+    write_ts := write_ts + 1;
+    acks := 0;
+    trigger <bebBroadcast, [Write, write_ts, v]>;
+
+upon event <bebDeliver, src, [Write, value_ts, value]> do:
+    if value_ts > ts:
+        ts := value_ts;
+        val := value;
+    trigger <pp2pSend, src, [ACK, value_ts]>;
+
+upon event <pp2pDeliver, q, [ACK, value_ts]> such that value_ts = write_ts do:
+    acks := acks + 1;
+    if acks > N/2:
+        acks := 0;
+        trigger <onrrWriteReturn>
+
+#################
+# Part 2: Reads #
+#################
+
+upon event <onrrRead> do:
+    read_id := read_id + 1;
+    readlist := [nil] * N;
+    trigger <bebBroadcast, [Read, rid]>;
+
+upon event <bebDeliver, src, [Read, read_id]> do:
+    trigger <pp2pSend, src, [Value, read_id, ts, val]>;
+
+upon event <pp2pDeliver, q, [Value, read_id, read_ts, read_val]> do:
+    readlist[q] := (read_ts, read_val);
+    if size(readlist) > N/2:
+        v := highest_timestamp_val(readlist);
+        readlist := [nil] * N;
+        trigger <onrrReadReturn, v>;
+{% endhighlight %}
+
+### (1, N) Atomic register
+With regular registers, the guarantees we gave about reads that are concurrent to writes are a little weak. For instance, suppose that a writer $p$ invokes `write(v)`. The specification allows for concurrent reads to return `nil` then `v` then `nil` again, and so on, until the write is done or if the writer crashes while writing, this can go on forever. An **atomic register** prevents such behavior.
+
+An atomic register provides an additional guarantee compared to a regular register: *ordering*. The guarantee is that even when there is concurrency and failures, the execution is *linearizable*, i.e. it is equivalent to a sequential and failure-free execution.
+
+This means that both of the following are true:
+
+- Every failed write operation appears to be either complete or not to have been invoked at all
+- Every complete operation appears to have been executed at some instant between its invocation and the reply event.
+
+Roughly speaking ,this prevents "old" values from being read by a process $q$ once a newer value has been read by $s$. The properties are:
+
+- **ONAR1. Termination = ONRR1**
+- **ONAR2. Validity = ONRR2**
+- **ONAR3. Ordering**: If a read returns a value $v$ and a subsequent read returns a value $w$, then the write of $w$ does not precede the write of $v$
+
+We assume a fail-stop model, where any number of processes can crash, channels are reliable, and failure detection is perfect. We won't go into the algorithm in detail, but its signature is:
+
+{% highlight dapseudo linenos %}
+Implements:
+    (1, N)-AtomicRegister (onar)
+Uses:
+    BestEffortBroadcast (beb)
+    PerfectLinks (pp2p)
+    PerfectFailureDetector (P)
+Events:
+    Request: <onarRead>: invokes a read on the register
+    Request: <onarWrite, v>: invokes a write with value v on the register
+    Indication: <onarReadReturn, v>: completes a read, returns v
+    Indication: <onarWriteReturn>: completes a write on the register
+Properties:
+    ONAR1, ONAR2, ONAR3
+{% endhighlight %}
+
+
+{% details Guest Lectures %}
 
 ## Guest Lecture 1: Mathematically robust distributed systems
 Some bugs in distributed systems can be very difficult to catch (it could involve long and costly simulation; with $n$ computers, it takes time $2^n$ to simulate all possible cases), and can be very costly when it happens.
@@ -1597,3 +1794,4 @@ We'll prove the following properties under the hypotheses that we have at most $
   
   To prove this, we'll need to prove a sub-property: that each set $\Omega_i$ contains at least one byzantine node. We prove this by contradiction. We'll suppose the opposite, namely that $\Omega_i$ contains no byzantine node (i.e. that they are all correct). I won't write down the proof of this, but it's in the lecture notes if ever (it's by induction).
 
+{% enddetails %}
