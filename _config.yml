@@ -8,7 +8,7 @@ name: OUTPUT
 
 # A subtitle for the site.
 # Written below the site's name, and next to it in the page title.
-subtitle: The blog of Maxime Kjaer
+subtitle: The blog of <span title="/maksim ˈkjɛɹ/">Maxime Kjaer</span>
 
 # A default description for the site. 
 # Used by search engines, Facebook and Twitter. Overridden by blog posts' description when possible.
