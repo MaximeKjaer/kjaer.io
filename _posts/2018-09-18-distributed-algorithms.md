@@ -5,27 +5,11 @@ edited: true
 note: true
 ---
 
-{% comment %}
-Useful:
-
-Π
-∅
-∉
-∈
-∪
-⊆
-{% endcomment %}
-
 - [Course website](http://dcl.epfl.ch/site/education/da)
 - The course follows the book [*Introduction to Reliable (and Secure) Distributed Programming*](https://www.springer.com/gp/book/9783642152597) (available from the library or through SpringerLink)
 - Final exam is 60%
 - Projects in teams of 2-3 are 40%. The project is the implementation of various broadcast algorithms
 - No midterm
-
-$$
-\newcommand{\abs}[1]{\left\lvert#1\right\rvert}
-\newcommand{\set}[1]{\left\{#1\right\}}
-$$
 
 <!-- More -->
 
@@ -321,8 +305,8 @@ upon event <rbBroadcast, m> do:
 # side of the link) from the src (original broadcaster):
 upon event <bebDeliver, sender, [Data, src, m]> do:
     if m ∉ delivered:
-        delivered := delivered ∪ {m};
         # deliver m from src:
+        delivered := delivered ∪ {m};
         trigger <rbDeliver, src, m>;
         # echo to others if src no longer correct:
         if src ∉ correct:
@@ -440,7 +424,7 @@ def can_deliver(m):
     return len(ack[m]) > N/2
 {% endhighlight %}
 
-## Causal order broadcast
+## Causal order broadcast (CB)
 So far, we didn't consider ordering among messages. In particular, we considered messages to be independent. 
 
 Two messages from the same process might not be delivered in the order they were broadcast. This could be problematic: imagine a message board implemented with (uniform) reliable broadcast. For instance, in a message board application, a broadcaster $p$ could send out a message $m_1$, immediately change its mind and send out a rectification $m_2$. But due to network delays, messages may come out of order, and $m_2$ may be delivered before $m_1$ by the receiving node $q$. This is problematic, because the modification $m_2$ won't make sense to $q$ as long as it hasn't delivered $m_1$.
@@ -477,7 +461,7 @@ Uses:
     ReliableBroadcast (rb)
 Events:
     Request: <rcbBroadcast, m>: broadcasts a message m to all processes
-    Indication: <rcbBroadcast, sender, m>: delivers a message m sent by sender
+    Indication: <rcbDeliver, sender, m>: delivers a message m sent by sender
 Properties:
     RB1, RB2, RB3, RB4, CO
 
@@ -689,12 +673,16 @@ upon event <decide, decided> do:
     wait = false;
 {% endhighlight %}
 
-We assume that the `sort` function is deterministic and that all processes run the exact same sorting routine.
+We assume that the `sort` function is deterministic and that all processes run the exact same sorting routine. We run this function to be sure that all processes traverse and deliver the decided set in the same order (usually, sets do not offer any ordering guarantees, though this is somewhat of an implementation detail).
 
 Our total order broadcast is based on consensus, which we describe below.
 
-## Consensus
+## Consensus (CONS)
 In the (uniform) consensus problem, the processes all propose values, and need to agree on one of these propositions. This gives rise to two basic events: a proposition (`<propose, v>`), and a decision (`<decide, v>`). Solving consensus is key to solving many problems in distributed computing (total order broadcast, atomic commit, ...).
+
+Blockchain is based on consensus. Bitcoin mining is actually about solving consensus: a leader is chosen to decide on the broadcast order, and this leader gains 50 bitcoin. Seeing that this is a lot of money, many people want to be the leader; but we only want a single leader. Nakamoto's solution is to choose the leader by giving out a hard problem. The computation can only be done with brute-force, there are no smart tricks or anything. So people put [enormous amounts of energy](https://digiconomist.net/bitcoin-energy-consumption) towards solving this. Usually, only a single person will win the mining block; the probability is small, but the [original Bitcoin paper](https://bitcoin.org/bitcoin.pdf) specifies that we should wait a little before rewarding the winner, in case there are two winners.
+
+### Properties
 
 The properties that we would like to see are:
 
@@ -708,8 +696,6 @@ Termination and integrity together imply that every correct process decides exac
 When we have uniform agreement (UC2), we want no processes to decide differently, no matter if they are faulty or correct. In this case, we talk about *uniform consensus*.
 
 We can build consensus using total order broadcast, which is described above. But total broadcast can be built with consensus. It turns out that **consensus and total order broadcast are equivalent problems in a system with reliable channels**.
-
-Blockchain is based on consensus. Bitcoin mining is actually about solving consensus: a leader is chosen to decide on the broadcast order, and this leader gains 50 bitcoin. Seeing that this is a lot of money, many people want to be the leader; but we only want a single leader. Nakamoto's solution is to choose the leader by giving out a hard problem. The computation can only be done with brute-force, there are no smart tricks or anything. So people put [enormous amounts of energy](https://digiconomist.net/bitcoin-energy-consumption) towards solving this. Usually, only a single person will win the mining block; the probability is small, but the [original Bitcoin paper](https://bitcoin.org/bitcoin.pdf) specifies that we should wait a little before rewarding the winner, in case there are two winners.
 
 ### Algorithm 1: Fail-Stop Consensus
 Suppose that there are $N$ processes in $\Pi$, with IDs $1, \dots, N$. At the beginning, every process proposes a value; to decide, the processes go through $N$ rounds incrementally. At each round, the process with the ID corresponding to the round number is the leader of the round.
@@ -972,10 +958,8 @@ We use multiplication to factor in the decisions we get from other processes; if
 
 We need a perfect failure detector $\mathcal{P}$. An eventually perfect failure detector $\diamond\mathcal{P}$ is not enough, because we may suspect a process: this leads us to run uniform consensus with a proposal to abort, and consequently decide to abort. After this whole ordeal, we may find out that it wasn't crashed after all, and the previously suspected process would never decide, which violates termination. 
 
-### 2-Phase Commit
-
-
-This is a *blocking* algorithm. Unlike NBAC, this algorithm does not use consensus. It operates under a relaxed set of constraints; the termination property has been replaced with weak termination, which just says that if a process $p$ doesn't crash, then all correct processes eventually decide.
+### 2-Phase Commit (2PC)
+This is a *blocking* algorithm, meaning that a crash will result in the algorithm being stuck. Unlike NBAC, this algorithm does not use consensus. It operates under a relaxed set of constraints; the termination property has been replaced with weak termination, which just says that if a process $p$ doesn't crash, then all correct processes eventually decide.
 
 In 2PC, we have a leading coordinator process $p$ which takes the decision. It asks everyone to vote, makes a decision, and notifies everyone of the decision.
 
@@ -1003,7 +987,7 @@ TRB solves this by adding this missing piece of information to (uniform) reliabl
 ### Properties
 The properties of TRB are:
 
-- **TRB1. Integrity**: If a process delivers a message $m$, then either $m=\phi$, or $m$ was broadcast by $p_{\text{src}}$
+- **TRB1. Integrity**: If a process delivers a message $msg$, then either $msg=\phi$, or $msg=m$ that was broadcast by $p_{\text{src}}$
 - **TRB2. Validity**: If the sender $p_{\text{src}}$ is correct and broadcasts a message $m$, then $p_{\text{src}}$ eventually delivers $m$
 - **(U)TRB3. (Uniform) Agreement**: For any message $m$, if a correct process (any process) delivers $m$, then every correct process delivers $m$
 - **TRB4. Termination**: Every correct process eventually delivers exactly one message
@@ -1058,7 +1042,7 @@ upon event <decide, decision> do:
     trigger <trbDeliver, p_src, decision>;
 {% endhighlight %}
 
-Let's take a look at the scenario where $p_{\text{src}}$ broadcasts $m$ to processes $q$, $r$ and $s$. It broadcasts using BEB, so it can crash while broadcasting, and some processes wouldn't receive the message. Suppose $q$ and $r$ got the message, but $s$ did not; instead it detects that $p_{\text{src}}$ has crashed. In the consensus round, $s$ will propose $\phi$, while the two other processes propose $m$. Since they are in the majority, the result of the consensus will be a decision to deliver $m$. But in this scenario, $\phi$ would also have been a valid result.
+Let's take a look at the scenario where $p_{\text{src}}$ broadcasts $m$ to processes $q$, $r$ and $s$. It broadcasts using BEB, so it can crash while broadcasting, and some processes wouldn't receive the message. Suppose $q$ and $r$ got the message, but $s$ did not; instead it detects that $p_{\text{src}}$ has crashed. In the consensus round, $s$ will propose $\phi$, while the two other processes propose $m$. Since they are in the majority, the result of the consensus will be a decision to deliver $m$ (remember [algorithm 3 for uniform consensus](#algorithm-3-uniform-consensus-with-eventually-perfect-failure-detector), which picks the majority value). But in this scenario, $\phi$ would also have been a valid result.
 
 ### Failure detector
 The TRB algorithm uses the perfect failure detector $\mathcal{P}$, which means that is is sufficient. Is it also sufficient? We'll argue that it is, because we can implement $\mathcal{P}$ with TRB (meaning that it's necessary):
@@ -1070,7 +1054,7 @@ Assume that every process $p_i$ is the broadcaster $p_{\text{src}}$, and can use
 
 This algorithm uses non-uniform TRB, i.e. just respecting agreement (not uniform agreement).
 
-## Group membership
+## Group membership (GM)
 Many of the algorithms we've seen so far require some knowledge of the state of other processes in the network $\Pi$. In other words, we need to know which processes are *participating* in the computation and which are not. So far, we've used failure detectors to get this information.
 
 The problem with failure detectors is that they are not coordinated, even when the failure detector is perfect. The outputs of failure detectors in different processes are not always the same: we may get notifications about crashes in different orders and at different times (because of delays in the network), and thus obtain different perspectives of the system's evolution.
@@ -1088,7 +1072,7 @@ When the view changes, we get an indication event `<membView, V>`; we say that p
 
 The properties for the group membership abstraction in this course are:
 
-- **Memb1. Local Monotonicity**: If a process installs view $(j, M)$ after $(k, N)$, then $j > k$ and $\abs{M} < \abs{N}$ (the only reason to change a view is to remove a process from the set when it crashes).
+- **Memb1. Local Monotonicity**: If a process installs view $(j, M)$ after $(k, N)$, then $j > k$ and $M \subset N$ (the only reason to change a view is to remove a process from the set when it crashes).
 - **Memb2. Uniform Agreement**: No two processes install views $(j, M)$ and $(j, M')$ such that $M \ne M'$.
 - **Memb3. Completeness**: If a process $p$ crashes, then there is an integer $j$ such that every correct process installs view $(j, M)$ in which $p\notin M$
 - **Memb4. Accuracy**: If some process installs a view $(i, M)$ and $p\notin M$ then $p$ has crashed.
@@ -1234,6 +1218,10 @@ upon event <trbDeliver, src, (view_id, view_delivered)> do:
     forall m ∈ view_delivered and m ∉ delivered do:
         delivered := delivered ∪ {m};
         trigger <vsDeliver, src, m>;
+
+# If we get ϕ, we can consider the process to be done flushing:
+upon event <trbDeliver, src, ϕ> do:
+    trbDone := trbDone ∪ {src};
 
 # Once we have all flushes, we can go to the next view:
 upon event (trbDone = view.memb) and (blocked = true) do:
@@ -1425,39 +1413,38 @@ upon event <uconsDecide, view_id, view_members, view_dset> do:
     trigger <uvsView, view>;
 {% endhighlight %}
 
-## From message passing to Shared memory
+## Shared Memory (SM)
 In this section, we'll take a look at shared memory through a series of distributed algorithms that enable distributed data storage through read and write operations. These shared memory abstractions are called *registers*, since they resemble one.
 
 The variations we'll look at vary in the number of processes that can read or write. Specifically, we'll look at:
 
 - $(1, N)$ regular register
+- $(1, 1)$ atomic register
 - $(1, N)$ atomic register
-- $(N, N)$ atomic register
 
-The tuple notation above represents the supported number of writers and readers, respectively, so $(1, N)$ means one process can write, and $N$ can read.
+The tuple notation above represents the supported number of writers and readers, respectively, so $(1, N)$ means one process can write, and $N$ can read. As we'll see, the difference between regular and atomic registers lies in the concurrency guarantees that they offer.
 
 ### (1, N) Regular register
-This register assumes only one writer, but an arbitrary number of readers. This means that one specific process $p$ can write, but any process can read.
+This register assumes only one writer, but an arbitrary number of readers. This means that one specific process $p$ can write, but any process (including $p$) can read.
 
 #### Properties
-First of all, we'd like to provide property **ONRR1 Termination**: if a correct process invokes an operation, then the operation eventually completes.
+A (1, N) regular register provides the following properties:
 
-We can provide strong guarantees about the values returned by reads as long as there are no concurrent operations: with only a single reader, any `read()` that isn't concurrent with a `write()` returns the last value written. 
+- **ONRR1 Termination**: if a correct process invokes an operation, then the operation eventually completes
+- **ONRR2 Validity**:
+    + Any read not concurrent with a write returns the last value written
+    + Reads concurrent with a write return the last value written *or* the value concurrently being written
 
-However, when the `read()` *is* concurrent with a `write()`, we can only offer minimal guarantees: the returned value can either be the last value written, or the value concurrently being written.
+A note about ONRR2: if the writer crashes, the failed write is considered to be concurrent with all concurrent and future reads
 
-If the writer crashes during a `write()`, the `write()` on which it crashed is considered to be concurrent with all concurrent and future reads (i.e. any read that did not precede it). Therefore, a read after a failed write can return the value that was supposed to be written, or the last value written before that.
-
-Let's recap these three properties, which we can think of as **ONRR2 Validity**:
-
-- Any read not concurrent with a write returns the last value written
-- Reads concurrent with a write return the last value written *or* the value concurrently being written
-- If the writer crashes, the failed write is considered to be concurrent with all concurrent and future reads
+Therefore, a read after a failed write can return the value that was supposed to be written, or the last value written before that.
 
 In any case, reads always return values that have been, are being, or have been attempted to be written. In other words, read values can't be created out of thin air, they must come from somewhere.
 
 #### Algorithm 1: fail-stop with perfect failure detection
-Let's take a look at how we can implement this with a message passing model. This is a fail-stop algorithm with a perfect failure detector:
+Let's take a look at how we can implement this with a message passing model. The following fail-stop algorithm is fairly simple. It uses a perfect failure detector (eventually perfect would not be enough).
+
+To read, the algorithm simply returns the locally stored value. To write, it `bebBroadcast`s a `Write` message with the new value. Other processes can acknowledge this with a PL, and update the value (including the process that is being written to, as it also broadcasts the `Write` to itself). Once every process has ack'ed, we can complete the write operation by triggering `<onrrWriteReturn>`.
 
 {% highlight dapseudo linenos %}
 Implements:
@@ -1477,7 +1464,7 @@ Properties:
 upon event <onrr, Init> do:
     val := nil;    # register value
     correct := Π;  # set of correct processes 
-    writeset := ∅; # set of processes that have ACK'ed the write
+    acked := ∅;    # set of processes that have ACK'ed the write
 
 upon event <crash, p> do:
     correct := correct \ {p};
@@ -1493,10 +1480,10 @@ upon event <bebDeliver, src, [Write, v]> do:
     trigger <plSend, src, ACK>;
 
 upon event <plDeliver, src, ACK> do:
-    writeset := writeset ∪ {src};
+    acked := acked ∪ {src};
 
-upon correct ⊆ writeset do:
-    writeset := ∅;
+upon correct ⊆ acked do:
+    acked := ∅;
     trigger <onrrWriteReturn>;
 {% endhighlight %}
 
@@ -1517,11 +1504,15 @@ The above algorithm is correct, as:
 Since we used PFD2 of $\mathcal{P}$ in the above proof, we need a perfect failure detector. Without that, we may violate the ONRR2 validity property of the register. 
 
 #### Algorithm 2: Fail-silent without failure detectors
-Under the assumption that a majority of the processes are correct, we can actually implement (1, N) registers without failure detectors.
+Under the assumption that a majority of the processes are correct, we can actually implement (1, N) regular registers without failure detectors. This majority assumption is needed for this algorithm, even if we were to add an eventually perfect failure detector.
 
-The key idea is that the writer process $p$ and all reader processes $q_i$ should use a set of witnesses that keep track of the most recent value of the register. Each set of witnesses must overlap: this forms *quorums* (defined as a collection of sets so that no two sets' intersection is empty). In our case, we consider a very simple form of quorum, namely a majority.
+The key idea is that the writer process $p$ and all reader processes should use a set of *witnesses* that keep track of the most recent value of the register. Each set of witnesses must overlap: this forms *quorums* (defined as a collection of sets so that no two sets' intersection is empty). In our case, we consider a very simple form of quorum, namely a majority.
 
-Like the previous algorithm, we store the register value in `val`; in addition to it, we also store a timestamp `ts`, counting the number of write operations. When the writer process $p$ writes, it increments the timestamp, and `bebBroadcast`s a write message to all processes. The processes can adopt the value by storing it locally if the timestamp is larger than the current one, and acknowledging. Once $p$ has such an acknowledgment from a majority of processes, it completes the write.
+Like the previous algorithm, we store the register value in `val`; in addition to it, we also store a timestamp `ts`, counting the number of write operations. 
+
+When the writer process $p$ writes, it increments the timestamp, and `bebBroadcast`s a `Write` message to all processes. The processes can adopt the value by storing it locally if the timestamp is larger than the current one, and acknowledging through a PL. Once $p$ has such an acknowledgment from a majority of processes, it completes the write.
+
+To read a value, the reader `bebBroadcast`s a `Read` message to all processes. Every process replies through a PL with its current value and timestamp. Once the reader has replies from a majority of processes, it selects the one with the highest timestamp, which ensures that the last value written is returned.
 
 {% highlight dapseudo linenos %}
 Implements:
@@ -1538,12 +1529,12 @@ Properties:
     ONRR1, ONRR2
 
 upon event <onrr, Init> do:
-    ts := 0;
-    val := nil;
-    write_ts := 0;
-    acks := 0;
-    read_id := 0;
-    readlist := [nil] * N;
+    val := nil;    # register value
+    ts := 0;       # register timestamp (counts number of writes)
+    write_ts := 0; # timestamp of the pending write
+    acks := 0;     # number of processes having ack'ed pending write
+    read_id := 0;  # id of the currently pending read operation
+    readlist := [nil] * N; # replies from the Read message
 
 ##################
 # Part 1: Writes #
@@ -1587,21 +1578,118 @@ upon event <pp2pDeliver, q, [Value, read_id, read_ts, read_val]> do:
 {% endhighlight %}
 
 ### (1, N) Atomic register
+#### Properties
 With regular registers, the guarantees we gave about reads that are concurrent to writes are a little weak. For instance, suppose that a writer $p$ invokes `write(v)`. The specification allows for concurrent reads to return `nil` then `v` then `nil` again, and so on, until the write is done or if the writer crashes while writing, this can go on forever. An **atomic register** prevents such behavior.
 
-An atomic register provides an additional guarantee compared to a regular register: *ordering*. The guarantee is that even when there is concurrency and failures, the execution is *linearizable*, i.e. it is equivalent to a sequential and failure-free execution.
+An atomic register provides an additional guarantee compared to a regular register: *ordering*. The guarantee is that even when there is concurrency and failures, the execution is *linearizable*, i.e. it is equivalent to a sequential and failure-free execution. This means that we can now think of the write happening at a single atomic point in time, sometime during the execution of the write.
 
 This means that both of the following are true:
 
 - Every failed write operation appears to be either complete or not to have been invoked at all
 - Every complete operation appears to have been executed at some instant between its invocation and the reply event.
 
-Roughly speaking ,this prevents "old" values from being read by a process $q$ once a newer value has been read by $s$. The properties are:
+Roughly speaking, atomic registers prevent "old" values from being read by a process $q$ once a newer value has been read by $s$. The properties are:
 
 - **ONAR1. Termination = ONRR1**
 - **ONAR2. Validity = ONRR2**
 - **ONAR3. Ordering**: If a read returns a value $v$ and a subsequent read returns a value $w$, then the write of $w$ does not precede the write of $v$
 
+#### From (1, N) regular to (1, 1) atomic
+First, let's convert (1, N) regular into (1, 1) atomic. As before, we'll keep a timestamp for writes, which we increment every time we write. But this time, we'll also introduce a timestamp for reads, which contains the highest write-timestamp it has read so far. This allows the reader to avoid returning old values once it has read a new one.
+
+{% highlight dapseudo linenos %}
+Implements:
+    (1, 1)-AtomicRegister (ooar)
+Uses:
+    (1, N)-RegularRegister (onrr)
+
+upon event <ooar, Init> do:
+    val := nil;      # register value
+    ts := 0;         # reader timestamp
+    write_ts := nil; # writer timestamp
+
+upon event <ooarWrite, v> do:
+    write_ts := write_ts + 1;
+    trigger <onrrWrite, (write_ts, v)>;
+
+upon event <onrrWriteReturn> do:
+    trigger <ooarWriteReturn>;
+
+upon event <ooarRead> do:
+    trigger <onrrRead>;
+
+upon event <onrrReadReturn, (value_ts, value)> do:
+    if value_ts > ts:
+        val := value;
+        ts := value_ts;
+    trigger <ooarReadReturn, val>;
+{% endhighlight %}
+
+#### Algorithm 1: From (1, 1) atomic to (1, N) atomic
+We can construct a (1, N) atomic register from $N^2$ underlying (1, 1) atomic registers. These are organized in a $N \times N$ matrix, with instances called 
+$\text{ooar}[q][r]$ for $q \in \Pi$ and $r \in \Pi$.
+
+Register instance $\text{ooar}[q][r]$ is used to inform process $q$ about the last value read by reader $r$. This establishes a sort of one-way communication channel, where $r$ writes to the register, and $q$ reads from it.
+
+The writer $p$ places written values into registers $\text{ooar}[q][p]$, so that all readers $q\in\Pi$ can read. This means that every read and write requires $N$ registers to be updated.
+
+{% highlight dapseudo linenos %}
+Implements:
+    (1, N)-AtomicRegister (onar)
+Uses:
+    (1, 1)-AtomicRegister (multiple instances ooar[][])
+Events:
+    Request: <onarRead>: invokes a read on the register
+    Request: <onarWrite, v>: invokes a write with value v on the register
+    Indication: <onarReadReturn, v>: completes a read, returns v
+    Indication: <onarWriteReturn>: completes a write on the register
+Properties:
+    ONAR1, ONAR2, ONAR3
+
+upon event <onar, Init> do:
+    ts := 0;          # timestamp
+    acks := 0;        # number of updated registers in write and read
+    writing := false; # whether we are currently reading or writing
+    readval := nil;   # last read value
+    readlist := [nil] * N; # reads from all other processes
+    forall q ∈ Π, r ∈ Π:
+        ooar[q][r] = new ooar with writer r, reader q;
+
+# To write, write to all q processes through (1, 1)-atomic registers
+upon event <onarWrite, v> do:
+    ts := ts + 1;
+    writing := true;
+    forall q ∈ Π:
+        trigger <ooar[q][self]Write, (ts, v)>;
+
+# When all (1, 1)-atomic writes are done, WriteReturn or ReadReturn
+upon event <ooar[q][self]WriteReturn> do:
+    acks := acks + 1;
+    if acks = N:
+        acks := 0;
+        if writing:
+            trigger <onarWriteReturn>;
+            writing := false;
+        else:
+            trigger <onarReadReturn, readval>;
+
+# To read, read from all r processes through (1, 1)-atomic registers
+upon event <onarRead> do:
+    forall r ∈ Π do:
+        trigger <ooar[self][r]Read>;
+
+# When all reads are done, select the highest timestamp value,
+# and write to all q processes
+upon event <ooar[self][r]ReadReturn, (value_ts, value)> do:
+    readlist[r] := (value_ts, value);
+    if size(readlist) = N:
+        (maxts, readval) := highest_timestamp_pair(readlist);
+        readlist := [nil] * N;
+        forall q ∈ Π do:
+            trigger <ooar[q][self]Write, (maxts, readval)>;
+{% endhighlight %}
+
+#### Algorithm 2: Read-impose Write-all (1, N) atomic
 We assume a fail-stop model, where any number of processes can crash, channels are reliable, and failure detection is perfect. We won't go into the algorithm in detail, but its signature is:
 
 {% highlight dapseudo linenos %}
@@ -1619,6 +1707,8 @@ Events:
 Properties:
     ONAR1, ONAR2, ONAR3
 {% endhighlight %}
+
+
 
 
 {% details Guest Lectures %}
