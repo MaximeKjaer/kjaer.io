@@ -12,12 +12,46 @@ note: true
 
 <!-- More --> 
 
+## XML
+Traditional database systems rely on the relational model, which was initially developed in the 1970's and 1980's. But the Internet brought new challenges for data management, and provided incentives for developing new storage systems. There has been a movement of NoSQL databases since, exploring a variety of data models (key-value stores with Redis, column stores with Cassandra or Google Cloud Bigtable, graph stores with Neo4j, or document stores with MongoDB or Exist-db).
+
+Many of these were not standardized, and essentially were tied to a specific implementation. This can pose a problem for data that needs to be kept for a long time (in the banking or aeronautical industries, for instance). Indeed, the life cycle of data is often much longer than that of programs.
+
+How can we ensure long-term access to data? How can we ensure that it can still be read in 15 or 50 years? One information representation format that hasn't changed for 50+ years is ASCII (1963), so for long-term data access, this is probably the best bet.
+
+But we still need a standard format: otherwise, the ASCII encoding of our data is still tied to a particular file parser. This means that data exchange is reduced to a program exchange, which is expensive and doesn't scale.
+
+This is what XML was originally invented for: to have one language to describe and exchange data. It isn't the first in its field, though; its ancestor is SGML, invented in 1974 at IBM. Tim Berners-Lee invented HTML in 1989, and and founded the W3C in 1994. XML was first drafted in 1996.
+
+The initial [W3C goals of XML](https://www.w3.org/TR/WD-xml-961114#sec1.1) were:
+
+1. XML shall be straightforwardly usable over the Internet.
+2. XML shall support a wide variety of applications.
+3. XML shall be compatible with SGML.
+4. It shall be easy to write programs which process XML documents.
+5. The number of optional features in XML is to be kept to the absolute minimum, ideally zero.
+6. XML documents should be human-legible and reasonably clear.
+7. The XML design should be prepared quickly.
+8. The design of XML shall be formal and concise.
+9. XML documents shall be easy to create.
+10. Terseness is of minimal importance.  
+
+The last point is perhaps the biggest con about XML: it's extremely verbose, and has lots of repetitive markup, which makes for large files.
+
+But there are many pros about XML: it's a long-standing, standardized format, and one of the pillars of the web. If you use XML, you shouldn't ever have to write a parser.
+
+XML is a meta-language: it makes it possible to create markup languages: concrete implementations of XML are known as "XML dialects". They describe all the admissible structures (legal element names, how they can be composed, and perhaps even the data types they can contain). To define such a dialect, one must write a schema with DTD, XML Schema or Relax NG &mdash; more on this later. Some widespread dialects are XHTML, SVG, SOAP, MathML, WSDL, XForms.
+
+There are therefore two levels of correctness with XML. The first is the minimal requirement that XML files should be well-formed XML. The second is optional and stricter: the XML can conform to a given XML dialect.
+
 ## XPath
-XPath is the W3C standard language for traversal and navigation in XML trees.
+XPath is the [W3C standard language](https://www.w3.org/TR/xpath/all/) for traversal and navigation in XML trees.
 
 For navigation, we use the **location path** to identify nodes or content. A location path is a sequence of location steps separated by a `/`:
 
 {% highlight xpath linenos %}
+(: The following XPath expression has three location paths :)
+(:     1    :) (:       2       :) (:   3   :)
 child::chapter/descendant::section/child::para
 {% endhighlight %}
 
@@ -29,39 +63,55 @@ XPath defines 13 axes allowing navigation, including `self`, `parent`, `child`, 
 
 A nodetest filters nodes:
 
-| Test     | Semantics     |
-| :------------- | :------------- |
-| `node()`       | let any node pass       |
-| `text()`      | select only text nodes  |
-| `comment()`   | preserve only comment nodes |
+| Test           | Semantics                                             |
+| :------------- | :---------------------------------------------------- |
+| `node()`       | let any node pass                                     |
+| `text()`       | select only text nodes                                |
+| `comment()`    | preserve only comment nodes                           |
 | `name`         | preserves only **elements/attributes** with that name |
-| `*` | `*` preserves every **element/attribute** |
+| `*`            | `*` preserves every **element/attribute**             |
 
-At each navigation step, nodes can be filtered using qualifiers. 
-
-{% highlight xpath linenos %}
-axis::nodetest[qualifier][qualifier]
-{% endhighlight %}
-
-For instance:
+At each navigation step, nodes can be filtered using qualifiers. For instance:
 
 {% highlight xpath linenos %}
+(: axis::nodetest[qualifier1] :)
 following-sibling::para[position()=last()]
 {% endhighlight %}
 
 A qualifier filters a node-set depending on the axis. Each node in a node-set is kept only if the evaluation of the qualifier returns true.
 
-Qualifiers may include comparisons (`=`, `<`, `<=`, ...). The comparison is done on the `string-value()`, which is the concatenation of all descendant text nodes in *document order*. But there's a catch here! Comparison between node-sets is under existential semantics: there only needs to be one pair of nodes for which the comparison is true. Thus, when negating, we can get universal quantification.  
+Qualifiers may include comparisons (`=`, `<`, `<=`, ...). When comparing nodes, the comparison is done on the `string-value()`, which is the concatenation of all descendant text nodes in *document order*. But there's a catch here! Comparison between node-sets is under existential semantics: there only needs to be one pair of nodes for which the comparison is true:
+
+{% highlight text linenos %}
+node-set1 eq node-set2
+iff
+∃n1 ∈ node-set1, ∃n2 ∈ node-set1 | string-value(n1) eq string-value(n2)
+
+where eq ∈ {=, !=, <, >, <=, >=}
+{% endhighlight %}
+
+Thus, when negating, we can get universal quantification.
 
 XPaths can be a union of location paths separated by `|`. Qualifiers can include boolean expressions (`or`, `not`, `and`, ...). 
 
+We can use variables `$x`, but these cannot be set in XPath; they are constants, set by the host language executing the XPath expression.
 
 There are a few basic functions: `last()`, `position()`, `count(node-set)`, `concat(string, string, ...string`), `contains(str1, str2)`, etc. These can be used within a qualifier.
 
-XPath also supports abbreviated syntax. For instance, `child::` is the default axis and can be omitted, `@` is a shorthand for `attribute::`, `[4]` is a shorthand for `[position()=4]` (note that positions start at 1).
+XPath also supports abbreviated syntax:
+
+| Abbreviated | Full form                      |
+| :---------- | :----------------------------- |
+| `child::`   | Default axis, can be omitted   |
+| `@`         | `attribute::`                  |
+| `//`        | `/descendant-or-self::node()`/ |
+| `.`         | `self::node()`                 |
+| `..`        | `parent::node()`               |
+| `[4]`       | `[position() = 4]`[^pos-one]   |
+
+[^pos-one]: Note that positions start at 1
 
 XPath is used in XSLT, XQuery, XPointer, XLink, XML Schema, XForms, ...
-
 
 ### Evaluation
 To evaluate an XPath expression, we have in our state:
@@ -80,7 +130,7 @@ There are three classes of languages that constraint XML content:
 
 ### DTD
 
-Document Type Definitions (DTDs) are XML’s native schema system. It allows to define document classes, using a declarative approach to define the logical structure of a document.
+Document Type Definitions (DTDs) are XML's native schema system. It allows to define document classes, using a declarative approach to define the logical structure of a document.
 
 {% highlight xml linenos %}
 <!ELEMENT recipe (title, comment*, item+, picture?, nbPers)>
@@ -153,7 +203,7 @@ We can define more complex types using **type constructors**.
 <xsd:element name="prolog" type="Prolog"/>
 {% endhighlight %}
 
-This defines a Prolog type containing a sequence of a `series`, `author`, and `Characters`, which is `character+`. 
+This defines a Prolog type containing a sequence of a `series`, `author`, and `characters` of type `Characters`, which is defined as a sequence of `character+` elements. 
 
 Using the `mixed="true"` attribute on an `xsd:complexType` allows for mixed content: attributes, elements, and text can be mixed (like we know in HTML, where you can do `<p>hello <em>world</em>!</p>`).
 
@@ -203,7 +253,7 @@ Additionally, it is possible to define user-defined types:
 
 #### Criticism
 
-There have been some criticisms addressed to XML Schema:
+There [have been some criticisms](http://xml.coverpages.org/Clark-Jelliffe-Schemas20020604.html) addressed to XML Schema:
 
 - The specification is very difficult to understand
 - It requires a high level of expertise to avoid surprises, as there are many complex and unintuitive behaviors
@@ -217,7 +267,7 @@ There have been some criticisms addressed to XML Schema:
 
   Assertions on simple types introduced a new facet for simple types, called an assertion, to precise constraints using XPath expressions.
 
-  {% highlight xml linenos %}
+{% highlight xml linenos %}
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:element name="NbOfAttempts">
@@ -228,7 +278,7 @@ There have been some criticisms addressed to XML Schema:
         </xs:complexType>
     </xs:element>
 </xs:schema>
-  {% endhighlight %}
+{% endhighlight %}
 
 Therefore, some of the original W3C XML Schema committee have gone on to create alternatives, some of which we will see below.
 
@@ -306,7 +356,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 </grammar>
 {% endhighlight %}
 
-In addition to datatypes, we can also express admissible XML *content* using regexes, but (and this is important!) **we cannot exprain cardinality constraints or uniqueness constraints**. 
+In addition to datatypes, we can also express admissible XML *content* using regexes, but (and this is important!) **we cannot express cardinality constraints or uniqueness constraints**. 
 
 If we need to express those, we can make use of Schematron.
 
@@ -359,9 +409,9 @@ A short description of the different Schematron elements follows:
 - `<report>`: same as an assertion, but the validation doesn't fail; instead, a warning is issued.
 
 ## XML Information Set
-The purpose of [XML Information Set](https://msdn.microsoft.com/en-us/library/aa468561.aspx), or Infoset, is to "purpose is to provide a consistent set of definitions for use in other specifications that need to refer to the information in a well-formed XML document[^infoset-spec]".
+The purpose of [XML Information Set](https://msdn.microsoft.com/en-us/library/aa468561.aspx), or Infoset, is to "provide a consistent set of definitions for use in other specifications that need to refer to the information in a well-formed XML document"[^infoset-spec].
 
-[^infoset-spec]: [XML Information Set specification](https://www.w3.org/TR/xml-infoset/), W3C Recommendation
+[^infoset-spec]: [XML Information Set specification](https://www.w3.org/TR/xml-infoset/#intro), W3C Recommendation
 
 It specifies a standardized, abstract model to represent the properties of XML trees. The goal is to provide a standardized viewpoint for the implementation and description of various XML technologies.
 
@@ -409,12 +459,13 @@ Let's take a look at an individual XSLT template:
 
 {% highlight xml linenos %}
 <xsl:template match="e">
-    result: <xsl:apply-templates/>
+    <!-- Template body goes here -->
+    <xsl:apply-templates/>
 </xsl:template>
 {% endhighlight %}
 
 - `e` is an XPath expression that selects the nodes the XSLT processor will apply the template to
-- `result` specifies the content to be produces in the output for each node selected by `e`
+- The body of the `xsl:template` specifies the content to be produces in the output for each node selected by `e`
 - `xsl:apply-templates` indicates that templates are to be applied on the selected nodes, in document order; to select nodes, it may have a `select` attribute, which is an XPath expression defaulting to `child::node()`.
 
 The XSLT execution is roughly as follows:
@@ -528,12 +579,12 @@ version="2.0">
                 <xsl:apply-templates select="Catalog/Product/Book/Title">
                     <xsl:sort select="."/>
                 </xsl:apply-templates>
-        </ul>
+            </ul>
         </body>
         </html>
     </xsl:template>
 
-        <xsl:template match="Title">
+    <xsl:template match="Title">
         <li>
             <xsl:value-of select="."/>
         </li>
@@ -552,7 +603,7 @@ XQuery is a **strongly typed** and **functional** language that offers features 
 
 It does not use the XML syntax. Instead, it offers a general purpose (Turing-complete) language that can be used for developing XML based applications.
 
-XQuery is a [W3C Recommendation](https://www.w3.org/TR/xquery/all/), and is therefore closely linked to [XML Schema](#xml-schema), as it uses the XML Schema type system. Note that there is for no support for XQuery with Relax NG or other non-W3C schema languages. A nice book on XQuery is [available at O'Reily](http://shop.oreilly.com/product/0636920035589.do).
+XQuery is a [W3C Recommendation](https://www.w3.org/TR/xquery/all/), and is therefore closely linked to [XML Schema](#xml-schema), as it uses the XML Schema type system. Note that for now, there is no support for XQuery with Relax NG or other non-W3C schema languages. A nice book on XQuery is [available at O'Reily](http://shop.oreilly.com/product/0636920035589.do).
 
 ### Syntax
 A query is made up of three parts:
@@ -769,7 +820,7 @@ We will take a look at the [Oppidum framework](https://github.com/ssire/oppidum)
 An XML database looks quite a lot like a normal database; for instance, it uses a traditional, B-tree based indexing system, has a querying language, etc. The main difference is simply that data is XML instead of a table, and that we use XQuery instead of SQL.
 
 ### REST
-REST stands for REpresentational State Transfer. It's an architectural style created by Roy Fieding in [his PhD thesis](https://www.ics.uci.edu/~fielding/
+REST stands for REpresentational State Transfer. It's an architectural style created by Roy Fielding in [his PhD thesis](https://www.ics.uci.edu/~fielding/)
 
 In REST, we have resources, located by a URL on Web-based REST, that may be processed by a client. A collection is simply a set of resources. Interaction with a REST API happens with classical CRUD (Create, Read, Update, Delete) on URLs, which in HTTP are the `POST`, `GET`, `PUT` and `DELETE` requests.
 
@@ -782,6 +833,51 @@ In REST, we have resources, located by a URL on Web-based REST, that may be proc
 
 To specify the REST architecture, Oppidum has a DSL that allows us to define the set of resources and actions, determine the URLs and associated HTTP verbs (`GET`, `POST`, etc) recognized by the application, and so on.
 
+Oppidum has its own DSL to specify the REST architecture of a webapp:
+
+{% highlight xml linenos %}
+<site>
+    <item name="contact"/>
+    <item name="home" epilogue="standard">
+        <model src="modules/home/home.xql"/>
+        <view src="modules/home/home.xsl"/>
+    </item>
+    <item name="books" epilogue="standard"
+        collection="topics/home" resource="home.xml"/>
+    <collection name="workspaces">
+        <item name="foo">
+            ...
+        </item>
+    </collection>
+    <collection name="projects" supported="search create"
+        method="POST" epilogue="standard"
+        collection="workspaces/$2" resource="projcets.xml">
+        ...
+    </collection>
+</site>
+{% endhighlight %}
+
+The `item` elements refer to a single resource, with the `name` attribute indicating an URL segment pointing to the resource. We can associate HTTP verbs to the URLs; `GET` is the default.
+
+Longer URLs can be constructed by `collection` elements. In the above, we have a `workspaces/foo` item.
+
+Oppidum also allows us to associate models and views to items, as well as an epilogue (which serves as the template in which we should serve the view). A shortcut is to, instead of defining an XQuery model, just bind the item directly to the XPath of the information we want to send back, as in the `books` element
+
+The `projects` collection shows a more complete example of the fields that can be used for a collection. The positional variable `$2` will be replaced by the 2<sup>nd</sup> segment of the URL.
+
+An epilogue may look like this:
+
+{% highlight xml linenos %}
+<html>
+    <head> ... </head>
+    <body>
+        <site:navigation>NAVIGATION</site:navigation>
+        <site:content>RESULT OF TRANSFORMATION</site:content>
+    </body>
+</html>
+{% endhighlight %}
+
+All elements in the `site:X` namespace are inserted into the generated page. 
 
 ## Foundations of XML types
 We've seen seen XML tools for validation (DTD, XML Schema, Relax NG), navigation and extraction (XPath) and transformation (XQuery, XSLT).
@@ -808,7 +904,7 @@ Children = children[Person+]
 
 By convention, capitalized variables are **type variables** (non-terminals), and non-capitalized are terminals.
 
-A tree grammar defines a set of legal trees. As any grammar, tree grammars are defined within an alphabet $\Sigma$, with a set of type variables $X := \left\\{X_1 ::= T_1, \dots, X_N ::= T_n\right\\}$. A tree grammar is defined by the pair $(E, X)$, where $E$ represents the starting type variable. Each $T_i$ is a tree type expression:
+A tree grammar defines a set of legal trees. As any grammar, tree grammars are defined within an alphabet $\Sigma$, with a set of type variables $E := \left\\{X_1 ::= T_1, \dots, X_n ::= T_n\right\\}$. A tree grammar is defined by the pair $(E, X)$, where $X$ represents the starting type variable in $E$. Each $T_i$ is a tree type expression:
 
 {% highlight antlr linenos %}
 T ::=
@@ -835,9 +931,11 @@ $$
 \left\{ X = a, Y; \quad Y = b, X | \epsilon \right\} \\
 $$
 
-A small reminder on regular vs. context-free grammars: regular grammars are decidable (we can check for inclusion with a DFA), while context-free grammars are undecidable (we cannot check for inclusion in $a^n b^n$ with a DFA, for instance).
+A small reminder on regular vs. context-free grammars: regular grammars are decidable (we can check for inclusion with a DFA), while context-free grammars may be undecidable (we cannot check for inclusion in $a^n b^n$ with a DFA, for instance).
 
-Within the class of regular grammars, there are three subclasses of interest, in order of specificity (each of these is a subset of the classes above):
+Note that regular grammars are a subset of context-free grammars; checking whether a context-free grammar is regular is undecidable.
+
+Within the class of regular grammars, there are three subclasses of interest. Therefore, we have four classes, which are, in order of increasing specificity (each of these is a subset of the classes above):
 
 1. Context-free
 2. Regular
@@ -846,13 +944,13 @@ Within the class of regular grammars, there are three subclasses of interest, in
 
 Each subclass is defined by additional restrictions compared to its parent. The more restrictions we add, the more expressive power we lose. It turns out that these classes correspond to different XML technologies:
 
-1. **Context-free**: ?
+1. **Context-free**: None
 2. **Regular**: Relax NG
 3. **Single Type**: XML Schema 
 4. **Local**: DTD
 
 #### DTD & Local tree grammars
-As we said previously, the expressive power of a grammar class is defined by which restriction have been imposed. In DTD, the restriction is that each element name is associated with a regex. This means that for each $a[T_1]$ and $a[T_1]$ occuring in $X$, the content models are identical: $T_1 = T_2$.
+As we said previously, the expressive power of a grammar class is defined by which restriction have been imposed. In DTD, the restriction is that each element name is associated with a regex. This means that for each $a[T_1]$ and $a[T_1]$ occuring in $E$, the content models are identical: $T_1 = T_2$.
 
 In other words, in DTDs, the content of an XML tag cannot depend on the context of the tag. This removes some expressive power.
 
@@ -1070,6 +1168,22 @@ Inside a `<wsdl:description>` tag, we can use:
 - Description of the interface (`<wsdl:interface/>`), i.e. what operations and messages are defined
 - Binding (`<wsdl:binding/>`) describing how the web service is accessed over the network
 - Service tag (`<wsdl:service`) describing where the service can be accessed
+
+Here's an example from IBM:
+
+{% highlight xml linenos %}
+<application xmlns="http://wadl.dev.java.net/2009/02">
+    <resources base="http://example.com/api">
+        <resource path="books">
+            <method name="GET"/>
+            <resource path="{bookId}">
+                <param required="true" style="template" name="bookId"/>
+                <method name="GET"/>
+            </resource>
+        </resource>
+    </resources>
+</application>
+{% endhighlight %}
 
 ### Simple Object Access Protocol (SOAP)
 SOAP is a W3C standard protocolSOAP is a W3C standard protocol, with strict rules and advanced security features. However, it comes with substantial complexity, leading to slow page load times.
