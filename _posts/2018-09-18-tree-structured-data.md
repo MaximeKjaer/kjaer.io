@@ -643,7 +643,7 @@ A query consists of one or more comma-separated **XQuery expressions**, which ar
 ### Creating XML content
 To build XML content, we can embed "escaped" XQuery code using curly brackets, within our template file, as follows:
 
-{% highlight xml linenos %}
+{% highlight xquery linenos %}
 <report year="2018">
     The value is {round (3.14)}
 </report>
