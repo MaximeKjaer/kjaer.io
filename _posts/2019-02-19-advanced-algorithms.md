@@ -12,9 +12,13 @@ A prerequisite for this course is [CS-250 Algorithms](/algorithms/).
 * TOC
 {:toc}
 
+⚠ *Work in progress*
+
 $$
 \newcommand{\abs}[1]{\left\lvert#1\right\rvert}
 \newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\bigO}[1]{\mathcal{O}\left(#1\right)}
+\newcommand{\vec}[1]{\mathbf{#1}}
 $$
 
 ## When does the greedy algorithm work? 
@@ -355,3 +359,326 @@ $$
 Here, $\delta^-(v)$ denotes the set of arcs $\set{(u, v) \in A}$ incoming to $v$. In this partition matroid, the independent edge sets are those that have at most one arc incoming to every vertex $v \ne r$.
 
 Any arborescence is independent in both matroids, by definition. Conversely, a set $T$ independent in both matroids of cardinality $\abs{V} - 1$ (so that it is a base in both) is an arborescence: being a spanning tree, it has a unique path between $r$ and any vertex $v$.
+
+## Linear Programming
+
+### Maximum cardinality bipartite matching
+
+#### Definitions
+We've seen [the definition](#definition-of-bipartite-matching) and [one algorithm](#bipartite-matching-as-a-matroid-intersection) for bipartite matching. Let's look into an alternative method.
+
+Recall that a path is a collection of edges $\set{(v_0, v_1), (v_1, v_2), \dots, (v_{k-1}, v_k)}$ where all the $v_i$'s are distinct vertices.
+
+An *alternating* path with respect to an edge set $M$ is a path that alternates between edges in $M$ and edges in $E\setminus M$.
+
+An *augmenting* path with respect to an edge set $M$ is an alternating path in which the first and last vertices are unmatched, i.e. $(v_0, v_k) \notin M$.
+
+In a bipartite graph, the matching $M$ may define alternating paths in which we cannot revisit a node (by definition of a matching). Also note that an augmenting path is one that increases the matching; this is the core idea behind the following algorithm.
+
+#### Algorithm
+
+{% highlight python linenos %}
+def augmenting_path_algorithm(G):
+    """
+    Input:  Bipartite graph G = (V, E)
+    Output: Matching M of maximum cardinality
+    """
+    M = set()
+    while exists an augmenting path P:
+        M = MΔP
+    return M
+{% endhighlight %}
+
+$M \Delta P$ is the [symmetric difference](https://en.wikipedia.org/wiki/Symmetric_difference), which we can also denote:
+
+$$
+M \Delta P 
+\equiv (M \setminus P) \cup (P \setminus M)
+\equiv (M \cup P) \setminus (M \cap P)
+$$
+
+An efficient algorithm to find an augmenting path $P$ is to run BFS, looking for unmatched vertices. This can be run in linear for bipartite graphs (though it is harder in general graphs), so the total runtime of the algorithm is $\bigO{\abs{V}^2 + \abs{E}\cdot\abs{V}}$.
+
+#### Correctness proof
+We now prove the correctness of this algorithm, which is to say that it indeed finds a maximum matching. The algorithm returns a set $M$ with respect to which there are no augmenting paths, so to prove correctness we must prove the following:
+
+**Theorem**: A matching $M$ is a maximum **if and only if** there are no augmenting paths with respect to $M$.
+
+The proof is by contradiction.
+
+First, let's prove the $\Rightarrow$ direction. Suppose for the sake of contradiction that $M$ is maximum, but that there exists an augmenting path $P$ with respect to $M$. Then $M' = M \Delta P$ is a matching of greater cardinality than $M$, which contradicts the optimality of $M$.
+
+Then, let's prove the $\Leftarrow$ direction. We must prove that the lack of augmenting paths implies that $M$ is maximal. Suppose toward contradiction that it is not, i.e. that there is a maximal matching $M^\*$ such that $\abs{M^\*} > \abs{M}$. Let $Q = M \Delta M^\*$; intuitively, this edge set $Q$ represents the edges that $M$ and $M^\*$ disagree on.
+
+From there on, we reason as follows:
+
+- $Q$ has more edges from $M^\*$ than from $M$ (since $\abs{M^\*} > \abs{M}$, which implies that $\abs{M^\* \setminus M} > \abs{M \setminus M^\*}$)
+- In $Q$, every vertex $v$ has degree $\le 2$, with at most one edge from $M$, and at most one edge from $M^*$. Thus, every component in $Q$ is either:
+    + a path (where middle nodes have degree two and the ends of the path have degree one), or
+    + a cycle (where all nodes have degree two)
+- The cycles and paths that compose $Q$ alternate between edges from $M$ and $M^\*$ (we cannot have vertices incident to two edges of the same set, as $M$ and $M^\*$ are matchings). This leads us to the following observations:
+    + In cycles, there is the same number of edges from $M$ and $M^\*$
+    + In paths, there number of edges from $M^\*$ is $\ge$ than the number of edges from $M$
+- Let's remove cycles from consideration, and concentrate on paths. We can do so and still retain the property of having more edges from $M^\*$ than from $M$. Since $\abs{M^\*} > \abs{M}$, there must be at least one path with strictly more edges from $M^\*$ than from $M$; it must start and end with a $M^\*$ edge, and alternate between the sets in between. This path is an augmenting path with respect to $M$.
+
+Therefore, there must exist an augmenting path $P$ with respect to $M$, which is a contradiction.
+
+#### Generalization
+In the above, we've seen an algorithm for unweighted bipartite matching. If we'd like to generalize it to weighted bipartite matching[^equivalent-bipartite], we'll have to introduce a powerful algorithmic tool: linear programming.
+
+### Definition of Linear Programming
+A linear program (LP) is the problem of finding values for $n$ variables $x_1, x_2, \dots, x_n \in \mathbb{R}$ that minimize (or equivalently, maximize) a given linear objective function, subject to $m$ linear constraints:
+
+$$
+\begin{align}
+\textbf{minimize: }   & \sum_{i=1}^n c_i x_i   & \\
+\textbf{subject to: } 
+    & \sum_{i=1}^n e_{i, j} x_i =   b_j & \text{for }j=1,\dots,m_1 \\
+    & \sum_{i=1}^n d_{i, k} x_i \ge g_k & \text{for }k=1,\dots,m_2 \\
+    & \sum_{i=1}^n f_{i, p} x_i \le l_p & \text{for }p=1,\dots,m_3 \\
+\end{align}
+$$ 
+
+Where $m = m_1 + m_2 + m_3$.
+
+Strictly speaking, it isn't necessary to allow equality and upper-bound constraints: 
+
+- We can get an equality constraint with a lower-bound and an upper-bound.
+- We can transform an upper-bound into a lower-bound by multiplying all factors and the bound by $-1$.
+
+Still, we allow them for simpler notation for now. Strict inequality, however, is disallowed (otherwise, we wouldn't have a closed set, and there would never be an optimal solution, as we could always get closer to the bound by an infinitesimal amount).
+
+### Extreme points
+A feasible solution is an **extreme point** if it cannot be written as a convex combination of other feasible solutions.
+
+A **convex combination** of points $x_1, x_2, \dots, x_n$ is a point of the form $\sum_{i=1}^n \lambda_i x_i$ where the $\lambda_i \in [0, 1]$ satisfy $\sum_{i=1}^n \lambda_i = 1$.
+
+To gain some intuition about what an extreme point is, we can take a look at the diagram below:
+
+![A feasible which isn't an extreme point](/images/advanced-algorithms/extreme-point.png)
+
+In the above, $P$ is not an extreme point because $P = \frac{1}{2} X + \frac{1}{2} Y$. If we can walk an $\epsilon$ amount in opposing directions, then it is not an extreme point.
+
+Extreme points are important because they have useful structural properties that we can exploit to design algorithms and construct proofs. We can state the following theorem about extreme points:
+
+**Theorem**: If the feasible region is bounded, then there always exists an optimum which is an extreme point.
+
+The proof is as follows. As the feasible region is bounded, there is an optimal solution $x^\*$. If $x^\*$ happens to be an extreme point, we are done. The real work in this proof is for the case where $x^\*$ isn't an extreme point. To prove this, we'll have to introduce a small lemma:
+
+**Lemma**: Any feasible point can be written as a convex combination of the extreme points.
+
+This is essentially proven by the following diagram:
+
+![A feasible point and the extreme points that it is constructed from](/images/advanced-algorithms/convex-combination-extreme-points.png)
+
+Indeed, if we draw a line from a feasible point $P$ in a bounded domain, we'll hit the bounds in two locations $X$ and $Y$, which are convex combination of the extreme points $A$, $B$ and $B$, $C$, respectively. $P$ is itself a convex combination of $X$ and $Y$, and thus of the extreme points $A$, $B$, $C$ and $D$.
+
+With this lemma in place, we can write the feasible solution $x^\*$ as a convex combination of extreme points: 
+
+$$
+x^* = \sum_i \lambda_i x^{(i)}
+$$
+
+Where the $x^{(i)}$ are extreme points, and $\lambda_i \in [0, 1]$ satisfy $\sum_i \lambda_i = 1$.
+
+Let $c = \begin{bmatrix}c_1 & c_2 & \dots & c_n\end{bmatrix}$ be the vector defining the objective that we wish to maximize (the proof is the same if we minimize). Then we have:
+
+$$
+\begin{align}
+  c^T x^*
+& = \sum_{i=1}^n c_i x_i^*
+  = c^T \left( \sum_j \lambda_j x^{(j)} \right)
+  = \sum_i c_i \left( \sum_j \lambda_j x_i^{(j)} \right) \\
+& = \sum_j \lambda_j \left( \sum_i c_i x_i^{(j)} \right)
+  = \sum_j \lambda_j c^T x^{(j)}
+\end{align}
+$$ 
+
+This proves $c^T x^\* = \sum_j \lambda_j c^T x^{(j)}$. In other words, the value of the objective function is a weighted average of the extreme points. If we measured the height of all the people in a class, and got the average value of 170cm, we could say that at least one person has height $\ge$ 170cm. For the same reason, we can conclude from the above:
+
+$$
+c^T x^* = \sum_j \lambda_j c^T x^{(j)}
+\implies 
+\exists j : c^T x^{(j)} \ge c^T x^*
+$$
+
+This extreme point $x^{(j)}$ is gives us a higher value for the objective function than $x^\*$. Since $x^\*$ was chosen to be *any* feasible point, this means that $x^{(j)}$ is an optimal solution.
+
+
+### Maximum weight bipartite perfect matching
+The problem corresponds to the following:
+
+- **Input**: A bipartite graph $G=(V, E)$ where $V = A \cup B$ and $\abs{A} = \abs{B}$, and edge weights $w: E \mapsto \mathbb{R}$
+- **Output**: A perfect matching $M$ maximizing $w(M) = \sum_{e \in M} w(e)$
+
+A matching is **perfect** if every vertex is incident to *exactly* one edge in the matching (i.e. every vertex is matched). We need $\abs{A} = \abs{B}$ for this to work.
+
+This problem can be formulated as the following linear program:
+
+$$
+\begin{align}
+\textbf{maximize: }   & \sum_{e \in E} x_e w(e)   & \\
+\textbf{subject to: } 
+    & \sum_{e = (a, b) \in E} x_e = 1 & \forall a \in A \\
+    & \sum_{e = (a, b) \in E} x_e = 1 & \forall b \in B \\
+    & x_e \ge 0                       & \forall e \in E \\
+\end{align}
+$$
+
+The constraints say that every vertex is chosen exactly once. The intended meaning for variables $x_e$ is:
+
+$$
+x_e = \begin{cases}
+1 & \text{if } e \in M \\
+0 & \text{otherwise}
+\end{cases}
+$$
+
+But in linear programming, we cannot take on discrete values; instead, we can only have $x_e \in [0, 1]$, which gives us the constraint $0 \le x_e \le 1$. The upper bound of 1 is implied by the other constraints, so for the sake of conciseness, we only give the minimal set of constraints above.
+
+Still, we will see that relaxing $x_e$ to be in $[0, 1]$ still gives us an optimal solution $x^\*$ for which $x_e^\* \in \set{0, 1} \forall e \in E$.
+
+**Claim**: For bipartite graphs, any extreme point solution to the LP is integral[^integral-definition].
+
+[^integral-definition]: Integral means that it is an integer; coupled with the constraint that $0 \le x_e \le 1$, being integral implies $x_e \in \set{0, 1}$.
+
+We'll prove this by contradiction. Let $x^\*$ be an extreme point for the graph $G=(A \cup B, E)$, and let $E_f = \set{e \in E : 0 < x_e^\* < 1}$ be the set of edges for which optimal extreme point solution $x^\*$ is not integral. We suppose toward contradiction that the solution $x^\*$ contains such edges, i.e. that $E_f \ne \emptyset$.
+
+We have the constraint that for any given vertex $a\in A$ or $b\in B$, $\sum_{e = (a, b) \in E} x_e^\* = 1$. This means that either:
+
+- All the incident edges $e$ to the vertex have integral weights $x_e^\* \in \set{0, 1}$, and the vertex therefore has no incident edges in $E_f$.
+- At least one incident edge $e$ to the vertex has non-integral weight $0 < x_e^\* < 1$. But because of the above constraint, it takes at least two non-integral weights $x_{e_1}^\*$ and $x_{e_2}^\*$ to sum up to 1, so having one incident edge in $E_f$ implies having at least two incident edges in $E_f$.
+
+This implies that $E_f$ must contain a cycle. By construction, because we only have a finite number of vertices in $E_f$ and because they cannot have degree 1, the path must close back to the original vertex.
+
+Further, cycles in a bipartite graph must have even length. This follows from the fact that to get back to a vertex in $A$, we must go to $B$ and back to $A$ $k$ times, for a total of $2k$ edges.
+
+All these edges in the cycle are fractional (being in $E_f$). Since this is a proof by contradiction, we'll try to find two feasible points $y$ and $z$ such that $x^\* = \frac{1}{2}(y + z)$, which would be a contradiction of the assumption that $x^\*$ is an extreme point.
+
+Let $e_1, e_2, \dots, e_{2k}$ be the edges of the cycle. Let $y$ and $z$ be defined for each edge $e$ as follows:
+
+$$
+\begin{align}
+y_e & = \begin{cases}
+    x_e^* + \epsilon & \text{if } e \in \set{e_1, e_3, e_5, \dots, e_{2k-1}} \\
+    x_e^* - \epsilon & \text{if } e \in \set{e_2, e_4, e_6, \dots, e_{2k}} \\
+    x_e^* & \text{otherwise} \\
+\end{cases} \\ \\
+
+z_e & = \begin{cases}
+    x_e^* - \epsilon & \text{if } e \in \set{e_1, e_3, e_5, \dots, e_{2k-1}} \\
+    x_e^* + \epsilon & \text{if } e \in \set{e_2, e_4, e_6, \dots, e_{2k}} \\
+    x_e^* & \text{otherwise} \\
+\end{cases} \\
+\end{align}
+$$
+
+The degree constraints of $\sum_{e = (a, b) \in E} y_e = 1$ and $\sum_{e = (a, b) \in E} z_e = 1$ are satisfied, because they alternate between adding and subtracting $\epsilon$ in a cycle of even length, and we assumed that $x_e^\*$ satisfies them.
+
+To ensure feasibility, we must choose a small $\epsilon$ to guarantee that all $y_e, z_e \in [0, 1] \forall e \in E$. We can choose the following value to do so:
+
+$$
+\epsilon = \min\set{x_e^*, (1 - x_e^*)} \forall e \in E_f
+$$
+
+Note that this indeed satisfies $x^\* = \frac{1}{2}(y + z)$, so we have a contradiction of the assumption that $x^\*$ is an extreme point.
+
+#### Bipartite perfect matching polytope
+The polytope[^polytope-definition] corresponding to the bipartite perfect matching LP constraints is called the *bipartite perfect matching polytope*. 
+
+[^polytope-definition]: A polytope is a geometric object with flat sides, which is exactly what linear constraints form.
+
+$$
+\begin{align}
+P = \bigg\{ x : 
+& \sum_{e = (a, b) \in E} x_e = 1 & \forall a \in A, & \\
+& \sum_{e = (a, b) \in E} x_e = 1 & \forall b \in B, & \\
+& x_e \ge 0                       & \forall e \in E & 
+\bigg\}
+\end{align}
+$$
+
+We can solve the maximum weight bipartite matching problem by solving the above linear program.
+
+#### General graphs
+Unfortunately, this is only for bipartite graphs; for general graphs, we have a problem with odd cycles. We could solve this by imposing an addition constraint on odd cycles:
+
+$$
+\sum_{e \in E} x_e \le \frac{\abs{S} - 1}{2}, 
+\quad \forall S \subseteq V,
+\quad \abs{S} \text{ odd}
+$$
+
+Unfortunately, this adds exponentially many constraints. A proof 2 or 3 years ago established that there is no way around this.
+
+### Vertex cover
+The vertex cover problem is defined as follows:
+
+- **Input**: A graph $G = (V, E)$ with node weights $w : V \mapsto \mathbb{R}$
+- **Output**: A vertex cover $C \subseteq V$ that minimizes $w(C) = \sum_{v\in C} w(v)$
+
+A vertex cover $C$ is a vertex set that ensures that every edge has at least one endpoint in $C$. In other words, $C$ is a vertex cover if $\forall e = (u, v) \in E$, we have $u\in C$ or $v\in C$.
+
+Just like [maximum weight bipartite perfect matching](#maximum-weight-bipartite-perfect-matching), the vertex cover problem can be formulated as LP constraints:
+
+$$
+\begin{align}
+\textbf{minimize: }   & \sum_{v \in V} x_v w(v)   & \\
+\textbf{subject to: } 
+    & x_u + x_v \ge 1 & \forall (u, v) \in E \\
+    & 0 \le x_v \le 1 & \forall v \in V \\
+\end{align}
+$$
+
+The constraints tell us that at least one of the endpoints should be in the vertex cover, as the intended meaning for $x_v$ is:
+
+$$
+x_v = \begin{cases}
+1 & \text{if } v \in C \\
+0 & \text{otherwise}
+\end{cases}
+$$
+
+**Claim**: For bipartite graphs, any extreme point to the vertex cover LP is integral.
+
+We'll prove this by contradiction. Let $x^\*$ be an extreme point, and $V_f = \set{v : 0 < x_v^\* < 1}$ be the vertices with fractional values in $x^\*$. Suppose toward contradiction that $V_f \ne \emptyset$. 
+
+Since $G$ is bipartite, the vertices $V$ are split into disjoint subsets $A$ and $B$. In the same way, we can divide $V_f$ into disjoint subsets $A_f = V_f \cap A$ and $B_f = V_f \cap B$, which are the fractional vertices in $A$ and $B$, respectively.
+
+As previously, we'll define $y$ and $z$ such that $x^\* = \frac{1}{2}(y + z)$, by setting $\epsilon = \min\set{x_v, (1 - x_v) : v \in A_f \cup B_f}$, and letting:
+
+$$
+\begin{align}
+y_v & = \begin{cases}
+    x_v^* + \epsilon & \text{if } v \in A_f \\
+    x_v^* - \epsilon & \text{if } v \in B_f \\
+    x_v^* & \text{otherwise} \\
+\end{cases} \\ \\
+
+z_v & = \begin{cases}
+    x_v^* - \epsilon & \text{if } v \in A_f \\
+    x_v^* + \epsilon & \text{if } v \in B_f \\
+    x_v^* & \text{otherwise} \\
+\end{cases} \\
+\end{align}
+$$
+
+Let's verify that these are feasible solutions. We'll just verify $y$, but the proof for $z$ follows the same reasoning.
+
+By the selection of $\epsilon$, we have $0 \le y_v \le 1$, $\forall v\in V$, which satisfies the second constraint. 
+
+To verify the first constraint, we must verify that $y_a + y_b \ge 1$ for every edge $(a, b) \in E$.
+
+- If $x_a = 1$ (or $x_b = 1$), then $a \notin V_f$ (or $b \notin V_f$), so $y_a = x_a = 1$ (or $y_b = x_b = 1$), so the constraint holds.
+- If $0 < x_a, x_b < 1$, then $a \in A_f$ and $b \in B_f$, which also respects the constraint, because:
+
+$$
+y_a + y_b = (x_a + \epsilon) + (x_b - \epsilon) = x_a + x_b \ge 1
+$$
+
+The last inequality holds because $x^\*$ is a feasible solution and thus satisfies the first property.
+
+These $y$ and $z$ are feasible solutions, and therefore show a contradiction in our initial assumption that $x^\*$ is an extreme point; the claim is therefore verified.
+
+#### General graphs
+For general graphs, we have the same problem with odd cycles as for matchings. But the situation is actually even worse in this case, as the problem is NP-hard for general graphs, and we do not expect to have efficient algorithms for it.
