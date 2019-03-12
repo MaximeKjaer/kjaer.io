@@ -682,3 +682,383 @@ These $y$ and $z$ are feasible solutions, and therefore show a contradiction in 
 
 #### General graphs
 For general graphs, we have the same problem with odd cycles as for matchings. But the situation is actually even worse in this case, as the problem is NP-hard for general graphs, and we do not expect to have efficient algorithms for it.
+
+## Duality
+
+### Intuition
+Consider the following linear program:
+
+$$
+\begin{align}
+\textbf{minimize: }   & 7x_1 + 3x_2 \\
+\textbf{subject to: } 
+    & x_1  +  x_2 \ge 2 \\
+    & 3x_1 +  x_2 \ge 4 \\
+    & x_1,  x_2   \ge 0 \\
+\end{align}
+$$
+
+We're looking for an optimal solution OPT. To find this value, we can ask about the upper bound and about the lower bound. 
+
+- Is there a solution of cost $\le 10$? Is OPT $\le 10$?
+- Is there no better solution? Is OPT $\ge 10$?
+
+For instance, for the [max weight bipartite perfect matching problem](#maximum-weight-bipartite-perfect-matching), we can ask[^maximization-problem]:
+
+[^maximization-problem]: This particular example is a maximization problem, but in general we'll be considering minimization problems. It all still holds, just don't get confused if things are switched in this example.
+
+- Is there a matching of value at least $v$? In other words, is $\text{OPT} \ge v$?
+- Do all matchings have value at most $v$? In other words, is $\text{OPT} \le v$?
+
+Answering the first kind of question is easy enough: we can just find a feasible solution to the LP with an objective function that fits the bill (i.e. is $\ge v$). 
+
+To answer the second kind of question though, we have to be a little smarter. The intuition is that a linear combination of primal constraints cannot exceed the primal objective function. This leads us to define the following dual LP with variables $y_1$ and $y_2$:
+
+$$
+\begin{align}
+\textbf{maximize: }   & 2y_1 + 4y_2 \\
+\textbf{subject to: } 
+    & y_1 + 3y_2 \le 7 \\
+    & y_1 +  y_2 \le 3 \\
+    & y_1, y_2   \ge 0 \\
+\end{align}
+$$
+
+Let's formalize this approach for the general case.
+
+### General case
+Consider the following linear program with $n$ variables, $x_i$ for $i \in [1, n]$ and $m$ constraints:
+
+$$
+\begin{align}
+\textbf{minimize: }   & \sum_{i=1}^n c_i x_i   & \\
+\textbf{subject to: } 
+    & \sum_{i=1}^n A_{ji} x_i \ge b_j & \forall j = 1, \dots, m \\
+    & x_i \ge 0 & \forall i = 1, \dots, n \\
+\end{align}
+$$
+
+The $A$ matrix of factors is an $m\times n$ matrix (with $i$ ranging over columns, and $j$ over rows). This means that the factors in the primal are in the same layout as in $A$; we'll see that they're transposed in the dual.
+
+Indeed, the dual program has $m$ variables $y_j$ for $j \in [1, m]$ and $n$ constraints:
+
+$$
+\begin{align}
+\textbf{maximize: }   & \sum_{j=1}^m b_j y_j   & \\
+\textbf{subject to: } 
+    & \sum_{j=1}^m A_{ji} y_j \le c_i & \forall i = 1, \dots, n \\
+    & y_j \ge 0 & \forall j = 1, \dots, m \\
+\end{align}
+$$
+
+Note that the dual of the dual is the primal, so we can convert problems both ways.
+
+### Weak duality
+Weak duality tells us that every dual-feasible solution is a lower bound of primal-feasible solutions.
+
+**Theorem**: If $x$ is a feasible solution to the primal problem and $y$ is feasible to the dual, then:
+
+$$
+\sum_{i=1}^n c_i x_i \ge
+\sum_{j=1}^m b_j y_j
+$$
+
+We can prove this by rewriting the right-hand side:
+
+$$
+\sum_{j=1}^m b_j y_j \le
+\sum_{j=1}^m \sum_{i=1}^n A_{ji} x_i y_j =
+\sum_{i=1}^n \left( \sum_{j=1}^m A_{ji} y_j \right) x_i \le
+\sum_{i=1}^n c_i x_i
+$$
+
+The first inequality uses the constraints of the primal, and the second uses the constraints of the dual. We also use the fact that $x, y \ge 0$ throughout.
+
+This leads us to the conclusion that the optimal solution of the primal is lower bounded by the optimal solution to the dual. In fact, we can make a stronger assertion than that, which is what we do in strong duality.
+
+### Strong duality
+Strong duality tells us that the dual solutions aren't just a lower bound, but that the optimal solutions to the dual and the primal are equal.
+
+**Theorem**: If $x$ is an optimal primal solution and $y$ is an optimal dual solution, then:
+
+$$
+\sum_{i=1}^n c_i x_i = \sum_{j=1}^m b_j y_j
+$$
+
+Furthermore, if the primal problem is unbounded, then the dual problem is infeasible, and vice versa: if the dual is unbounded, the primal is infeasible.
+
+### Example: Maximum Cardinality Matching and Vertex Cover on bipartite graphs
+These two problems are the dual of each other. Remember that max cardinality matching is the following problem:
+
+- **Input**: a bipartite graph $G = (A \cup B, E)$
+- **Output**: a matching $M$
+
+We define a variable $x_e$ for each edge $e\in E$, with the intended meaning that $x_e$ represents the number of incident edges to $e$ in the matching $M$. This leads us to defining the following LP:
+
+$$
+\begin{align}
+\textbf{maximize: }   & \sum_{e \in E} x_e & \\
+\textbf{subject to: } 
+    & \sum_{e = (a, b) \in E} x_e \le 1 & \forall a \in A \\
+    & \sum_{e = (a, b) \in E} x_e \le 1 & \forall b \in B \\
+    & x_e \ge 0 & \forall e \in E \\
+\end{align}
+$$
+
+The dual program is:
+
+$$
+\begin{align}
+\textbf{minimize: }   & \sum_{v \in A\cup B} y_v & \\
+\textbf{subject to: } 
+    & y_a + y_b \ge 1 & \forall (a, b) \in E \\
+    & y_v \ge 0       & \forall v \in A \cup B \\
+\end{align}
+$$
+
+This dual problem corresponds to the relaxation of vertex cover, which returns a vertex set $C$. By weak duality, we have $\abs{M} \le \abs{C}$, for any matching $M$ and vertex cover $C$. Since both [the primal](#maximum-weight-bipartite-perfect-matching) and [the dual](#vertex-cover) are integral for bipartite graphs, we have strong duality, which implies Kőnig's theorem.
+
+### Kőnig's theorem
+Kőnig's theorem describes an equivalence between the maximum matching and the vertex cover problem in bipartite graphs. Another Hungarian mathematician, Jenő Egerváry, discovered it independently the same year[^hungarian-algorithm-name].
+
+[^hungarian-algorithm-name]: The Hungarian algorithm bears its name in honor of Kőnig and Egerváry, the two Hungarian mathematicians whose work it is based on.
+
+**Theorem**: Let $M^\*$ be a maximum cardinality matching and $C^\*$ be a minimum vertex cover of a bipartite graph. Then:
+
+$$
+\abs{M^*} = \abs{C^*}
+$$
+
+### Complementarity slackness
+As a consequence of strong duality, we have a strong relationship between primal and dual optimal solutions:
+
+**Theorem**: Let $x\in\mathbb{R}^n$ be a feasible solution to the primal, and let $y\in\mathbb{R}^m$ be a feasible solution to the dual. Then:
+
+$$
+x, y \text{ are optimal solutions}
+\iff
+\begin{cases}
+x_i > 0 \implies c_i = \sum_{j=1}^m A_{ji} y_j
+& \forall i = 1, \dots, n \\
+
+y_j > 0 \implies b_j = \sum_{i=1}^n A_{ji} x_i
+& \forall j = 1, \dots, m \\
+\end{cases}
+$$
+
+Note that we could equivalently write $x_i \ne 0$ instead of $x_i > 0$ because we assume to have the constraint that $x_i \ge 0$ (similarly for $y_j$).
+
+The "space" between the value of a constraint and its bound is what we call "slackness". In this case, since the right-hand side of the iff says that the variables being positive implies that the constraints are met exactly (and aren't just bounds), we have no slackness.
+
+#### Proof
+We can prove this complementarity slackness by applying strong duality to weak duality.
+
+First, let's prove the $\Rightarrow$ direction. Let $x, y$ be the optimal primal solution. From the proof of weak duality, we have:
+
+$$
+\sum_{j=1}^m b_j y_j \le
+\sum_{j=1}^m \sum_{i=1}^n A_{ji} x_i y_j =
+\sum_{i=1}^n \left( \sum_{j=1}^m A_{ji} y_j \right) x_i \le
+\sum_{i=1}^n c_i x_i
+$$
+
+Since we're assuming that $x, y$ are optimal solutions, we also have strong duality, which tells us that:
+
+$$
+\sum_{i=1}^n c_i x_i = \sum_{j=1}^m b_j y_j
+$$
+
+With this in mind, all the inequalities above become equalities:
+
+$$
+\sum_{j=1}^m b_j y_j =
+\sum_{j=1}^m \sum_{i=1}^n A_{ji} x_i y_j =
+\sum_{i=1}^n \left( \sum_{j=1}^m A_{ji} y_j \right) x_i =
+\sum_{i=1}^n c_i x_i
+$$
+
+From this, we can quite trivially arrive to the following conclusion:
+
+$$
+\sum_{i=1}^n c_i x_i =
+\sum_{i=1}^n \left( \sum_{j=1}^m A_{ji} y_j \right) x_i
+\implies 
+c_i x_i = \left( \sum_{j=1}^m A_{ji} y_j \right) x_i
+\quad \forall i = 1, \dots, n
+$$
+
+This means that as long as $x_i \ne 0$, we have:
+
+$$
+c_i = \sum_{j=1}^m A_{ji} y_j
+$$
+
+Now, let's prove the $\Leftarrow$ direction. We know that:
+
+$$
+\begin{align}
+c_i x_i & = \left( \sum_{j=1}^m A_{ji} y_j \right) x_i 
+& \forall i = 1, \dots, n \\
+
+b_j y_j & = \left( \sum_{i=1}^n A_{ji} x_i \right) y_j 
+& \forall j = 1, \dots, m \\
+\end{align}
+$$
+
+Therefore, we can do just as in the proof of weak duality:
+
+$$
+\sum_{j=1}^m b_j y_j =
+\sum_{j=1}^m \sum_{i=1}^n A_{ji} x_i y_j =
+\sum_{i=1}^n \left( \sum_{j=1}^m A_{ji} y_j \right) x_i =
+\sum_{i=1}^n c_i x_i
+$$
+
+This is equivalent to $x, y$ being optimal solutions, by weak duality.
+
+### Duality of Min-Cost Perfect Bipartite Matching
+- **Input**: $G = (A\cup B, E)$, a bipartite weighted graph with edge weights $c: E \mapsto \mathbb{R}$
+- **Output**: Perfect matching $M$ of maximum cost $c(M) = \sum_{e \in M} c(e)$ 
+
+We assume that $G$ is a *complete* bipartite graph, meaning that all possible edges exist. This is equivalent to not having a complete graph, as we can just consider missing edges in an incomplete graph as having infinite weight in a complete graph.
+
+In the LP for this problem, we let $x_e$ be a variable for every edge $e$, taking value 1 if $e$ is picked in the matching, and 0 if not. The problem is then:
+
+$$
+\begin{align}
+\textbf{maximize: }   & \sum_{e \in E} c(e) x_e & \\
+\textbf{subject to: } 
+    & \sum_{b \in B : (a, b) \in E} x_{ab} = 1 & \forall a \in A \\
+    & \sum_{a \in A : (a, b) \in E} x_{ab} = 1 & \forall b \in B \\
+    & x_e \ge 0 & \forall e \in E \\
+\end{align}
+$$
+
+As [we saw previously](#maximum-weight-bipartite-perfect-matching), any extreme point of this problem is integral, so we can solve the min-cost perfect matching by solving the above LP. But that is not the most efficient approach. Using duality, we can reduce the problem to that of finding a perfect matching in an unweighted graph, which [we saw how to solve](#algorithm-1) using augmenting paths.
+
+To obtain the dual, we'll first write the above LP in a form using inequalities, which gives us the following primal:
+
+$$
+\begin{align}
+\textbf{minimize: }   & \sum_{e \in E} c(e) x_e & \\
+\textbf{subject to: }
+    & \sum_{b \in B : (a, b) \in E} x_{ab} \ge 1 & \forall a \in A \\
+    & - \sum_{b \in B : (a, b) \in E} x_{ab} \ge -1 & \forall a \in A \\
+    & \sum_{a \in A : (a, b) \in E} x_{ab} \ge 1 & \forall b \in B \\
+    & -\sum_{a \in A : (a, b) \in E} x_{ab} \ge -1 & \forall b \in B \\
+    & x_e \ge 0 & \forall e \in E \\
+\end{align}
+$$
+
+This notation is a little tedious, so we'll introduce a variable for each constraint. For each $a \in A$, we introduce $u_a^-$ for the first constraint and $u_a^+$ for the second; similarly for each $b \in B$, we introduce $v_b^-$ and $v_b^+$ for the third and fourth constraint respectively. These will play the same role as the dual $y$ variables, in that every constraint in the primal has a variable in the dual. The dual is thus:
+
+$$
+\begin{align}
+\textbf{maximize: }  
+    & \sum_{a \in A} (u_a^+ - u_a^-) + \sum_{b \in B} (v_b^+ - v_b^-) & \\
+\textbf{subject to: }
+    & (u_a^+ - u_a^-) + (v_b^+ - v_b^-) \le c(e) 
+    & \forall e = (a, b) \in E \\
+    & u_a^+, u_a^-, v_b^+, v_b^- \ge 0
+    & \forall a \in A, b \in B \\
+\end{align}
+$$
+
+By [complementarity slackness](#complementarity-slackness), $x$ and $y = (u^+, u^-, v^+, v^-)$ are feasible *if and only if* the following holds:
+
+$$
+x_e > 0
+\implies 
+(u_a^+ - u_a^-) + (v_b^+ - v_b^-) = c(e)
+\quad \forall e = (a, b) \in E
+$$
+
+We also get a series of more less interesting implications, which are trivially true as their right-hand side is always true (because the original constraints already specified equality):
+
+$$
+\begin{align}
+  u_a^+ > 0 
+& \implies \sum_{b \in B : (a, b) \in E} x_{ab} = 1 
+& \forall a \in A \\
+
+  u_a^- > 0 
+& \implies - \sum_{b \in B : (a, b) \in E} x_{ab} = -1 
+& \forall a \in A \\
+
+  v_b^+ > 0
+& \implies \sum_{a \in A : (a, b) \in E} x_{ab} = 1
+& \forall b \in B \\
+
+  v_b^- > 0
+& \implies -\sum_{a \in A : (a, b) \in E} x_{ab} = -1 
+& \forall b \in B \\
+\end{align}
+$$
+
+For the following discussion, we'll define:
+
+$$
+\begin{align}
+u_a \in \mathbb{R} = u_a^+ - u_a^-  & \quad \forall a \in A \\
+v_b \in \mathbb{R} = v_b^+ - v_b^-  & \quad \forall b \in B \\
+\end{align}
+$$
+
+Note that these are not constrained to be $\ge 0$. If we need to go back from $(u, v)$ notation to $(u^+, u^-, v^+, v^-)$ notation, we can define $u_a^+ = u_a$ and $u_a^- = 0$ when $u_a \ge 0$, and $u_a^+ = 0$ and $u_a^- = u_a$ if not (equivalently for $v_b$).
+
+We can simplify the notation of our dual LP to the equivalent notation:
+
+$$
+\begin{align}
+\textbf{maximize: }  
+    & \sum_{a \in A} u_a + \sum_{b \in B} v_b & \\
+\textbf{subject to: }
+    & u_a + v_b \le c(e) 
+    & \forall e = (a, b) \in E \\
+\end{align}
+$$
+
+With this simplified notation, complementarity slackness gives us that $x$ and $y = (u, v)$ are feasible if and only if the following holds:
+
+$$
+x_e > 0
+\implies
+u_a + v_b = c(e) \quad \forall e = (a, b) \in E
+$$
+
+In other words, we can summarize this as the following lemma:
+
+**Lemma**: A perfect matching $M$ is of minimum cost **if and only if** there is a feasible dual solution $u, v$ such that:
+
+$$
+u_a + v_b = c(e) \qquad \forall e = (a, b) \in M
+$$
+
+In other words, if we can find a vertex weight assignment such that every edge has the same weight as the sum of its vertex weights, we've found a min-cost perfect matching. This is an interesting insight that will lead us to the Hungarian algorithm.
+
+### Hungarian algorithm
+Consider the following bipartite graph:
+
+{% graph %}
+graph [nodesep=0.3, ranksep=2]
+bgcolor="transparent"
+rankdir="LR"
+
+subgraph cluster_left {
+    color=invis
+    1 2 3
+}
+
+subgraph cluster_right {
+    color=invis
+    4 5 6
+}
+
+1 -- 4
+2 -- 4
+2 -- 5 [color=red, penwidth=3.0]
+3 -- 4
+3 -- 6
+{% endgraph %}
+
+The thin edges have cost 1, and the thick red edge has cost 2. The Hungarian algorithm uses the [lemma from above](#duality-of-min-cost-perfect-bipartite-matching) to always keep a dual solution $y = (u, v)$ that is *feasible at all times*. For any fixed dual solution, the lemma tells us that the perfect matching can only contain **tight edges**, which are edges $e = (a, b)$ for which $u_a + v_b = c(e)$. 
