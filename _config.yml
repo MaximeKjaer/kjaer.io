@@ -70,7 +70,8 @@ sass:
 # Use the following gems when building the site
 plugins:
   - jekyll-sitemap # Automatically create a sitemap on build
-  - jekyll-mathjax-csp # Server-side rendering of Mathjax
+  - jekyll-mathjax-csp # Server-side rendering of math with MathJax
+  - jekyll-diagrams # Server-side rendering of graphs with Graphviz
 
 mathjax_csp:
   output: CommonHTML    # SVG, CommonHTML, or MML (default: SVG)
@@ -89,6 +90,13 @@ defaults:
       unlisted: false
       edited: false
       note: false
+
+diagrams:
+  graphviz:
+    engine: dot
+    options: '-Tsvg'
+  diag:
+    options: '-Tsvg --nodoctype'
 
 # Exclude these files from your production _site
 exclude:

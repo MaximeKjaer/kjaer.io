@@ -21,6 +21,7 @@ addons:
   apt:
     packages:
     - graphicsmagick        # for image compression
+    - graphviz              # to compile graphs to svg
     - libcurl4-openssl-dev  # to avoid SSL errors
 
 before_install:
