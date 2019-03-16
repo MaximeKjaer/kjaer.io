@@ -1,0 +1,29 @@
+@mixin block($block-name, $block-color) {
+	--block-bg-color: #{$block-color};
+	--block-border-color: #{darken($block-color, 50%)};
+	--block-name: "#{$block-name}";
+}
+
+
+.block {
+	padding: 0.3em 2em;
+	background-color: var(--block-bg-color);
+	border-bottom: 1px solid var(--block-border-color);
+	border-top: 1px solid var(--block-border-color);
+
+	&::before {
+		content: var(--block-name);
+		font-family: $title-font;
+		font-size: $title-weight-light;
+		color: var(--block-border-color);
+		font-variant: small-caps;
+	}
+
+	p {
+		margin-top: 0.5em;
+	}
+
+	&.note {
+		@include block('Note', #e1edf1);
+	}
+}
