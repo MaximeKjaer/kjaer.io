@@ -8,6 +8,10 @@
 $code_default-padding: 5px;
 $code_default-color: #ccc;
 
+code, pre {
+	font-family: $monospace-font;
+}
+
 // Line numbers:
 .gutter {
 	user-select: none;
