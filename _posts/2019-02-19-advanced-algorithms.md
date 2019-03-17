@@ -611,7 +611,7 @@ $$
 
 Unfortunately, this adds exponentially many constraints. A proof 2 or 3 years ago established that there is no way around this.
 
-### Vertex cover
+### Vertex cover for bipartite graphs
 The vertex cover problem is defined as follows:
 
 - **Input**: A graph $G = (V, E)$ with node weights $w : V \mapsto \mathbb{R}$
@@ -680,8 +680,7 @@ The last inequality holds because $x^\*$ is a feasible solution and thus satisfi
 
 These $y$ and $z$ are feasible solutions, and therefore show a contradiction in our initial assumption that $x^\*$ is an extreme point; the claim is therefore verified.
 
-#### General graphs
-For general graphs, we have the same problem with odd cycles as for matchings. But the situation is actually even worse in this case, as the problem is NP-hard for general graphs, and we do not expect to have efficient algorithms for it.
+For general graphs, we have the same problem with odd cycles as for matchings. But the situation is actually even worse in this case, as the problem is NP-hard for general graphs, and we do not expect to have efficient algorithms for it. Still, we'll see an [approximation algorithm](#vertex-cover-for-general-graphs) later on.
 
 ## Duality
 
@@ -816,7 +815,7 @@ $$
 \end{align}
 $$
 
-This dual problem corresponds to the relaxation of vertex cover, which returns a vertex set $C$. By weak duality, we have $\abs{M} \le \abs{C}$, for any matching $M$ and vertex cover $C$. Since both [the primal](#maximum-weight-bipartite-perfect-matching) and [the dual](#vertex-cover) are integral for bipartite graphs, we have strong duality, which implies Kőnig's theorem.
+This dual problem corresponds to the relaxation of vertex cover, which returns a vertex set $C$. By weak duality, we have $\abs{M} \le \abs{C}$, for any matching $M$ and vertex cover $C$. Since both [the primal](#maximum-weight-bipartite-perfect-matching) and [the dual](#vertex-cover-for-bipartite-graphs) are integral for bipartite graphs, we have strong duality, which implies Kőnig's theorem.
 
 ### Kőnig's theorem
 Kőnig's theorem describes an equivalence between the maximum matching and the vertex cover problem in bipartite graphs. Another Hungarian mathematician, Jenő Egerváry, discovered it independently the same year[^hungarian-algorithm-name].
@@ -1028,15 +1027,19 @@ $$
 
 In other words, we can summarize this as the following lemma:
 
-**Lemma**: A perfect matching $M$ is of minimum cost **if and only if** there is a feasible dual solution $u, v$ such that:
-
-$$
-u_a + v_b = c(e) \qquad \forall e = (a, b) \in M
-$$
+> lemma ""
+> A perfect matching $M$ is of minimum cost **if and only if** there is a feasible dual solution $u, v$ such that:
+> 
+> $$
+> u_a + v_b = c(e) \qquad \forall e = (a, b) \in M
+> $$
 
 In other words, if we can find a vertex weight assignment such that every edge has the same weight as the sum of its vertex weights, we've found a min-cost perfect matching. This is an interesting insight that will lead us to the Hungarian algorithm.
 
 ### Hungarian algorithm
+The Hungarian algorithm finds a min-cost perfect matching. It works with the dual problem to try to construct a feasible primal solution.
+
+#### Example
 Consider the following bipartite graph:
 
 {% graph %}
@@ -1046,19 +1049,261 @@ rankdir="LR"
 
 subgraph cluster_left {
     color=invis
-    1 2 3
+    A B C
 }
 
 subgraph cluster_right {
     color=invis
-    4 5 6
+    D E F
 }
 
-1 -- 4
-2 -- 4
-2 -- 5 [color=red, penwidth=3.0]
-3 -- 4
-3 -- 6
+A -- D
+B -- D
+B -- E [color=red, penwidth=3.0]
+C -- D
+C -- F
 {% endgraph %}
 
 The thin edges have cost 1, and the thick red edge has cost 2. The Hungarian algorithm uses the [lemma from above](#duality-of-min-cost-perfect-bipartite-matching) to always keep a dual solution $y = (u, v)$ that is *feasible at all times*. For any fixed dual solution, the lemma tells us that the perfect matching can only contain **tight edges**, which are edges $e = (a, b)$ for which $u_a + v_b = c(e)$. 
+
+The Hungarian algorithm initializes the vertex weights to the following trivial solutions:
+
+$$
+v_b = 0, \quad
+u_a = \min_{b \in B} c_{ab}
+$$
+
+The right vertices get weight 0, and the left vertices get the weight of the smallest edge they're incident to. The weights $u$ and $v$, and the set of tight edges $E'$ is displayed below. 
+
+{% graph %}
+graph [nodesep=0.3, ranksep=2]
+bgcolor="transparent"
+rankdir="LR"
+
+subgraph cluster_left {
+    color=invis
+    A[label="A = 1"];
+    B[label="B = 1"];
+    C[label="C = 1"];
+}
+
+subgraph cluster_right {
+    color=invis
+    D[label="D = 0"];
+    E[label="E = 0"];
+    F[label="F = 0"];
+}
+
+A -- D
+B -- D
+C -- D
+C -- F
+{% endgraph %}
+
+Then, we try to find a perfect matching in this graph using the [augmenting path algorithm](#algorithm-1), for instance. However, this graph has no perfect matching (node $E$ is disconnected, $A$ and $B$ are both only connected to $D$). Still, we can use this fact to improve the dual solution $(u, v)$, using Hall's theorem:
+
+> theorem "Hall's theorem"
+> An $n$ by $n$ bypartite graph $G = (A \cup B, E')$ has a perfect matching **if and only if** $\abs{S} \le \abs{N(S)}$ for all $S \subseteq A$
+
+Here, $N(S)$ is the *neighborhood* of $S$. In the example above, we have no perfect matching, and we have $S = \set{A, B}$ and $N(S) = \set{D}$.
+
+{% graph %}
+graph [nodesep=0.3, ranksep=2]
+bgcolor="transparent"
+rankdir="LR"
+
+subgraph cluster_left {
+    color=invis
+    subgraph cluster_S {
+        color=black;
+        label="S";
+        A[label="A = 1"];
+        B[label="B = 1"];
+    }
+    C[label="C = 1"];
+}
+
+subgraph cluster_right {
+    color=invis
+    subgraph cluster_NS {
+        color=black;
+        label="N(S)";
+        D[label="D = 0"];
+    }
+    E[label="E = 0"];
+    F[label="F = 0"];
+}
+
+A -- D
+B -- D
+C -- D
+C -- F
+{% endgraph %}
+
+This set $S$ is a *certificate* that can be used to update the dual lower bound. If we pick a $\epsilon > 0$ (we'll see which value to pick later), we can increase $u_a$ for all vertices in $S$ by an amount $+\epsilon$, and decrease $v_b \in N(S)$ by $-\epsilon$. Let's take a look at which edges remain tight:
+
+- Edges between $S$ and $N(S)$ remain tight as $u_a + \epsilon + v_b - \epsilon = u_a + v_b = c(a, b)$
+- Edges between $A \setminus S$ and $B \setminus N(S)$ are unaffected and remain tight
+- Any tight edge between $A\setminus S$ and $N(S)$ will stop being tight
+- By definition of the neighborhood, there are no edges from $S$ to $B\setminus N(S)$
+
+Because we've changed the set of tight edges, we've also changed our solution set $E'$ to something we can maybe find an augmenting path in. For instance, picking $\epsilon = 1$ in the graph above gives us a new set $E'$ of tight edges:
+
+{% graph %}
+graph [nodesep=0.3, ranksep=2]
+bgcolor="transparent"
+rankdir="LR"
+
+subgraph cluster_left {
+    color=invis
+    A[label="A = 2"];
+    B[label="B = 2"];
+    C[label="C = 1"];
+}
+
+subgraph cluster_right {
+    color=invis
+    D[label="D = -1"];
+    E[label="E = 0"];
+    F[label="F = 0"];
+}
+
+A -- D
+B -- D
+B -- E [color=red, penwidth=3.0]
+C -- F
+{% endgraph %}
+
+The augmenting path algorithm can find a perfect matching in this graph, which is optimal by the lemma (TODO link).
+
+#### Algorithm
+Initialize:
+
+$$
+v_b = 0, \quad
+u_a = \min_{b \in B} c_{ab}
+$$
+
+Iterate:
+
+- Consider $G' = (A \cup B, E')$ where $E' = \set{(a, b) \in E : u_a + v_b = c((a, b))}$ is the set of all tight edges
+- Find a maximum-cardinality matching in $G'$. 
+    + If it is a perfect matching, we are done by complementarity slackness' $\Rightarrow$ direction.
+    + Otherwise, we can find a "certificate" set $S \subseteq A$ such that $\abs{S} > \abs{N(S)}$. This is guaranteed to exist by Hall's theorem.
+        * Update weights by $\epsilon$
+        * Go to step 1
+
+The weights are updated as follows:
+
+$$
+u'_a = \begin{cases}
+    u_a + \epsilon & \text{if } a \in S \\
+    u_a & \text{if } a \notin S \\
+\end{cases}
+\qquad
+v'_b = \begin{cases}
+    v_b + \epsilon & \text{if } b \in N(S) \\
+    v_b & \text{if } b \notin N(S) \\
+\end{cases}
+$$
+
+This remains feasible. The dual objective value increases by $(\abs{S} - \abs{N(S)})\epsilon$; as $\abs{S} > \abs{N(S)}$ by Hall's theorem, $\abs{S} - \abs{N(S)} > 1$ so $(\abs{S} - \abs{N(S)})\epsilon > \epsilon$: we only increase the value!
+
+To get the maximal amount of growth in a single step, we should choose $\epsilon$ as large as possible while keeping a feasible solution:
+
+$$
+\epsilon = 
+\min_{(a, b) \in S \times (B \setminus N(S))} 
+    c((a, b)) - u_a - v_b 
+> 0
+$$
+
+This algorithm is $\bigO{n^3}$, but can more easily be implemented in $\bigO{n^4}$.
+
+## Approximation algorithms
+Many optimization problems are NP-hard. Unless $P = NP$, there is no algorithm for these problems that have the following three properties:
+
+1. Efficiency (polynomial time)
+2. Reliability (works for any input instance)
+3. Optimality (finds an optimal solution)
+
+Properties 2 and 3 are related to *correctness*. Perhaps we could relax property 3 a little to obtain property 1? Doing so will lead us to approximation algorithms.
+
+An $\alpha$-approximation algorithm is an algorithm that runs in polynomial time and outputs a solution a solution $S$ such that (for a minimization problem):
+
+$$
+\frac{\text{cost}(S)}{\text{cost}(OPT)} \le \alpha
+$$
+
+Alternatively, for maximization problems:
+
+$$
+\frac{\text{profit}(S)}{\text{profit}(OPT)} \ge \alpha
+$$
+
+Here, "cost" and "profit" refer to the objective functions. We will have $\alpha \ge 1$ for minimization problems, and $\alpha \le 1$ for maximization. If we have $\alpha = 1$ then we have a precise algorithm (not really an *approximation* algorithm).
+
+Giving a value for $\alpha$ can be hard: we don't know the cost of the optimal solution, which is what we're stuck trying to compute in the first place. Instead, for minimization problems, we can do compare ourselves with a *lower bound* on the optimum, which gives us:
+
+$$
+\frac{\text{cost}(S)}{\text{cost}(OPT)} 
+\le \frac{\text{cost}(S)}{\text{lower bound on OPT}} 
+\le \alpha
+$$
+
+To get this bound, we typically proceed as follows:
+
+1. Give an exact formulation of the problem as an Integer Linear Program (ILP), usually with $x_i \in \set{0, 1}$.
+2. Relax the ILP to a LP with $x_i \in [0, 1]$
+3. Solve the LP to get an optimal solution $x^\*\_{\text{LP}}$ which is a lower (respectively upper) bound on the optimal solution $x^\*\_{\text{ILP}}$ to the ILP, and thus also on the original problem.
+4. Somehow round $x^\*\_{\text{LP}}$ "without losing too much", which will determine $\alpha$.
+
+### Vertex Cover for general graphs
+As we [saw previously](#vertex-cover-for-bipartite-graphs), vertex cover can be formulated as the following LP:
+
+$$
+\begin{align}
+\textbf{minimize: }   & \sum_{v \in V} x_v w(v)   & \\
+\textbf{subject to: } 
+    & x_u + x_v \ge 1 & \forall (u, v) \in E \\
+    & 0 \le x_v \le 1 & \forall v \in V \\
+\end{align}
+$$
+
+Letting $x_i \in \set{0, 1}$ gives us our ILP. If we relax this to $x_i \in [0, 1]$, we get our LP. We proved that this LP works for bipartite graphs (i.e. that any extreme point for bipartite graphs is integral), but we're now considering the general case, in which we know we won't always get integral solutions. 
+
+Therefore, to go from LP to ILP, we must define a rounding scheme: given an optimal solution $x^\*$ to the LP, we will return:
+
+$$
+C = \set{v \in V : x_v^* \ge \frac{1}{2}}
+$$
+
+This is still a feasible solution, because for any edge $(u, v)$, we have $x_u^\* + x_v^\* \ge 1$, so at least one of $x_u^\*$ and $x_v^\*$ is $\ge \frac{1}{2}$.
+
+We'll now talk about the value of $\alpha$.
+
+> claim ""
+> The weight of $C$ is at most twice the value of the optimal solution of vertex cover.
+> 
+> $$
+> w(C) \le 2\text{VC}_{\text{OPT}}
+> $$
+
+We prove the claim as follows:
+
+$$
+\begin{align}
+w(C) 
+& = \sum_{v \in C}   w(v)
+  = \sum_{v \in V : x_v^* \ge \frac{1}{2}}  w(v) \\
+
+& \le \sum_{v \in V : x_v^* \ge \frac{1}{2}}  2x_v^* w(v)
+  \le \sum_{v \in V}   2x_v^* w(v) \\
+
+& =   2\sum_{v \in V}   x_v^* w(v)
+  =   2\text{LP}_{\text{OPT}} \\
+& \le 2\text{VC}_{\text{OPT}}
+\end{align}
+$$
+
+Therefore, we have a 2-approximation algorithm for Vertex Cover.
