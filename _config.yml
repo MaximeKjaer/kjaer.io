@@ -72,6 +72,7 @@ plugins:
   - jekyll-sitemap # Automatically create a sitemap on build
   - jekyll-mathjax-csp # Server-side rendering of math with MathJax
   - jekyll-diagrams # Server-side rendering of graphs with Graphviz
+  - premonition # block-styled content (notes, theorems, etc)
 
 mathjax_csp:
   output: CommonHTML    # SVG, CommonHTML, or MML (default: SVG)
@@ -97,6 +98,14 @@ diagrams:
     options: '-Tsvg'
   diag:
     options: '-Tsvg --nodoctype'
+
+premonition:
+  default:
+    template: >
+      <div class="block {{type}}" {% if header %}id="{{ type }}:{{ title | slugify: "latin" }}"{% endif %}>
+      {% if header %}<p class="header">{{ title }}</p>{% endif %}
+      {{ content }}
+      </div>
 
 # Exclude these files from your production _site
 exclude:

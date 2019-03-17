@@ -23,7 +23,23 @@
 		margin-top: 0.5em;
 	}
 
+	.header {
+
+	}
+
 	&.note {
 		@include block('Note', #e1edf1);
+	}
+
+	&.theorem {
+		@include block('Theorem', #eee);
+	}
+
+	&.lemma {
+		@include block('Lemma', #eee);
+	}
+
+	&.claim {
+		@include block('Claim', #eee);
 	}
 }
