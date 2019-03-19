@@ -40,15 +40,16 @@ In Scala, we'd write this as:
 {% highlight scala linenos %}
 trait Monad[T] {
     def flatMap[U](f: T => Monad[U]): Monad[U]
-    def unit(x: T): Monad[T]
 }
+
+def unit[T](x: T): Monad[T]
 {% endhighlight %}
 
 `Monad` is a parametric (or *generic*) type, in that it takes a type parameter `T`.
 
 We already know `flatMap` from lists: it applies a function to all elements of the list and its sublists, and returns a flat list of results. 
 
-The second method, `unit`, works as a constructor of monads: it takes a value `x` of type `T` and returns a `Monad[T]` containing `x`. To discuss the theory, we call it `unit`, but in Scala implementations, we typically define it as `apply`, which is a constructor method.
+The second method, `unit`, works as a constructor of monads: it takes a value `x` of type `T` and returns a `Monad[T]` containing `x`. To discuss the theory, we call it `unit`, but in Scala implementations, we typically define it as `apply`, the constructor method, on the companion object.
 
 To be a little more formal about what these methods should do, we can quickly mention the three *monadic laws*. Let `f` and `g` be functions that create a monad from some value, `x` be some value, and `m` be an instance of the monad. We want the following properties to always hold:
 
