@@ -1,6 +1,7 @@
 ---
 title: A monad is not a burrito
 description: Monads are this scary, complicated thing for many people learning Scala and functional programming. This article is a pragmatic explanation of what they are, and what they're useful for.
+edited: true
 ---
 
 <div class="block note" markdown="1">
@@ -39,7 +40,7 @@ In Scala, we'd write this as:
 {% highlight scala linenos %}
 trait Monad[T] {
     def flatMap[U](f: T => Monad[U]): Monad[U]
-    def unit[T](x: T): Monad[T]
+    def unit(x: T): Monad[T]
 }
 {% endhighlight %}
 
