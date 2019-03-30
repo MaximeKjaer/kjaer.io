@@ -19,6 +19,9 @@ $$
 \newcommand{\set}[1]{\left\{#1\right\}}
 \newcommand{\bigO}[1]{\mathcal{O}\left(#1\right)}
 \newcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\expect}[1]{\mathbb{E}\left[#1\right]}
+\newcommand{\prob}[1]{\mathbb{P}\left[#1\right]}
+\newcommand{\qed}[0]{\tag*{$\blacksquare$}}
 $$
 
 ## When does the greedy algorithm work? 
@@ -1303,7 +1306,371 @@ w(C)
 & =   2\sum_{v \in V}   x_v^* w(v)
   =   2\text{LP}_{\text{OPT}} \\
 & \le 2\text{VC}_{\text{OPT}}
+\qed
 \end{align}
 $$
 
 Therefore, we have a 2-approximation algorithm for Vertex Cover.
+
+### Integrality gap
+#### Definition 
+As a recap, we're talking about the following programs:
+
+- **ILP**: Integral LP, the original definition of the problem.
+- **LP**: Relaxation of the ILP. Its optimal solution has the lowest cost of all the programs; it's lower or equal to that of the ILP because the LP allows variables to take on more values than the ILP ($[0, 1]$ instead of $\set{0, 1}$).
+- **Approximation algorithm**: Rounding of LP. Rounding increases cost by a factor $\alpha$.
+- **OPT**: The (hypothetical) optimal solution
+
+The notion of *integrality gap* allows us to bound the power of our LP relaxation. It defines the "gap" in cost between the optimal LP solution and the optimal OPT solution.
+
+Let $\mathcal{I}$ be the set of all instances of a given problem. For minimization problems, the integrality gap is defined as:
+
+$$
+g = \max_{I \in \mathcal{I}}
+    \frac{\text{OPT}(I)}{\text{OPT}_{\text{LP}}(I)}
+$$
+
+This allows us to give some guarantees on bounds: for instance, suppose $g=2$ and our LP found $\text{OPT}\_{\text{LP}} = 70$. Since the problem instance might have been the one maximizing the integrality, all we can guarantee is that $\text{OPT}(I) \le 2\cdot \text{OPT}\_{\text{LP}}(I) = 140$. In this case, we cannot make an approximation algorithm that approximates better than within a factor $g = 2$.
+
+#### Integrality gap of Vertex Cover
+> claim "Vertex cover integrality gap"
+> The integrality gap for Vertex Cover for a graph of $n$ vertices is at least $2 - \frac{2}{n}$
+
+On a *complete* graph with $n$ vertices, we have $OPT = n - 1$ because if there are two vertices we don't choose, the edge between them isn't covered. 
+
+Assigning $\frac{1}{2}$ to every vertex is a feasible solution of cost $\frac{n}{2}$ so the optimum must be smaller or equal.
+
+We can use these two facts to compute the integrality gap:
+
+$$
+g \ge \frac{n-1}{\frac{n}{2}} = 2 - \frac{2}{n}
+\qed
+$$
+
+Our 2-approximation algorithm for vertex cover implies that the integrality gap is at most 2, so we have:
+
+$$
+2 - \frac{2}{n} \le g \le 2
+$$
+
+### Set cover
+#### Problem definition
+Set cover is a generalization of vertex cover.
+
+- **Input**:
+    + A universe of $n$ elements $\mathcal{U} = \set{e_1, e_2, \dots, e_n}$
+    + A family of subsets $\mathcal{T} = \set{S_1, S_2, \dots, S_m}$
+    + A cost function $\mathcal{T} \mapsto \mathbb{R}_+$
+- **Output**: A collection $C \subseteq \mathcal{T}$ of subsets of minimum cost that cover all elements
+
+More formally, the constraint of $C$ is:
+
+$$
+C \subseteq \mathcal{T} : \bigcup_{S \in C} S = \mathcal{U}
+\quad
+\text{and } c(C) \text{ is minimal}
+$$
+
+#### First attempt at an approximation algorithm
+We can formulate this as an ILP of $n$ constraints, with $m$ variables. We'll let each $x_i \in \set{0, 1}$ be 1 if $S_i \in C$, and 0 otherwise. The LP is:
+
+$$
+\begin{align}
+\textbf{minimize: }   & \sum_{i=1}^m x_i \cdot c(S_i)   & \\
+\textbf{subject to: } 
+    & \sum_{S_i : e \in S_i} x_i \ge 1 & \forall e \in \mathcal{U} \\
+\end{align}
+$$
+
+As for the rounding, suppose that the element that belongs in the most sets is represented in $f$ sets $S_i$; each element belongs to at most $f$ sets. We'll do the following rounding to ensure feasibility:
+
+$$
+C = \set{S_i : x_i^* \ge \frac{1}{f}}
+$$
+
+Analyzing this in the same way as we did for Vertex Cover would short us that this is an approximation within a factor of $f$.
+
+#### Better approximation algorithm
+If we introduce some randomness and allow our algorithm to sometimes output non-feasible solutions, we can get much better results in expectation.
+
+We'll run the following algorithm:
+
+1. Solve the LP to get an optimal solution $x^\*$
+2. Choose some positive integer constant $d$
+3. Start with an empty result set $C$ and run the following $d$ times:
+    - For $i = 1, \dots, m$, add set $S_i$ to the solution $C$ with probability $x_i^\*$ (choosing independently for each set).
+
+The algorithm gives each set $d$ chances to be picked. This randomness introduces the possibility of two "bad events", the probabilities of which we'll study later:
+
+- The solution has too high cost
+- The solution is not feasible: there is at least one element that isn't covered by $C$
+
+As we'll see in the two following claims, we can bound both of them.
+
+> claim "Set Cover Claim 7"
+> The expected cost of all sets added in one execution of Step 3 is:
+> 
+> $$
+> \sum_{i=1}^m x_i^* \cdot c(S_i) = \text{LP}_{\text{OPT}}
+> $$
+
+For each set $S_i \in \mathcal{T}$, we let $Y_{S_i}$ be a random indicator variable telling us whether $S_i$ was picked to be in $C$:
+
+$$
+Y_{S_i} = \begin{cases}
+0 & \text{if } S_i \in C \\
+1 & \text{otherwise} \\
+\end{cases}
+$$
+
+Unsurprisingly, the expected value of $Y_{S_i}$ is:
+
+$$
+\expect{Y_{S_i}} 
+= \prob{Y_{S_i} = 1}\cdot 1 + \prob{Y_{S_i} = 0}\cdot 0 
+= x_i^*
+$$
+
+The expected cost is therefore:
+
+$$
+\expect{c(C)}
+= \sum_{i=1}^m c(S_i) \prob{S_i \text{is picked}}
+= \sum_{i=1}^m c(S_i) Y_{S_i}
+= \sum_{i=1}^m c(S_i) x_i^*
+= \text{LP}_{\text{OPT}}
+\qed
+$$
+
+From this, we can immediately derive the following corollary: 
+
+> corollary "Set Cover Corollary 8"
+> The expected cost of $C$ after $d$ executions of Step 3 is at most:
+> 
+> $$
+>     d \cdot \sum_{i=1}^m c(S_i)x_i^*
+> \le d \cdot \text{LP}_{\text{OPT}}
+> \le d \cdot \text{OPT}
+> $$
+
+Note that $\text{LP}_{\text{OPT}} \le \text{OPT}$ because LP is a relaxation of the ILP, so its optimum can only be better (i.e. lower for minimization problems like this one). This gives us some probabilistic bound on the first "bad event" of the cost being high.
+
+We also need to look into the other "bad event" of the solution not being feasible:
+
+> claim "Set Cover Claim 9"
+> The probability that a constraint is unsatisfied after a single execution is at most $\frac{1}{e}$.
+
+A constraint is unsatisfied if $\exists e \in \mathcal{U} : e$ is not covered by $C$. Suppose that the unsatisfied constraint contains $k$ variables:
+
+$$
+x_1 + x_2 + \dots + x_k \le 1
+$$
+
+Let $S_1, \dots, S_k$ be the sets covering $e$. Then:
+
+$$
+\begin{align}
+\prob{\text{constraint unsatisfied}} 
+& = \prob{S_1 \notin C, \dots, S_k \notin C} \\
+& = \prob{S_1 \text{ not taken}} \dots \prob{S_k \text{ not taken}} \\
+& = (1-x_1^*) \dots (1 - x_k^*) \\
+& \le e^{-x_1^*} \cdot \dots \cdot e^{-x_k^*} \\
+& = \exp\left( -\sum_{i=1}^k x_i^* \right) \\
+& \le e^{-1}
+\qed
+\end{align}
+$$
+
+Note that:
+
+- The second step uses the independence of the $S_i$; while their probabilities are linked, their inclusion in $C$ is determined by independent "coin flips".
+- The first inequality step uses $1-x \le e^{-x}$. This is a small lemma that follows from the Taylor expansion (it's good to know, but it's not vital to do so). 
+- The second inequality uses the constraints of the problem, which tell us that $\sum_i x_i^\* \ge 1$.
+
+So we have probability $e^{-1}\approx\frac{1}{3}$ of leaving a constraint unsatisfied. This is pretty bad! 
+
+To get a better bound, we could have our algorithm pick set $S_i$ with probability $\min(1, 2\ln(n) x_s^\*)$, which would make $\prob{S_i \notin C} = (1 - 2\ln(n) x_i^\*)$, and the probability would be upper-bounded by $\frac{1}{n^2}$.
+
+Another technique to "boost" the probability of having a feasible solution is to run the loop $d$ times instead of once. In the following, we'll pick $d = c\cdot\ln(n)$ because it will enable us to get nice closed forms. But these proofs could be done for any other formulation of $d$.
+
+> claim "Set Cover claim 10"
+> The output $C$ after $d=c\cdot\ln(n)$ is a feasible solution with probability at least $1 - \frac{1}{n^{c-1}}$.
+
+The probability that a given constraint is unsatisfied after $d$ executions of step 3 is at most:
+
+$$
+\left(\frac{1}{e}\right)^{d}
+$$
+
+
+If we pick $d = c\cdot\ln(n)$, we get:
+
+$$
+\left(\frac{1}{e}\right)^{c\cdot\ln(n)} = \frac{1}{n^c}
+$$
+
+By [union bound](https://en.wikipedia.org/wiki/Boole%27s_inequality), we get that the probability of any constraint being unsatisfied is at most:
+
+$$
+n\cdot\frac{1}{n^c} = \frac{1}{n^{c-1}}
+\qed
+$$
+
+
+At this point, we have an idea of the probabilities of the two "bad events": we have an expected value of the cost, and a bound of the probability of the solution not being feasible. Still, there might be a bad correlation between the two: maybe the feasible outputs have very high cost? Maybe all infeasible solutions have low cost? The following claim deals with that worry.
+
+> claim "Set Cover Claim 11"
+> The algorithm outputs a feasible solution of cost at most $4d\text{OPT}$ with probability greater that $\frac{1}{2}$.
+
+To prove this, we'll make use of Markov's inequality:
+
+> theorem "Markov's Inequality"
+> For a non-negative random variable $X$:
+> 
+> $$
+> \prob{X \ge x \expect{X}} \le \frac{1}{c}
+> $$
+
+This stems from:
+
+$$
+\begin{align}
+         & \prob{X \ge c} \cdot c \le \expect{X} \\
+\implies & \prob{X \ge c} \le \frac{\expect{X}}{c} \\
+\end{align}
+$$
+
+If we set $c = d\cdot\expect{X}$ we get:
+
+$$
+\prob{X \ge d\cdot\expect{X}} \le \frac{1}{d}
+\qed
+$$
+
+Now onto the proof of our claim: let $\mu$ be the expected cost, which by the corollary is $d\cdot\text{OPT}$. We can upper-bound the "bad event" of the cost being very bad: by Markov's inequality we have $\prob{\text{cost} > 4\mu} \le \frac{1}{4}$. We chose a factor $4$ here because this will give us a nice bound later on; we could pick any number to obtain another bound. We can also upper-bound the "bad event" of the solution being infeasible, which we know (thanks to claim 10) to be upper-bounded by $\frac{1}{n^{c-1}} \le \frac{1}{2}$ for $d = c\cdot\ln(n)$ iterations. By union-bound, the probability that no bad event happens is at least $1 - \frac{1}{4} - \frac{1}{n}$. Supposing $n > 4$, this probability is indeed greater than $\frac{1}{2}$. $\qed$
+
+This claim tells us that choosing $d = c\cdot\ln(n)$, we have a $\bigO{\log n}$ approximation algorithm for the set cover problem.
+
+## Multiplicative Weights Algorithm
+
+### Warm-up
+Suppose that you want to invest money on the stock market. To help you invest this money, you listen to $n$ experts. Every day, each of them tells you whether the stock will go up or down.
+
+| Day  | Expert 1 | Expert 2 | Expert 3 | Expert 4 | Actual |
+| :--: | :------: | :------: | :------: | :------: | :----: |
+|  1   |    📈    |    📈    |    📈    |    📈    |   📈   |
+|  2   |    📈    |    📈    |    📉    |    📈    |   📈   |
+|  3   |    📈    |    📉    |    📈    |    📉    |   📉   |
+
+All the experts were right on day 1, but expert 3 was wrong on day 2, and experts 1 and 3 were wrong on day 3.
+
+Your goal is to devise a strategy that allows you to do as well as the best expert. For this warm-up example, we'll work under the assumption that there is a "perfect expert" who is never wrong.
+
+Our strategy is then the following. At day $t$, let $S_t$ be the set of experts who have been right so far. We will follow the majority in $S_t$. This ensures that we'll be wrong at most $\log_2(n)$ times (we follow the majority, so we can divide the pool of trusted experts at least in half whenever we make a mistake).
+
+### Formalization of the problem
+We'll generalize and formalize the problem we saw above. The following game is played between an omniscient Adversary (the stock market) and an Aggregator (you), who is advised by $n$ experts. 
+
+For $t = 1, \dots, T$ (days on the stock market), each expert $i \in [n]$ advises "yes" or "no" ("up" or "down"). The Aggregator predicts either yes or no. The Adversary, with knowledge of the Aggregator's prediction and of the expert advice, decides the yes-or-no outcome. The Aggregator observes the outcome, and suffers some cost if his prediction was incorrect.
+
+Note that the Adversary's role is not to make the Aggregator be wrong all the time, which would be easy: seeing that it's omniscient, the Adversary could just observe the opposite outcome of what the Aggregator predicted. Instead, we can consider that the Adversary's role is to make the Aggregator look as bad as possible compared to the best expert.
+
+The Aggregator's role is to make as few mistakes as possible, but since the experts may be unhelpful and the outcomes can be bad, the Aggregator can only hope for a performance guarantee relative to the best expert, in hindsight. To do so, it can track which experts are helpful; we'll see some good strategies for this.
+
+The number of mistakes in excess of the best expert is called *(external) regret*.
+
+## Weighted Majority (WM)
+In a world where experts can be wrong (yes, really), we can somewhat "soften" our strategy. Instead of discarding them completely on their first mistake, we can just discount their advice. This leads us to the [Weighted Majority algorithm](https://www.sciencedirect.com/science/article/pii/S0890540184710091), which is defined as follows.
+
+We begin by assigning a weight $w_i^{(1)}$ to each expert $i$, initialized at 1. Thereafter, for each day $t$:
+
+- Aggregator predicts yes or no based on a majority vote, weighted by $\vec{w}^{(t)} = (w_1^{(t)}, \dots, w_n^{(t)})$
+- After observing the outcome, for every mistaken expert $i$, set $w_i^{(t+1)} = w_i^{(t)} / 2$
+
+We chose to update the experts' weights by a factor $\frac{1}{2}$, which leads us to some fast learning (maybe too fast!). 
+
+> theorem "16.1"
+> For any sequence of outcomes, any duration $T$ and any expert $i$:
+> 
+> $$
+> \text{# of WM mistakes} \le 2.41 \cdot (\text{# of }i\text{'s mistakes}) + \log_2(n)
+> $$
+
+The $2.41$ seems very arbitrary, but we'll show where it comes from.
+
+Let $i \in [n]$ be any expert. Let $\Phi^{(t)}$ defined as follows be a "potential function":
+
+$$
+\Phi^{(t)} = \sum_{i \in [n]} w_i^{(t)}
+$$
+
+Our strategy will be to bound $\Phi^{(T+1)}$ from below with expert $i$'s mistakes, and from above with WM's mistakes.
+
+For the lower bound, we can observe that:
+
+$$
+\Phi^{(T+1)} 
+= \sum_{j \in [n]} w_j^{(T+1)} 
+\ge w_i^{(T+1)}
+= \left(\frac{1}{2}\right)^{\text{# of } i \text{'s mistakes}}
+$$
+
+The inequality stems from the fact that all weights are always $\ge 0$.
+
+For the upper bound, let's start by observing the following: $\Phi^{(1)} = n$ as all weights are initialized to 1. Additionally, whenever WM errs, we halve the weights for experts representing at least half of the total weights (since we follow the weighted majority). This means that we loose at least $\frac{1}{4}$ of the total weight:
+
+$$
+\Phi^{(t+1)} \le \frac{3}{4}\Phi^{(t)}
+$$
+
+This implies that we can bound the final value of the potential function as follows:
+
+$$
+\Phi^{(T+1)} \le \left(\frac{3}{4}\right)^{\text{# of WM mistakes}} \cdot \Phi^{(1)}
+$$
+
+Combining these bounds together, we get:
+
+$$
+\left(\frac{1}{2}\right)^{\text{# of } i \text{'s mistakes}}
+\le
+\Phi^{(T+1)}
+\le
+\left(\frac{3}{4}\right)^{\text{# of WM mistakes}} \cdot n
+$$
+
+Taking the $\log_2$ of both bounds yields:
+
+$$
+-(\text{# of }i\text{'s mistakes})
+\le
+\log_2(n) + \log_2\left(\frac{3}{4}\right) \cdot (\text{# of WM mistakes})
+$$
+
+So finally:
+
+$$
+\text{# of WM mistakes} 
+\le
+(1/\log_2(4/3)) \cdot (\text{# of }i\text{'s mistakes} + \log_2(n))
+$$
+
+We have $(1/\log_2(4/3)) \approx 2.41$, which proves the theorem. $\qed$
+
+The 2.41 constant is a consequence of our arbitrary choice to halve the weights; if instead we choose to divide by a $(1+\epsilon)$ factor in the update rule:
+
+$$
+w_i^{(t+1)} = \begin{cases}
+    w_i^{(t)} / (1 + \epsilon) & \text{if expert } i \text{ was wrong} \\
+    w_i^{(t)} & \text{otherwise}
+\end{cases}
+$$
+
+Then we achieve a more general formulation:
+
+$$
+\text{# of WM mistakes} \le 2(1 + \epsilon) \cdot (\text{# of }i\text{'s mistakes}) + \bigO{\frac{\log_2(n)}{\epsilon}}
+$$
+
+
+
