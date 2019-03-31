@@ -151,13 +151,15 @@ def greedy(M, w):
 #### Correctness proof
 We'd like to prove the following theorem:
 
-**Theorem**: *For any ground set* $E = \set{1, 2, \dots, n}$ *and a family of subsets* $\mathcal{I}$, `greedy` *finds a maximum weight base for any set of weights* $w: E \mapsto \mathbb{R}$ **if and only if** $M=(E, \mathcal{I})$ *is a matroid.*
+> theorem ""
+> For any ground set $E = \set{1, 2, \dots, n}$ and a family of subsets $\mathcal{I}$, `greedy` finds a maximum weight base for any set of weights $w: E \mapsto \mathbb{R}$ **if and only if** $M=(E, \mathcal{I})$ is a matroid.
 
 The if direction ($\Leftarrow$) follows from the [correctness proof](#correctness-proof) we did for Kruskal's algorithm.
 
 For the only if direction ($\Rightarrow$), we must prove the following claim, which we give in the contrapositive form.
 
-**Claim**: Suppose $(E, \mathcal{I})$ is not a matroid. Then there exists an assignment of weights $w: E \mapsto \mathbb{R}$ such that `greedy` does not return a maximum weight base.
+> claim ""
+> Suppose $(E, \mathcal{I})$ is not a matroid. Then there exists an assignment of weights $w: E \mapsto \mathbb{R}$ such that `greedy` does not return a maximum weight base.
 
 To prove this, we're going to cook up some weights for which `greedy` doesn't return a maximum weight base when $(E, \mathcal{I})$ isn't a matroid (i.e. the tuple either violates $(I_1)$ or $(I_2)$).
 
@@ -202,7 +204,7 @@ $$
 = \abs{S} + \frac{1}{2}
 $$
 
-However, since $T\in\mathcal{I}$ and $\abs{T} > \abs{S}$, we expect the optimal solution to have value $\abs{T} \ge \abs{S} + 1 > \abs{S} + \frac{1}{2}$.
+However, since $T\in\mathcal{I}$ and $\abs{T} > \abs{S}$, we expect the optimal solution to have value $\abs{T} \ge \abs{S} + 1 > \abs{S} + \frac{1}{2}$. $\qed$
 
 #### Examples
 <br/>
@@ -541,9 +543,10 @@ But in linear programming, we cannot take on discrete values; instead, we can on
 
 Still, we will see that relaxing $x_e$ to be in $[0, 1]$ still gives us an optimal solution $x^\*$ for which $x_e^\* \in \set{0, 1} \forall e \in E$.
 
-**Claim**: For bipartite graphs, any extreme point solution to the LP is integral[^integral-definition].
+> claim ""
+> For bipartite graphs, any extreme point solution to the LP is integral.
 
-[^integral-definition]: Integral means that it is an integer; coupled with the constraint that $0 \le x_e \le 1$, being integral implies $x_e \in \set{0, 1}$.
+Integral means that it is an integer; coupled with the constraint that $0 \le x_e \le 1$, being integral implies $x_e \in \set{0, 1}$.
 
 We'll prove this by contradiction. Let $x^\*$ be an extreme point for the graph $G=(A \cup B, E)$, and let $E_f = \set{e \in E : 0 < x_e^\* < 1}$ be the set of edges for which optimal extreme point solution $x^\*$ is not integral. We suppose toward contradiction that the solution $x^\*$ contains such edges, i.e. that $E_f \ne \emptyset$.
 
@@ -584,7 +587,7 @@ $$
 \epsilon = \min\set{x_e^*, (1 - x_e^*)} \forall e \in E_f
 $$
 
-Note that this indeed satisfies $x^\* = \frac{1}{2}(y + z)$, so we have a contradiction of the assumption that $x^\*$ is an extreme point.
+Note that this indeed satisfies $x^\* = \frac{1}{2}(y + z)$, so we have a contradiction of the assumption that $x^\*$ is an extreme point. $\qed$
 
 #### Bipartite perfect matching polytope
 The polytope[^polytope-definition] corresponding to the bipartite perfect matching LP constraints is called the *bipartite perfect matching polytope*. 
@@ -642,7 +645,8 @@ x_v = \begin{cases}
 \end{cases}
 $$
 
-**Claim**: For bipartite graphs, any extreme point to the vertex cover LP is integral.
+> claim ""
+> For bipartite graphs, any extreme point to the vertex cover LP is integral.
 
 We'll prove this by contradiction. Let $x^\*$ be an extreme point, and $V_f = \set{v : 0 < x_v^\* < 1}$ be the vertices with fractional values in $x^\*$. Suppose toward contradiction that $V_f \ne \emptyset$. 
 
@@ -681,7 +685,7 @@ $$
 
 The last inequality holds because $x^\*$ is a feasible solution and thus satisfies the first property.
 
-These $y$ and $z$ are feasible solutions, and therefore show a contradiction in our initial assumption that $x^\*$ is an extreme point; the claim is therefore verified.
+These $y$ and $z$ are feasible solutions, and therefore show a contradiction in our initial assumption that $x^\*$ is an extreme point; the claim is therefore verified. $\qed$
 
 For general graphs, we have the same problem with odd cycles as for matchings. But the situation is actually even worse in this case, as the problem is NP-hard for general graphs, and we do not expect to have efficient algorithms for it. Still, we'll see an [approximation algorithm](#vertex-cover-for-general-graphs) later on.
 
@@ -758,12 +762,13 @@ Note that the dual of the dual is the primal, so we can convert problems both wa
 ### Weak duality
 Weak duality tells us that every dual-feasible solution is a lower bound of primal-feasible solutions.
 
-**Theorem**: If $x$ is a feasible solution to the primal problem and $y$ is feasible to the dual, then:
-
-$$
-\sum_{i=1}^n c_i x_i \ge
-\sum_{j=1}^m b_j y_j
-$$
+> theorem "Weak duality"
+> If $x$ is a feasible solution to the primal problem and $y$ is feasible to the dual, then:
+> 
+> $$
+> \sum_{i=1}^n c_i x_i \ge
+> \sum_{j=1}^m b_j y_j
+> $$
 
 We can prove this by rewriting the right-hand side:
 
@@ -772,6 +777,8 @@ $$
 \sum_{j=1}^m \sum_{i=1}^n A_{ji} x_i y_j =
 \sum_{i=1}^n \left( \sum_{j=1}^m A_{ji} y_j \right) x_i \le
 \sum_{i=1}^n c_i x_i
+
+\qed
 $$
 
 The first inequality uses the constraints of the primal, and the second uses the constraints of the dual. We also use the fact that $x, y \ge 0$ throughout.
@@ -781,11 +788,12 @@ This leads us to the conclusion that the optimal solution of the primal is lower
 ### Strong duality
 Strong duality tells us that the dual solutions aren't just a lower bound, but that the optimal solutions to the dual and the primal are equal.
 
-**Theorem**: If $x$ is an optimal primal solution and $y$ is an optimal dual solution, then:
-
-$$
-\sum_{i=1}^n c_i x_i = \sum_{j=1}^m b_j y_j
-$$
+> theorem "Strong Duality"
+> If $x$ is an optimal primal solution and $y$ is an optimal dual solution, then:
+> 
+> $$
+> \sum_{i=1}^n c_i x_i = \sum_{j=1}^m b_j y_j
+> $$
 
 Furthermore, if the primal problem is unbounded, then the dual problem is infeasible, and vice versa: if the dual is unbounded, the primal is infeasible.
 
@@ -825,28 +833,30 @@ Kőnig's theorem describes an equivalence between the maximum matching and the v
 
 [^hungarian-algorithm-name]: The Hungarian algorithm bears its name in honor of Kőnig and Egerváry, the two Hungarian mathematicians whose work it is based on.
 
-**Theorem**: Let $M^\*$ be a maximum cardinality matching and $C^\*$ be a minimum vertex cover of a bipartite graph. Then:
-
-$$
-\abs{M^*} = \abs{C^*}
-$$
+> theorem "Kőnig's Theorem"
+> Let $M^\*$ be a maximum cardinality matching and $C^\*$ be a minimum vertex cover of a bipartite graph. Then:
+> 
+> $$
+> \abs{M^*} = \abs{C^*}
+> $$
 
 ### Complementarity slackness
 As a consequence of strong duality, we have a strong relationship between primal and dual optimal solutions:
 
-**Theorem**: Let $x\in\mathbb{R}^n$ be a feasible solution to the primal, and let $y\in\mathbb{R}^m$ be a feasible solution to the dual. Then:
-
-$$
-x, y \text{ are optimal solutions}
-\iff
-\begin{cases}
-x_i > 0 \implies c_i = \sum_{j=1}^m A_{ji} y_j
-& \forall i = 1, \dots, n \\
-
-y_j > 0 \implies b_j = \sum_{i=1}^n A_{ji} x_i
-& \forall j = 1, \dots, m \\
-\end{cases}
-$$
+> theorem "Complementarity Slackness"
+> Let $x\in\mathbb{R}^n$ be a feasible solution to the primal, and let $y\in\mathbb{R}^m$ be a feasible solution to the dual. Then:
+> 
+> $$
+> x, y \text{ are optimal solutions}
+> \iff
+> \begin{cases}
+> x_i > 0 \implies c_i = \sum_{j=1}^m A_{ji} y_j
+> & \forall i = 1, \dots, n \\
+> 
+> y_j > 0 \implies b_j = \sum_{i=1}^n A_{ji} x_i
+> & \forall j = 1, \dots, m \\
+> \end{cases}
+> $$
 
 Note that we could equivalently write $x_i \ne 0$ instead of $x_i > 0$ because we assume to have the constraint that $x_i \ge 0$ (similarly for $y_j$).
 
@@ -916,7 +926,7 @@ $$
 \sum_{i=1}^n c_i x_i
 $$
 
-This is equivalent to $x, y$ being optimal solutions, by weak duality.
+This is equivalent to $x, y$ being optimal solutions, by weak duality. $\qed$
 
 ### Duality of Min-Cost Perfect Bipartite Matching
 - **Input**: $G = (A\cup B, E)$, a bipartite weighted graph with edge weights $c: E \mapsto \mathbb{R}$
@@ -1579,7 +1589,7 @@ The Aggregator's role is to make as few mistakes as possible, but since the expe
 
 The number of mistakes in excess of the best expert is called *(external) regret*.
 
-## Weighted Majority (WM)
+### Weighted Majority (WM)
 In a world where experts can be wrong (yes, really), we can somewhat "soften" our strategy. Instead of discarding them completely on their first mistake, we can just discount their advice. This leads us to the [Weighted Majority algorithm](https://www.sciencedirect.com/science/article/pii/S0890540184710091), which is defined as follows.
 
 We begin by assigning a weight $w_i^{(1)}$ to each expert $i$, initialized at 1. Thereafter, for each day $t$:
@@ -1672,5 +1682,376 @@ $$
 \text{# of WM mistakes} \le 2(1 + \epsilon) \cdot (\text{# of }i\text{'s mistakes}) + \bigO{\frac{\log_2(n)}{\epsilon}}
 $$
 
+### Generalized Game with Randomized Strategies
+We now allow the Aggregator to play a random strategy instead of always making deterministic predictions. Randomization is in fact often a good strategy to limit the effect of adversaries.
 
+In this variation of the problem, we still have $t = 1, \dots, T$ days, on each of which all experts $i\in[n]$ give their advice. Previously, the answer could only be one of two options (up/down or yes/no), but we will generalize this to any number of possible options.
+
+The Aggregator (whom we'll now call the Allocator) picks some distribution $\vec{p}^{(t)} = \left(p_1^{(t)}, \dots, p_n^{(t)} \right)$ over the experts. Now, $p_i^{(t)}$ represents the probability of following expert $i$'s advice.
+
+The Adversary is still omniscient: with knowledge of the expert advice and of $\vec{p}^{(t)}$, it determines the cost vector $\vec{m}^{(t)} = \left(m_1^{(t)}, \dots, m_n^{(t)} \right) \in [-1, 1]^n$. The intended meaning of $m_i^{(t)}$ is the cost[^negative-cost] of following expert $i$'s advice on day $t$.
+
+[^negative-cost]: A negative value of $m_i^{(t)}$ thus means that it was profitable to follow the expert's advice.
+
+The expected cost is therefore:
+
+$$
+\expect{\text{cost at day } t} 
+= \sum_{i\in[n]} p_i^{(t)} \cdot m_i^{(t)}
+=: \vec{p}^{(t)} \cdot \vec{m}^{(t)}
+$$
+
+### Hedge Strategy
+The Hedge strategy operates in the problem setting described above. It is parametrized by a learning parameter $\epsilon > 0$.
+
+- Initially, set all expert weights $w_i^{(1)}$ to 1.
+- For each day $t$:
+    + Pick the distribution $p_i^{(t)} = w_i^{(t)} / \Phi^{(t)}$, where $\Phi^{(t)} = \sum_{i\in[n]} w_i^{(t)}$ is the potential function as defined previously.
+    + After observing the cost vector $\vec{m}^{(t)}$, set $w_i^{(t+1)} = w_i^{(t)} \cdot \exp(-\epsilon \cdot m_i^{(t)})$
+
+Note that:
+
+- $\exp(-\epsilon \cdot m_i^{(t)}) < 1$ if $m_i^{(t)} > 0$
+- $\exp(-\epsilon \cdot m_i^{(t)}) > 1$ if $m_i^{(t)} < 0$
+
+This means that the weights increase when it was profitable to follow the expert, and decrease when it wasn't.
+
+An alternative strategy is the Multiplicative Weights Update (MWU) strategy, which uses $w_i^{(t+1)} = w_i^{(t)} \cdot (1 - \epsilon \cdot m_i^{(t)})$. This is just as good, as it leads us to the same guarantee:
+
+> theorem ""
+> Suppose $\epsilon \le 1$, and $\vec{p}^{(t)}$ is chosen by Hedge for $t \in [T]$. Then for any expert $i$:
+> 
+> $$
+> \expect{\text{final cost}} 
+> = \sum_{t=1}^T \vec{p}^{(t)} \cdot \vec{m}^{(t)}
+> \le
+> \sum_{t=1}^T m_i^{(t)} + \frac{\ln(n)}{\epsilon} + \epsilon T
+> $$
+
+Note that this inequality holds for any expert $i$, and in particular, for the best expert. Let's take a look at the terms in this inequality:
+
+$$
+\underbrace{\sum_{t=1}^T \vec{p}^{(t)} \cdot \vec{m}^{(t)}}_{\text{our loss}}
+\le \underbrace{\sum_{t=1}^T m_i^{(t)}}_{\text{loss of best expert}}
++   \underbrace{\frac{\ln(n)}{\epsilon} + \epsilon T}_{\text{small additive term}}
+$$
+
+This means that Hedge does as well as the best expert, within a small additive term. Note that this small error is minimized to be $\bigO{\sqrt{T}}$ when $\epsilon = \sqrt{\frac{\ln(n)}{T}}$.
+
+Let's prove this theorem. Like before, our proof strategy will be to upper bound and lower bound the potential function $\Phi^{(t)}$.
+
+**Lower bound**: We can lower-bound the final potential $\Phi^{(T+1)}$ as before:
+
+$$
+\Phi^{(T+1)} 
+:=  \sum_{j\in [n]} w_j^{(T+1)} 
+\ge w_i^{(T+1)} 
+=   w_i^{(1)} \cdot \prod_{t=1}^T \exp\left(-\epsilon m_i^{(t)}\right)
+=   \exp\left( -\epsilon \sum_{t=1}^T m_i^{(t)} \right)
+$$
+
+**Upper bound**: the proof for the upper bound will be somewhat longer. Let's start by bounding the individual update rule of the potential function:
+
+$$
+\begin{align}
+\phi^{(t+1)} 
+
+& = \sum_{j\in[n]} w_j^{(t+1)} \\
+
+& = \sum_{j\in[n]} w_j^{(t)} \cdot \exp\left(-\epsilon m_j^{(t)}\right) \\
+
+& \overset{(1)}{\le}  \sum_{j\in[n]} w_j^{(t)} \cdot \left(
+    1 -\epsilon m_j^{(t)} + \epsilon^2 \left(m_j^{(t)}\right)^2
+\right) \\
+
+& \overset{(2)}{\le}  \sum_{j\in[n]} w_j^{(t)} \cdot \left(
+    1 -\epsilon m_j^{(t)} + \epsilon^2
+\right) \\
+
+& = \sum_{j\in[n]} w_j^{(t)} \cdot (1 + \epsilon^2)
+  - \sum_{j\in[n]} \epsilon w_j^{(t)} m_j^{(t)} \\
+
+& \overset{(3)}{=} \phi^{(t)} (1 + \epsilon^2) 
+  - \epsilon \sum_{j\in[n]} \phi^{(t)} p_j^{(t)} m_j^{(t)} \\
+
+& = \Phi^{(t)} \left(1 + \epsilon^2 - \epsilon \vec{p}^{(t)}\cdot\vec{m}^{(t)}\right)  \\
+
+& \overset{(4)}{\le} \Phi^{(t)} \cdot \exp\left(
+    \epsilon^2 - \epsilon \vec{p}^{(t)}\cdot\vec{m}^{(t)}
+\right)
+\end{align}
+$$
+
+Step $(1)$ uses the the Taylor expansion of $e^{-x}$:
+
+$$
+e^{-x} 
+= \sum_{i=0}^\infty \frac{(-x)^i}{i!} 
+= 1 - x + \frac{x^2}{2} - \frac{x^3}{6} + \dots
+$$
+
+For $x \in [-1, 1]$, we have that $e^{-x} \le 1 - x + x^2$. We can use this fact to our advantage in the following, as the exponentiated term $-\epsilon m_j^{(t)}$ is in $[-1, 1]$ (because we supposed $0 < \epsilon \le 1$ in the theorem).
+
+Step $(2)$ uses the fact that $\left(m_j^{(t)}\right)^2 \le 1$ as $m_j^{(t)} \in [-1, 1]$ by definition.
+
+Step $(3)$ uses $\Phi^{(t)} p_j^{(t)} = w_j^{(t)}$, which stems from the definition of the Hedge strategy.
+
+Step $(4)$ uses the same Taylor expansion, but in the other direction, using the fact that $1 + x \le e^x$.
+
+This gives us an upper bound on $\Phi^{(t+1)}$ in terms of $\Phi^{(t)}$. We can use this bound repeatedly to find a bound for $\Phi^{(T+1)}$:
+
+$$
+\begin{align}
+\Phi^{(T+1)}
+
+& \le \Phi^{(T)} \cdot \exp\left(
+    \epsilon^2 - \epsilon \vec{p}^{(T)}\cdot\vec{m}^{(T)}
+\right) \\
+
+& \le \Phi^{(T-1)} \cdot \exp\left(
+    \epsilon^2 - \epsilon \vec{p}^{(T-1)}\cdot\vec{m}^{(T-1)}
+\right) \cdot \exp\left(
+    \epsilon^2 - \epsilon \vec{p}^{(T)}\cdot\vec{m}^{(T)}
+\right) \\
+
+& \vdots \\
+
+& \le \Phi^{(1)}\cdot \exp\left(
+    \epsilon^2 T - \epsilon \sum_{t=1}^T \vec{p}^{(t)}\cdot\vec{m}^{(t)}
+\right) \\
+
+& = n\cdot \exp\left(
+    \epsilon^2 T - \epsilon \sum_{t=1}^T \vec{p}^{(t)}\cdot\vec{m}^{(t)}
+\right) \\
+\end{align}
+$$
+
+The last step uses the fact that all weights were initialized to 1, and thus that $\Phi^{(1)} = n$. Putting the bounds together, we get:
+
+$$
+\exp\left( -\epsilon \sum_{t=1}^T m_i^{(t)} \right)
+\le
+\Phi^{(T+1)}
+\le
+n\cdot\exp\left(
+    \epsilon^2 T - \epsilon \sum_{t=1}^T \vec{p}^{(t)}\cdot\vec{m}^{(t)}
+\right)
+$$
+
+Taking the natural logarithm on both sides of the bound yields:
+
+$$
+- \epsilon \sum_{t=1}^T m_i^{(t)}
+\le 
+\ln(n) + \epsilon^2 T 
+- \epsilon \sum_{t=1}^T \vec{p}^{(t)}\cdot\vec{m}^{(t)}
+$$
+
+We get to the final result by dividing by $\epsilon$ and rearranging the terms. $\qed$
+
+From this, we can infer a corollary that will be useful for solving covering LPs. For these problems, it's useful to consider the *average cost* incurred per day. We will also generalize the cost vector so that it can take values in $[-\rho, \rho]^n$ instead of just $[-1, 1]^n$. This $\rho$ is called the **width**.
+
+> corollary "Corollary 3"
+> Suppose $\epsilon \le 1$. For $t \in [T]$, let $\vec{p}^{(t)}$ be picked by Hedge, and assume the cost vectors are $\vec{m}^{(t)} \in [-\rho, \rho]^n$.
+> 
+> If $T \ge (4\rho^2 \ln n) / \epsilon^2$, then for any expert $i$:
+> 
+> $$
+> \frac{1}{T}\sum_{t=1}^T \vec{p}^{(t)}\cdot\vec{m}^{(t)}
+> \le
+> \frac{1}{T}
+> $$
+
+This tells us that the average daily performance is as good as the best expert's average daily performance, within some linear term $2\epsilon$. The "average regret" is the difference between the algorithm's and the expert's average daily performances.
+
+### Covering LPs
+Covering LPs are defined as follows:
+
+> definition ""
+> A linear program of the form:
+> 
+> $$
+> \begin{align}
+> \textbf{minimize: }   & \sum_{j=1}^n c_j x_j   & \\
+> \textbf{subject to: } 
+>     & A x \ge b \\
+>     & 0 \le x_j \le 1 & \forall j \\
+> \end{align}
+> $$
+> 
+> is a **covering** LP if all coefficients of the constraints and objective function are non-negative:
+> 
+> $$
+> A \in \mathbb{R}_+^{m\times n}, \;
+> b \in \mathbb{R}_+^m \text{ and }
+> c \in \mathbb{R}_+^n
+> $$
+
+Note that covering LPs require the variables to be in $[0, 1]$ (whereas the more general form of LPs simply requires $x \ge 0$). Vertex cover and set cover, for instance, satisfy this requirement. 
+
+### Hedging for LPs
+#### Example
+An example of a covering LP is:
+
+$$
+\begin{align}
+\textbf{minimize: }   & x_1 + 2 x_2 & \\
+\textbf{subject to: } 
+    &   x_1 + 3 x_2 \ge 2 \\
+    & 2 x_1 +   x_2 \ge 1 \\
+    & x_i \ge 0 & \forall i = 1, \dots, n \\
+\end{align}
+$$
+
+This LP has two constraints: we could simplify it by adding up those constraints into one, with weights $p_1 = p_2 = \frac{1}{2}$, which would give us the following LP:
+
+$$
+\begin{align}
+\textbf{minimize: }   & x_1 + 2 x_2 & \\
+\textbf{subject to: } 
+    & 1.5 x_1 + 2 x_2 \ge 1.5 \\
+    & x_i \ge 0 & \forall i = 1, \dots, n \\
+\end{align}
+$$
+
+This has an optimal solution of $x_1 = 1, x_2 = 0$, but that doesn't work in the original LP. In general, any solution that is valid in the original LP will be valid in the simplified summed LP, but that implication does not hold the other way around. This means that the cost of the simplified LP is lower (as it allows for more solutions).
+
+To remediate this, we can perhaps update the weights $p_1$ and $p_2$: we need to increase the weights of the satisfied constraint, and decrease the weights of the unsatisfied constraint. This will lead us to using the Hedge strategy to solve LPs.
+
+#### General idea
+When using Hedge for LPs, the "experts" are the constraints of the LP. Hedge maintains a weight distribution over the constraints, and iteratively updates those weights based on the cost function at each step.
+
+The "simplified problem" as we defined it above can more strictly be defined as:
+
+$$
+\begin{align}
+\textbf{minimize: }   & \sum_{j=1}^n c_j x_j \\
+\textbf{subject to: } 
+    & \left(
+        \sum_{i=1}^m p_i A_i
+    \right) \cdot x 
+    \ge \sum_{i=1}^m p_i b_i \\
+    & 0 \le x \le 1 \\
+\end{align}
+$$
+
+The oracle we need takes a probability distribution $\vec{p} = \left(p_1, \dots, p_m\right)$ over the $m$ experts such that $\sum_{i=1}^m p_i = 1$, and outputs an optimal solution $x^\*$ to the above "simplified problem".
+
+#### Hedge Algorithm for Covering Linear Programs
+The Hedge Algorithm plays the role of the Aggregator/Allocator, determining the $\vec{p}^{(t)}$, but also that of the Adversary, determining the cost $\vec{m}^{(t)}$ using the result of the oracle.
+
+Initially, we assign each constraint $i$ a weight $w_i^{(1)} := 1$.
+
+Then, for each step $t$, we pick the distribution as follows:
+
+$$
+p_i^{(t)} = \frac{w_i^{(t)}}{\Phi^{(t)}},
+\quad
+\text{where } \Phi^{(t)} = \sum_{i\in[n]} w_i^{(t)}
+$$
+
+Now, we need to play the role of the Adversary. We let $x^{(t)}$ be the solution returned by the oracle on the LP created using the convex combination $\vec{p}^{(t)}$ of constraints. As we said above, the cost $c \cdot x^{(t)}$ of the "simplified" LP is at most that of the original LP. We can define the cost of the constraint $i$ as:
+
+$$
+m_i^{(t)} 
+= \sum_{j=1}^n A_{ij} x_j^{(t)} - b_i 
+= A_i x^{(t)} - b_i
+$$
+
+We have a positive cost if the constraint is satisfied (so the weight will be decreased by Hedge), and a positive cost if not (which increases the weight).
+
+After observing the cost, we can go back to playing the Allocator and update the weights as always in Hedge:
+
+$$
+w_i^{(t+1)} = w_i^{(t)} \cdot \exp\left(-\epsilon \cdot m_i^{(t)}\right)
+$$
+
+After $T$ steps, the algorithm should output the average of the constructed solutions:
+
+$$
+\bar{x} = \frac{1}{T} \sum_{t=1}^T x^{(t)}
+$$
+
+#### Analysis
+Let's now analyze how we should pick $T$ and see the properties of the algorithm. 
+
+First off, since we proved that Hedge works for an adversarial, omniscient construction of the cost vectors, it will definitely work for this construction.
+
+Let's define $\rho$ to be a bound on $\abs{m_i^{(t)}}$, basically answering "how big can the cost be"? Let:
+
+$$
+\rho = \max_{1 \le i \le m} \set{max(b_i, A_i \vec{1} - b_i)}
+$$
+
+This means that $\rho \ge b_i$ and $\rho \ge \sum_j A_{ij} b_i$, $\forall i \in [n]$. By corollary 3, for $\epsilon \in [0, 1]$ and $T \ge (4\rho^2 \ln m) / \epsilon^2$, and for any constraint $i$, we have:
+
+$$
+\frac{1}{T}\sum_{t=1}^T \vec{p}^{(t)} \cdot \vec{m}^{(t)}
+\le 
+\frac{1}{T}\sum_{t=1}^T \vec{m}_i^{(t)} + 2\epsilon
+$$
+
+Let's consider the sum in the left-hand side of this expression, corresponding to the "final performance":
+
+$$
+\begin{align}
+\sum_{t=1}^T \vec{p}^{(t)} \cdot \vec{m}^{(t)}
+& = \sum_{t=1}^T \left(
+    \sum_i \vec{p}_i^{(t)} \cdot \vec{m}_i^{(t)}
+\right) \\
+
+& = \sum_{t=1}^T \left(
+    \underbrace{\sum_i \vec{p}_i^{(t)} \cdot \left(
+        A_i x^{(t)} - b_i
+    \right)}_{(*)}
+\right) \\
+
+& \ge 0 \\
+\end{align}
+$$
+
+Note that $(*)$ is non-negative since we're working in a covering LP and because the oracle only outputs feasible solutions $x^{(t)}$, which allows us to conclude in the final step that the whole expression is non-negative. The inequality we derived from corollary 3 is therefore:
+
+$$
+0 \le
+\frac{1}{T}\sum_{t=1}^T \vec{p}^{(t)} \cdot \vec{m}^{(t)}
+\le 
+\frac{1}{T}\sum_{t=1}^T \vec{m}_i^{(t)} + 2\epsilon
+$$
+
+Rearranging the terms, we get that:
+
+$$
+-2\epsilon 
+\le
+\frac{1}{T}\sum_{t=1}^T \vec{m}_i^{(t)}
+= \frac{1}{T}\sum_{t=1}^T \left(
+    A_i x^{(t)} - b_i
+\right)
+= A_i \bar{x} - b_i
+$$
+
+This implies that for every constraint $i$:
+
+$$
+A_i \bar{x} \ge b_i - 2\epsilon
+$$
+
+This means that the solution $\bar{x}$ is always **almost feasible**: it might break some constraints with up to $2\epsilon$. 
+
+The cost $c^T\bar{x}$ is **at most the cost of an optimal solution** to the original LP since each solution $x^{(t)}$ to the "simplified LP" has a cost lower than the original LP. 
+
+How do we set the right parameters? Let's look at the [set cover](#set-cover) LP relaxation. We have that $\rho \le n$ since the LP uses $b_i = 1\, \forall i \in [m]$ and $A_{ij}$ is always either 0 or 1. Therefore, if we define $\rho$ as above, this holds. We can set $T = (4n^2 \ln m)/\epsilon^2$[^more-careful-analysis]: this gives us an "almost feasible" solution $\bar{x}$:
+
+[^more-careful-analysis]: A more careful analysis can tell us to use $\approx n \ln m / \epsilon^2$.
+
+$$
+\sum_{e\in S} x_e \ge 1 - 2\epsilon
+$$
+
+We can obtain a feasible (almost optimal) solution by using:
+
+$$
+x^* = \frac{\bar{x}}{1-2\epsilon}
+$$
 
