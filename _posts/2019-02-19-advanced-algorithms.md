@@ -75,7 +75,8 @@ In the correctness proof below, we'll need a few useful facts, which we won't ta
 #### Correctness proof
 We will prove the following lemma by contradiction.
 
-**Lemma**: *`kruskal_greedy` returns a maximum weight spanning tree*.
+> lemma "Kruskal correctness"
+> `kruskal_greedy` returns a maximum weight spanning tree.
 
 We'll suppose for the sake of contradiction that `kruskal_greedy` doesn't return a *maximum* weight spanning tree. This means that we suppose it picks edges $S = \set{s_1, s_2, \dots, s_{n-1}}$ [^number-edges], but that there exists a tree $T = \set{t_1, t_2, \dots, t_{n-1}}$ of higher weight.
 
@@ -247,7 +248,17 @@ $$
 $$
 
 ##### Laminar matroid
-Todo
+Laminar matroids $M = (E, \mathcal{I})$ are defined by a family $\mathcal{F}$ of subsets of the ground set $E$ that satisfy the following. If $X, Y \in \mathcal{F}$, then either:
+
+- $X \cap Y = \emptyset$
+- $X \subseteq Y$
+- $Y \subseteq X$
+
+We can think of these subsets as being [part of a tree](http://vu-my.s3.amazonaws.com/wp-content/uploads/sites/2392/2015/07/30090557/Tara-E-Fife.pdf), where each node is the union of its children. For each set $X \in \mathcal{F}$, we define an integer $k_X$. The matroid is then defined by:
+
+$$
+\mathcal{I} = \set{S \subseteq E : \abs{S \cap X} \le k_X \, \forall X \in \mathcal{F}}
+$$
 
 ##### Gammoid ("Netflix matroid")
 Todo
@@ -265,9 +276,10 @@ The intersection of two matroids satisfies $(I_1)$, but generally not $(I_2)$.
 
 The following theorem adds a lot of power to the concept of matroids.
 
-**Theorem**: *There is an efficient[^efficient-meaning] algorithm for finding a max-weight independent set in the intersection of two matroids.*
+> theorem ""
+> There is an efficient algorithm for finding a max-weight independent set in the intersection of two matroids.
 
-[^efficient-meaning]: Here, efficient means polynomial time, if we assume a polynomial time membership oracle. This is the case for all the matroid examples seen in class.
+Here, efficient means polynomial time, if we assume a polynomial time membership oracle. This is the case for all the matroid examples seen in class.
 
 #### Definition of bipartite matching
 For instance, we can consider the example of [bipartite matching](/algorithms/#bipartite-matching).
@@ -372,11 +384,15 @@ Any arborescence is independent in both matroids, by definition. Conversely, a s
 #### Definitions
 We've seen [the definition](#definition-of-bipartite-matching) and [one algorithm](#bipartite-matching-as-a-matroid-intersection) for bipartite matching. Let's look into an alternative method.
 
-Recall that a path is a collection of edges $\set{(v_0, v_1), (v_1, v_2), \dots, (v_{k-1}, v_k)}$ where all the $v_i$'s are distinct vertices.
+Recall that a *path* is a collection of edges $\set{(v_0, v_1), (v_1, v_2), \dots, (v_{k-1}, v_k)}$ where all the $v_i$'s are distinct vertices. We can represent a path as $(v_0, v_1, \dots, v_k)$.
 
-An *alternating* path with respect to an edge set $M$ is a path that alternates between edges in $M$ and edges in $E\setminus M$.
+A *maximal path* is a path to which we cannot add any edges to make it longer.
 
-An *augmenting* path with respect to an edge set $M$ is an alternating path in which the first and last vertices are unmatched, i.e. $(v_0, v_k) \notin M$.
+A *maximum length path* is the longest path. Note that it is also a maximal path, but that this is a stronger assertion.
+
+An *alternating path* with respect to an edge set $M$ is a path that alternates between edges in $M$ and edges in $E\setminus M$.
+
+An *augmenting path* with respect to an edge set $M$ is an alternating path in which the first and last vertices are unmatched, meaning that they are not incident to an edge in $M$.
 
 In a bipartite graph, the matching $M$ may define alternating paths in which we cannot revisit a node (by definition of a matching). Also note that an augmenting path is one that increases the matching; this is the core idea behind the following algorithm.
 
@@ -389,31 +405,78 @@ def augmenting_path_algorithm(G):
     Output: Matching M of maximum cardinality
     """
     M = set()
-    while exists an augmenting path P:
-        M = MΔP
+    while exists an augmenting path P wrt. M:
+        M = M △ P
     return M
 {% endhighlight %}
 
-$M \Delta P$ is the [symmetric difference](https://en.wikipedia.org/wiki/Symmetric_difference), which we can also denote:
+$M \bigtriangleup P$ is the [symmetric difference](https://en.wikipedia.org/wiki/Symmetric_difference), which we can also denote:
 
 $$
-M \Delta P 
+M \bigtriangleup P 
 \equiv (M \setminus P) \cup (P \setminus M)
 \equiv (M \cup P) \setminus (M \cap P)
 $$
 
-An efficient algorithm to find an augmenting path $P$ is to run BFS, looking for unmatched vertices. This can be run in linear for bipartite graphs (though it is harder in general graphs), so the total runtime of the algorithm is $\bigO{\abs{V}^2 + \abs{E}\cdot\abs{V}}$.
+An efficient algorithm to find an augmenting path $P$ is make edges in $M$ directed from $B$ to $A$, and edges in $E\setminus M$ directed from $A$ to $B$. We can then run BFS from unmatched vertices in $A$, looking for unmatched vertices in $B$. This can be run in $\bigO{\abs{V} + \abs{E}}$ time for bipartite graphs (it is harder in general graphs). Seeing that there can be up to $k = \bigO{\abs{V}}$ matchings in the graph and that each augmenting path increases the matching size by one, we have to run $k$ loops. Therefore, the total runtime of the algorithm is $\bigO{\abs{V}^2 + \abs{E}\cdot\abs{V}}$.
+
+Here's how the algorithm works. Suppose we already have a graph with a matching $M$ (in red):
+
+{% graph %}
+graph [nodesep=0.3, ranksep=2]
+bgcolor="transparent"
+rankdir="LR"
+
+subgraph cluster_left {
+    color=invis
+    B A C
+}
+
+subgraph cluster_right {
+    color=invis
+    F E D
+}
+
+B -- F [color=red, penwidth=3.0]
+A -- E [color=red, penwidth=3.0]
+B -- E
+A -- D
+C -- F
+{% endgraph %}
+
+The path $P$ corresponds to all the edges in the graph. The symmetric difference $M \bigtriangleup P$ corresponds to a new matching $M'$ of cardinality $\abs{M'} = \abs{M} + 1$:
+
+{% graph %}
+graph [nodesep=0.3, ranksep=2]
+bgcolor="transparent"
+rankdir="LR"
+
+subgraph cluster_left {
+    color=invis
+    A B C
+}
+
+subgraph cluster_right {
+    color=invis
+    D E F
+}
+
+B -- E [color=red, penwidth=3.0]
+A -- D [color=red, penwidth=3.0]
+C -- F [color=red, penwidth=3.0]
+{% endgraph %}
 
 #### Correctness proof
 We now prove the correctness of this algorithm, which is to say that it indeed finds a maximum matching. The algorithm returns a set $M$ with respect to which there are no augmenting paths, so to prove correctness we must prove the following:
 
-**Theorem**: A matching $M$ is a maximum **if and only if** there are no augmenting paths with respect to $M$.
+> theorem "Augmenting Path Algorithm Correctness"
+> A matching $M$ is maximal **if and only if** there are no augmenting paths with respect to $M$.
 
 The proof is by contradiction.
 
-First, let's prove the $\Rightarrow$ direction. Suppose for the sake of contradiction that $M$ is maximum, but that there exists an augmenting path $P$ with respect to $M$. Then $M' = M \Delta P$ is a matching of greater cardinality than $M$, which contradicts the optimality of $M$.
+First, let's prove the $\Rightarrow$ direction. Suppose for the sake of contradiction that $M$ is maximum, but that there exists an augmenting path $P$ with respect to $M$. Then $M' = M \bigtriangleup P$ is a matching of greater cardinality than $M$, which contradicts the optimality of $M$.
 
-Then, let's prove the $\Leftarrow$ direction. We must prove that the lack of augmenting paths implies that $M$ is maximal. Suppose toward contradiction that it is not, i.e. that there is a maximal matching $M^\*$ such that $\abs{M^\*} > \abs{M}$. Let $Q = M \Delta M^\*$; intuitively, this edge set $Q$ represents the edges that $M$ and $M^\*$ disagree on.
+Then, let's prove the $\Leftarrow$ direction. We must prove that the lack of augmenting paths implies that $M$ is maximal. Suppose toward contradiction that it is not, i.e. that there is a maximal matching $M^\*$ such that $\abs{M^\*} > \abs{M}$. Let $Q = M \bigtriangleup M^\*$; intuitively, this edge set $Q$ represents the edges that $M$ and $M^\*$ disagree on.
 
 From there on, we reason as follows:
 
@@ -426,7 +489,7 @@ From there on, we reason as follows:
     + In paths, there number of edges from $M^\*$ is $\ge$ than the number of edges from $M$
 - Let's remove cycles from consideration, and concentrate on paths. We can do so and still retain the property of having more edges from $M^\*$ than from $M$. Since $\abs{M^\*} > \abs{M}$, there must be at least one path with strictly more edges from $M^\*$ than from $M$; it must start and end with a $M^\*$ edge, and alternate between the sets in between. This path is an augmenting path with respect to $M$.
 
-Therefore, there must exist an augmenting path $P$ with respect to $M$, which is a contradiction.
+Therefore, there must exist an augmenting path $P$ with respect to $M$, which is a contradiction. $\qed$
 
 #### Generalization
 In the above, we've seen an algorithm for unweighted bipartite matching. If we'd like to generalize it to weighted bipartite matching[^equivalent-bipartite], we'll have to introduce a powerful algorithmic tool: linear programming.
@@ -466,17 +529,19 @@ In the above, $P$ is not an extreme point because $P = \frac{1}{2} X + \frac{1}{
 
 Extreme points are important because they have useful structural properties that we can exploit to design algorithms and construct proofs. We can state the following theorem about extreme points:
 
-**Theorem**: If the feasible region is bounded, then there always exists an optimum which is an extreme point.
+> theorem ""
+> If the feasible region is bounded, then there always exists an optimum which is an extreme point.
 
 The proof is as follows. As the feasible region is bounded, there is an optimal solution $x^\*$. If $x^\*$ happens to be an extreme point, we are done. The real work in this proof is for the case where $x^\*$ isn't an extreme point. To prove this, we'll have to introduce a small lemma:
 
-**Lemma**: Any feasible point can be written as a convex combination of the extreme points.
+> lemma ""
+> Any feasible point can be written as a convex combination of the extreme points.
 
 This is essentially proven by the following diagram:
 
 ![A feasible point and the extreme points that it is constructed from](/images/advanced-algorithms/convex-combination-extreme-points.png)
 
-Indeed, if we draw a line from a feasible point $P$ in a bounded domain, we'll hit the bounds in two locations $X$ and $Y$, which are convex combination of the extreme points $A$, $B$ and $B$, $C$, respectively. $P$ is itself a convex combination of $X$ and $Y$, and thus of the extreme points $A$, $B$, $C$ and $D$.
+Indeed, if we draw a line from a feasible point $P$ in a bounded domain, we'll hit the bounds in two locations $X$ and $Y$, which are convex combination of the extreme points $A$, $B$ and $C$, $D$, respectively. $P$ is itself a convex combination of $X$ and $Y$, and thus of the extreme points $A$, $B$, $C$ and $D$.
 
 With this lemma in place, we can write the feasible solution $x^\*$ as a convex combination of extreme points: 
 
@@ -507,7 +572,7 @@ c^T x^* = \sum_j \lambda_j c^T x^{(j)}
 \exists j : c^T x^{(j)} \ge c^T x^*
 $$
 
-This extreme point $x^{(j)}$ is gives us a higher value for the objective function than $x^\*$. Since $x^\*$ was chosen to be *any* feasible point, this means that $x^{(j)}$ is an optimal solution.
+This extreme point $x^{(j)}$ is gives us a higher value for the objective function than $x^\*$. Since $x^\*$ was chosen to be *any* feasible point, this means that $x^{(j)}$ is an optimal solution. $\qed$
 
 
 ### Maximum weight bipartite perfect matching
@@ -688,6 +753,8 @@ The last inequality holds because $x^\*$ is a feasible solution and thus satisfi
 These $y$ and $z$ are feasible solutions, and therefore show a contradiction in our initial assumption that $x^\*$ is an extreme point; the claim is therefore verified. $\qed$
 
 For general graphs, we have the same problem with odd cycles as for matchings. But the situation is actually even worse in this case, as the problem is NP-hard for general graphs, and we do not expect to have efficient algorithms for it. Still, we'll see an [approximation algorithm](#vertex-cover-for-general-graphs) later on.
+
+In the above, we have seen two integrality proofs. These both have the same general approach: construct $y$ and $z$ adding or subtracting $\epsilon$ from $x^\*$ such that $y \ne x^\*$, $z \ne x^\*$ and $x^\* = \frac{y + z}{2}$, and such that $y$ and $z$ are feasible solutions. To prove feasibility, we much choose a construction where all the $\epsilon$ cancel out. If that isn't possible, then we must the variables for which the $\epsilon$ don't cancel out are "on their own" (i.e. not with any other variables) in the constraint.
 
 ## Duality
 
@@ -1283,7 +1350,7 @@ $$
 \end{align}
 $$
 
-Letting $x_i \in \set{0, 1}$ gives us our ILP. If we relax this to $x_i \in [0, 1]$, we get our LP. We proved that this LP works for bipartite graphs (i.e. that any extreme point for bipartite graphs is integral), but we're now considering the general case, in which we know we won't always get integral solutions. 
+Letting $x_i \in \set{0, 1}$ gives us our ILP. If we relax this to $x_i \in [0, 1]$, we get our LP. We proved that this LP works for bipartite graphs (i.e. that any extreme point for bipartite graphs is integral), but we're now considering the general case, in which we know we won't always get integral solutions.
 
 Therefore, to go from LP to ILP, we must define a rounding scheme: given an optimal solution $x^\*$ to the LP, we will return:
 
@@ -1321,6 +1388,11 @@ w(C)
 $$
 
 Therefore, we have a 2-approximation algorithm for Vertex Cover.
+
+Note that the above LP formulation can be generalized to $k$-uniform hypergraphs[^hypergraph] by summing over all vertices of an edge in the constraints. In the rounding step, we select all vertices that have weight $\ge \frac{1}{k}$. The algorithm then becomes a $k$-approximation algorithm.
+
+[^hypergraph]: A $k$-uniform hypergraph $G=(V, E)$ is defined over a vertex set $V$ and an edge set $E$, where each edge $e \in E$ contains $k$ vertices. A normal graph is just a 2-uniform hypergraph.
+
 
 ### Integrality gap
 #### Definition 
@@ -1370,7 +1442,7 @@ Set cover is a generalization of vertex cover.
 - **Input**:
     + A universe of $n$ elements $\mathcal{U} = \set{e_1, e_2, \dots, e_n}$
     + A family of subsets $\mathcal{T} = \set{S_1, S_2, \dots, S_m}$
-    + A cost function $\mathcal{T} \mapsto \mathbb{R}_+$
+    + A cost function $c: \mathcal{T} \mapsto \mathbb{R}_+$
 - **Output**: A collection $C \subseteq \mathcal{T}$ of subsets of minimum cost that cover all elements
 
 More formally, the constraint of $C$ is:
@@ -1538,7 +1610,7 @@ To prove this, we'll make use of Markov's inequality:
 > For a non-negative random variable $X$:
 > 
 > $$
-> \prob{X \ge x \expect{X}} \le \frac{1}{c}
+> \prob{X \ge c \expect{X}} \le \frac{1}{c}
 > $$
 
 This stems from:
@@ -1859,7 +1931,7 @@ From this, we can infer a corollary that will be useful for solving covering LPs
 > $$
 > \frac{1}{T}\sum_{t=1}^T \vec{p}^{(t)}\cdot\vec{m}^{(t)}
 > \le
-> \frac{1}{T}
+> \frac{1}{T} \sum_{t=1}^T m_i^{(t)} + 2\epsilon
 > $$
 
 This tells us that the average daily performance is as good as the best expert's average daily performance, within some linear term $2\epsilon$. The "average regret" is the difference between the algorithm's and the expert's average daily performances.

@@ -11,12 +11,15 @@
 	border-bottom: 1px solid var(--block-border-color);
 	border-top: 1px solid var(--block-border-color);
 
-	&::before {
-		content: var(--block-name);
+	.header {
 		font-family: $title-font;
 		font-size: $title-weight-light;
 		color: var(--block-border-color);
 		font-variant: small-caps;
+
+		&::before {
+			content: var(--block-name);
+		}
 	}
 
 	p {
@@ -41,5 +44,13 @@
 
 	&.claim {
 		@include block('Claim', #eee);
+	}
+
+	&.corollary {
+		@include block('Corollary', #eee);
+	}
+
+	&.definition {
+		@include block('Definition', #eee);
 	}
 }
