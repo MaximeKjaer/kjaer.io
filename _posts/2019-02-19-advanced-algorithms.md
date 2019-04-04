@@ -1578,23 +1578,26 @@ Another technique to "boost" the probability of having a feasible solution is to
 > claim "Set Cover claim 10"
 > The output $C$ after $d=c\cdot\ln(n)$ is a feasible solution with probability at least $1 - \frac{1}{n^{c-1}}$.
 
-The probability that a given constraint is unsatisfied after $d$ executions of step 3 is at most:
+The probability that a given constraint $i$ is unsatisfied after $d$ executions of step 3 is at most:
 
 $$
-\left(\frac{1}{e}\right)^{d}
+\prob{\text{constraint } i \text{ unsatisfied}}
+= \left(\frac{1}{e}\right)^{d}
 $$
 
 
 If we pick $d = c\cdot\ln(n)$, we get:
 
 $$
-\left(\frac{1}{e}\right)^{c\cdot\ln(n)} = \frac{1}{n^c}
+\prob{\text{constraint } i \text{ unsatisfied}}
+= \left(\frac{1}{e}\right)^{c\cdot\ln(n)} = \frac{1}{n^c}
 $$
 
 By [union bound](https://en.wikipedia.org/wiki/Boole%27s_inequality), we get that the probability of any constraint being unsatisfied is at most:
 
 $$
-n\cdot\frac{1}{n^c} = \frac{1}{n^{c-1}}
+\prob{\text{any constraint unsatisfied}}
+= n\cdot\frac{1}{n^c} = \frac{1}{n^{c-1}}
 \qed
 $$
 
@@ -1629,7 +1632,7 @@ $$
 \qed
 $$
 
-Now onto the proof of our claim: let $\mu$ be the expected cost, which by the corollary is $d\cdot\text{OPT}$. We can upper-bound the "bad event" of the cost being very bad: by Markov's inequality we have $\prob{\text{cost} > 4\mu} \le \frac{1}{4}$. We chose a factor $4$ here because this will give us a nice bound later on; we could pick any number to obtain another bound. We can also upper-bound the "bad event" of the solution being infeasible, which we know (thanks to claim 10) to be upper-bounded by $\frac{1}{n^{c-1}} \le \frac{1}{2}$ for $d = c\cdot\ln(n)$ iterations. By union-bound, the probability that no bad event happens is at least $1 - \frac{1}{4} - \frac{1}{n}$. Supposing $n > 4$, this probability is indeed greater than $\frac{1}{2}$. $\qed$
+Now onto the proof of our claim: let $\mu$ be the expected cost, which by the corollary is $d\cdot\text{OPT}$. We can upper-bound the "bad event" of the cost being very bad: by Markov's inequality we have $\prob{\text{cost} > 4\mu} \le \frac{1}{4}$. We chose a factor $4$ here because this will give us a nice bound later on; we could pick any number to obtain another bound. We can also upper-bound the "bad event" of the solution being infeasible, which we know (thanks to claim 10) to be upper-bounded by $\frac{1}{n^{c-1}} \le \frac{1}{2}$ for $d = c\cdot\ln(n)$ iterations. By [union bound](https://en.wikipedia.org/wiki/Boole%27s_inequality), the probability that no bad event happens is at least $1 - \frac{1}{4} - \frac{1}{n}$. Supposing $n > 4$, this probability is indeed greater than $\frac{1}{2}$. $\qed$
 
 This claim tells us that choosing $d = c\cdot\ln(n)$, we have a $\bigO{\log n}$ approximation algorithm for the set cover problem.
 
@@ -2127,3 +2130,382 @@ $$
 x^* = \frac{\bar{x}}{1-2\epsilon}
 $$
 
+## Simplex method
+The simplex method is an algorithm to solve LPs. Its running time is exponential in the worst case, but runs very fast in practice. This makes it a very used algorithm, more so than other polynomial-time algorithms that are often slower in practice.
+
+A small overview of the steps of the simplex method is given below. This is a very rough overview; the lecture notes go over example runs of the simplex method, so check those for the details of how to run simplex.
+
+1. Rewrite the constraints as equality, introducing "slack variables" $s_1, s_2, \dots$
+2. Set $z$ to be equal to the objective function
+3. Set $x_i = 0$, so $s_i = b_i$, $\forall i \in [n]$
+4. Maintain a simplex tableau with non-zero variables to the left of the equality, and the rest to the right.
+5. Select a variable ($s$ or $x$) with positive weight (or negative if we're minimizing) in the formulation of $z$ to increase. Say we chose $x_k$. Increase it as much as the constraints will allow.
+6. Compensate by modifying the value of all left-hand side constraints in which $x_k$ appears.
+7. Pivot[^pivot-joke]: in the constraint that dictated the new value of $x_k$, swap the left-hand side (call it $s_j$) with $x_k$: $s_j \leftrightarrow x_k$.
+8. Rewrite the constraints to use the newly determined formulation of $x_k$. This will also update $z$.
+9. Go to step 5; stop when we can no longer increase any variables.
+
+[^pivot-joke]: There's a Friends reference to be made here, but I wouldn't ever be the type of person to make [that kind of joke](https://www.youtube.com/watch?v=R2u0sN9stbA)
+
+A few problems can arise when trying to apply the simplex method, which we'll discuss here:
+
+- **Unboundedness**: If the polytope defined by the given constraints is not bounded, the optimal solution is infinite.
+- **Degeneracy**: it might happen that we cannot increase any variable but still need to pivot two of them to proceed. This doesn't mean that the simplex method won't terminate, but this is an edge case that must be handled. One possible solution is to use a lexicographic ordering of variables.
+- **Initial vertex**: Sometimes, it's easy to find that $\vec{x} = \vec{0}$ is a feasible solution, but other times it may be harder. To find a feasible starting point, we may have to solve another LP to find a starting point (Phase I), and then do what we described above to solve the original LP (Phase II).
+- **Infeasibility**: If the constraints define an empty polytope, there is no feasible starting point; Phase I will detect this.
+
+## Randomized Algorithms
+As before, when we discussed the possible "bad events" in approximation algorithms, there are two kinds of claims that we want to make about randomized algorithms:
+
+- It gives (close to) correct solutions with good probability
+- The expected cost (value of the objective function) is close to the cost of the optimal solution.
+
+If we have an algorithm that generates the correct (optimal) solution with probability $p > 0$, we can obtain an algorithm that succeeds with high probability, even when $p$ is low. The trick is to "boost" the probabilities by running the algorithm $k$ times: the probability that one run succeeds is $1 - (1 - p)^k$. 
+
+For small values of $p$, we'll generally use the approximation of $e^{-p}$ for $(1-p)$. It follows that one of the repeated runs will find the correct (optimal) solution with probability at least $1-e^{-pk}$. We can pick $k$ so that this number is close to 1.
+
+### Minimum cut problem
+- **Input**: An undirected graph $G = (V, E)$ with $n = \abs{V}$ vertices
+- **Output**: An edge set $S$ that is a min-cut of the graph
+
+To define this min-cut more formally, we'll need to introduce $E(S, \bar{S})$, the set of edges that have *exactly one* endpoint in $S$:
+
+$$
+E(S, \bar{S}) = \set{(u, v) \in E : u \in S, v \notin S}
+$$
+
+In the min-cut problem, we're looking the partition of $G$ where the two parts are joined together with the minimum number of edges:
+
+$$
+\min_{\emptyset \subset S \subset V} \abs{E(S, \bar{S})}
+$$
+
+### Karger's algorithm
+
+#### Algorithm
+Karger's algorithm solves the min-cut problem in $\bigO{n^4 \log n}$. A single run, as defined below, is $\bigO{n^2}$, but as [we'll see later](#boosting-the-probability-of-success), we may have to run it $\bigO{n^2 \log n}$ times to find a min-cut with high probability.
+
+{% highlight python linenos %}
+def karger(G, n):
+    """
+    Input: Graph G = (V, E) of size n
+    Output: Size of the min-cut
+    """
+    for i in range(1, n - 2):
+        choose edge (u, v) uniformly at random
+        contract it
+    size_min_cut = number of edges between two final super-nodes
+    return size_min_cut
+{% endhighlight %}
+
+Let's define how the contracting procedure happens. Consider the following graph:
+
+{% graph %}
+graph [nodesep=0.7, ranksep=0]
+bgcolor="transparent"
+rankdir="LR"
+
+a -- b [label="e"]
+a -- b -- c -- d -- a
+b -- c -- d
+b -- c
+{% endgraph %}
+
+If we contract edge $e$, we get the following graph:
+
+{% graph neato %}
+graph [nodesep=0.7, ranksep=0]
+bgcolor="transparent"
+rankdir="LR"
+
+ab -- c -- d -- ab
+ab -- c -- d
+ab -- c
+{% endgraph %}
+
+We've created a new super-node $ab$. This reduces the total number of nodes in the graph by 1. We do not remove loops when contracting an edge.
+
+#### Analysis
+Let $(S^\*, \bar{S^\*})$ be the optimal minimum cut of $G$, of size $k$. We'll work our way towards analyzing the probability that the algorithm finds the optimal cut. 
+
+First, let's take a look at the probability that a single edge is in the optimal min-cut. This corresponds to the probability of the algorithm chose "the wrong edge" when picking uniformly at random: if it contracts an edge that should have been in $E(S^\*, \bar{S^\*})$, then it will not output the optimal solution.
+
+> claim "Karger Claim 1"
+> The probability that a uniformly random edge is in $E(S^\*, \bar{S^\*})$ is at most $2/n$
+
+Consider the first contraction of the algorithm (this is without loss of generality). Let $e$ be a uniformly random edge in $G$:
+
+$$
+\newcommand{\mincut}[0]{(S^*, \bar{S^*})}
+\newcommand{\mincutedges}[0]{E\mincut}
+
+\prob{e \in \mincutedges}
+= \frac{\abs{\mincutedges}}{\abs{E}}
+= \frac{k}{\abs{E}}
+$$
+
+We do not know in advance what the value of $k$ is, so we'll upper-bound $\frac{k}{\abs{E}}$ by lower-bounding $\abs{E}$.
+
+Let $d(v)$ be the degree of a vertex $v$. The [handshaking lemma](https://en.wikipedia.org/wiki/Handshaking_lemma) tells us that:
+
+$$
+\sum_{v \in V} d(v) = 2 \abs{E} 
+$$
+
+If the min-cut is of size $k$, we can lower bound $d(v)$ by $k$. This is because if the size of the min-cut is $k$, no vertex $w$ can have degree less than $k$; otherwise, we'd have chosen $S = \set{w}$ and achieved a smaller min-cut. Therefore, $k \le d(v)$.
+
+It follows then that:
+
+$$
+2\abs{E} = \sum_{v \in V} d(v) \ge n\cdot k
+$$
+
+With this, we've bounded our probability:
+
+$$
+\prob{e \in \mincutedges} 
+= \frac{k}{\abs{E}}
+\le \frac{k}{nk / 2}
+= \frac{2}{n}               \qed
+$$
+
+In the following, we'll need to use the following property of the algorithm:
+
+> claim "Karger Fact 2"
+> For any graph $G$, when we contract an edge $e$, the size of the minimum cut does not decrease.
+
+We won't prove this, but it seems intuitive. If $G'$ is a version of $G$ where $e$ has been contracted, then $\text{MINCUT}(G) \le \text{MINCUT}(G')$.
+
+Now, let's try to analyze the probability that the full algorithm returns the correct solution:
+
+> theorem "Karger Theorem 3"
+> For any graph $G = (V, E)$ with $n$ nodes and a min-cut $(S^\*, \bar{S^\*})$, Karger's algorithm returns $(S^\*, \bar{S^\*})$ with probability at least $\frac{2}{n(n-1)} = 1 / {n \choose 2}$
+
+Let $A_i$ be the probability that the edge picked in step $i$ of the loop is not in $\mincutedges$. The algorithm succeeds in finding the min-cut $\mincut$ if $A_1, A_2, \dots, A_{n-2}$ all occur. By the chain rule, the probability of this is:
+
+$$
+\prob{A_1, A_2, \dots, A_{n-2}}
+= \prob{A_1} \cdot \prob{A_2 \mid A_1} \cdot \dots \cdot \prob{A_{n-2} \mid A_1, A_2, \dots, A_{n-3}}
+$$
+
+By the two previous claims, seeing that there are at most $n - i + 1$ edges to choose from at step $i$, then for all $i$:
+
+$$
+\prob{A_i \mid A_1, A_2, \dots, A_{i-1}} 
+\ge
+1 - \frac{2}{n - i + 1}
+$$
+
+Therefore:
+
+$$
+\begin{align}
+\prob{A_1, A_2, \dots, A_{n-2}}
+& \overset{(1)}{\ge}
+    \left(1 - \frac{2}{n}   \right) 
+    \left(1 - \frac{2}{n-1} \right)
+    \dots
+    \left(1 - \frac{2}{3} \right) \\
+& \overset{(2)}{=}
+    \frac{n-2}{n} \cdot
+    \frac{n-3}{n-1} \cdot
+    \frac{n-4}{n-2} \cdot
+    \dots \cdot
+    \frac{3}{5}\cdot\frac{2}{4}\cdot\frac{1}{3} \\
+& \overset{(3)}{=}
+    \frac{2}{n(n-1)} \\
+& \overset{(4)}{=} 1 / {n \choose 2}
+\end{align}
+$$
+
+Step $(1)$ uses the inequality we defined above. 
+
+Step $(2)$ rewrites $(1 - \frac{2}{n - i + 1})$ as $\frac{n - 2 - i + 1}{n - i + 1} = \frac{n-i-1}{n-i+1}$. 
+
+Step $(3)$ uses the structure of these fractions to cancel out terms (notice how the numerator appears in the denominator two fractions later).
+
+Finally, $(4)$ uses the definition of the binomial coefficient. $\qed$
+
+This leads us to the following corollary:
+
+> corollary "Karger Corollary 4"
+> Any graph has at most $n \choose 2$ min-cuts.
+
+The proof for this is short and sweet: suppose that there is a graph $G$ that has more than $n \choose 2$ min-cuts. Then, for one of those cuts, the algorithm would find that exact cut with probability less that $1 / {n \choose 2}$, which is a contradiction. $\qed$
+
+#### Boosting the probability of success
+The algorithm runs in $\bigO{n^2}$, but the probability of success is $\ge 1 {n \choose 2}$, which is $\bigO{1/n^2}$. As [we said above](#randomized-algorithms), we can "boost" this probability of success to $1 - 1/n$ by running the same algorithm a bunch of times. If we run it $\bigO{n^2 \log n}$ times, we can get a probability of success of $1 - 1/n$:
+
+$$
+\begin{align}
+\prob{\text{does not return min-cut}} 
+& = \prob{\text{all } m \text{ runs fail}} \\
+& \le \left(1 - \frac{1}{n^2}\right)^m \\
+& \le \exp\left(-\frac{1}{n^2} \right)^m \\
+& \le \frac{1}{n} \quad \text{for } m = n^2 \log n
+\end{align}
+$$
+
+### Karger-Stein's algorithm
+Karger's algorithm only fails when it contracts an edge of the min-cut. In the beginning, that probability is $2 / n$, and towards the end it goes up to a constant; in the very last step, the probability that we contract an edge of the min-cut is $1/3$.
+
+This means that we'll often run the first steps correctly, only to make mistakes towards the very end. Karger-Stein fixes this by running more copies as the graph gets smaller.
+
+{% highlight python linenos %}
+def karger_stein(G, n):
+    """
+    Input: Graph G = (V, E) of size n
+    Output: (min cut, size)
+    """
+    if n == 2:
+        return E, len(E)
+    for i in range(1, n - n/sqrt(2)):
+        choose edge (u, v) uniformly at random
+        contract it
+    let G' be the contracted graph
+    E1, n1 = karger_stein(G', m)
+    E2, n2 = karger_stein(G', m)
+    return best cut of the two
+{% endhighlight %}
+
+To analyze the running time, let $T(n)$ be the time that it takes to compute the min-cut of a graph of size $n$:
+
+$$
+T(n) = \bigO{n^2} + 2T(n/\sqrt{2})
+$$
+
+Using the [master theorem](/algorithms/#master-theorem) to solve this recursion, we find that the algorithm runs in $\bigO{n^2 \log n}$.
+
+> theorem "Karger-Stein Theorem 5"
+> The Karger-Stein algorithm finds a min-cut with probability at least $1 / 2\log n$.
+
+Proof todo $\qed$
+
+We can boost this probability to $1 - 1/n$ by running the algorithm $\log^2 n$ times.
+
+## Polynomial identity testing
+Suppose that we're given two polynomials $p(x)$ and $q(x)$ of degree $d$. We only have access to an oracle that allows us to evaluate the polynomial, but not to see its definition. We'd like to know if $p$ and $q$ are identical, i.e. whether $p(x) - q(x) = 0$ for all inputs $x \in \mathbb{R}^d$.
+
+### Schwartz-Zippel
+The Schwartz-Zippel lemma tells us the following.
+
+> lemma "Schwartz-Zippel Lemma"
+> Let $p(x_1, \dots, x_n)$ be a **nonzero** polynomial of $n$ variables with degree $d$. Let $S \subseteq \mathbb{R}$ be a finite set, with at least $d$ elements in it. If we assign $x_1, \dots, x_n$ values from $S$ independently and uniformly at random, then:
+> 
+> $$
+> \prob{p(x_1, \dots, x_n) = 0} \le \frac{d}{\abs{S}} 
+> $$ 
+
+#### Proof for one dimension
+Let's start by proving this for $d = 1$. We want to know whether $p(x) = q(x)$ for all inputs $x$. As we saw above, this is equivalent to answering whether $g(x) = p(x) - q(x) = 0$. When the polynomial is one-dimensional, we can write it as follows:
+
+$$
+g(x) = \sum_{i=1}^n a_i x_i
+$$
+
+If $g \ne 0$ then $\exists i : a_i \ne 0$. Suppose $g$ is a non-zero polynomial; we can then write the probability of it evaluating to zero as:
+
+$$
+\begin{align}
+\prob{g(x_1, \dots, x_n) = 0} 
+& = \prob{\sum_{j=1}^n a_j x_j = 0} \\
+& = \prob{a_i x_i = - \sum_{j \ne i} a_j x_j}
+\end{align}
+$$
+
+Writing the probability in this form is called the *principle of deferred decision*. We set all the $x_1, \dots, x_n$ except $x_j$ arbitrarily; this means that we can now see the sum in the last line as a constant $c$. What's left is the following:
+
+$$
+\prob{a_i x_i = c}
+$$
+
+There are $\abs{S}$ choices for $x_i$, and at most one satisfies $a_i x_1 = c$, so the final result is:
+
+$$
+\prob{g(x_1, \dots, x_n) = 0}
+= \prob{a_i x_i = c}
+\le \frac{1}{\abs{S}}
+
+\qed
+$$
+
+#### General proof
+Todo.
+
+#### Matrix identity
+We can use this for identity testing of matrices too; suppose we are given three $n\times n$ matrices $A, B, C$. We'd like to test whether $AB = C$. Matrix multiplication is expensive ($\bigO{n^3}$ or [slightly less](/algorithms/#strassens-algorithm-for-matrix-multiplication)). Instead, we can use the Schwartz-Zippel:
+
+> theorem "Schwartz-Zippel for matrices"
+> If $AB \ne C$ then:
+> 
+> $$
+> \mathbb{P}_{x_i \sim S}\left[
+>   ABx \ne Cx
+> \right] \ge 1 - \frac{1}{\abs{S}}
+> $$
+
+Rather than infer it from Schwartz-Lippel, we'll give a direct proof of this.
+
+### Perfect matching
+### Adjacency matrix
+Let $G = (A \cup B, E)$ be a $n\times n$ bipartite graph.We can represent the graph as a $n\times n$ adjacency matrix having an entry if nodes are connected by an edge:
+
+$$
+A_{ij} = \begin{cases}
+x_{ij} & \text{if } (v_i, v_j) \in E \\
+0      & \text{otherwise}
+\end{cases}
+$$
+
+For instance:
+
+{% graph %}
+graph [nodesep=0.3, ranksep=2]
+bgcolor="transparent"
+rankdir="LR"
+
+subgraph cluster_left {
+    color=invis
+    a b c
+}
+
+subgraph cluster_right {
+    color=invis
+    d e f
+}
+
+a -- d
+b -- e -- c -- f -- b
+{% endgraph %}
+
+The above graph would have the following matrix representation:
+
+$$
+A = \begin{bmatrix}
+x_{ab} & 0      & 0      \\
+0      & x_{be} & x_{bf} \\
+0      & x_{ce} & x_{cf} \\
+\end{bmatrix}
+$$
+
+#### Bipartite graphs
+We have a nice theorem on this adjacency matrix:
+
+> theorem "Perfect Matching and Determinant"
+> A graph $G$ has a perfect matching **if and only if** the determinant $\det(A)$ is not identical to zero.
+
+Proof todo
+
+#### General graphs
+This result actually generalizes to general graphs, though the proof is much more difficult. If we construct the following matrix (called the Tutte matrix):
+
+$$
+A_{ij} = \begin{cases}
+x_{ij}  & \text{if } (v_i, v_j) \in E, \text{ and } i < j \\
+-x_{ij} & \text{if } (v_i, v_j) \in E, \text{ and } i \ge j \\
+0       & \text{otherwise}
+\end{cases}
+$$
+
+> theorem "General Graph Matching"
+> Graph $G$ has a perfect matching **if and only if** $\det(A)$ is not identical to zero.
