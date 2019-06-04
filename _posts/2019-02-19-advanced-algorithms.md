@@ -2812,3 +2812,243 @@ $$
 $$
 
 This can simplified to be at most $\exp{\left(-\frac{\delta^2}{2+\delta}\mu\right)}$. $\qed$
+
+
+## Hashing
+### Introduction
+Hashing is a technique of mapping from an input domain $U$ to a domain of size $N$, where typically $N \ll \abs{U}$. To do so, we use a hash function $h: U \rightarrow \set{1, 2, \dots, N}$. The question we want to study is how to choose $h$.
+
+A typical application for hashing is that we want to store a subset $S$ of the large universe $U$, where $\abs{S} \ll \abs{U}$. For each $x \in U$, we want to support three operations: `insert(x)`, `delete(x)` and `query(x)`. 
+
+A hash table supports these operations; $x\in U$ is placed in $T[h(x)]$, where $T$ is a table of size $N$. For collisions (i.e. values that hash to the same bucket), we use a linked list.
+
+An ideal hash function should have the property that the probability that two or more elements hash to the same value is low, in order to use the table efficiently, and the linked lists short. 
+
+However, the following statement proves to be problematic if we pick a fixed hash function: for a fixed $h$,
+
+$$
+\exists S \subseteq U 
+\text{ such that }
+\abs{S} \ge \frac{\abs{U}}{N}
+\text{ and }
+h(x) = h(y) \quad \forall x, y \in S
+$$
+
+In other words, if we fix a hash function $h$, an adversary could select a "bad dataset" for which all values hash to the same location, thus rendering hashing useless. We cannot prove any worst-case guarantees for hashing in that case. This will lead us to choose our function $h$ at random from a family $\mathcal{H}$.
+
+The question of how to choose $\mathcal{H}$ remains. We want to choose it such that a random function from $\mathcal{H}$ maps to a given location of the hash table uniformly and independently at random. Choosing according to this goal ensures that the number of collisions is low. To see that, consider a value $x$, and let $L_x$ be the length of the linked list containing $x$. Let $I_y$ be a random variable:
+
+$$
+I_y = \begin{cases}
+1 & \text{if } h(y) = h(x) \\
+0 & \text{otherwise}
+\end{cases}
+$$
+
+We will hash $x$, and also every $y \in S$ and see how many collisions that brings about. After doing this, the length of the linked list will be one for $x$, plus the number of values in $S$ that hash to the same value:
+
+$$
+L_x = 1 + \sum_{y \in S : y \ne x} I_y
+$$
+
+Since we're choosing $h$ at random from $\mathcal{H}$, we need to look at the expectation rather than a single realization. By linearity of expectation:
+
+$$
+\expect{L_x} 
+= 1 + \sum_{y \in S : y \ne x} \expect{I_y} 
+= 1 + \frac{\abs{S} - 1}{N}
+$$
+
+Usually we'll choose $N > \abs{S}$, in which case we expect less than 2 collisions.
+
+The last step in the above uses our assumption that if we choose a function $h$ uniformly at random in $\mathcal{H}$, then a given value hashes to a uniformly random location in the table. This means that for a value $x$:
+
+$$
+\begin{align}
+\expect{I_y} 
+& = 1 \cdot \prob{h(y) = h(x)} + 0 \cdot \prob{h(y) \ne h(x)} \\
+& = \prob{h(y) = h(x)} \\
+& = \begin{cases}
+    1 & \text{if } x = y \\
+    \frac{1}{N} & \text{otherwise}
+\end{cases} \\
+\end{align}
+$$
+
+Let's suppose that the family $\mathcal{H}$ contains all possible permutations of mappings. That would mean $\abs{\mathcal{H}} = N^{\abs{U}}$. To store it, we would need $\log_2\left(N^{\abs{U}}\right) = \abs{U} \log_2(N)$ bits, which is too big.
+
+Luckily, we can save on storage by using the following observation: in the above calculations, we don't need full mutual independence between all values $y \in S$ and $x$; we only need pairwise independence between $x$ and each $y \in S$. This means that we don't have to choose uniformly at random from all possible mappings, but instead from a smaller set of functions with limited independence.
+
+### 2-universal hash families
+Let's start by defining 2-universality:
+
+> definition "2-universal hash families (Carter Wegman 1979)"
+> A family $\mathcal{H}$ of hash functions is 2-universal if for any $x\ne y \in U$, the following inequality holds:
+> 
+> $$
+> \mathbb{P}_{h \in \mathcal{H}}\left[h(x) = h(y)\right] 
+> \le \frac{1}{N}
+> $$
+
+We can design 2-universal hash families in the following way. Choose a prime $p \in \set{\abs{U}, \abs{U} + 1, \dots, 2\abs{U}}$ and let:
+
+$$
+f_{a, b}(x) = ax + b \mod p \quad \text{where } a, b \in [p], a \ne 0
+$$
+
+We let the hash function be:
+
+$$
+h_{a, b}(x) = f_{a, b}(x) \mod N
+$$
+
+This works because the integers modulo $p$ form a field when $p$ is prime, so we can define addition, multiplication and division among them. 
+
+> lemma "Lemma 2, 2-Universal Hash Families"
+> For any $x \ne y$ and $s \ne t$, the following system has exactly one solution:
+> 
+> $$
+> \begin{align}
+> ax + b = s & \mod p \\
+> ay + b = t & \mod p \\
+> \end{align}
+> $$
+
+Since $[p]$ constitutes a finite field, we have that $a = (x - y)^{-1}(s -t)$ and $b = s - ax$. $\qed$
+
+Note that this proof also explains why we require $s \ne t$: if we had $s = t$ the only solution would be $a = 0$, in which case $f_{a, b}(x)$ would return $b$ for all $x \in U$, thus rendering hashing useless.
+
+Moreover, there are $p\cdot(p-1)$ possible choices for the pair $a \in \set{1, 2, \dots, p-1}$ and $b \in \set{0, 1, \dots, p-1}$. Therefore, over a uniformly at random choice of $a$ and $b$, if we select any $s$, $t$, $x$ and $y$ such that $x \ne y$:
+
+$$
+\mathbb{P}_{a, b}\left[
+    f_{a, b}(x) = s \land f_{a, b}(y) = t
+\right] = \begin{cases}
+    0 & \text{if } s = t \\
+    \frac{1}{p\cdot(p-1)} & \text{if } s \ne t \\
+\end{cases}
+\label{eq:collision-prob}\tag{Collision prob.}
+$$
+
+This probability describes two cases, which we will comment:
+
+- If $s = t$ then the probability we're looking at is equivalent to $\mathbb{P}\_{a, b}\left[f\_{a, b}(x) = f\_{a, b}(y)\right] = \mathbb{P}\_{a, b}\left[ax + b = ay + b \mod p\right]$. Since $p$ is prime, $[p]$ is a field and thus $ax + b = ay + b \mod p$ implies $x = y \mod p$, which cannot happen by assumption (we chose $x \ne y$).
+- If $s \ne t$, then we're looking at the probability that $x$ and $y$ hash to different values. The probability that they both hash to the given $s$ and $t$ is that of having chosen the one correct pair $a, b$ producing $s$ and $t$ for $x$ and $y$. Since there are $p\cdot(p-1)$ possible pairs $a, b$, the probability is $\frac{1}{p\cdot(p-1)}$.
+
+These observations lead us to the following lemma:
+
+> lemma "Lemma 3, 2-Universal Hash Families"
+> $\mathcal{H} = \set{h_{a, b} : a, b \in [p] \land a\ne 0}$ is universal.
+
+To prove this, we will have to check the definition, i.e. whether the probability of two different values hashing to the same value is less than $\frac{1}{N}$. For any $x \ne y$:
+
+$$
+\begin{align}
+\prob{h_{a, b}(x) = h_{a, b}(y)}
+& = \prob{f_{a, b}(x) = f_{a, b}(y) \mod N} \\
+& \overset{(1)}{=} \sum_{s, t \in [p]}
+    \mathbb{I}_{s = t \mod N} \cdot \prob{f_{a, b}(x) = s \land f_{a, b}(y) = t} \\
+& \overset{(2)}{=} \frac{1}{p\cdot(p-1)} \sum_{s, t \in [p] : s \ne t} \mathbb{I}_{s = t \mod N} \\
+& \overset{(3)}{\le} \frac{1}{p\cdot(p-1)} \frac{p\cdot(p-1)}{N} \\
+& = \frac{1}{N}
+\end{align}
+$$
+
+Step $(1)$ uses an indicator variable to capture whether $s = t \mod N$ so that we can reformulate the probability in the same form as in $\ref{eq:collision-prob}$. Step $(2)$ uses the $\ref{eq:collision-prob}$. Step $(3)$ follows from the fact that for each $s \in [p]$, we have at most $\frac{p-1}{N}$ different $t$ such that $s\ne t$ and $s = t \mod N$. $\qed$
+
+The importance of all of the above is that we can now create a 2-universal hash functions solely by picking two numbers $a$ and $b$ uniformly at random, and we only need to store $a \in [p]$ and $b \in [p]$, which requires $\bigO{\log \abs{U}}$ space instead of the completely random hash function which required $\bigO{\abs{U} \log N}$ bits.
+
+Let us calculate the expected number of collisions:
+
+$$
+\sum_{x \ne y \in S} \mathbb{P}_{h \in \mathcal{H}}\left[h(x) = h(y)\right]
+\le {\abs{S} \choose 2} / N
+$$
+
+$\mathcal{H}$ being a 2-universal hash family, the probability of collision is $\le \frac{1}{N}$. There are ${\abs{S} \choose 2}$ possible pairs $x, y \in S$ such that $x \ne y$, which leads us to the above result.
+
+### Two-layer hash tables
+If we select $N$ to be greater than $\abs{S}^2$, we can have no collisions with high probability. In practice, such a large table is unrealistic, so we use linked lists or a second layer of hash table for collisions.
+
+The two-layer table works as follows. Let $s_i$ denote the actual number of collisions in bucket $i$. If we construct a second layer for bucket $i$, of size $\approx s_i^2$, we can easily find separate locations in the second layer for all $s_i$ values that collided in the first layer.
+
+The total size of the second layers is:
+
+$$
+\sum_{i=1}^N s_i^2
+$$
+
+We can compute the expected total size of the second layers by decomposing the squares as follows:
+
+$$
+\begin{align}
+\expect{\sum_{i=1}^N s_i^2} 
+& = \expect{\sum_{i=1}^N s_i^2 + s_i - s_i}  \\
+& = \expect{\sum_{i=1}^N s_i(s_i - 1)} + \expect{\sum_{i=1}^N s_i} \\
+& \overset{(1)}{\le} \frac{\abs{S}(\abs{S} - 1)}{N} + \abs{S} \\
+& \overset{(2)}{\le} 2\abs{S} \\
+\end{align}
+$$
+
+Step $(2)$ is true if we assume $N \ge \abs{S}$. Step $(1)$ places a (large) upper bound using the fact that the we cannot expect more collisions than there are elements in the set of hashed values $S$.
+
+### $k$-wise independence
+We can adapt the [discussion on 2-universality](#2-universal-hash-families) to pairwise independence.
+
+> definition "2-wise independent hash family"
+> We say that $\mathcal{H}$ is 2-wise independent if for any $x \ne y$ and any pair of $s, t \in [N]$,
+> 
+> $$
+> \mathcal{P}_{h\in\mathcal{H}}\left[h(x) = s \land h(y) = t\right]
+> = \frac{1}{N^2}
+> $$
+
+Note that 2-wise independence implies 1-wise independence. 
+
+> definition "1-wise independent hash family"
+> We say that $\mathcal{H}$ is 1-wise independent if for any $x\in U$ and any pair of $s \in [N]$,
+> 
+> $$
+> \mathcal{P}_{h\in\mathcal{H}}\left[h(x) = s\right]
+> = \frac{1}{N}
+> $$
+
+More generally, we can extend the discussion to $k$-wise independent hash families. For some prime number $p$ consider the family of functions constructed by choosing $a_0, \dots, a_{k-1}$ uniformly at random in $\set{0, 1, \dots, p-1}$, and letting the function be defined as:
+
+$$
+f_{a_0, \dots, a_{k-1}}(x) = a_{k-1} x^{k-1} + \dots + a_1 x + a_0
+$$
+
+This function is $k$-wise independent. We can store it with $\bigO{k \log \abs{U}}$ memory.
+
+### Load balancing
+Let's discuss how large the linked lists can get. For simplicity, we'll consider a situation in which we hash $n$ keys into a hash table of size $n$. We also assume that the funciton is completely random, rather than just 2-universal as above.
+
+This situation can be explained by the analogy of balls-and-bins. We throw balls at random, and they each land in a bin, independently and uniformly at random. Clearly, we expect one ball in each bin, but the maximum number of balls in a single bin can be higher. For a given $i$:
+
+$$
+\prob{\text{bin } i \text{ gets more than } k \text{ elements}}
+\le {n \choose k} \cdot \frac{1}{n^k} 
+\le \frac{1}{k!}
+$$
+
+The first step uses union bound: the probability that any of the $n \choose k$ events happen is at most the sum of their individual properties. [Stirling's formula](https://en.wikipedia.org/wiki/Stirling%27s_approximation) allows us to approximate the factorial:
+
+$$
+k! \approx \sqrt{2nk}\left(\frac{k}{e}\right)^k
+$$
+
+Choosing $k = \bigO{\frac{\log n}{\log\log n}}$ ensures $\frac{1}{k!} \le \frac{1}{n^2}$. Thus:
+
+$$
+\prob{\exists \text{ a bin with } \ge k \text{ balls}}
+\le n\cdot\frac{1}{n^2}
+= \frac{1}{n}
+$$
+
+Long story short, with probability larger than $1 - 1/n$, the max load is less than $\bigO{\frac{\log n}{\log\log n}}$. We can even boost this probability of success to $1 - 1/n^c$ by changing the parameters a little.
+
+### Power of two choices
+This is not bad, but we can do even better using the following cool fact (that we won't prove).
+
+The trick we use at the supermarket is to go to the checkout counter with the shortest queue. This is a linear process in the number of checkout registers, so consider this simpler trick: when throwing a ball, pick two random bins, and select the one with the fewest balls (shortest linked list). This ensures that the maximal load drops to $\bigO{\log\log n}$, which is a huge improvement on $\bigO{\frac{\log n}{\log\log n}}$. This is called the *power of two choices*.
