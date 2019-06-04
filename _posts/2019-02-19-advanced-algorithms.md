@@ -2509,3 +2509,304 @@ $$
 
 > theorem "General Graph Matching"
 > Graph $G$ has a perfect matching **if and only if** $\det(A)$ is not identical to zero.
+
+
+Todo finish lecture 12
+
+## Sampling and Concentration Inequalities
+For this chapter, suppose that there is an unknown distribution $D$, and that we draw independent samples $X_1, X_2, \dots, X_n$ from $D$ and return the mean:
+
+$$
+X = \frac{1}{n} \sum_{i=1}^n X_i
+$$
+
+The law of large numbers tells us that as $n$ goes to infinity, the empirical average $X$ converges to the mean $\expect{X}$. In this chapter, we address the question of how large $n$ should be to get an $\epsilon$-additive error in our empirical measure.
+
+
+### Markov's inequality
+Consider the following simple example. Suppose that the average Swiss salary is 6000 CHF per month. What fraction of the working population receives at most 8000 CHF per month?
+
+One extreme is that everyone earns exactly the same amount of 6000 CHF, in which case the answer is 100%. The other extreme is that a fraction of all workers earn 0 CHF/month; in the worst case, $\frac{1}{4}$ of all workers earn 0 CHF/month, while the rest earns 8000.
+
+Markov's inequality tells us about this worst-case scenario. It allows us to give a bound on the average salary $X$ for the "worst possible" distribution.
+
+> theorem "Markov's inequality"
+> Let $X \ge 0$ be a random variable. Then, for all $k$:
+> 
+> $$
+> \prob{X \ge k \cdot \expect{X}} \le \frac{1}{k}
+> $$
+> 
+> Equivalently:
+> 
+> $$
+> \prob{X \ge k} \le \frac{\expect{X}}{k}
+> $$
+
+In the salary example, $X$ denotes the average salary. We know that $\expect{X} = 6000$ and $k = \frac{4}{3}$. 
+
+The proof can be stated in a single line:
+
+$$
+\expect{X} 
+=   \sum_i \prob{X = i} \cdot i 
+\ge \sum_{i \ge k} \prob{X = i} \cdot i
+\ge \sum_{i \ge k} \prob{X = i} \cdot k
+=   k \cdot \prob{X \ge k}
+
+\qed
+$$
+
+This proof is tight, meaning that all inequalities are equalities if the distribution of $X$ only has two points mass:
+
+$$
+X = \begin{cases}
+0 & \text{with probability } 1 - 1/k \\
+k + \epsilon & \text{with probability } 1/k \\
+\end{cases}
+$$
+
+### Variance
+Markov's inequality is a bound we can give if we don't know much about the distribution $D$. Indeed, if all we know is the expectation of $D$, Markov's inequality is the best bound we can give. 
+
+We can get a stronger bound if we know the variance of the distribution.
+
+> definition "Variance"
+> The variance of a random variable $X$ is defined as:
+> 
+> $$
+> \var{X} = \expect{(X - \expect{X})^2} = \expect{X^2} - \expect{X}^2
+> $$
+
+### Chebyshev's inequality
+Using the variance of the distribution, we can give the following bound on how much the empirical average will diverge from the true mean:
+
+> theorem "Chebyshev's inequality"
+> For any random variable $X$,
+> 
+> $$
+> \prob{\abs{X - \expect{X}} > \epsilon} < \frac{\var{X}}{\epsilon^2}
+> $$
+> 
+> Equivalently:
+> 
+> $$
+> \prob{\abs{X - \expect{X}} > k\sigma} \le \frac{1}{k^2}
+> $$
+> 
+> where $\sigma = \sqrt{\var{X}}$ is the standard deviation of $X$.
+
+Note that we used strict inequality, but that these can be replaced with non-strict inequalities without loss of generality.
+
+It turns out that Chebyshev's inequality is just Markov's inequality applied to the variance random variable $Y := (X - \expect{X})^2$. Indeed, by Markov:
+
+$$
+\prob{Y \ge \epsilon^2} \le \frac{\expect{Y}}{\epsilon^2}
+$$
+
+In other words:
+
+$$
+\prob{\abs{X - \epsilon{X}}^2 \ge \epsilon^2} \ge \frac{\var{X}}{\epsilon^2}
+$$
+
+Taking the square root on both sides yields:
+
+$$
+\prob{\abs{X - \expect{X}} \ge \epsilon} \ge \frac{\var{X}}{\epsilon^2}
+\qed
+$$
+
+### Polling
+We can use Chebyshev's inequality to answer the question we raised in the beginning of this section, namely of estimating a mean $\mu$ using independent samples of the distribution $D$.
+
+By linearity of expectation, mean $\mu$ is the same thing as $\expect{X}$:
+
+$$
+\expect{X} = \expect{\frac{1}{n} \sum_i X_i} = \mu
+$$
+
+We can use Chebyshev's inequality to upper bound the following:
+
+$$
+\prob{\abs{\frac{X_1 + X_2 + \dots + X_n}{n} - \mu} \ge \epsilon}
+$$
+
+To use Chebyshev's inequality, we first need to calculate the variance. To do that, we will first introduce the idea of *pairwise independence*.
+
+> definition "Pairwise independence"
+> A set of random variables $X_1, X_2, \dots, X_n$ are *pairwise independent* if for all $1 \le i, j \le n$:
+> 
+> $$
+> \expect{X_i X_j} = \expect{X_i} \expect{X_j}
+> $$
+
+Note that full independence implies pairwise independence.
+
+> lemma "Variance of sums"
+> For any set of pairwise independent $X_1, \dots, X_n$:
+> 
+> $$
+> \var{X_1 + \dots + X_n} = \var{X_1} + \dots + \var{X_n}
+> $$
+
+We can write:
+
+$$
+\begin{align}
+\var{X_1 + \dots + X_n}
+& = \expect{(X_1 + \dots + X_n)^2} - (\expect{X_1} + \dots + \expect{X_n} )^2 \\
+& = \expect{\sum_{i, j} X_i X_j} - \sum_{i, j} \expect{X_i} \expect{X_j} \\
+& \overset{(1)}{=} \sum_{i=1}^n \left( \expect{X_i^2} - (\expect{X_i})^2 \right) \\
+& = \sum_{i=1}^n \var{X_i} 
+\end{align}
+$$
+
+In step $(1)$ we used pairwise independence. $\qed$
+
+Going back the polling example, we use the above lemma. Since the samples are independent, they're also pairwise independent, so by the lemma:
+
+$$
+\begin{align}
+\var{X} 
+& = \var{\frac{X_1 + \dots + X_n}{n}} \\
+& = \frac{1}{n^2} \var{X_1 + \dots + X_n}  \\
+& = \frac{1}{n^2} (\var{X_1} + \dots + \var{X_n}) \\
+& = \frac{\var{D}}{n} \\
+\end{align}
+$$
+
+By Chebyshev's inequality:
+
+$$
+\prob{\abs{X - \mu} \ge \epsilon} \le \frac{\var{D}}{n\epsilon^2}
+\label{eq:test123}
+$$
+
+For the following discussion, let's suppose that our poll was about whether people would vote yes or no in a referendum. This means that the random variables $X_i$ are independent Bernoulli variables:
+
+$$
+X_i = \begin{cases}
+1 & \text{with probability } p \\
+0 & \text{with probability } 1 - p \\
+\end{cases}
+$$
+
+Here, $p$ represents the fraction of the population that would vote yes. We want to estimate $p$ (the expectation of the Bernoulli trial) within $\epsilon$ additive error. To do this, we calculate the variance of $X_i$, for which we need to know $\expect{X_i}^2$ and $\expect{X_i^2}$.
+
+We know that the expectation of a Bernoulli variable is $\expect{X_i} = p$. The second moment is:
+
+$$
+\expect{X_i^2} = 1^2 \cdot p + 0^2 \cdot (1 - p) = p
+$$
+
+Therefore, the variance is:
+
+$$
+\var{X_i} = \expect{X_i^2} - \expect{X_i}^2 = p - p^2 = p(1-p) \le \frac{1}{4}
+$$
+
+This confirms that the variance of a Bernoulli variable is $p(1-p)$, which we maybe already knew. In the worst case, $p = \frac{1}{2}$ gives us an upper-bound of $\frac{1}{4}$ on the variance.
+
+By the bound we obtained with Chebyshev, we have:
+
+$$
+\prob{\abs{\frac{\sum_i X_i}{n} - p} \ge \epsilon} \le \frac{1}{4n\epsilon^2}
+$$
+
+This means that to achieve an $\epsilon$-additive error with probability $1 - \delta$, we need $\bigO{\frac{1}{\delta\epsilon^2}}$ many samples. The important part of the above inequality is that the size $n$ of the sample is independent of the size $N$ of the population.
+
+For instance, suppose we chose 10 000 individuals randomly from the population, and calculated the empirical mean. By the above inequality, with probability 15/16, our estimate is within 2% of the true mean[^used-numbers].
+
+[^used-numbers]: We obtain this by setting $\epsilon = 0.02$ and $n = 10 000$. This tells us the probability that our empirical average is off by more than $\epsilon = 0.02$, which is $\frac{1}{4n\epsilon^2} = \frac{1}{16}$.
+
+### Chernoff bounds
+The Chernoff bounds, also called *strong concentration bounds*, give us quantitative bounds for the convergence described by the law of large numbers. If $X$ is an average of independent random variables with standard deviation $\sigma$ and satisfy other properties, then:
+
+$$
+\prob{\abs{X - \expect{X}} \ge k\sigma} \le e^{-\Omega(k^2)}
+$$
+
+This is an exponentially improved bound compared to Chebyshev's inequality. To get this strong bound, we need $X$ to be an average of mutually independent random variables, which is a stronger assumption than the pairwise independence needed for Chebyshev.
+
+There are different formulations of Chernoff bounds, each tuned to different assumptions. We start with the statement for a sum of independent Bernoulli trials:
+
+> theorem "Chernoff bounds for a sum of independent Bernoulli trials"
+> Let $X = \sum_{i = 1}^n X_i$ where $X_i$ = 1 with probability $p_i$ and $X_i = 0$ with probability $1 - p_i$, and all $X_i$ are independent. Let $\mu = \expect{X} = \sum_{i=1}^n p_i$. Then:
+> 
+> 1. **Upper tail**: $\prob{X \ge (1 + \delta)\mu} \le \exp{\left(-\frac{\delta^2}{2+\delta}\mu\right)}$ for all $\delta > 0$
+> 2. **Lower tail**: $\prob{X \le (1 - \delta)\mu} \le \exp{\left(-\frac{\delta^2}{2}\mu\right)}$ for all $\delta > 0$
+
+Another formulation of the Chernoff bounds, called Hoeffding's inequality, applies to bounded random variables, regardless of their distribution:
+
+> theorem "Hoeffding's Inequality"
+> Let $X_1, \dots, X_n$ be independent random variables such that $a \le X_i \le b$ for all $i$ Let $X = \sum_{i=1}^n X_i$ and set $\mu = \expect{X}$. Then:
+> 
+> 1. **Upper tail**: $\prob{X \ge (1 + \delta)\mu} \le \exp{\left(-\frac{2\delta^2\mu^2}{n(b-a)^2}\right)}$ for all $\delta > 0$
+> 2. **Lower tail**: $\prob{X \ge (1 - \delta)\mu} \le \exp{\left(-\frac{-\delta^2\mu^2}{n(b-a)^2}\right)}$ for all $\delta > 0$
+
+<br>
+
+#### Polling with Chernoff bounds
+We can use the Chernoff bounds in our polling example:
+
+$$
+\begin{align}
+\prob{\abs{\frac{\sum_{i=1}^n X_i}{n} - p} \ge \epsilon}
+& =   \prob{\abs{\sum_{i=1}^n X_i - pn} \ge n\epsilon} \\
+& \ge \prob{\sum_{i=1}^n X-i \ge (1 + \frac{\epsilon}{p})pn}
+    + \prob{\sum_{i=1}^n X-i \le (1 + \frac{\epsilon}{p})pn} \\
+& \ge \exp{-\frac{\epsilon^2n}{3}} + \exp{-\frac{\epsilon^2n}{2}}
+\end{align}
+$$
+
+If we want to estimate $p$ within an additive error $\epsilon$ with probability $1 - \delta$ we can simply let:
+
+$$
+n = 3\frac{\ln(2/\delta)}{\epsilon^2}
+$$
+
+To illustrate the difference between Chernoff and Chebyshev, suppose we wanted to estimate $p$ with additive error $\epsilon$ with probability $1 - \delta$. If we wanted this probability of success to be $1 - 2^{-100}$, with Chebyshev we would need $2^{100}/\epsilon^2$ samples, whereas we only need $100/\epsilon^2$ with Chernoff. 
+
+#### Proof sketch of Chernoff bounds
+We will give the proof for the upper tail bound; the lower tail is analogous. For any $s > 0$:
+
+$$
+\prob{X \ge a} 
+= \prob{(e^s)^X \ge (e^s)^a}
+\le \frac{\expect{e^{sX}}}{e^{sa}}
+$$
+
+The "magic trick" here is to take the exponent on both sides. We can then use Markov to get an upper bound. Let us analyze the numerator. Seeing that the variables $X_1, \dots, X_n$ are independent:
+
+$$
+\expect{e^{sX}} 
+= \expect{e^{s(X_1 + X_2 + \dots + X_n)}}
+= \prod_{i=1}^n \expect{e^{s X_i}}
+$$
+
+We can use the fact that $X_i$ is a Bernoulli random variable taking value 1 with probability $p_i$, and 0 with probability $(1 - p_i)$. This means that the random variable $e^{sX}$ takes value $e^s$ with probability $p_i$, and 1 with probability $(1 - p_i)$. This allows us to give a bound for this product of expectations:
+
+$$
+\begin{align}
+\prod_{i=1}^n \expect{e^{s X_i}}
+& = \prod_{i=1}^n (p_i \cdot e^s + (1-p_i) \cdot 1) \\
+& = \prod_{i=1}^n 1 + p_i (e^s - 1) \\
+&\le\prod_{i=1}^n \exp\left(p_i (e^s - 1)\right) \\
+& = \exp\left( \mu(e^s - 1) \right)
+\end{align}
+$$
+
+The inequality step uses the same fact we've used in Hedge, that because of the Taylor expansion of $e^y$, we have that $1 + y \le e^y$. We simply plug $y = p(e^s - 1)$ to get this result.
+
+Now, we can set $a = (1+\delta) \mu$ and $s = \ln(1 + \delta)$, and get[^choice-of-s]
+
+[^choice-of-s]: For reasons we won't go into, it just turns out that this choice of $s$ makes the upper bound for the tail probability as small as possible
+
+$$
+\prob{X \ge a} 
+\le \frac{e^{\mu\delta}}{(1 + \delta)^{\mu(1+\delta)}}
+=   \left(\frac{e^\delta}{(1 + \delta)^{1 + \delta}}\right)^\mu
+$$
+
+This can simplified to be at most $\exp{\left(-\frac{\delta^2}{2+\delta}\mu\right)}$. $\qed$
