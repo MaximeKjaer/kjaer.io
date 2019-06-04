@@ -15,6 +15,7 @@ task :test do
     :parallel => {
       :in_processes => 2
     }
+    :verbose => true
   }
 
   begin
