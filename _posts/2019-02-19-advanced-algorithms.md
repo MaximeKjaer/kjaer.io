@@ -17,10 +17,12 @@ A prerequisite for this course is [CS-250 Algorithms](/algorithms/).
 $$
 \newcommand{\abs}[1]{\left\lvert#1\right\rvert}
 \newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\stream}[1]{\left\langle#1\right\rangle}
 \newcommand{\bigO}[1]{\mathcal{O}\left(#1\right)}
 \newcommand{\vec}[1]{\mathbf{#1}}
 \newcommand{\expect}[1]{\mathbb{E}\left[#1\right]}
 \newcommand{\prob}[1]{\mathbb{P}\left[#1\right]}
+\newcommand{\var}[1]{\text{Var}\left(#1\right)}
 \newcommand{\qed}[0]{\tag*{$\blacksquare$}}
 $$
 
@@ -1597,7 +1599,7 @@ By [union bound](https://en.wikipedia.org/wiki/Boole%27s_inequality), we get tha
 
 $$
 \prob{\text{any constraint unsatisfied}}
-= n\cdot\frac{1}{n^c} = \frac{1}{n^{c-1}}
+\le n\cdot\frac{1}{n^c} = \frac{1}{n^{c-1}}
 \qed
 $$
 
@@ -1632,7 +1634,7 @@ $$
 \qed
 $$
 
-Now onto the proof of our claim: let $\mu$ be the expected cost, which by the corollary is $d\cdot\text{OPT}$. We can upper-bound the "bad event" of the cost being very bad: by Markov's inequality we have $\prob{\text{cost} > 4\mu} \le \frac{1}{4}$. We chose a factor $4$ here because this will give us a nice bound later on; we could pick any number to obtain another bound. We can also upper-bound the "bad event" of the solution being infeasible, which we know (thanks to claim 10) to be upper-bounded by $\frac{1}{n^{c-1}} \le \frac{1}{2}$ for $d = c\cdot\ln(n)$ iterations. By [union bound](https://en.wikipedia.org/wiki/Boole%27s_inequality), the probability that no bad event happens is at least $1 - \frac{1}{4} - \frac{1}{n}$. Supposing $n > 4$, this probability is indeed greater than $\frac{1}{2}$. $\qed$
+Now onto the proof of our claim: let $\mu$ be the expected cost, which by the corollary is $d\cdot\text{OPT}$. We can upper-bound the "bad event" of the cost being very bad: by Markov's inequality we have $\prob{\text{cost} > 4\mu} \le \frac{1}{4}$. We chose a factor $4$ here because this will give us a nice bound later on; we could pick any number to obtain another bound. We can also upper-bound the "bad event" of the solution being infeasible, which we know (thanks to claim 10) to be upper-bounded by $\frac{1}{n^{c-1}} \le \frac{1}{n}$ for $d = c\cdot\ln(n)$ iterations. By [union bound](https://en.wikipedia.org/wiki/Boole%27s_inequality), the probability that no bad event happens is at least $1 - \frac{1}{4} - \frac{1}{n}$. Supposing $n > 4$, this probability is indeed greater than $\frac{1}{2}$. $\qed$
 
 This claim tells us that choosing $d = c\cdot\ln(n)$, we have a $\bigO{\log n}$ approximation algorithm for the set cover problem.
 
@@ -1829,7 +1831,7 @@ $$
 
 $$
 \begin{align}
-\phi^{(t+1)} 
+\Phi^{(t+1)} 
 
 & = \sum_{j\in[n]} w_j^{(t+1)} \\
 
@@ -1846,8 +1848,8 @@ $$
 & = \sum_{j\in[n]} w_j^{(t)} \cdot (1 + \epsilon^2)
   - \sum_{j\in[n]} \epsilon w_j^{(t)} m_j^{(t)} \\
 
-& \overset{(3)}{=} \phi^{(t)} (1 + \epsilon^2) 
-  - \epsilon \sum_{j\in[n]} \phi^{(t)} p_j^{(t)} m_j^{(t)} \\
+& \overset{(3)}{=} \Phi^{(t)} (1 + \epsilon^2) 
+  - \epsilon \sum_{j\in[n]} \Phi^{(t)} p_j^{(t)} m_j^{(t)} \\
 
 & = \Phi^{(t)} \left(1 + \epsilon^2 - \epsilon \vec{p}^{(t)}\cdot\vec{m}^{(t)}\right)  \\
 
@@ -2362,9 +2364,9 @@ def karger_stein(G, n):
     for i in range(1, n - n/sqrt(2)):
         choose edge (u, v) uniformly at random
         contract it
-    let G' be the contracted graph
-    E1, n1 = karger_stein(G', m)
-    E2, n2 = karger_stein(G', m)
+    let G2 be the contracted graph of size m
+    E1, n1 = karger_stein(G2, m)
+    E2, n2 = karger_stein(G2, m)
     return best cut of the two
 {% endhighlight %}
 
@@ -2497,7 +2499,7 @@ We have a nice theorem on this adjacency matrix:
 Proof todo
 
 #### General graphs
-This result actually generalizes to general graphs, though the proof is much more difficult. If we construct the following matrix (called the Tutte matrix):
+This result actually generalizes to general graphs, though the proof is much more difficult. If we construct the following matrix (called the skew-symmetric matrix, or Tutte matrix):
 
 $$
 A_{ij} = \begin{cases}
