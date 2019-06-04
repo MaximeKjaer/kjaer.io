@@ -2598,7 +2598,7 @@ Using the variance of the distribution, we can give the following bound on how m
 > 
 > where $\sigma = \sqrt{\var{X}}$ is the standard deviation of $X$.
 
-Note that we used strict inequality, but that these can be replaced with non-strict inequalities without loss of generality.
+Note that we used strict inequality, but that for continuous random variables, these can be replaced with non-strict inequalities without loss of generality.
 
 It turns out that Chebyshev's inequality is just Markov's inequality applied to the variance random variable $Y := (X - \expect{X})^2$. Indeed, by Markov:
 
@@ -2682,7 +2682,6 @@ By Chebyshev's inequality:
 
 $$
 \prob{\abs{X - \mu} \ge \epsilon} \le \frac{\var{D}}{n\epsilon^2}
-\label{eq:test123}
 $$
 
 For the following discussion, let's suppose that our poll was about whether people would vote yes or no in a referendum. This means that the random variables $X_i$ are independent Bernoulli variables:
@@ -2992,7 +2991,7 @@ $$
 
 Step $(2)$ is true if we assume $N \ge \abs{S}$. Step $(1)$ places a (large) upper bound using the fact that the we cannot expect more collisions than there are elements in the set of hashed values $S$.
 
-### $k$-wise independence
+### k-wise independence
 We can adapt the [discussion on 2-universality](#2-universal-hash-families) to pairwise independence.
 
 > definition "2-wise independent hash family"
@@ -3052,3 +3051,272 @@ Long story short, with probability larger than $1 - 1/n$, the max load is less t
 This is not bad, but we can do even better using the following cool fact (that we won't prove).
 
 The trick we use at the supermarket is to go to the checkout counter with the shortest queue. This is a linear process in the number of checkout registers, so consider this simpler trick: when throwing a ball, pick two random bins, and select the one with the fewest balls (shortest linked list). This ensures that the maximal load drops to $\bigO{\log\log n}$, which is a huge improvement on $\bigO{\frac{\log n}{\log\log n}}$. This is called the *power of two choices*.
+
+## Streaming algorithms
+Streaming algorithms take as input a long stream $\sigma = \stream{a_1, a_2, \dots, a_m}$ consisting of $m$ elements taking values from the universe $[n] = \set{1, \dots, n}$.
+
+We can assume that $m$ and $n$ are huge; if we were Facebook, $m$ could be the number of profiles and $n$ the number of different cities in the world.
+
+The algorithm must be super fast, and cannot store all the data in memory. Our goal is to process the input stream (left to right) using a small amount of space, while calculating some interesting function $\phi(\sigma)$.
+
+Ideally, we would achieve this in $p = 1$ pass with $s = \bigO{\log m + \log n}$ memory, but we may have to allow some error margins to achieve these.
+
+### Finding Frequent Items Deterministically
+We have a stream $\sigma = \stream{a_1, a_2, \dots, a_m}$ where each $a_i \in [n]$. This implicitly defines a frequency vector $\vec{f} = (f_1, \dots, f_n)$ describing the number of times each value has been represented in the stream. Note that this $\vec{f}$ is not the input of the algorithm, but simply another way of denoting the stream. Also note that $f_1 + f_2 + \dots + f_n = m$.
+
+We will consider the following two problems:
+
+- **Majority**: if there exists a $j$ such that $f_j > \frac{m}{2}$, output $j$. Otherwise, output "NONE".
+- **Frequent**: Output the set $\set{j : f_j > \frac{m}{k}}$
+
+Unfortunately, there is no deterministic one-pass algorithm that doesn't need linear memory $\Omega(\min(m, n))$. 
+
+However, it is possible to define an algorithm that only needs logarithmic memory if we allow for some margin of error. The Misra-Gries algorithm is a single-pass ($p = 1$) algorithm that solves the related problem of estimating the frequencies $f_j$, and can thus also be used to solve the above problems.
+
+The algorithm uses a parameter $k$ that controls the quality of the answers it gives.
+
+{% highlight python linenos %}
+def initialize():
+    A = dict() # associative key-value array
+
+def process(j):
+    if j in A.keys():
+        A[j] += 1
+    elif len(A.keys()) < k - 1:
+        A[j] = 1
+    else:
+        for l in A.keys():
+            A[l] -= 1
+            if A[l] == 0:
+                del A[l]
+
+def result(a):
+    if a in A.keys():
+        return A[a]
+    else:
+        return 0
+{% endhighlight %}
+
+The algorithm stores at most $k - 1$ key/value pairs. Each key requires $\log n$ bits to store, and each value at most $\log m$ bits, so the total space is $\bigO{k(\log n + \log m)}$.
+
+To analyze the quality of the solutions, we'll proceed in two steps: first an upper bound, then a lower bound. To make things easier, we'll pretend that the `A` map consists of $n$ key-value pairs, where `A[j] == 0` if `j` is not actually stored in `A` by the algorithm.
+
+Let $\hat{f}_j$ denote the answer output by the algorithm, and $f_j$ be the true answer.
+
+> claim "Misra-Gries upper bound"
+> $$
+> \hat{f}_j \le f_j
+> $$
+
+We only increase the counter for $j$ when we have seen $j$. $\qed$
+
+> claim "Misra-Gries lower bound"
+> $$
+> f_j - \frac{m}{k} \le \hat{f}_j
+> $$
+
+We need to look into how often we decrement the counters. To simplify the argumentation, we allow ourselves a small re-interpretation, but everything stays exactly equivalent. We'll consider that whenever `A[j]` is decremented, we also decrement $k - 1$ other counters, for a total of $k$ decrements at a time.
+
+Since the stream consists of $m$ elements, there can be at most $m/k$ decrements. This can be explained by the "elevator argument". Consider an elevator that, every time it goes up, goes up by 1 floor. Every time it goes down, it goes down by $k$ floors. Let $m$ be the number of times it goes up in a day. How many times can it go down? The answer is that it must have gone down $\le m/k$ times. $\qed$
+
+We can summarize these two claims in a theorem about Misra-Gries:
+
+> theorem "Misra-Gries"
+> The Misra-Gries algorithm with parameter $k$ uses one pass and $\bigO{k(\log m + \log n)}$ bits of memory. For any token $j$, it provides an estimate $\hat{f}_j$ satisfying:
+> 
+> $$
+> f_j - \frac{m}{k} \le \hat{f}_j \le f_j
+> $$
+
+We can use the Misra-Gries algorithm to solve the **Frequent** problem with one additional pass. If some token $j$ has $f_j > \frac{m}{k}$ then its counter `A[j]` will be $> 0$ at the end of the algorithm. Thus we can make a second pass over the input stream counting the exact frequencies of all elements $j \in \text{keys}(A)$ and output the set of desired elements.
+
+### Estimating the number of distinct elements
+We consider the following problem:
+
+- **Distinct elements**: Output an approximation to the number $d(\sigma) = \abs{\set{j : f_j > 0}}$ of distinct elements that appear in the stream $\sigma$
+
+This is the "Facebook problem" of estimating the number of different cities on the site. The $d$ function is also called the $L_0$ norm.
+
+It is not possible to solve this in sublinear space with deterministic or exact algorithms. We therefore look for a randomized approximation algorithm. The algorithm, which we'll call $A$, should give a guarantee on the quality and failure probability of its output $A(\sigma)$, of the following type:
+
+$$
+\prob{\frac{d(\sigma)}{3} \le A(\sigma) \le 3d(\sigma)} \ge 1-\delta
+$$
+
+That is, with probability $1 - \delta$ we have a 3-approximate solution. The amount of space we use will be $\bigO{\log(1/\delta) \log n}$.
+
+#### Ingredients
+We need a [pairwise independent hash family](k-wise-independence) $\mathcal{H}$. The following fact will be useful:
+
+> lemma "Lemma 2: Pairwise independent hash family"
+> There exists a pairwise independent hash family so that $h$ can be sampled by picking $\bigO(\log n)$ random bits. Moreover, $h(x)$ can be calculated in space $\bigO{\log n}$.
+
+We will also need the $\text{zeros}$ function. For an integer $p > 0$, let $\text{zeros}(p)$ denote the number of zeros that the binary representation of $p$ *ends* with (trailing 0s). Formally:
+
+$$
+\text{zeros}(p) = \max\set{i : 2^i \text{ divides } p}
+$$
+
+For instance:
+
+| $p$    | Binary representation | $\text{zeros}(p)$ |
+| ------ | --------------------- | ----------------- |
+| 1      | `1`                   | 0                 |
+| 2      | `10`                  | 1                 |
+| 3      | `11`                  | 0                 |
+| 4      | `100`                 | 2                 |
+| 5      | `101`                 | 0                 |
+| 6      | `110`                 | 1                 |
+| 7      | `111`                 | 0                 |
+| 8      | `1000`                | 3                 |
+
+<br> 
+
+#### Algorithm
+Let $p$ be a number of $k$ bits, i.e. $p \in \set{0, 1, \dots, 2^k-1}$. There are $n = 2^k$ possible values for $p$. Considering all possible values, we can see that each bit is 0 or 1 with probability $\frac{1}{2}$, independently. Therefore, to have $\text{zeros}(p) \ge r$, the independent event of a bit being 0 must happen $r$ times in a row, so:
+
+$$
+\prob{\text{zeros}(p) \ge r} = \left(\frac{1}{2}\right)^r
+$$
+
+Equivalently, we have:
+
+$$
+\prob{\text{zeros}(p) \ge \log_2 r} 
+= \left(\frac{1}{2}\right)^{\log_2 r}
+= \frac{1}{r}
+$$
+
+Therefore, if we have $r$ distinct numbers, we expect at least one  number $j$ to have $\text{zeros}(h(j)) \ge \log r$.
+
+With this intuition in mind, the algorithm is:
+
+{% highlight python linenos %}
+def initialize():
+    h = random [n] -> [n] hash function from pairwise indep. family.
+    z = 0
+
+def process(j):
+    z = max(z, zeros(h(j)))
+
+def output():
+    return 2 ** (z + 1/2)
+{% endhighlight %}
+
+This algorithm uses $\bigO{\log \log n}$ space to store the binary representation of $z$, which counts the number of zeros in the binary representation of $h(j)$, and $\bigO{\log n}$ for the hash function. Let's analyze the quality of the output.
+
+#### Analysis
+For each $j \in [n]$ and each integer $r \ge 0$, let $X_{r, j}$ be an indicator variable for the event "$\text{zeros}(h(j)) \ge r$":
+
+$$
+X_{r, j} = \begin{cases}
+1 & \text{if } \text{zeros}(h(j)) \ge r \\
+0 & \text{otherwise} \\
+\end{cases}
+$$
+
+Let $Y_r$ count the number of values that hash to something with at least $r$ zeros:
+
+$$
+Y_r = \sum_{j : f_j > 0} X_{r, j}
+$$
+
+Let $t$ denote the value of $z$ when the algorithm terminates. By definition, iff there's at least one value that hashes to more than $r$ zeros, then the final $t$ is $\ge r$.
+
+$$
+Y_r > 0 \iff t \ge r
+\label{eq:streaming-equiv-1}\tag{Equivalence 1}
+$$
+
+This can be equivalently stated as:
+
+$$
+Y_r = 0 \iff t < r
+\label{eq:streaming-equiv-2}\tag{Equivalence 2}
+$$
+
+Since $h(j)$ is uniformly distributed over $(\log n)$-bit strings we have $\prob{\text{zeros}(h(j)) \ge r} = \left(\frac{1}{2}\right)^r$ as before. This allows us to give the expectation of $Y_r$. Let $d$ be the solution to the problem, i.e. $d = \abs{\set{j : f_j > 0}}$. Then:
+
+$$
+\expect{Y_r} = \sum_{j : f_j > 0} \expect{X_{r, j}} = \frac{d}{2^r}
+$$
+
+The variance is:
+
+$$
+\begin{align}
+\var{Y_r} 
+& = \expect{Y_r^2} - \expect{Y_r}^2 \\
+& = \expect{\sum_{j, j' : f_j, f_{j'} > 0} X_{r, j} \cdot X_{r, j'}}
+  - \sum_{j, j' : f_j, f_{j'} > 0} \expect{X_{r, j}} \expect{X_{r, j'}} \\
+& \overset{(1)}{=} \sum_{j : f_j > 0} \left(
+    \expect{X_{r, j}^2} - \expect{X_{r, j}}^2
+  \right) \\
+& \le \sum_{j : f_j > 0} \expect{X_{r, j}^2} \\
+& \overset{(2)}{=} \sum_{j : f_j > 0} \expect{X_{r, j}}
+= \frac{d}{2r}
+\end{align}
+$$
+
+Step $(2)$ uses the fact that $X_{j, r}$ is an indicator variable that is either 0 or 1, so $X_{j, r}^2 = X_{j, r}^2$. Step $(1)$ uses pairwise independence as follows:
+
+$$
+\sum_{j, j' : j \ne j'} \expect{X_{j, r} X_{j', r}}
+= \sum_{j, j' : j \ne j'} \expect{X_{j, r}}\expect{X_{j', r}}
+$$
+
+Applying this in the left-hand side of $(1)$ cancels out the $X_{j, r}$ and $X_{j', r}$ where $j \ne j'$, as those terms are subtracted by sum of expectations.
+
+By using Markov's inequality, we get:
+
+$$
+\prob{Y_r > 0} = \prob{Y_r \ge 1} 
+\le \frac{\expect{Y_r}}{1} 
+= \frac{d}{2^r}
+\label{eq:markov-bound1}\tag{Bound 1}
+$$
+
+Since we also know the variance, we can use Chebyshev's inequality[^chebyshev-note]:
+
+[^chebyshev-note]: Note that Chebyshev bounds the probability of being further than $k$ from $\mu$ in either direction. This is a little overkill, because we're only interested in one direction. There may be room to make this bound tighter, but it's good enough for us.
+
+$$
+\prob{Y_r = 0} 
+\le \prob{\abs{Y_r - \expect{Y_r}} \ge \frac{d}{2^r}}
+\le \frac{\var{Y_r}}{(d/2^r)^2}
+\le \frac{2^r}{d}
+\label{eq:chebyshev-bound2}\tag{Bound 2}
+$$
+
+Let $\hat{d}$ be the algorithm's output, the approximate estimation of $d$. Recall that $t$ was the final value of $z$. Then $\hat{d} = 2^{t + 1/2}$.
+
+Let $a$ be the smallest integer such that $2^{a + 1/2} \ge 3d$. Using $\ref{eq:streaming-equiv-1}$ and $\ref{eq:markov-bound1}$: 
+
+$$
+\prob{\hat{d} \ge 3d} 
+= \prob{t \ge a}
+= \prob{Y_a > 0}
+\le \frac{d}{2^a}
+\le \frac{\sqrt{2}}{3}
+$$
+
+Let $b$ be the largest integer such that $2^{b+1/2} \le d/3$. Using $\ref{eq:streaming-equiv-2}$ and $\ref{eq:chebyshev-bound2}$:
+
+$$
+\prob{\hat{d} \le d/3}
+= \prob{t \le b}
+= \prob{Y_{b+1} = 0}
+\le \frac{2^{b+1}}{d}
+\le \frac{\sqrt{2}}{3}
+$$
+
+This gives us failure bounds on both sides of $\frac{\sqrt{2}}{3}$, which is quite high. To decrease this, we can adjust our goal to allow for better than a 3-approximation. Alternatively, we can use the median trick to boost the probability of success.
+
+#### Median trick
+If we run $k$ copies of the above algorithm in parallel, using mutually independent random hash functions, we can output the median of the $k$ answers.
+
+If this median exceeds $3d$ then $k/2$ individual answers must exceed $3d$. We can expect $\le k\sqrt{\sqrt{2}}{3}$ of them to exceed $3d$, so by the Chernoff bounds, the probability of this event is $\le 2^{-\Omega(k)}$. This works similarly for the lower bound.
+
+If we choose $k = \Theta(\log(1 - \delta))$ we can get to a probability of success of $\delta$. This means increasing total memory to $\bigO{\log(1 - \delta) \log n}$.
+
+Note that using the average instead of the median would not work! Messing up the average only requires one bad sample, and we have no guarantee of how far off each wrong answer can be; we only have guarantees on answers being within a successful 3-approximation.
