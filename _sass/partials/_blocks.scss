@@ -1,11 +1,11 @@
-@mixin block($block-name, $block-color) {
+@mixin block($block-color) {
 	--block-bg-color: #{$block-color};
 	--block-border-color: #{darken($block-color, 50%)};
-	--block-name: "#{$block-name}";
 }
 
 
 .block {
+	@include block(#eee);
 	padding: 0.3em 2em;
 	background-color: var(--block-bg-color);
 	border-bottom: 1px solid var(--block-border-color);
@@ -16,41 +16,13 @@
 		font-size: $title-weight-light;
 		color: var(--block-border-color);
 		font-variant: small-caps;
-
-		&::before {
-			content: var(--block-name);
-		}
 	}
 
 	p {
 		margin-top: 0.5em;
 	}
 
-	.header {
-
-	}
-
 	&.note {
-		@include block('Note', #e1edf1);
-	}
-
-	&.theorem {
-		@include block('Theorem', #eee);
-	}
-
-	&.lemma {
-		@include block('Lemma', #eee);
-	}
-
-	&.claim {
-		@include block('Claim', #eee);
-	}
-
-	&.corollary {
-		@include block('Corollary', #eee);
-	}
-
-	&.definition {
-		@include block('Definition', #eee);
+		@include block(#e1edf1);
 	}
 }

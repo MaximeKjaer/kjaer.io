@@ -100,11 +100,24 @@ diagrams:
     options: '-Tsvg --nodoctype'
 
 premonition:
+  types:
+    note:
+      id: note
+    theorem:
+      id: theorem
+    lemma:
+      id: lemma
+    claim:
+      id: claim
+    corollary:
+      id: corollary
+    definition:
+      id: definition
   default:
     template: >
       <div class="block {{type}}" {% if header %}id="{{ type }}:{{ title | slugify: "latin" }}"{% endif %}>
-      {% if header %}<p class="header">{{ title }}</p>{% endif %}
-      {{ content }}
+        <p class="header">{{ type | capitalize}}{% if header %}: {{ title }}{% endif %}</p>
+        {{ content }}
       </div>
 
 # Exclude these files from your production _site
