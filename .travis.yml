@@ -31,7 +31,7 @@ before_install:
 
 script:
   - bash _scripts/build.sh
-  - bundle exec rake test
+  - travis_wait 30 bundle exec rake test
 
 after_success:
   - bash _scripts/deploy.sh

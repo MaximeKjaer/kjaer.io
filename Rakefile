@@ -4,10 +4,8 @@ task :test do
   options = { 
     :assume_extension => true,
     :check_favicon => true,
-    :disable_external => true, # temporary
-    :check_opengraph => false, # temporary
-    :check_html => false, # temporary
-    :external_only => true, # temporary
+    :check_opengraph => true,
+    :check_html => true,
     :http_status_ignore => [429],
     :only_4xx => true,
     :internal_domains => [
@@ -19,8 +17,7 @@ task :test do
     },
     :parallel => {
       :in_processes => 2
-    },
-    :verbose => true
+    }
   }
 
   begin
