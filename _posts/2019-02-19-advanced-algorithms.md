@@ -257,7 +257,7 @@ Laminar matroids $M = (E, \mathcal{I})$ are defined by a family $\mathcal{F}$ of
 - $X \subseteq Y$
 - $Y \subseteq X$
 
-We can think of these subsets as being [part of a tree](http://vu-my.s3.amazonaws.com/wp-content/uploads/sites/2392/2015/07/30090557/Tara-E-Fife.pdf), where each node is the union of its children. For each set $X \in \mathcal{F}$, we define an integer $k_X$. The matroid is then defined by:
+We can think of these subsets as being part of a tree, where each node is the union of its children. For each set $X \in \mathcal{F}$, we define an integer $k_X$. The matroid is then defined by:
 
 $$
 \mathcal{I} = \set{S \subseteq E : \abs{S \cap X} \le k_X \, \forall X \in \mathcal{F}}
@@ -3170,7 +3170,7 @@ $$
 That is, with probability $1 - \delta$ we have a 3-approximate solution. The amount of space we use will be $\bigO{\log(1/\delta) \log n}$.
 
 #### Ingredients
-We need a [pairwise independent hash family](k-wise-independence) $\mathcal{H}$. The following fact will be useful:
+We need a [pairwise independent hash family](#k-wise-independence) $\mathcal{H}$. The following fact will be useful:
 
 > lemma "Lemma 2: Pairwise independent hash family"
 > There exists a pairwise independent hash family so that $h$ can be sampled by picking $\bigO{\log n}$ random bits. Moreover, $h(x)$ can be calculated in space $\bigO{\log n}$.

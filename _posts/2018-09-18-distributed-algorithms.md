@@ -600,7 +600,7 @@ upon event <rbDeliver, src, [Data, VC_m, m]>:
 The $\le$ comparison operation on vector clocks is defined as follows: $VC_a \le VC_b$ iff it is less or equal in all positions, and at least one position is strictly less.
 
 ## Total order broadcast (TOB)
-In [reliable broadcast](#reliable-broadcast), the processes are free to deliver in any order they wish. In [causal broadcast](#causal-order-broadcast), we restricted this a little: the processes must deliver in causal order. But causal order is only partial: some messages are causally unrelated, and may therefore be delivered in a different order by the processes.
+In [reliable broadcast](#reliable-broadcast), the processes are free to deliver in any order they wish. In [causal broadcast](#causal-order-broadcast-cb), we restricted this a little: the processes must deliver in causal order. But causal order is only partial: some messages are causally unrelated, and may therefore be delivered in a different order by the processes.
 
 In **total order broadcast** (TOB), the processes must deliver all messages according to the same order. Note that this is orthogonal to causality, or even FIFO ordering. It can be *made* to respect causal or FIFO ordering, but at its core, it is only concerned with all processes delivering in the same order, no matter the actual ordering of messages.
 
