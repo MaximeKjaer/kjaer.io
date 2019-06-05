@@ -16,6 +16,7 @@ A prerequisite for this course is [CS-250 Algorithms](/algorithms/).
 
 $$
 \newcommand{\abs}[1]{\left\lvert#1\right\rvert}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
 \newcommand{\set}[1]{\left\{#1\right\}}
 \newcommand{\stream}[1]{\left\langle#1\right\rangle}
 \newcommand{\bigO}[1]{\mathcal{O}\left(#1\right)}
@@ -2645,7 +2646,7 @@ To use Chebyshev's inequality, we first need to calculate the variance. To do th
 
 Note that full independence implies pairwise independence.
 
-> lemma "Variance of sums"
+> lemma "Variance of a sum"
 > For any set of pairwise independent $X_1, \dots, X_n$:
 > 
 > $$
@@ -2992,7 +2993,38 @@ $$
 Step $(2)$ is true if we assume $N \ge \abs{S}$. Step $(1)$ places a (large) upper bound using the fact that the we cannot expect more collisions than there are elements in the set of hashed values $S$.
 
 ### k-wise independence
-We can adapt the [discussion on 2-universality](#2-universal-hash-families) to pairwise independence.
+Intuitively, a collection of events is $k$-wise independent if any subset of $k$ of them are mutually independent. We can formalize this as follows:
+
+> definition "k-wise independent hash family"
+> A family $\mathcal{H}$ of has functions is $k$-wise independent if for any $k$ distinct elements $(x_1, \dots, x_k) \in U^k$ and any numbers $(u_1, \dots, u_k)$ we have:
+> 
+> $$
+> \mathcal{P}_{h\in\mathcal{H}}\left[
+>   h(x_1) = u_1 \land \dots \land h(x_k) = u_k
+> \right] = \left(
+>   \frac{1}{\abs{U}}
+> \right)^k
+> $$
+
+Recall [the definition we gave previously for pairwise independence](#definition:pairwise-independence). Generalizing this to $k$-wise independence, we get:
+
+> lemma "Expectation of product of k-wise independent variables"
+> For any set of $k$-wise independent $X_1, \dots, X_n$:
+> 
+> $$
+> \expect{X_{i_1} X_{i_2} \dots X_{i_k}}
+> = \expect{X_{i_1}} \expect{X_{i_2}} \dots \expect{X_{i_k}}
+> $$
+
+For some prime number $p$ consider the family of functions constructed by choosing $a_0, \dots, a_{k-1}$ uniformly at random in $\set{0, 1, \dots, p-1}$, and letting the function be defined as:
+
+$$
+f_{a_0, \dots, a_{k-1}}(x) = a_{k-1} x^{k-1} + \dots + a_1 x + a_0
+$$
+
+This function is $k$-wise independent. We can store it with $\bigO{k \log \abs{U}}$ memory.
+
+We can adapt the [discussion on 2-universality](#2-universal-hash-families) to pairwise independence (also called 2-wise independence).
 
 > definition "2-wise independent hash family"
 > We say that $\mathcal{H}$ is 2-wise independent if for any $x \ne y$ and any pair of $s, t \in [N]$,
@@ -3002,7 +3034,7 @@ We can adapt the [discussion on 2-universality](#2-universal-hash-families) to p
 > = \frac{1}{N^2}
 > $$
 
-Note that 2-wise independence implies 1-wise independence. 
+Note that 2-wise independence implies 1-wise independence.
 
 > definition "1-wise independent hash family"
 > We say that $\mathcal{H}$ is 1-wise independent if for any $x\in U$ and any pair of $s \in [N]$,
@@ -3011,14 +3043,6 @@ Note that 2-wise independence implies 1-wise independence.
 > \mathcal{P}_{h\in\mathcal{H}}\left[h(x) = s\right]
 > = \frac{1}{N}
 > $$
-
-More generally, we can extend the discussion to $k$-wise independent hash families. For some prime number $p$ consider the family of functions constructed by choosing $a_0, \dots, a_{k-1}$ uniformly at random in $\set{0, 1, \dots, p-1}$, and letting the function be defined as:
-
-$$
-f_{a_0, \dots, a_{k-1}}(x) = a_{k-1} x^{k-1} + \dots + a_1 x + a_0
-$$
-
-This function is $k$-wise independent. We can store it with $\bigO{k \log \abs{U}}$ memory.
 
 ### Load balancing
 Let's discuss how large the linked lists can get. For simplicity, we'll consider a situation in which we hash $n$ keys into a hash table of size $n$. We also assume that the funciton is completely random, rather than just 2-universal as above.
@@ -3149,9 +3173,9 @@ That is, with probability $1 - \delta$ we have a 3-approximate solution. The amo
 We need a [pairwise independent hash family](k-wise-independence) $\mathcal{H}$. The following fact will be useful:
 
 > lemma "Lemma 2: Pairwise independent hash family"
-> There exists a pairwise independent hash family so that $h$ can be sampled by picking $\bigO(\log n)$ random bits. Moreover, $h(x)$ can be calculated in space $\bigO{\log n}$.
+> There exists a pairwise independent hash family so that $h$ can be sampled by picking $\bigO{\log n}$ random bits. Moreover, $h(x)$ can be calculated in space $\bigO{\log n}$.
 
-We will also need the $\text{zeros}$ function. For an integer $p > 0$, let $\text{zeros}(p)$ denote the number of zeros that the binary representation of $p$ *ends* with (trailing 0s). Formally:
+We will also need the $\text{zeros}$ function. For an integer $p > 0$, let $\text{zeros}(p)$ denote the number of zeros that the binary representation of $p$ *ends* with (trailing `0`s). Formally:
 
 $$
 \text{zeros}(p) = \max\set{i : 2^i \text{ divides } p}
@@ -3320,3 +3344,208 @@ If this median exceeds $3d$ then $k/2$ individual answers must exceed $3d$. We c
 If we choose $k = \Theta(\log(1 - \delta))$ we can get to a probability of success of $\delta$. This means increasing total memory to $\bigO{\log(1 - \delta) \log n}$.
 
 Note that using the average instead of the median would not work! Messing up the average only requires one bad sample, and we have no guarantee of how far off each wrong answer can be; we only have guarantees on answers being within a successful 3-approximation.
+
+### F2 estimation
+We're now interested estimating the second frequency moment $F_2$:
+
+$$
+F_2 = \norm{\vec{f}}_2^2 = \sum_{i=1}^n f_i^2
+$$
+
+#### Naive attempt
+Let's consider a first, naive attempt.
+
+{% highlight python linenos %}
+def initialize():
+    z = 0
+
+def process(j):
+    z = z + 1
+
+def output():
+    return z ** 2
+{% endhighlight %}
+
+Let's look at the expectation:
+
+$$
+\expect{Z^2}
+= \left(\sum_{i=1}^n f_i\right)^2
+= \underbrace{\sum_{i=1}^n f_i^2}_{\text{we want this}}
++ \underbrace{2\sum_{i < j} f_i f_j}_{\text{additional term we don't want}}
+$$
+
+To get rid of this additional term, instead of incrementing $z$ for each element $j$, the solution is to flip a coin on whether to increment or decrement $z$. This is the basis for the following algorithm.
+
+#### Alon Matias Szegedy algorithm
+{% highlight python linenos %}
+def initialize():
+    h = random 4-wise independent hash function, h: [n] -> {-1, +1}
+    z = 0
+
+def process(j):
+    z = z + h(j)
+
+def output():
+    return z ** 2
+{% endhighlight %}
+
+At the end of the algorithm, we have $Z = \sum_{i=1}^n f_i h(i)$.
+
+> claim "$F_2$ unbiased estimator"
+> $Z^2$ is an unbiased estimator:
+> 
+> $$
+> \expect{Z^2} = \norm{\vec{f}}_2^2
+> $$
+
+Let's prove this. 
+
+$$
+\begin{align}
+\expect{Z^2}
+& = \expect{\left(\sum_{i \in [n]} f_i h(i) \right)^2} \\
+& \overset{(1)}{=} \expect{\sum_{i, j \in [n]} h(i) h(j) f_i f_j} \\
+& \overset{(2)}{=} \expect{\sum_{i \in [n]} h(i)^2 f_i^2} 
+  + \expect{\sum_{i \ne j \in [n]} h(i) h(j) f_i f_j} \\
+& \overset{(3)}{=} \expect{\sum_{i \in [n]} f_i^2}
+  + \sum_{i \ne j \in [n]} \expect{h(i)} \expect{h(j)} f_i f_j \\
+& \overset{(4)}{=} \norm{\vec{f}}_2^2
+\end{align}
+$$
+
+In step $(1)$, we simply expand the square. Step $(2)$ separates products of identical terms from those of non-identical terms using linearity of expectation. Step $(3)$ uses the fact that $h(i)^2 = 1$ as $h(i) = \pm 1$, as well as linearity of expectation and 4-wise independence to push down the expectation into the sum[^push-down-expectation]. Finally, step $(4)$ uses the fact that $\expect{h(i)} = \expect{h(j)} = 0$. $\qed$
+
+[^push-down-expectation]: 4-independence implies 2-independence. We can then use the [lemma for expectation of the product of random variables](#lemma:expectation-of-product-of-k-wise-independent-variables) to "push down" expectation.
+
+> claim "$F_2$ variance"
+> $$
+> \var{Z^2} \le 2 \norm{\vec{f}}_2^4
+> $$
+
+Recall that we can compute the variance using the following formula:
+
+$$
+\var{Z^2} = \expect{Z^4} - (\expect{Z^2})^2
+$$
+
+We already have the expectation, so let's compute the first term: 
+
+$$
+Z^4 = 
+    \left(\sum_{i \in [n]} h(i) f_i\right) \cdot
+    \left(\sum_{j \in [n]} h(j) f_j\right) \cdot
+    \left(\sum_{k \in [n]} h(k) f_k\right) \cdot
+    \left(\sum_{l \in [n]} h(l) f_l\right)
+$$
+
+Let's consider several types of terms resulting from this multiplication:
+
+- All the indices are equal:
+  
+  $$
+  \sum_{i \in [n]} h(i)^4 f_i^4 = \sum_{i \in [n]} f_i^4
+  $$
+
+- The indices are matched 2 by 2:
+  
+  $$
+  {4 \choose 2} \sum_{i < j} (h(i) h(j) f_i f_j)^2
+  = 6 \sum_{i < j} f_i^2 f_j^2
+  $$
+
+- Terms with a single unmatched multiplier (meaning at least one index different from all others) can be ignored. Indeed, when we compute the expectation, we will get a term containing $\expect{h(i) \cdot h(j) \cdot h(k) \cdot h(l)}$. Suppose $i$ is different from $j$, $k$ and $l$ (but we impose no restrictions on these three: they could be the same or they could be different). Since $h$ is 4-wise independent, it we can "push down" the expectation by the [lemma on products of independent variables](#lemma:expectation-of-product-of-k-wise-independent-variables), at the very least separating the $h(i)$ term:
+  
+  $$
+  \expect{h(i) \cdot h(j) \cdot h(k) \cdot h(l)} 
+  = \expect{h(i)}\cdot\expect{h(j) \cdot h(k) \cdot h(l)}
+  $$
+
+  We'll get $\expect{h(i)} = 0$ for any $1 \le i \le n$, which confirms that the term can be ignored.
+
+Therefore:
+
+$$
+\expect{Z^4} = \sum_{i \in [n]} f_i^4 + 6 \sum_{i < j} f_i^2 f_j^2
+$$
+
+The variance of $Z^2$ is thus:
+
+$$
+\begin{align}
+\var{Z^2}
+& = \expect{Z^4} - \left(\expect{Z^2}\right)^2 \\
+& = \sum_{i \in [n]} f_i^4 
+  + 6 \sum_{i < j} f_i^2 f_j^2
+  - \left( \sum_{i \in [n]} f_i^2 \right)^2 \\
+& = \sum_{i \in [n]} f_i^4 
+  + 6 \sum_{i < j} f_i^2 f_j^2
+  - \sum_{i \in [n]} f_i^4
+  - 2 \sum_{i < j} f_i^2 f_j^2 \\
+& = 4 \sum_{i < j} f_i^2 f_j^2 \\
+& \overset{(1)}{\le}
+    2 \left(\sum_{i \in [n]} f_i^2\right)^2 \\
+& = 2 \norm{\vec{f}}_2^2
+\end{align}
+$$
+
+Step $(1)$ uses the following:
+
+$$
+2 \left(\sum_{i \in [n]} f_i^2\right)^2 
+= 2\left(
+    \sum_{i \in [n]} f_i^4 + 2 \sum_{i < j} f_i^2 f_j^2
+\right)
+$$
+
+$\qed$
+
+#### Boosting the precision
+We can improve the precision of the estimate by repeating the algorithm a sufficient number of times independently, and outputting the average.
+
+In this case, the algorithm is:
+
+1. Maintain $t = \frac{6}{\epsilon^2}$ identical and independent copies of the above algorithm, and let $Z_1^2, Z_2^2, \dots, Z_t^2$ denote the output of these copies.
+2. Output $\tilde{Z}^2 = \frac{1}{t} \sum_{i=1}^t Z_i^2$
+
+We make the following claim about this algorithm:
+
+> claim ""
+> Let $\norm{\vec{f}}_2^2$ denote the exact correct answer. The algorithm produces outputs an answer $\tilde{Z}^2$ satisfying:
+> 
+> $$
+> \prob{\abs{\tilde{Z}^2 - \norm{\vec{f}}_2^2} \ge \epsilon \norm{\vec{f}}_2^2}
+> \le \frac{1}{3}
+> \label{eq:f2-goal}\tag{$F_2$ goal}
+> $$
+
+By linearity of expectation, $\tilde{Z}^2$ remains an unbiased estimator as:
+
+$$
+\expect{\tilde{Z}^2} = \frac{1}{t} \sum_{i=1}^t \expect{Z_i^2} = \norm{\vec{f}}_2^2
+$$
+
+Since we know [the variance of a single run](#claim:f-2-variance), the variance of the average of all runs is:
+
+$$
+\var{\tilde{Z}^2} 
+= \var{\frac{1}{t} \sum_{i=1}^t Z_i^2}
+= \frac{1}{t^2} \sum_{i=1}^t \var{Z_i^2}
+= \frac{1}{t} \var{Z^2}
+\le \frac{2}{t} \norm{\vec{f}}_2^4
+$$
+
+By [Chebyshev's inequality](#theorem:chebyshev-s-inequality), this allows us to prove that we're achieving our goal $\ref{eq:f2-goal}$:
+
+$$
+\begin{align}
+\prob{\abs{\tilde{Z}^2 - \norm{\vec{f}}_2^2} \ge \epsilon \norm{\vec{f}}_2^2}
+& \le \frac{\var{\tilde{Z}^2}}{\epsilon^2\norm{\vec{f}}_2^4} \\
+& \le \frac{2}{t\epsilon^2} \\
+& \le \frac{1}{3}
+\end{align}
+$$
+
+$\qed$
+
+Note that we didn't use the [median trick] in this case, but we used the average instead. Using the median is especially problematic when the failure probability is $\ge \frac{1}{2}$. As an analogy, when you flip a coin that gives tails 60% of the time, the median will always give tails as $n \rightarrow \infty$, so be careful!
