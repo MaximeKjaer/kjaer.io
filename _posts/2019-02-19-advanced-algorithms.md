@@ -901,7 +901,7 @@ This dual problem corresponds to the relaxation of vertex cover, which returns a
 ### Kőnig's theorem
 Kőnig's theorem describes an equivalence between the maximum matching and the vertex cover problem in bipartite graphs. Another Hungarian mathematician, Jenő Egerváry, discovered it independently the same year[^hungarian-algorithm-name].
 
-[^hungarian-algorithm-name]: The Hungarian algorithm bears its name in honor of Kőnig and Egerváry, the two Hungarian mathematicians whose work it is based on.
+[^hungarian-algorithm-name]: The Hungarian algorithm bears its name in honor of [Kőnig](https://en.wikipedia.org/wiki/D%C3%A9nes_K%C5%91nig) and [Egerváry](https://en.wikipedia.org/wiki/Jen%C5%91_Egerv%C3%A1ry), the two Hungarian mathematicians whose work it is based on.
 
 > theorem "Kőnig's Theorem"
 > Let $M^\*$ be a maximum cardinality matching and $C^\*$ be a minimum vertex cover of a bipartite graph. Then:
@@ -3549,3 +3549,218 @@ $$
 $\qed$
 
 Note that we didn't use the [median trick] in this case, but we used the average instead. Using the median is especially problematic when the failure probability is $\ge \frac{1}{2}$. As an analogy, when you flip a coin that gives tails 60% of the time, the median will always give tails as $n \rightarrow \infty$, so be careful!
+
+## Locality sensitive hashing
+### Definition
+Intuitively, a *locality sensitive hashing function* (LSH function) is a hash function that hashes "close points" to the same value, and "distant points" to different values.
+
+To be more precise, if $\text{dist}(p, q) \le r$ we want to map $p$ and $q$ to the same value with high probability; if $\text{dist}(p, q) > c\cdot r$, we want $p$ and $q$ to hash to different values with high probability. More formally:
+
+> definition "Locality sensitive hashing families"
+> Let $U$ be the universe containing the points $P$. Suppose he have a family $\mathcal{H} = \set{h: U \rightarrow \mathbb{Z}}$ of functions mapping from $U$ to $\mathbb{Z}$. We say $\mathcal{H}$ is $(r, c\cdot r, p_1, p_2)$-LSH if for all $p, q \in U$:
+> 
+> $$
+> \begin{align}
+> \text{dist}(p, q) \le r 
+> & \implies \mathbb{P}_{h\sim\mathcal{H}}\left[
+>   h(p) = h(q)
+> \right] \ge p_1 \\
+> 
+> \text{dist}(p, q) \ge c\cdot r 
+> & \implies \mathbb{P}_{h\sim\mathcal{H}}\left[
+>   h(p) = h(q)
+> \right] \le p_2 \\
+> \end{align}
+> $$
+
+Here, the distance function could be anything, but we'll just consider it to be Euclidean distance for the sake of simplicity.
+
+Let's try to see what this means visually:
+
+![Visualization of the distances and areas involved](/images/advanced-algorithms/lsh.svg)
+
+We consider $p$ to be at the center of the diagram. Let's consider the guarantees we make for different positions of $q$:
+
+- If $q$ is within the red circle, a function $h$ selected uniformly at random from $\mathcal{H}$ will hash $p$ and $q$ to the same value with probability at least $p_1$.
+- If $q$ is within the blue circle (but not within the red), we make no guarantees.
+- If $q$ is outside both circles (in the black square), then the two values collide with probability at most $p_2$.
+
+### Boosting probabilities
+Given an $(r, c\cdot r, p_1, p_2)$-LSH family (under the assumption $p_1 > p_2$), we can boost it to get $p_1 \approx 1$ and $p_2 \approx 2$. We do this in two steps.
+
+#### Reducing $p_2$
+To reduce $p_2$, we simply draw $k$ functions from $\mathcal{H}$ independently. The overall hashing function $h$ maps a point $p \in P$ to a $k$-dimensional vector.
+
+$$
+h(p) = \left[ h_1(p), \dots, h_k(p)\right]
+$$
+
+By independence of the functions $h_1, \dots, h_k$, we have:
+
+$$
+\text{dist}(p, q) \ge c \cdot r 
+\implies \prob{h(p) = h(q)}
+= \prob{h_1(p) = h_1(q)} \cdot \dots \cdot \prob{h_k(p) = h_k(q)}
+\le p_2^k
+$$
+
+The last step happens because each term is $\le p_2$ since we're considering the case $\text{dist}(p, q) \ge c \cdot r$.
+
+#### Augmenting $p_1$
+Unfortunately, the above also reduced $p_1$: the above hash function hashes close points to the same vector with probability $\ge p_1^k$, which is not what we want. We want to be able to make a better guarantee than that. To boost this probability, we run $l$ independent copies of the above $k$-dimensional vector. This defines something like a $l \times k$ matrix of hashes:
+
+$$
+\begin{align}
+f_1(p) & = \left[h_{1, 1}(p), \dots, h_{1, k}(p)\right] \\
+       & \vdots \\
+f_l(p) & =  \left[h_{l, 1}(p), \dots, h_{l, k}(p)\right] \\ 
+\end{align}
+$$
+
+For a sufficiently large $l$, there is a high probability that there is an $i \in [l]$ such that $f_i(p) = f_i(q)$. Indeed, if $\text{dist}(p, q) \le r$, then:
+
+$$
+\begin{align}
+\prob{\exists i \mid f_i(p) = f_i(q)} 
+& = 1 - \prob{\forall i, f_i(p) \ne f_i(q)} \\
+& \overset{(1)}{=} 1 - \prob{f_i(p) \ne f_i(q)}^l \\
+& \overset{(2)}{\ge} 1 - (1 - p_1^k)^l
+\end{align}
+$$
+
+Step $(1)$ is by independence of the functions, and step $(2)$ is because each individual probability term is $\le 1 - p_1^k$ as it's the inverse of the event of two vectors being identical, which we previously said happened with probability $\ge p_1^k$.
+
+#### Tuning parameters
+In the above, we want to find any function $f_i$, $i\in[l]$, that hashes $p$ and $q$ to the same vector of size $k$. In other words, we want any one of $l$ function to produce all the same $k$ values; we want a disjunction of a conjunction ($\lor$ of $\land$) to be true in order to consider that a collision has happened.
+
+How do we tune the parameters $k$ and $l$ in this setting?
+
+First, we choose $k$ according to either one of these equivalent equations:
+
+$$
+p_2^k = \frac{1}{n}
+\iff
+k = \frac{\log n}{\log(1 / p_2)}
+$$
+
+We'll assume $p_1 = p_2^\rho$ for some $\rho < 1$. We'll see that this $\rho$ parameter is of paramount importance, determining the running time and memory of the algorithm. We choose $l \propto n^\rho \ln n$. 
+
+### Example: LSH for binary vectors
+Let's give an example of a LSH family for binary vectors. Consider $P \subseteq \set{0, 1}^d$, and let $\text{dist}$ be the [Manhattan distance](https://en.wikipedia.org/wiki/Taxicab_geometry) (i.e. the number of bits that are different between the two binary vectors).
+
+> claim ""
+> The family $\mathcal{H} := \set{h_i}_{i=1}^d$, where $h_i(p) = p_i$ selects the $i$<sup>th</sup> bit of $p$, is $(r, c\cdot r, e^{-r/d}, e^{-c\cdot r/d})$-LSH.
+
+Observe that for each $p, q \in \set{0, 1}^d$:
+
+$$
+\mathbb{P}_{h\sim\mathcal{H}}\left[h(p) = h(q)\right] 
+= \frac{\text{# bits in common}}{\text{total bits}}
+= \frac{d - \text{dist}(p, q)}{d}
+= 1 - \frac{\text{dist}(p, q)}{d}
+$$
+
+Therefore:
+
+$$
+\mathbb{P}_{h\sim\mathcal{H}}\left[h(p) = h(q)\right] = \begin{cases}
+\ge 1 - \frac{r}{d} \approx e^{-r/d}  & \text{if dist}(p, q) \le r \\
+\le 1 - \frac{c\cdot r}{d} \approx e^{e-c\cdot r/d} & \text{if dist}(p, q) \ge c \cdot r \\
+\end{cases}
+$$
+
+Therefore, $\mathcal{H}$ is $(r, c\cdot r, e^{-r/d}, e^{-c\cdot r/d})$-LSH. $\qed$
+
+### Application: Approximate Nearest Neighbor Search
+#### Nearest Neighbor Search
+Consider the following problem, called the Nearest Neighbor Search (NNS): consider a set $P \subset \mathbb{R}^d$ of $n$ points in (potentially) high-dimensional space. For any query $q \in \mathbb{R}^d$, find the closest point $p$:
+
+$$
+\min_{p \in P} \text{dist}(p, q)
+$$
+
+The naive solution would be to loop over all points in $P$, but this takes $\bigO{n\cdot d}$ time and space. 
+
+If we had $d=1$ we pre-process the points by sorting them, and then run a binary search to find the closest element. Generalizing this to higher dimensions leads us to [k-d trees](https://en.wikipedia.org/wiki/K-d_tree), but these unfortunately suffer from the [curse of dimensionality](https://en.wikipedia.org/wiki/Curse_of_dimensionality), and fail to beat the naive solution when $d = \Omega(\log n)$.
+
+#### Approximate Nearest Neighbor Search
+If we allow approximate solutions instead of searching for the exact nearest neighbor, we can reduce this problem to that of finding an LHS family. We'll call the approximate variant Approximate Nearest Neighbor Search (ANNS); in this problem, instead of finding the closest point $p$ to a query point $q$, we're happy to find a point $p \in P$ such that:
+
+$$
+\text{dist}(p, q) \le c \cdot \min_{s \in P} \text{dist}(s, q)
+$$
+
+Here, $c$ is the approximation factor.
+
+#### Reduction to LSH
+With the following algorithm, the ANNS problem is reduced to that of finding a LSH.
+
+The idea of the algorithm is to take a $(r, c\cdot r, p_1, p_2)$-LSH family with $p_1 \approx 1$ and $p_2 \approx 0$ (we can [boost the probabilities](#boosting-probabilities) if we need to), and to build a hash table in which we store $h(p)$ for each $p \in P$. For a query point $q$, we can do a lookup in the hash table in $\bigO{1}$: we can then traverse the linked list of points hashing to the same value, and pick the first one satisfying $\text{dist}(p, q) \le c \cdot r$.
+
+{% highlight python linenos %}
+def preprocess():
+     choose k * l functions from H
+     construct l hash tables
+     for i in range(l):
+        for p in P:
+            store p at location fᵢ(p) = (hᵢ₁(p), ..., hᵢₖ(p)) in i-th hash table
+
+def query(q):
+    for i in range(l):
+        compute fᵢ(q)
+        go over all points where fᵢ(p) = fᵢ(q)
+        return first point p satisfying dist(p, q) <= c * r
+{% endhighlight %}
+
+To see how this solves the ANNS problem, consider a point $p$ such that $\text{dist}(p, q) \le r$. In this case, we have $h(p) = h(q)$ with probability $p_1 \approx 1$. If we have $\text{dist}(p, q) \ge c\cdot r$, we have $h(p) = h(q)$ with probability $p_2 \approx 0$.
+
+#### Probability of success
+Let's fix a query point $q$, and consider the "good case", i.e. a point $p$ in the inner circle, meaning $\text{dist}(p, q) \le r$. Then:
+
+$$
+\begin{align}
+\prob{\exists i : f_i(p) = f_i(q)}
+& \overset{(1)}{\ge} 1 - (1 - p_1^k)^l \\
+& \overset{(2)}{=}   1 - (1 - p_2^{\rho k})^l \\
+& \overset{(3)}{=}   1 - (1 - n^{-\rho})^l \\
+& \overset{(4)}{\approx} 1 - e^{-l\cdot n^{-\rho}} \\
+& \overset{(5)}{=} 1 - \frac{1}{n}
+\end{align}
+$$
+
+Step $(1)$ follows from [what we proved](#augmenting-p_1) when augmenting $p_1$. Step $(2)$ follows from [our assumption](#tuning-parameters) that $p_1 = p_2^\rho$ for some $\rho < 1$. Step $(3)$ comes from [our choice of $k$](#tuning-parameters) that satisfies $p_2^k = \frac{1}{n}$, and step $(4)$ from the (by now) usual trick of $1-x \le e^{-x}$, which stems from the Taylor expansion of $e^{-x}$. Finally, we simplify the expression in step $(5)$.
+
+This all means that for any point $p$ within distance $\le r$, we output $p$ with probability $\ge 1 - 1/n$.
+
+#### Space and time complexity of the reduction
+The algorithm maintains $\bigO{l}$ hash tables, each of which contains $n = \abs{P}$ values, where each is a $k$-dimensional vector. The space complexity is thus:
+
+$$
+\bigO{l \cdot n \cdot k} 
+= \bigO{n^{1 + \rho} \cdot \ln n \cdot \frac{\log n}{\log(1 / p_2)}}
+$$
+
+since we [picked the parameters](#tuning-parameters) $l = \bigO{n^\rho \ln n}$ and $k = \bigO{\frac{\log n}{\log(1 / p_2)}}$.
+
+For the query time, we need to compute the $k$-dimensional vectors $f_i(q)$ for $i \in [l]$, which is $\bigO{l\cdot k}$. Then, we need to look at candidate points: there is overhead in considering ineligible ("far away") points. To know how much overhead this represents, we must consider how many "far away" points we expect to find in a linked list. 
+
+To compute this expectation, we fix a query point $q$, and consider that $\text{dist}(p, q) > c \cdot r$, i.e. the point is outside both circles. For any fixed $i$, the expected number of points $p$ that hash to the same value as $q$ but are outside both circles is:
+  
+$$
+\expect{\# p : \text{dist}(p, q) > c \cdot r \land f_i(p) = f_i(q)}
+\le n \cdot p_2^k
+\le 1
+$$
+
+The first step happens by linearity of expectation, and the second one by our choice of $k$.
+
+Summing up over all $i \in [l]$, in expectation there are $\bigO{l}$ far-away points in our data set mapping to the same value as $q$ for *some* $i$. To measure their distance (and thus know their ineligibility), we must take time $\bigO{d}$ for each such point. This implies an overhead of $\bigO{l\cdot d}$ to examine these.
+
+In total, we have a runtime of:
+
+$$
+\bigO{l\cdot k + d \cdot l}
+= \bigO{n^\rho \cdot \ln(n) \cdot \left( \frac{\log n}{\log(1/p_2)} + d \right)}
+$$
+
+Ignoring lower-order terms, the algorithm runs with memory $\bigO{n^{\rho + 1}}$ and query time $\bigO{n^\rho}$.
