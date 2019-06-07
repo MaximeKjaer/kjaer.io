@@ -120,17 +120,19 @@ The generalization of these two properties will lead us to matroids.
 
 ### Matroids
 #### Definition
-A matroid $M = (E, \mathcal{I})$ is defined on a finite ground set $E$ of elements, and a family $\mathcal{I} \subseteq 2^E$ of subsets of $E$, satisfying two properties:
+> definition "Matroid"
+> A matroid $M = (E, \mathcal{I})$ is defined on a finite ground set $E$ of elements, and a family $\mathcal{I} \subseteq 2^E$ of subsets of $E$, satisfying two properties:
+> 
+> - $(I_1)$: If $X \subseteq Y$ and $Y \in \mathcal{I}$ then $X\in\mathcal{I}$
+> - $(I_2)$: If $X\in\mathcal{I}$ and $Y\in\mathcal{I}$ and $\abs{Y}>\abs{X}$ then $\exists e \in Y \setminus X : X + e \in \mathcal{I}$
 
-- $(I_1)$: If $X \subseteq Y$ and $Y \in \mathcal{I}$ then $X\in\mathcal{I}$
-- $(I_2)$: If $X\in\mathcal{I}$ and $Y\in\mathcal{I}$ and $\abs{Y} > \abs{X}$ then $\exists e \in Y \setminus X : X + e \in \mathcal{I}$
-
-#### Remarks
-The $(I_1)$ property is called "downward-closedness"; it tells us that by losing elements of a feasible solution, we still retain a feasible solution.
+The $(I_1)$ property is called *downward-closedness*, or the *hereditary property*; it tells us that by losing elements of a feasible solution, we still retain a feasible solution.
 
 The sets of $\mathcal{I}$ are called *independent sets*: if $X\in\mathcal{I}$, we say that $X$ is *independent*.
 
-$(I_2)$ implies that every *maximal* independent set is of maximum cardinality[^proof-maximal-independent]. This means that all maximal independent sets have the same cardinality. A set of maximum cardinality is called a *base* of the matroid.
+The $(I_2)$ property is the *augmentation property*. It implies that every *maximal*[^maximal-set] independent set is of maximum cardinality[^proof-maximal-independent]. This means that all maximal independent sets have the same cardinality. A set of maximum cardinality is called a *base* of the matroid.
+
+[^maximal-set]: Maximal means that we cannot add any elements to the set and retain independence.
 
 [^proof-maximal-independent]: Suppose toward contradiction that two sets $S$ and $T$ are maximal, but that $\abs{S} > \abs{T}$. By $(I_2)$, $\exists e \in S \setminus T : T + e \in \mathcal{I}$, which means that $T$ isn't maximal, which is a contradiction.
 
@@ -160,7 +162,9 @@ We'd like to prove the following theorem:
 
 The if direction ($\Leftarrow$) follows from the [correctness proof](#correctness-proof) we did for Kruskal's algorithm.
 
-For the only if direction ($\Rightarrow$), we must prove the following claim, which we give in the contrapositive form.
+For the only if direction ($\Rightarrow$), we must prove the following claim, which we give in the contrapositive form[^contrapositive-form].
+
+[^contrapositive-form]: If we want to prove $A \implies B$ we can equivalently prove the contrapositive $\neg B \implies \neg A$.
 
 > claim ""
 > Suppose $(E, \mathcal{I})$ is not a matroid. Then there exists an assignment of weights $w: E \mapsto \mathbb{R}$ such that `greedy` does not return a maximum weight base.
@@ -1110,7 +1114,7 @@ $$
 
 In other words, we can summarize this as the following lemma:
 
-> lemma ""
+> lemma "Min-cost perfect matching and dual solution"
 > A perfect matching $M$ is of minimum cost **if and only if** there is a feasible dual solution $u, v$ such that:
 > 
 > $$
@@ -1147,7 +1151,7 @@ C -- D
 C -- F
 {% endgraph %}
 
-The thin edges have cost 1, and the thick red edge has cost 2. The Hungarian algorithm uses the [lemma from above](#duality-of-min-cost-perfect-bipartite-matching) to always keep a dual solution $y = (u, v)$ that is *feasible at all times*. For any fixed dual solution, the lemma tells us that the perfect matching can only contain **tight edges**, which are edges $e = (a, b)$ for which $u_a + v_b = c(e)$. 
+The thin edges have cost 1, and the thick red edge has cost 2. The Hungarian algorithm uses the [lemma from above](#lemma:min-cost-perfect-matching-and-dual-solution) to always keep a dual solution $y = (u, v)$ that is *feasible at all times*. For any fixed dual solution, the lemma tells us that the perfect matching can only contain **tight edges**, which are edges $e = (a, b)$ for which $u_a + v_b = c(e)$. 
 
 The Hungarian algorithm initializes the vertex weights to the following trivial solutions:
 
@@ -1257,7 +1261,7 @@ B -- E [color=red, penwidth=3.0]
 C -- F
 {% endgraph %}
 
-The augmenting path algorithm can find a perfect matching in this graph, which is optimal by the lemma (TODO link).
+The augmenting path algorithm can find a perfect matching in this graph, which is optimal by [the lemma](#lemma:min-cost-perfect-matching-and-dual-solution).
 
 #### Algorithm
 Initialize:
@@ -1272,7 +1276,7 @@ Iterate:
 - Consider $G' = (A \cup B, E')$ where $E' = \set{(a, b) \in E : u_a + v_b = c((a, b))}$ is the set of all tight edges
 - Find a maximum-cardinality matching in $G'$. 
     + If it is a perfect matching, we are done by complementarity slackness' $\Rightarrow$ direction.
-    + Otherwise, we can find a "certificate" set $S \subseteq A$ such that $\abs{S} > \abs{N(S)}$. This is guaranteed to exist by Hall's theorem.
+    + Otherwise, we can find a "certificate" set $S \subseteq A$ such that $\abs{S} > \abs{N(S)}$. This is guaranteed to exist by [Hall's theorem](#theorem:hall-s-theorem).
         * Update weights by $\epsilon$
         * Go to step 1
 
@@ -1290,7 +1294,7 @@ v'_b = \begin{cases}
 \end{cases}
 $$
 
-This remains feasible. The dual objective value increases by $(\abs{S} - \abs{N(S)})\epsilon$; as $\abs{S} > \abs{N(S)}$ by Hall's theorem, $\abs{S} - \abs{N(S)} > 1$ so $(\abs{S} - \abs{N(S)})\epsilon > \epsilon$: we only increase the value!
+This remains feasible. The dual objective value increases by $(\abs{S} - \abs{N(S)})\epsilon$; as $\abs{S} > \abs{N(S)}$ by [Hall's theorem](#theorem:hall-s-theorem), $\abs{S} - \abs{N(S)} > 1$ so $(\abs{S} - \abs{N(S)})\epsilon > \epsilon$: we only increase the value!
 
 To get the maximal amount of growth in a single step, we should choose $\epsilon$ as large as possible while keeping a feasible solution:
 
