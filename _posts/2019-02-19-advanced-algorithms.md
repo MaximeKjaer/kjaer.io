@@ -3764,3 +3764,508 @@ $$
 $$
 
 Ignoring lower-order terms, the algorithm runs with memory $\bigO{n^{\rho + 1}}$ and query time $\bigO{n^\rho}$.
+
+## Submodularity
+### Definition
+> definition "Set function"
+> A set function $f : 2^N \rightarrow \mathbb{R}$ is a function assigning a real value to every subset $S \subseteq N$ of a ground set $N$.
+
+In many cases, the value of an item may depend on whether we already have selected some other item. For instance, just buying one shoe is much less valuable than buying both. Or in the other direction, in a stamp collection, once we already have a stamp of a particular type, an additional stamp of the same type is less valuable.
+
+In this latter example, the function that assigns a (monetary) value to the stamp collection corresponds to a *submodular function*.
+
+> definition "Classic definition of submodularity"
+> A set function $f$ is submodular if, for all $A, B \subseteq N$:
+> 
+> $$
+> f(A) + f(B) \ge f(A \cup B) + f(A \cap B)
+> $$
+
+An alternative (but equivalent) definition of submodularity may make more intuitive sense, but requires the introduction of the concept of *marginal contribution*:
+
+> definition "Marginal contribution"
+> Given a set function $f$, a set $S \subseteq N$ and an element $u \in S$, the *marginal contribution* of $u$ to $S$ is defined as:
+> 
+> $$
+> f(u \mid S) := f(S \cup \set{u}) - f(S)
+> $$
+
+The marginal contribution measures how much value an individual element $u$ adds if added to a set $S$. This allows us to give the alternative definition of submodularity:
+
+> definition "Diminishing returns definition of submodularity"
+> A set function $f$ is submodular *if and only if* for all $A \subseteq B \subseteq N$ and each $u \in N \setminus B$ the following holds:
+> 
+> $$
+> f(u \mid A) \ge f(u \mid B)
+> $$
+
+Intuitively, this means that a function is submodular if adding elements to a smaller set has a larger marginal contribution than if added to a larger set. Let's prove that this is equivalent to the [classic definition](#definition:classic-definition-of-submodularity).
+
+First, we'll prove the $\Rightarrow$ direction, namely that the [classic definition](#definition:classic-definition-of-submodularity) implies the [diminishing returns definition](#definition:diminishing-returns-definition-of-submodularity). Suppose that $f$ is submodular and let $A \subseteq B$ be two sets. We'll consider the sets $A \cup \set{u}$ and $B$. According to the classic definition:
+
+$$
+\begin{align}
+f(A \cup \set{u}) + f(B) & \ge f(A \cup \set{u} \cup B) + f((A \cup \set{u}) \cap B) \\
+
+f(A \cup \set{u}) + f(B) & \ge f(\set{u} \cup B) + f(A) \\
+
+f(A \cup \set{u}) - f(A) & \ge f(\set{u} \cup B) - f(B) \\
+
+f(u \mid A) & \ge f(u \mid B)
+\end{align}
+$$
+
+The first step uses the fact that $A \subseteq B$, thus $A \cap B = A$; this is also the case if we consider $A \cup \set{u}$ instead of $A$, regardless of whether $u \in A$. The second step rearranges the terms, and the third one uses the [definition of marginal contribution](#definition:marginal-contribution).
+
+Now, let's prove the $\Leftarrow$ direction, namely that the [diminishing returns definition](#definition:diminishing-returns-definition-of-submodularity) implies the [classic definition](#definition:classic-definition-of-submodularity). Let's consider two sets $C, D \subseteq N$. Let $h = \abs{D \setminus C}$ be the number of elements in $D \setminus C = \set{d_1, d_2, \dots, d_h}$. Let $D_i = \set{d_j : 1 \le j \le i}$ be the set of the first $i$ elements $D \setminus C$.
+
+$$
+\begin{align}
+f(D) - f(C \cap D)
+& \overset{(1)}{=} f(D_h) - f((C \cap D)\cup D_0) \\
+& \overset{(2)}{=} f((C \cap D) \cup D_h) - f((C \cap D)\cup D_0) \\
+& \overset{(3)}{=} \sum_{i = 1}^h f((C\cap D)\cup D_i) - f((C\cap D)\cup D_{i-1}) \\
+& \overset{(4)}{=} \sum_{i = 1}^h f(d_i \mid (C \cap D) \cup D_{i - 1}) \\
+& \overset{(5)}{\ge} \sum_{i = 1}^h f(d_i \mid C \cup D_{i - 1}) \\
+& \overset{(6)}{=} \sum_{i = 1}^h f(D_i \cup C) - f(D_{i-1} \cap C) \\
+& \overset{(7)}{=} f(C \cup D) - f(C) \\
+\end{align}
+$$
+
+Step $(1)$ follows from the fact that $D_0 = \emptyset$ and that $D_h = D$, and step $(2)$ from the fact that $(C \cap D) \cup D_h = D = D_h$ since $(C \cap D) \subseteq D$. Step $(3)$ introduces a reformulation as a telescoping sum[^telescoping-sum], and step $(4)$ rewrites the terms as a marginal contribution. The inequality in step $(5)$ holds by assumption, since $(C\cap D) \cup D_{i-1} \subseteq C \cup D_{i-1}$ as $(C \cap D) \subseteq C$. Step $(6)$ expands the marginal contributions according to the definition; this sum is telescoping, so we can do step $(7)$.
+
+[^telescoping-sum]: [Telescoping](https://en.wikipedia.org/wiki/Telescoping_series) means that if we expand the sum, everything cancels out except the very first and last terms.
+
+Rearranging the terms of the above inequality yields $f(C) + f(D) \ge f(C \cup D) + f(C \cap D)$ as required. $\qed$
+
+### Examples
+#### Cut size
+The function measuring the size of a cut induced by $(S, V \setminus S)$ in a graph $G = (V, E)$ is:
+
+$$
+\delta(S) = \abs{\set{(u, v) : u \in S, v \in V \setminus S}}
+$$
+
+This function $\delta : 2^V \rightarrow \mathbb{R}$ maps from the ground set $V$ to the reals. To see that it is submodular, we can look at the marginal contribution of a single point $u$ to a cut $S$. Let $E(v, T)$ be the number of edges between some node $v$ and a set of nodes $T$:
+
+$$
+\delta(v \mid S) = E(v, V \setminus (S \cup \set{v})) - E(v, S)
+$$
+
+In other words, the contribution of adding a node to a cut $S$ is the number of edges that now cross the cut $(S \cup \set{v})$ by the inclusion of $v$, minus the number of edges that no longer cross the cut, i.e. those that have been "absorbed" into the set by inclusion of $v$.
+
+Observe that the first term is decreasing in $S$, and the second is increasing in $S$, but is subtracted. Hence, the whole expression is decreasing in $S$, which proves submodularity.
+
+#### Coverage function
+Consider a finite collection of sets $T_1, T_2, \dots T_n$ with each $T_i \subseteq \mathbb{N}$. We consider a ground set of indices of these sets $N = [n]$ and a set function $f: 2^N \rightarrow \mathbb{R}$ defined by:
+
+$$
+f(S) = \abs{\bigcup_{i\in S} T_i}
+$$
+
+The function counts how many elements in $\mathbb{N}$ are covered by the sets specified by the indices in $S$. To show that this function is submodular, we analyze the marginal contribution of a set $T_i$ (represented by the addition of index $i$ to a set $S$):
+
+$$
+f(i \mid S) 
+= \abs{T_i \cup \bigcup_{j \in S} T_j} - \abs{\bigcup_{j\in S} T_j}
+= \abs{T_i \setminus \bigcup_{j\in S} T_j}
+$$
+
+This is decreasing in $S$ so $f$ is submodular.
+
+#### Matroid rank
+Let $\mathcal{M} = (X, \mathcal{I})$ be a [matroid](#matroids) on a ground set $X$. Let $r: 2^X \rightarrow \mathbb{R}$ be the rank function, defined by:
+
+$$
+r(A) = \max_{I \in \mathcal{I} \cap A} \abs{I}
+$$
+
+In words, $r(A)$ is the size of a maximal independent set containing only elements from $A$.
+
+This function is submodular: consider two sets $A, B \in X$. Let $C$ be any maximal independent set of $\mathcal{M}$ contained in $A \cap B$. By the [matroid augmentation property $(I_2)$](#definition:matroid), we can extend $C$ to a maximal independent set $D$ contained in $A \cup B$. Then:
+
+$$
+r(A \cup B) + r(A \cap B)
+=   \abs{D} + \abs{C}
+\le \abs{D\cap (A \cup B)} + \abs{D \caè (A \cap B)}
+=   \abs{D \cap B} + \abs{D \cap A}
+\le r(B) + r(A)
+$$
+
+This satisfies the classic definition of submodularity.
+
+#### Summarization
+A function summarizing data is often submodular, much for the same reason as the stamp collection example.
+
+#### Influence maximization
+Suppose we want to select $k$ people to give free samples to in order to launch a product. We want to select people that have the maximum influence, meaning that they tell the most people about the product. Solving this is basically a maximization of a submodular function under a cardinality constraint, which [we'll see more about later](#monotone-cardinality-constrained-submodular-maximization).
+
+#### Entropy
+Entropy is another example of a submodular function. If we already have a piece of information, then receiving it a second time adds no entropy. Or perhaps, if we have some information already, additional information adds less entropy than if we had no information at all.
+
+### Submodular function minimization
+In the following section, we'll assume that we can evaluate $f(S)$ in constant time. We will show that minimizing $f$ is equivalent to finding the global minimum of a certain convex continuous function, which we can do in polynomial time using the (sub)gradient descent. To be able to use the whole framework of convex optimization, we need to extend our submodular function on discrete sets, to a convex function on a continuous domain. This is what *Lovász extension* does.
+
+#### Lovász extension
+Say we have a submodular function $f : 2^N \rightarrow \mathbb{R}$. We want to *extend* it to $\hat{f}$. 
+
+To do that, we can start by thinking of $f : 2^N \rightarrow \mathbb{R}$ as $f : \set{0, 1}^n \rightarrow \mathbb{R}$, where $n = \abs{N}$, which maps indicator vectors to real values. This indicator vector indicates which elements of $N$ are contained in the considered set $S$.
+
+We also introduce an equivalence between $N$ and $[n]$ (we can just let the elements in $N$ be numbered).
+
+> definition "Lovász extension"
+> Let $f : \set{0, 1}^n \rightarrow \mathbb{R}$. Define $\hat{f}: [0, 1]^n \rightarrow \mathbb{R}$, the Lovász extension of $f$, as:
+> 
+> $$
+> \hat{f}(z) = \mathbb{E}_{\lambda\sim\mathcal{U}(0, 1)}\left[
+>   f(\set{i : z_i \ge \lambda})
+> \right] \quad \forall z\in[0, 1]^n 
+> $$
+> 
+> where $\lambda\sim\mathcal{U}(0, 1)$ denotes a uniformly random sample on $[0, 1]$.
+
+In other words, given a vector $z \in [0, 1]^n$, the extension $\hat{f}$ returns the expectation of placing a threshold $\lambda$ uniformly at random in $[0, 1]$, and evaluating $f$ with the set of terms in $z$ that are $\ge \lambda$.
+
+Notice that for any $\lambda \in ]0, 1]$, if $z \in \set{0, 1}^n$, then $\set{i : z_i \ge \lambda} = z$, so $\hat{f}$ will agree with $f$ over the hypercube (all integral points). At fractional points, $\hat{f}$ is some kind of average of $f$.
+
+We can actually give a more closed form of this averaging representation of $\hat{f}$. To do so, we order the elements of $z$:
+
+$$
+1 = z_1 \ge z_2 \ge \dots \ge z_n \ge z_{n+1} = 0
+$$
+
+Let $S_i$ for any $i\in[n]\cup\set{0}$ equal $\set{1, 2, \dots, i}$. Then:
+
+$$
+\emptyset = S_0 \subseteq S_1 \subseteq \dots \subseteq S_n = [n]
+$$
+
+Note that for any $\lambda \in [z_i, z_{i+1}[$ (the probability of this event being $z_i - z_{i+1}$ since $\lambda$ is selected from $\mathcal{U}(0, 1)$), for any $i \in [n]\cup\set{0}$, we have $\set{j \mid z_j \ge \lambda} = S_i$.
+
+All of this leads us to the following formulation:
+
+> definition "Lovász extension formulation"
+> Let $S_i = \set{1, 2, \dots, i}$ (where $S_0 = \emptyset$. Let $1 = z_1 \ge z_2 \ge \dots \ge z_n \ge z_{n+1} = 0$ be the non-increasingly ordered components of $z$. Then:
+> 
+> $$
+> \hat{f}(z) = \sum_{i=1}^n (z_i - z_{i+1})f(S_i)
+> $$
+
+This means that we can evaluate $\hat{f}$ at any $z$ using $n+1$ evaluations of $f$ (we assumed a call to take constant time).
+
+#### Convexity of the Lovász extension
+
+> theorem "Convexity of the Lovász extension"
+> Let $\hat{f}$ be the Lovász extension of $f : \set{0, 1}^n \rightarrow \mathbb{R}$. Then:
+> 
+> $$
+> \hat{f}\text{ is convex} \iff f\text{ is submodular}
+> $$
+
+The proof is quite long (todo).
+
+### Submodular function maximization
+For this part, we'll assume that all set functions we deal with are:
+
+- **Non-negative**: $f(S) \ge 0 \quad \forall S \subseteq N$
+- **Normalized**: $f(\emptyset) = 0$
+
+#### Monotone cardinality-constrained submodular maximization
+For this section, we'll also assume that $f$ is:
+
+- **Monotone**: $f(S) \le f(T) \quad\forall S\subseteq T\subseteq N$
+
+Monotonicity tells us that the value of $f(S)$ cannot decrease as we add elements; the marginal contribution is always positive. This means that $f(N) \ge f(S) \quad \forall S \subseteq N$, so unconstrained maximization is trivial (just pick the ground set). 
+
+Instead, we'll look at the less trivial *constrained maximization* problem, in which we're looking for a set $S \subseteq N$ of size at most $k$ that maximizes $f$. 
+
+In the beginning of the course, we saw that weighted maximization problems with linear objectives can be solved optimally by the greedy algorithm. This is even true if we generalize the constraint that $\abs{S} \le k$ by a general matroid constraint. 
+
+What happens if we try to generalize this submodular functions? The natural approach is to, at each step, greedily add the element that has the maximal marginal gain:
+
+{% highlight python linenos %}
+def greedy_submodular_maximization(N, f, k):
+    """
+    Input:  N   ground set
+            f   submodular function 2^N -> R
+            k   size constraint 0 <= k <= |N|
+    Output: S ⊆ N with |S| <= k
+    """
+    S = set()
+    for i in range(k):
+        u_i = argmax over u∈N\S of f(u|S)
+        S += u_i
+    return S
+{% endhighlight %}
+
+However, this algorithm can produce suboptimal results. For instance, if we consider a [coverage function](#coverage-function) with sets $T_1 = \set{1, 2, 3, 4}$, $T_2 = \set{1, 2, 5}$, $T_3 = {3, 4, 6}$, a greedy algorithm will select $T_1$ and then either $T_2$ and $T_3$ (covering 5 elements), whereas the optimal solution is to pick $T_2$ and $T_3$ (covering 6 elements).
+
+Still, we can show that the greedy algorithm gives a constant factor approximation. To show this, we'll need to introduce a lemma about marginal contributions:
+
+> lemma "Sum of marginal contributions"
+> Let $f : 2^N \rightarrow \mathbb{R}$ be a submodular function, and let $S, T\subseteq N$. Then:
+> 
+> $$
+> \sum_{e \in T \setminus S} f(e \mid S) \ge f(T \cup S) - f(S)
+> $$
+> 
+> Equivalently:
+> 
+> $$
+> f(S \cup T) \le f(S) + \sum_{e \in T \setminus S} f(e \mid S)
+> $$
+
+This tells us that the individual contributions of $T \setminus S$ to $S$ are more than the contribution of all of $T \setminus S$. In this instance, "the sum of the parts" is greater than the whole.
+
+To prove this, order the elements of $T \setminus S$ as $\set{e_1, e_2, \dots}$.
+
+$$
+\begin{align}
+f(S \cup T) 
+& =   f(S) + f(e_1 \mid S) + f(e_2 \mid S \cup {e_1}) + \dots \\
+& \le f(S) + f(e_1 \mid S) + f(e_2 \mid S) + \dots \\
+\end{align}
+$$
+
+The inequality follows from the submodularity of $f$. $\qed$
+
+This allows us to prove the following theorem:
+
+> theorem "Approximation guarantee of greedy maximization of a submodular function"
+> Let $S$ be the set produced by the greedy algorithm for maximizing a monotone submodular function $f$ subject to a cardinality constraint $k$. Let $O$ be any set of at most $k$ elements. Then:
+> 
+> $$
+> f(S) \ge \left(1 - \frac{1}{e}\right) f(O) \approx 0.632 f(O)
+> $$
+
+If this is true for any set $O$, it is also true for the optimal solution; therefore, the theorem tells us that the greedy algorithm is a $(1 - 1/e)$ approximation algorithm.
+
+Let us prove this. Since $f$ is monotone, we can assume $\abs{O} = k$; if we had $\abs{O} \le k$ we could always add elements to achieve $\abs{O} = k$, without decreasing $f(O)$.
+
+Let $u_i$ be the $i$<sup>th</sup> element selected by the greedy algorithm. Let $S_i = \set{u_j : j \le i}$ be the set of the first $i$ elements selected. Note that $S_0 = \emptyset$ and $S_k = S$. Consider an iteration $i$ and let $e$ be any element in $O \setminus S_{i-1}$ (i.e. in the optimal solution, but that we haven't picked yet). Then, by our greedy choice criterion:
+
+$$
+f(u_i \mid S_{i-1}) \ge f(e \mid S_{i-1})
+$$
+
+In other words, the optimal solution increases our current choice $S_{i-1}$ less than the element $u_i$ that we are going to pick at iteration $i$.
+
+We have one such inequality for each $e \in O \setminus S_{i-1}$. If we put all these inequalities together, i.e. we multiply by $\abs{O \setminus S_{i-1}}$, we get:
+
+$$
+\begin{align}
+\abs{O \setminus S_{i-1}} \cdot f(u_i \mid S_{i-1})
+& \overset{(1)}{\ge} \sum_{e \in O \setminus S_{i-1}} f(e \mid S_{i-1}) \\
+& \overset{(2)}{\ge} f(S_{i-1} \cup O) - f(S_{i-1}) \\
+& \overset{(3)}{\ge} f(O) - f(S_{i-1}) \\
+\end{align}
+$$
+
+Step $(1)$ uses submodularity of $f$, step $(2)$ uses [the previous lemma on the sum of marginal contributions](#lemma:sum-of-marginal-contributions), and step $(3)$ uses monotonicity (since $O \subseteq (S_{i-1} \cup O)$ we have $f(O) \le f(S_{i-1}\cup O$). 
+
+Now, note that $\abs{O \setminus S_{i-1}} \le k$ since we assumed $\abs{O} \le k$, and $f(u_i \mid S_{i-1})$ since $f$ is monotone. Therefore, as a small recap, we currently have the following inequality:
+
+$$
+k \cdot f(u_i \mid S_{i-1}) 
+\ge \abs{O \setminus S_{i-1}} \cdot f(u_i \mid S_{i-1})
+\ge f(O) - f(S_{i-1})
+$$
+
+Now, if we divide by $k$ in the above, and recall how we defined $S_i$ and $S_{i-1}$, we get:
+
+$$
+f(S_i) - f(S_{i-1}) 
+= f(u_i \mid S_{i-1})
+\ge \frac{1}{k} (f(O) - f(S_{i-1}))
+$$
+
+Rearranging the terms, we get:
+
+$$
+f(S_i) 
+\ge \left(1 - \frac{1}{k}\right) f(S_{i-1}) + \frac{1}{k} f(O)
+$$
+
+This gives a recurrence for $f(S_i)$, where it is defined in terms of $f(S_{i-1})$. By induction (a proof we will omit), we can show that:
+
+$$
+f(S_i) \ge \left( 1 - \left(1 - \frac{1}{k}\right)^i \right) f(O)
+$$
+
+To complete the proof, it suffices to plug in $i = k$ and note that $(1 - \frac{1}{k})^k \le e^{-1}$ using the usual trick of $1 + x \le e^x$ because of the Taylor expansion of the exponential function. $\qed$
+
+Note that this is the best possible bound. It is NP-hard to do better.
+
+#### Unconstrained submodular maximization
+Now, suppose that $f$ is not monotone. Then, the unconstrained maximization is relevant again, because we have no guarantee that the solution should be $N$. 
+
+The greedy algorithm that stops when no element gives any positive marginal gain does not perform well. For instance, consider the following example, where the ground set is $N = \set{u_1, u_2, \dots, u_n, v}$, and the function is:
+
+$$
+f(S) = \begin{cases}
+2 & \text{if } v \in S \\
+\abs{S} & \text{if } v \notin S \\
+\end{cases}
+$$
+
+Here, $f$ is indeed submodular, but the greedy algorithm would pick $v$ immediately, as it has marginal contribution 2 when $S = \emptyset$, whereas any other option only has marginal contribution 1. However, the optimal solution would be $\set{u_1, u_2, \dots, u_n}$, which would have value $n$.
+
+Instead of the naive greedy approach, we'll see the double-greedy approach that allows us to get a $\frac{1}{3}$ approximation. This algorithm is "greedy from two sides", one side starting at $\emptyset$ and the other at $N$.
+
+{% highlight python linenos %}
+def double_greedy_submodular_maximization(N, f):
+    """
+    Input:  N   ground set
+            f   submodular function 2^N -> R
+
+    Output: S ⊆ N with f(S) >= 1/3 * f(Opt)
+    """
+    X[0] = set()
+    Y[0] = N
+    for i in range(1, n+1): # 1 to n, inclusive
+        a[i] = f(X[i-1] + u[i]) - f(X[i-1]) # marginal contribution of adding u[i]
+        b[i] = f(Y[i-1] - u[i]) - f(Y[i-1]) # marginal contribution of removing u[i]
+        if a[i] >= b[i]:
+            X[i] = X[i-1] + u[i]
+        else:
+            Y[i] = Y[i-1] - u[i]
+    return X[n] # which is equal to Y[n]
+{% endhighlight %}
+
+Before we can prove that this algorithm is a $\frac{1}{3}$ approximation, we need some lemmas.
+
+> lemma "Sum of marginal contributions in double greedy"
+> For every $1 \le i \le n$:
+> 
+> $$
+> a_i + b_i \ge 0
+> $$
+
+This should be clear for a linear function $f$ (which is a special case of a submodular function), in which $a_i + b_i = 0$. We aim to prove this for the more general case of submodular functions.
+
+First, note that for all $i$, $X_{i-1} \subseteq Y_{i-1}$ as they start at $\emptyset$ and $N$ respectively, and meet in the middle. Also, $u_i \in Y_{i-1}$, since at step $i$ we have to make the decision of whether to keep or remove $u_i$ from $Y_{i-1}$. Therefore:
+
+$$
+\begin{align}
+(X_{i-1}\cup\set{u_i}) \cap (Y_{i-1}\setminus\set{u_i}) &= X_{i-1} \\
+(X_{i-1}\cup\set{u_i}) \cup (Y_{i-1}\setminus\set{u_i}) &= Y_{i-1} \\
+\end{align}
+$$
+
+By definition of $a_i$ and $b_i$, we have:
+
+$$
+\begin{align}
+a_i + b_i
+& = f(X_{i-1}\cup\set{u_i}) - f(X_{i-1}) 
+  + f(Y_{i-1}\setminus\set{u_i}) - f(Y_{i-1}) \\
+& = f(X_{i-1}\cup\set{u_i}) + f(Y_{i-1}\setminus\set{u_i}) 
+  - \left(f(X_{i-1}) + f(Y_{i-1})\right \\
+& \ge 0
+\end{align}
+$$
+
+The last step follows because we have something of the shape:
+
+$$
+f(A) + f(B) - (f(A \cup B) + f(A \cap B))
+$$
+
+Where $A = X_{i-1}\cup\set{u_i}$ and $B=Y_{i-1}\setminus\set{u_i}$. By the [classic definition of submodularity](#definition:classic-definition-of-submodularity), this is positive. $\qed$
+
+Next, we'll need a smooth way of walking between our solution and the optimal one. We'll do this by introducing $\text{OPT}_i$, which we define as:
+
+$$
+\text{OPT}_i = (\text{OPT} \cup X_i) \cap Y_i
+$$
+
+In other words, $\text{OPT}_i$ is obtained by adding all elements in $X_i$ to the optimal solution, and then removing all elements in $Y_i$. This means that $\text{OPT}_i$ is a set that agrees with what the algorithm already has done in the first $i$ steps, and that contains the optimal choices in the following positions. For instance, if we let the previous decisions be denoted by a $*$, we have:
+
+$$
+\begin{align}
+X_i & = (*, *, \dots, *, 0, 0, \dots, 0) \\
+Y_i & = (*, *, \dots, *, 1, 1, \dots, 1) \\
+\text{OPT}_i & = (*, *, \dots, *, o_{i+1}, o_{i+2}, \dots, o_n) \\
+\end{align}
+$$
+
+Note that $\text{OPT}_0 = \text{OPT}$ and that $\text{OPT}_n = X_n = Y_n$.
+
+> lemma "Decrease in $\text{OPT}_i$"
+> At each step $i$:
+> 
+> $$
+> \left[f(X_i) + f(Y_i)\right] - \left[f(X_{i-1}) + f(Y_{i-1})\right]
+> \ge f(\text{OPT}_{i-1}) - f(\text{OPT}_i)
+> $$
+
+Intuitively, this tells us that each step $i$ brings about a decrease in the value of $\text{OPT}_i$, but this decrease is always matched by an increase in the value of either $X_i$ or $Y_i$.
+
+If we rearrange the terms of this lemma, we get:
+
+$$
+\left[f(X_i) - f(X_{i-1})\right] + \left[f(Y_i) - f(Y_{i-1})\right]
+\ge f(\text{OPT}_{i-1}) - f(\text{OPT}_i)
+$$
+
+We will just prove this lemma for the case $a_i \ge b_i$, but the other case is similar. In this case, the algorithm sets $X_i = X_{i-1} \cup \set{u_i}$ and $Y_i = Y_{i-1}$.
+
+By [the lemma](#lemma:sum-of-marginal-contributions-in-double-greedy) on $a_i + b_i$, we have $a_i \ge 0$. This means that the above inequality is:
+
+$$
+f(u_i \mid X_{i-1}) = a_i \ge 0
+$$
+
+Let's now consider $\text{OPT}\_i$ Since $a\_i \ge b\_i$, we take $u\_i$, and thus have $\text{OPT}\_i = \text{OPT}\_{i-1}\cup\set{u\_i}$. There are two possible cases for this assignment:
+
+- $u\_i \in \text{OPT}$, in which case $\text{OPT}\_i = \text{OPT}\_{i-1}$. The right-hand side of the lemma is empty and we are done.
+- $u\_i \notin \text{OPT}$, in which case $\text{OPT}\_{i-1} \subseteq Y\_{i-1} \setminus \set{u\_i}$. By submodularity, we can replace $\text{OPT}\_{i-1}$ by any superset to obtain this for the right-hand side of the lemma:
+  
+  $$
+  \begin{align}
+  f(\text{OPT}_i) - f(\text{OPT}_i) 
+  & = f(u_i \mid \text{OPT}_{i-1}) \\
+  & =   f(u_i \mid \text{OPT}_{i-1}) \\
+  & \ge f(u_i \mid Y_{i-1} \setminus \set{u_i}) \\
+  & =   f(Y_{i-1}) - f(Y_{i-1} \setminus \set{u_i}) \\
+  & = -b_i \ge -a_i \\
+  \end{align}
+  $$
+
+  Multiplying by $-1$ on both sides, we get the following, as required:
+
+  $$
+  f(\text{OPT}_{i-1}) - f(\text{OPT}_i) \le a_i
+  \qed
+  $$
+
+With these lemma in place, we can get to the approximation theorem for this algorithm.
+
+> theorem "Double greedy approximation"
+> The above algorithm is a $\frac{1}{3}$ approximation for unconstrained submodular maximization.
+
+If we sum the inequality of [the lemma on $\text{OPT}_i$](#lemma:decrease-in-text-opt-i) over $i \in [n]$:
+
+$$
+\sum_{i=1}^n \left[
+    f(\text{OPT}_{i-1}) - f(\text{OPT}_i)
+\right]
+\le \sum_{i=1}^n \left[
+    f(X_i) + f(Y_i) - f(X_{i-1})  f(Y_{i-1})
+\right]
+$$
+
+Simplifying this telescoping sum, and using that $f$ is non-negative we get:
+
+$$
+f(\text{OPT}_0) - f(\text{OPT}_n)
+\le f(X_n) + f(Y_n) - f(X_0) - f(Y_0)
+\le f(X_n) + f(Y_n)
+$$
+
+Rearranging the terms, and using $\text{OPT}_0 = \text{OPT}$, $\text{OPT}_n = X_n = Y_n$, we get:
+
+$$
+f(\text{OPT}) \le 3 \cdot f(X_n)
+\qed
+$$
