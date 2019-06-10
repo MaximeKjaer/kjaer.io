@@ -3590,7 +3590,7 @@ We consider $p$ to be at the center of the diagram. Let's consider the guarantee
 - If $q$ is outside both circles (in the black square), then the two values collide with probability at most $p_2$.
 
 ### Boosting probabilities
-Given an $(r, c\cdot r, p_1, p_2)$-LSH family (under the assumption $p_1 > p_2$), we can boost it to get $p_1 \approx 1$ and $p_2 \approx 2$. We do this in two steps.
+Given an $(r, c\cdot r, p_1, p_2)$-LSH family (under the assumption $p_1 > p_2$), we can boost it to get $p_1 \approx 1$ and $p_2 \approx 0$. We do this in two steps.
 
 #### Reducing $p_2$
 To reduce $p_2$, we simply draw $k$ functions from $\mathcal{H}$ independently. The overall hashing function $h$ maps a point $p \in P$ to a $k$-dimensional vector.
@@ -3889,11 +3889,13 @@ In words, $r(A)$ is the size of a maximal independent set containing only elemen
 This function is submodular: consider two sets $A, B \in X$. Let $C$ be any maximal independent set of $\mathcal{M}$ contained in $A \cap B$. By the [matroid augmentation property $(I_2)$](#definition:matroid), we can extend $C$ to a maximal independent set $D$ contained in $A \cup B$. Then:
 
 $$
+\begin{align}
 r(A \cup B) + r(A \cap B)
-=   \abs{D} + \abs{C}
-\le \abs{D\cap (A \cup B)} + \abs{D \caè (A \cap B)}
-=   \abs{D \cap B} + \abs{D \cap A}
-\le r(B) + r(A)
+& =   \abs{D} + \abs{C} \\
+& \le \abs{D\cap (A \cup B)} + \abs{D \cap (A \cap B)} \\
+& =   \abs{D \cap B} + \abs{D \cap A} \\
+& \le r(B) + r(A) \\
+\end{align}
 $$
 
 This satisfies the classic definition of submodularity.
@@ -4273,3 +4275,184 @@ $$
 f(\text{OPT}) \le 3 \cdot f(X_n)
 \qed
 $$
+
+## Online algorithms
+Online algorithms are slightly different from streaming algorithms. They are similar in that they receive elements one at a time, and do not know the future. But while a streaming algorithm computes some kind of metric over the stream with limited memory, the goal of an online algorithm is to output some decision about each element before receiving the next.
+
+### Rental problems
+We'll introduce online algorithms with a very Swiss example, called the "[ski rental problem](https://en.wikipedia.org/wiki/Ski_rental_problem)", or more generally the rent/buy problem. 
+
+Suppose we go skiing every winter, and thus need skis. We can either buy a pair for a cost $B$ and use them forever, or rent them every winter and pay cost $R$ per year. If we knew how many times we would ski in our entire lives up-front, the calculation would be very easy. But the reality of it is that we don't know in advance. Instead, every winter we must make the choice of buying or renting. If we will ski less than $B/R$ times, then the optimal solution would be to always rent; if we ski more, we should buy from year 1.
+
+An easy algorithm is to rent every winter until we have paid $B$ in rent, and then buy at that point. If we ski less than $B/R$ times, this is optimal. If we ski more, it's within a factor 2 of the optimal solution (which would have been to buy on day 1).
+
+### Competitive ratio
+Note that the factor 2 in the above example isn't an approximation ratio, but something we call a *competitive ratio*. A competitive ratio is the performance loss we get by going to online algorithm, while an approximation ratio is what we get by going from NP to P.
+
+> definition "Competitive ratio"
+> If we have an online problem and some algorithm $\text{ALG}$ that, given an instance $I$ of the problem, gives the cost $\text{ALG}$ of the solution. Assume $\text{OPT}(I)$ is the best possible solution of instance $I$. Then:
+> 
+> $$
+> \max_{I} \frac{\text{ALG}(I)}{\text{OPT}(I)}
+> $$
+> 
+> is called the *competitive ratio* of the algorithm.
+
+The competitive ratio is how far off our algorithm is from the optimal solution in the worst case. An alternative definition of competitive ratio allows for some warm-up cost:
+
+> definition "Strong competitive ratio"
+> Assume the same setting as in the [definition of competitive ratio](#definition:competitive-ratio) above. We call $r$ the *competitive ratio* if:
+> 
+> $$
+> \text{ALG}(I) \le r \cdot \text{OPT}(I) + c
+> $$
+> 
+> for all $I$ and some constant $c$ independent of the length of the sequence $I$. If $c=0$, $r$ is the *strong competitive ratio*
+
+
+### Caching
+In computers, processors usually have a *cache* that sits in front of a *main memory*. When the processor needs to load information, it first goes to the cache. If the page is in cache, it's a *hit*; otherwise, it's a *miss*, and we go to main memory, and bring the page into the cache. If the cache is full at this point, one page must be evicted to be replaced. To decide which one to evict, a number of different *caching algorithms* exist; we'll go into the different options later.
+
+Suppose the cache has a capacity of $k$ pages, and the main memory has $N$ pages. A sequence of of reads could look like this:
+
+$$
+\stream{4, 1, 2, 1, 5, 3, 4, 4, 1, 2, 3}
+$$
+
+With $k=3$ pages, we would fill up the cache with pages 4, 1, 2 on the first three reads. Then we'd read 1, which is a cache hit. Reading 5 would be a cache miss, so we'd read from main memory and bring it in. Which page do we evict at this point though? This is up to the caching algorithm to determine.
+
+#### Deterministic caching
+A few examples of deterministic caching algorithms are:
+
+- **LRU (Least Recently Used)**: the page that has been in the cache the longest without being used is evicted
+- **FIFO (First In First Out)**: the cache is like a queue, where we evict the page at the head, and enqueue new pages
+- **LFU (Least Frequently Used)**: the page in the cache that has been used the least gets evicted
+- **LIFO (Last In First Out)**: the cache is like a stack, where we push new pages, and pop to evict
+
+> claim "Competitive ratio of LRU and FIFO"
+> LRU and FIFO have a competitive ratio of $k$ (where $k$ is the size of the cache).
+
+We'll divide the request sequence $\sigma$ into phases as follows:
+
+- Phase 1 begins at the first page of $\sigma$
+- Phase $i$ begins as soon as we have seen the $k$<sup>th</sup> distinct page after phase $i-1$ has begun.
+
+For instance, for $k=3$, the following stream would be divided as follows:
+
+$$
+\sigma = \stream{
+    \underbrace{4, 1, 2, 1}_{\text{Phase } 1},
+    \underbrace{5, 3, 4, 4}_{\text{Phase } 2},
+    \underbrace{1, 2, 3}_{\text{Phase } 3}
+}
+$$
+
+We will now show that $\text{OPT}(I)$ makes at least one cache miss each time a new phase begins. Let $p_j^i$ denote the $j$<sup>th</sup> page in phase $i$. Consider pages $p_2^i$ to $p_k^i$ and page $p_1^{i+1}$ (i.e. pages 2 to $k$ in phase $i$, and the first page of phase $i+1$). These are $k$ pages. 
+
+If none of the pages $p_2^i$ to $p_k^i$ have a cache miss, then $p_1^{i+1}$ must have one (because we've now seen more distinct pages than we can fit in our cache). Let $N$ be the number of phases. Then we have $\text{OPT}(I) \ge N - 1$ (the best we can do is no misses in pages 2 to $k$ of the phase, and then a miss in the first one). 
+
+On the other hand, LRU and FIFO make at most $k$ misses per phase, so $\text{ALG}(I)$, and they are thus $k$-competitive. $\qed$
+
+> claim "Competitive ratio of LFU and LIFO"
+> LFU and LIFO have *unbounded* competitive ratio. This means that the competitive ratio isn't bounded in terms of the parameters of the problem ($k$ and $N$), but rather by the size of input. 
+
+Having unbounded competitive ratios is *bad*. To prove this, we'll consider an input stream on which they perform particularly badly. Suppose we have a cache of size $k$, which originally contains pages $1$ through $k$. Suppose main memory has $N > k$ pages. 
+
+Let's start with LIFO. Consider the request sequence alternating between pages $k$ and $k+1$:
+
+$$\sigma = \stream{k+1, k, k+1, k, k+1, \dots}$$
+
+Since $k$ is the last page that was put in the cache, it will be evicted to make space for $k+1$. Then, since $k+1$ was the last page placed in cache, it will be evicted to make space for $k$, and so on. We have a cache miss for each page in the request sequence, whereas an optimal strategy would only have one cache miss.
+
+Now, let's consider LFU. Consider the same setup, but with the following request sequence, which has a "warm-up phase" that requests pages $1$ through $k-1$, $m$ times. Then it alternates between requesting $k$ and $k+1$, $m$ times each.
+
+$$
+\sigma = \stream{
+    \underbrace{1, 2, \dots, k-1}_{m \text{times}},
+    \underbrace{k, k+1, k, k+1, \dots}_{m \text{ times each}}
+}
+$$
+
+In the warm-up phase, we have no cache misses because we assume the cache to already have values $1$ through $k$. Then, page $k$ is requested, which is a cache hit for the same reason. From there on out, LFU evicts $k$ to make space for $k+1$ and vice versa. This means $2m$ cache misses, while an optimal strategy would only have a single cache miss, for the first request for page $k+1$ (it would evict any other page than $k$). Making $m$ large allows us to get any competitive ratio we want. $\qed$
+
+> lemma "Best competitive ratio for caching"
+> No deterministic online algorithm for caching can achieve a better competitive ratio than $k$, where $k$ is the size of the cache.
+
+Let $\text{ALG}$ be a deterministic online caching algorithm. Suppose the cache has size $k$ and currently holds pages $1$ to $k$. Suppose $N > k$ is the number of pages in memory.
+
+Since we know the replacement policy of $\text{ALG}$, we can construct an adversary that causes it to miss every element of the request sequence. This adversary doesn't need all $N$ pages to construct a "bad sequence" for the algorithm, but only $\set{1, 2, \dots, k, k+1}$. The requested element in this "bad sequence" is simply the one that isn't in the cache at that moment.
+
+In comparison, when the optimal algorithm has a cache miss, it means that the evicted page won't be requested for the next $k$ rounds. This means that $\text{ALG}$ has a $k$-competitive ratio (every page compared to one in $k$). $\qed$
+
+It may seem counter-intuitive that we consider that a policy that can miss every page is considered to be "the best possible strategy". But the important thing to understand here is that it's good because it's only $k$ times worse than the optimal solutions in the worst of cases, where even the optimal algorithm has some cache misses. The bad caching policies have a large number of misses even when the optimal algorithm has practically none.
+
+#### Randomized caching
+The following randomized caching strategy is known as the marking algorithm. Similarly to LRU, if a cache page is recently used, it's marked with a bit of value 1; otherwise, it's unmarked (bit with value 0).
+
+- Initially all pages are unmarked
+- Whenever a page is requested:
+    + If the page is in the cache, mark it
+    + Otherwise:
+        * If there is an unmarked page in the cache, evict an unmarked page chosen uniformly at random, bring the requested page in, mark it.
+        * Otherwise, unmark all pages and start a new phase
+
+> lemma "Competitive ratio of the marking algorithm"
+> The above strategy achieves a competitive ratio of:
+> 
+> $$
+> 2H_k = 2\left(\frac{1}{1} + \frac{1}{2} + \dots + \frac{1}{k} \right)
+> $$
+
+The above algorithm is almost the best we can do:
+
+> lemma "Best possible competitive ratio"
+> No randomized online algorithm has a competitive ratio better than $H_k$
+
+### Secretary problem
+The following problem is called the secretary problem:
+
+- $n$ candidates arrive in random order
+- When a candidate arrives, we must take an irrevocable decision on whether to hire the candidate. 
+
+We'd like to hire the best candidate (we can assume they all have an objective and precise score). Exactly one candidate must be hired. If the algorithm we devise only returns negative decisions, we'll just pick the last candidate regardless of what the algorithm says (this is equivalent to specifying that the algorithm must give us at most one candidate).
+
+#### Simple strategies
+If we select the first candidate, regardless of their score, we get:
+
+$$
+\prob{\text{hiring the best candidate}} = \frac{1}{n}
+$$
+
+Another strategy would be to interview but not hire the first $\frac{n}{2}$ candidates ("sampling phase"), and then pick whoever is better than the best candidate in the sampling phase ("hiring phase").
+
+$$
+\begin{align}
+\prob{\text{hiring the best candidate}}
+& \ge \prob{\text{second best is in the first half} \land \text{best is in the second half}} \\
+& \ge \prob{\text{second best is in the first half}}
+\cdot \prob{\text{best is in the second half}} \\
+& \ge \frac{1}{2} \cdot \frac{1}{2} \\
+& = \frac{1}{4}
+\end{align}
+$$
+
+Note that the second inequality holds despite the two events not quite being independent (if we know the second best is in the first half, that takes up a spot in the first half and it's slightly more likely that the best is in the second half). There are also other ways of fulfilling the event of hiring the best candidate (i.e. if the third best is in the first half, and the best is before the second best in the second half, etc), so the first inequality is not quite tight, but the above bound is good enough for us.
+
+#### Optimal strategy
+We can optimize the previous strategy by changing the point at which we switch from sampling phase to hiring phase. Instead of observing $n/2$, we can observe $r - 1$. Then:
+
+$$
+\begin{align}
+\prob{\text{hiring the best candidate}}
+& = \sum_{i=1}^n \prob{\text{selecting } i \land i \text{ is the best}} \\
+& = \sum_{i=1}^n \prob{\text{selecting } i \mid i \text{ is the best}} 
+    \cdot \prob{i \text{ is the best}} \\
+& = \sum_{i=1}^{r-1} 0 
+  + \frac{1}{n} \sum_{i=r}^n \prob{\text{second best of the first } i \text{candidates is among the first } r - 1 \mid i \text{is the best}} \\
+& = \frac{1}{n} \sum_{i=r}^n \frac{r-1}{i-1} \\
+& = \frac{r-1}{n}\sum_{i=r}^n \frac{1}{i-1} \\
+\end{align}
+$$
+
+We want to maximize the above. For large enough $r$, this is at $r = \frac{n}{e}$, which gives us a probability of selecting the best candidate of at least $\frac{1}{e}$, which is optimal!
+
