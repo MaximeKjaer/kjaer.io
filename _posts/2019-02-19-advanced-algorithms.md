@@ -19,6 +19,7 @@ $$
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
 \newcommand{\set}[1]{\left\{#1\right\}}
 \newcommand{\stream}[1]{\left\langle#1\right\rangle}
+\newcommand{\inner}[1]{\left\langle#1\right\rangle}
 \newcommand{\bigO}[1]{\mathcal{O}\left(#1\right)}
 \newcommand{\vec}[1]{\mathbf{#1}}
 \newcommand{\expect}[1]{\mathbb{E}\left[#1\right]}
@@ -32,7 +33,7 @@ $$
 ### Maximum weight spanning trees
 We'll start with a problem called *maximum weight spanning trees*.
 
-- **Input**: A graph $G = (V, E)$ with edge weights $w: E \mapsto \mathbb{R}$
+- **Input**: A graph $G = (V, E)$ with edge weights $w: E \rightarrow \mathbb{R}$
 - **Output**: A spanning tree $T \subseteq E$ of maximum weight $\sum_{e\in T} w(e)$
 
 A [spanning tree](/algorithms/#minimum-spanning-trees) is a subgraph connecting all vertices of $G$ in the minimum possible number of edges. Being a tree, it is acyclic by definition.
@@ -158,7 +159,7 @@ def greedy(M, w):
 We'd like to prove the following theorem:
 
 > theorem ""
-> For any ground set $E = \set{1, 2, \dots, n}$ and a family of subsets $\mathcal{I}$, `greedy` finds a maximum weight base for any set of weights $w: E \mapsto \mathbb{R}$ **if and only if** $M=(E, \mathcal{I})$ is a matroid.
+> For any ground set $E = \set{1, 2, \dots, n}$ and a family of subsets $\mathcal{I}$, `greedy` finds a maximum weight base for any set of weights $w: E \rightarrow \mathbb{R}$ **if and only if** $M=(E, \mathcal{I})$ is a matroid.
 
 The if direction ($\Leftarrow$) follows from the [correctness proof](#correctness-proof) we did for Kruskal's algorithm.
 
@@ -167,7 +168,7 @@ For the only if direction ($\Rightarrow$), we must prove the following claim, wh
 [^contrapositive-form]: If we want to prove $A \implies B$ we can equivalently prove the contrapositive $\neg B \implies \neg A$.
 
 > claim ""
-> Suppose $(E, \mathcal{I})$ is not a matroid. Then there exists an assignment of weights $w: E \mapsto \mathbb{R}$ such that `greedy` does not return a maximum weight base.
+> Suppose $(E, \mathcal{I})$ is not a matroid. Then there exists an assignment of weights $w: E \rightarrow \mathbb{R}$ such that `greedy` does not return a maximum weight base.
 
 To prove this, we're going to cook up some weights for which `greedy` doesn't return a maximum weight base when $(E, \mathcal{I})$ isn't a matroid (i.e. the tuple either violates $(I_1)$ or $(I_2)$).
 
@@ -268,7 +269,7 @@ $$
 $$
 
 ##### Gammoid ("Netflix matroid")
-Todo
+A gammoid describes a set of vertices that can be reached by vertex-disjoint paths in a directed graph. An example of this is Netflix, which may want to know how many people they can reach from their server nodes if each link has a certain max capacity.
 
 ### Matroid intersection
 Matroids form a rich set of problems that can be solved by the `greedy` algorithm, but there are also many problems with efficient algorithms that aren't matroids. This is the case for problems that aren't matroids themselves, but can be defined as the intersection of two matroids.
@@ -319,13 +320,13 @@ $$
 = M_A \cap M_B
 $$
 
-We'll use two partition matroids $M_A$ and $M_B$ imposing the same restrictions, but on $A$ and $B$, respectively. The ground set for both matroids is $E$, whose partition is as follows:
+We'll use two partition matroids $M_A$ and $M_B$ imposing the same restrictions, but on $A$ and $B$, respectively. The ground set for both matroids is $E$. The partitioning of the ground set in $M_A$ is defined as follows, and similarly for $M_B$:
 
 $$
-E = \bigcup \set{\delta(v) : v \in A}
+E = \bigcup_{v \in A} \set{\delta(v)}
 $$
 
-Here, $\delta(v)$ denotes the edges incident to a vertex $v$. We let $k_v = 1$ for every $v$ in $A$, so we can define the family of independent sets for the first matroid $M_A$ is:
+Here, $\delta(v)$ denotes the edges incident to a vertex $v$. Note that since $G$ is bipartite, none of the vertices in $A$ are connected; this means that the above indeed creates a partitioning in disjoint sets. We let $k_v = 1$ for every $v$ in $A$, so we can define the family of independent sets for the first matroid $M_A$ is:
 
 $$
 \mathcal{I}_A = \set{
@@ -335,9 +336,7 @@ $$
 }
 $$
 
-In other words, a set of edges $X \subseteq E$ is independent for $M_A$ (i.e. $X \in \mathcal{I_A}$) if it has at most one edge incident to every vertex of $A$ (no restrictions on how many edges can be incident to vertices on $B$). Defining $\mathcal{I}_B$ similarly, we see why the matroid intersection corresponds to a matching in $G$
-
- is defined similarly:
+In other words, a set of edges $X \subseteq E$ is independent for $M_A$ (i.e. $X \in \mathcal{I_A}$) if it has at most one edge incident to every vertex of $A$ (no restrictions on how many edges can be incident to vertices on $B$). Defining $\mathcal{I}_B$ similarly, we see why the matroid intersection corresponds to a matching in $G$:
 
 $$
 \mathcal{I}_B = \set{
@@ -481,9 +480,9 @@ We now prove the correctness of this algorithm, which is to say that it indeed f
 
 The proof is by contradiction.
 
-First, let's prove the $\Rightarrow$ direction. Suppose for the sake of contradiction that $M$ is maximum, but that there exists an augmenting path $P$ with respect to $M$. Then $M' = M \bigtriangleup P$ is a matching of greater cardinality than $M$, which contradicts the optimality of $M$.
+First, let's prove the $\Rightarrow$ direction. Suppose towards contradiction that $M$ is maximal, but that there exists an augmenting path $P$ with respect to $M$. Then $M' = M \bigtriangleup P$ is a matching of greater cardinality than $M$, which contradicts the optimality of $M$.
 
-Then, let's prove the $\Leftarrow$ direction. We must prove that the lack of augmenting paths implies that $M$ is maximal. Suppose toward contradiction that it is not, i.e. that there is a maximal matching $M^\*$ such that $\abs{M^\*} > \abs{M}$. Let $Q = M \bigtriangleup M^\*$; intuitively, this edge set $Q$ represents the edges that $M$ and $M^\*$ disagree on.
+Then, let's prove the $\Leftarrow$ direction. We must prove that the lack of augmenting paths implies that $M$ is maximal. We'll prove the contrapositive, so suppose $M$ is not maximal, i.e. that there is a maximal matching $M^\*$ such that $\abs{M^\*} > \abs{M}$. Let $Q = M \bigtriangleup M^\*$; intuitively, this edge set $Q$ represents the edges that $M$ and $M^\*$ disagree on.
 
 From there on, we reason as follows:
 
@@ -496,7 +495,7 @@ From there on, we reason as follows:
     + In paths, there number of edges from $M^\*$ is $\ge$ than the number of edges from $M$
 - Let's remove cycles from consideration, and concentrate on paths. We can do so and still retain the property of having more edges from $M^\*$ than from $M$. Since $\abs{M^\*} > \abs{M}$, there must be at least one path with strictly more edges from $M^\*$ than from $M$; it must start and end with a $M^\*$ edge, and alternate between the sets in between. This path is an augmenting path with respect to $M$.
 
-Therefore, there must exist an augmenting path $P$ with respect to $M$, which is a contradiction. $\qed$
+Therefore, there must exist an augmenting path $P$ with respect to $M$. This proves the contrapositive, so the $\Leftarrow$ direction stating that no augmenting paths $\Rightarrow M$ is maximal is proven. $\qed$
 
 #### Generalization
 In the above, we've seen an algorithm for unweighted bipartite matching. If we'd like to generalize it to weighted bipartite matching[^equivalent-bipartite], we'll have to introduce a powerful algorithmic tool: linear programming.
@@ -585,7 +584,7 @@ This extreme point $x^{(j)}$ is gives us a higher value for the objective functi
 ### Maximum weight bipartite perfect matching
 The problem corresponds to the following:
 
-- **Input**: A bipartite graph $G=(V, E)$ where $V = A \cup B$ and $\abs{A} = \abs{B}$, and edge weights $w: E \mapsto \mathbb{R}$
+- **Input**: A bipartite graph $G=(V, E)$ where $V = A \cup B$ and $\abs{A} = \abs{B}$, and edge weights $w: E \rightarrow \mathbb{R}$
 - **Output**: A perfect matching $M$ maximizing $w(M) = \sum_{e \in M} w(e)$
 
 A matching is **perfect** if every vertex is incident to *exactly* one edge in the matching (i.e. every vertex is matched). We need $\abs{A} = \abs{B}$ for this to work.
@@ -692,7 +691,7 @@ Unfortunately, this adds exponentially many constraints. A proof 2 or 3 years ag
 ### Vertex cover for bipartite graphs
 The vertex cover problem is defined as follows:
 
-- **Input**: A graph $G = (V, E)$ with node weights $w : V \mapsto \mathbb{R}$
+- **Input**: A graph $G = (V, E)$ with node weights $w : V \rightarrow \mathbb{R}$
 - **Output**: A vertex cover $C \subseteq V$ that minimizes $w(C) = \sum_{v\in C} w(v)$
 
 A vertex cover $C$ is a vertex set that ensures that every edge has at least one endpoint in $C$. In other words, $C$ is a vertex cover if $\forall e = (u, v) \in E$, we have $u\in C$ or $v\in C$.
@@ -755,7 +754,7 @@ $$
 y_a + y_b = (x_a + \epsilon) + (x_b - \epsilon) = x_a + x_b \ge 1
 $$
 
-The last inequality holds because $x^\*$ is a feasible solution and thus satisfies the first property.
+The last inequality holds because $x^\*$ is a feasible solution and thus satisfies the first LP constraint.
 
 These $y$ and $z$ are feasible solutions, and therefore show a contradiction in our initial assumption that $x^\*$ is an extreme point; the claim is therefore verified. $\qed$
 
@@ -1003,7 +1002,7 @@ $$
 This is equivalent to $x, y$ being optimal solutions, by weak duality. $\qed$
 
 ### Duality of Min-Cost Perfect Bipartite Matching
-- **Input**: $G = (A\cup B, E)$, a bipartite weighted graph with edge weights $c: E \mapsto \mathbb{R}$
+- **Input**: $G = (A\cup B, E)$, a bipartite weighted graph with edge weights $c: E \rightarrow \mathbb{R}$
 - **Output**: Perfect matching $M$ of maximum cost $c(M) = \sum_{e \in M} c(e)$ 
 
 We assume that $G$ is a *complete* bipartite graph, meaning that all possible edges exist. This is equivalent to not having a complete graph, as we can just consider missing edges in an incomplete graph as having infinite weight in a complete graph.
@@ -1059,7 +1058,7 @@ x_e > 0
 \quad \forall e = (a, b) \in E
 $$
 
-We also get a series of more less interesting implications, which are trivially true as their right-hand side is always true (because the original constraints already specified equality):
+We also get a series of less interesting implications, which are trivially true as their right-hand side is always true (because the original constraints already specified equality):
 
 $$
 \begin{align}
@@ -1151,7 +1150,7 @@ C -- D
 C -- F
 {% endgraph %}
 
-The thin edges have cost 1, and the thick red edge has cost 2. The Hungarian algorithm uses the [lemma from above](#lemma:min-cost-perfect-matching-and-dual-solution) to always keep a dual solution $y = (u, v)$ that is *feasible at all times*. For any fixed dual solution, the lemma tells us that the perfect matching can only contain **tight edges**, which are edges $e = (a, b)$ for which $u_a + v_b = c(e)$. 
+The thin black edges have cost 1, and the thick red edge has cost 2. The Hungarian algorithm uses the [lemma from above](#lemma:min-cost-perfect-matching-and-dual-solution) to always keep a dual solution $y = (u, v)$ that is *feasible at all times*. For any fixed dual solution, the lemma tells us that the perfect matching can only contain **tight edges**, which are edges $e = (a, b)$ for which $u_a + v_b = c(e)$. 
 
 The Hungarian algorithm initializes the vertex weights to the following trivial solutions:
 
@@ -1289,7 +1288,7 @@ u'_a = \begin{cases}
 \end{cases}
 \qquad
 v'_b = \begin{cases}
-    v_b + \epsilon & \text{if } b \in N(S) \\
+    v_b - \epsilon & \text{if } b \in N(S) \\
     v_b & \text{if } b \notin N(S) \\
 \end{cases}
 $$
@@ -1308,7 +1307,7 @@ $$
 This algorithm is $\bigO{n^3}$, but can more easily be implemented in $\bigO{n^4}$.
 
 ## Approximation algorithms
-Many optimization problems are NP-hard. Unless $P = NP$, there is no algorithm for these problems that have the following three properties:
+Many optimization problems are NP-hard. Unless P = NP, there is no algorithm for these problems that have the following three properties:
 
 1. Efficiency (polynomial time)
 2. Reliability (works for any input instance)
@@ -1423,7 +1422,9 @@ This allows us to give some guarantees on bounds: for instance, suppose $g=2$ an
 
 #### Integrality gap of Vertex Cover
 > claim "Vertex cover integrality gap"
-> The integrality gap for Vertex Cover for a graph of $n$ vertices is at least $2 - \frac{2}{n}$
+> Let $g$ be the integrality gap for the Vertex Cover problem on a graph of $n$ vertices.
+> 
+> $$g \ge 2 - \frac{2}{n}$$
 
 On a *complete* graph with $n$ vertices, we have $OPT = n - 1$ because if there are two vertices we don't choose, the edge between them isn't covered. 
 
@@ -1449,7 +1450,7 @@ Set cover is a generalization of vertex cover.
 - **Input**:
     + A universe of $n$ elements $\mathcal{U} = \set{e_1, e_2, \dots, e_n}$
     + A family of subsets $\mathcal{T} = \set{S_1, S_2, \dots, S_m}$
-    + A cost function $c: \mathcal{T} \mapsto \mathbb{R}_+$
+    + A cost function $c: \mathcal{T} \rightarrow \mathbb{R}_+$
 - **Output**: A collection $C \subseteq \mathcal{T}$ of subsets of minimum cost that cover all elements
 
 More formally, the constraint of $C$ is:
@@ -1496,11 +1497,13 @@ The algorithm gives each set $d$ chances to be picked. This randomness introduce
 
 As we'll see in the two following claims, we can bound both of them.
 
-> claim "Set Cover Claim 7"
+> claim "Expected cost in one execution"
 > The expected cost of all sets added in one execution of Step 3 is:
 > 
 > $$
-> \sum_{i=1}^m x_i^* \cdot c(S_i) = \text{LP}_{\text{OPT}}
+> \expect{c(C)} 
+> = \sum_{i=1}^m x_i^* \cdot c(S_i) 
+> = \text{LP}_{\text{OPT}}
 > $$
 
 For each set $S_i \in \mathcal{T}$, we let $Y_{S_i}$ be a random indicator variable telling us whether $S_i$ was picked to be in $C$:
@@ -1533,11 +1536,12 @@ $$
 
 From this, we can immediately derive the following corollary: 
 
-> corollary "Set Cover Corollary 8"
+> corollary "Expected cost in d execution"
 > The expected cost of $C$ after $d$ executions of Step 3 is at most:
 > 
 > $$
->     d \cdot \sum_{i=1}^m c(S_i)x_i^*
+> \expect{c(C)}
+> =   d \cdot \sum_{i=1}^m c(S_i)x_i^*
 > \le d \cdot \text{LP}_{\text{OPT}}
 > \le d \cdot \text{OPT}
 > $$
@@ -1546,7 +1550,7 @@ Note that $\text{LP}_{\text{OPT}} \le \text{OPT}$ because LP is a relaxation of 
 
 We also need to look into the other "bad event" of the solution not being feasible:
 
-> claim "Set Cover Claim 9"
+> claim "Probability of unsatisfied constraint"
 > The probability that a constraint is unsatisfied after a single execution is at most $\frac{1}{e}$.
 
 A constraint is unsatisfied if $\exists e \in \mathcal{U} : e$ is not covered by $C$. Suppose that the unsatisfied constraint contains $k$ variables:
@@ -1582,8 +1586,10 @@ To get a better bound, we could have our algorithm pick set $S_i$ with probabili
 
 Another technique to "boost" the probability of having a feasible solution is to run the loop $d$ times instead of once. In the following, we'll pick $d = c\cdot\ln(n)$ because it will enable us to get nice closed forms. But these proofs could be done for any other formulation of $d$.
 
-> claim "Set Cover claim 10"
-> The output $C$ after $d=c\cdot\ln(n)$ is a feasible solution with probability at least $1 - \frac{1}{n^{c-1}}$.
+> claim "Probability of feasible solution"
+> The output $C$ after $d=c\cdot\ln(n)$ executions is a feasible solution with probability at least:
+> 
+>  $$\prob{C \text{ feasible}} \ge 1 - \frac{1}{n^{c-1}}$$
 
 The probability that a given constraint $i$ is unsatisfied after $d$ executions of step 3 is at most:
 
@@ -1611,35 +1617,10 @@ $$
 
 At this point, we have an idea of the probabilities of the two "bad events": we have an expected value of the cost, and a bound of the probability of the solution not being feasible. Still, there might be a bad correlation between the two: maybe the feasible outputs have very high cost? Maybe all infeasible solutions have low cost? The following claim deals with that worry.
 
-> claim "Set Cover Claim 11"
+> claim "Probability of both good events"
 > The algorithm outputs a feasible solution of cost at most $4d\text{OPT}$ with probability greater that $\frac{1}{2}$.
 
-To prove this, we'll make use of Markov's inequality:
-
-> theorem "Markov's Inequality"
-> For a non-negative random variable $X$:
-> 
-> $$
-> \prob{X \ge c \expect{X}} \le \frac{1}{c}
-> $$
-
-This stems from:
-
-$$
-\begin{align}
-         & \prob{X \ge c} \cdot c \le \expect{X} \\
-\implies & \prob{X \ge c} \le \frac{\expect{X}}{c} \\
-\end{align}
-$$
-
-If we set $c = d\cdot\expect{X}$ we get:
-
-$$
-\prob{X \ge d\cdot\expect{X}} \le \frac{1}{d}
-\qed
-$$
-
-Now onto the proof of our claim: let $\mu$ be the expected cost, which by the corollary is $d\cdot\text{OPT}$. We can upper-bound the "bad event" of the cost being very bad: by Markov's inequality we have $\prob{\text{cost} > 4\mu} \le \frac{1}{4}$. We chose a factor $4$ here because this will give us a nice bound later on; we could pick any number to obtain another bound. We can also upper-bound the "bad event" of the solution being infeasible, which we know (thanks to claim 10) to be upper-bounded by $\frac{1}{n^{c-1}} \le \frac{1}{n}$ for $d = c\cdot\ln(n)$ iterations. By [union bound](https://en.wikipedia.org/wiki/Boole%27s_inequality), the probability that no bad event happens is at least $1 - \frac{1}{4} - \frac{1}{n}$. Supposing $n > 4$, this probability is indeed greater than $\frac{1}{2}$. $\qed$
+Let $\mu$ be the expected cost, which by the corollary is $d\cdot\text{OPT}$. We can upper-bound the "bad event" of the cost being very bad: by [Markov's inequality](#theorem:markov-s-inequality) we have $\prob{\text{cost} > 4\mu} \le \frac{1}{4}$. We chose a factor $4$ here because this will give us a nice bound later on; we could pick any number to obtain another bound. We can also upper-bound the "bad event" of the solution being infeasible, which we know (thanks to [the previous claim](#claim:probability-of-feasible-solution)) to be upper-bounded by $\frac{1}{n^{c-1}} \le \frac{1}{n}$ for $d = c\cdot\ln(n)$ iterations. By [union bound](https://en.wikipedia.org/wiki/Boole%27s_inequality), the probability that no bad event happens is at least $1 - \frac{1}{4} - \frac{1}{n}$. Supposing $n > 4$, this probability is indeed greater than $\frac{1}{2}$. $\qed$
 
 This claim tells us that choosing $d = c\cdot\ln(n)$, we have a $\bigO{\log n}$ approximation algorithm for the set cover problem.
 
@@ -1698,7 +1679,7 @@ $$
 
 Our strategy will be to bound $\Phi^{(T+1)}$ from below with expert $i$'s mistakes, and from above with WM's mistakes.
 
-For the lower bound, we can observe that:
+**Lower bound**: We can observe that:
 
 $$
 \Phi^{(T+1)} 
@@ -1709,7 +1690,7 @@ $$
 
 The inequality stems from the fact that all weights are always $\ge 0$.
 
-For the upper bound, let's start by observing the following: $\Phi^{(1)} = n$ as all weights are initialized to 1. Additionally, whenever WM errs, we halve the weights for experts representing at least half of the total weights (since we follow the weighted majority). This means that we loose at least $\frac{1}{4}$ of the total weight:
+**Upper bound:** let's start by observing the following: $\Phi^{(1)} = n$ as all weights are initialized to 1. Additionally, whenever WM errs, we halve the weights for experts representing at least half of the total weights (since we follow the weighted majority). This means that we loose at least $\frac{1}{4}$ of the total weight:
 
 $$
 \Phi^{(t+1)} \le \frac{3}{4}\Phi^{(t)}
@@ -1804,7 +1785,7 @@ An alternative strategy is the Multiplicative Weights Update (MWU) strategy, whi
 > Suppose $\epsilon \le 1$, and $\vec{p}^{(t)}$ is chosen by Hedge for $t \in [T]$. Then for any expert $i$:
 > 
 > $$
-> \expect{\text{final cost}} 
+> \expect{\text{final loss}} 
 > = \sum_{t=1}^T \vec{p}^{(t)} \cdot \vec{m}^{(t)}
 > \le
 > \sum_{t=1}^T m_i^{(t)} + \frac{\ln(n)}{\epsilon} + \epsilon T
@@ -1815,10 +1796,10 @@ Note that this inequality holds for any expert $i$, and in particular, for the b
 $$
 \underbrace{\sum_{t=1}^T \vec{p}^{(t)} \cdot \vec{m}^{(t)}}_{\text{our loss}}
 \le \underbrace{\sum_{t=1}^T m_i^{(t)}}_{\text{loss of best expert}}
-+   \underbrace{\frac{\ln(n)}{\epsilon} + \epsilon T}_{\text{small additive term}}
++   \underbrace{\frac{\ln(n)}{\epsilon} + \epsilon T}_{\text{external regret}}
 $$
 
-This means that Hedge does as well as the best expert, within a small additive term. Note that this small error is minimized to be $\bigO{\sqrt{T}}$ when $\epsilon = \sqrt{\frac{\ln(n)}{T}}$.
+This means that Hedge does as well as the best expert, within a small additive term, which is the external regret. Note that this small error is minimized to be $\bigO{\sqrt{T}}$ when $\epsilon = \sqrt{\frac{\ln(n)}{T}}$.
 
 Let's prove this theorem. Like before, our proof strategy will be to upper bound and lower bound the potential function $\Phi^{(t)}$.
 
@@ -1896,7 +1877,7 @@ $$
     \epsilon^2 - \epsilon \vec{p}^{(T)}\cdot\vec{m}^{(T)}
 \right) \\
 
-& \vdots \\
+& \ \vdots \\
 
 & \le \Phi^{(1)}\cdot \exp\left(
     \epsilon^2 T - \epsilon \sum_{t=1}^T \vec{p}^{(t)}\cdot\vec{m}^{(t)}
@@ -1933,7 +1914,7 @@ We get to the final result by dividing by $\epsilon$ and rearranging the terms. 
 
 From this, we can infer a corollary that will be useful for solving covering LPs. For these problems, it's useful to consider the *average cost* incurred per day. We will also generalize the cost vector so that it can take values in $[-\rho, \rho]^n$ instead of just $[-1, 1]^n$. This $\rho$ is called the **width**.
 
-> corollary "Corollary 3"
+> corollary "Long-term average regret"
 > Suppose $\epsilon \le 1$. For $t \in [T]$, let $\vec{p}^{(t)}$ be picked by Hedge, and assume the cost vectors are $\vec{m}^{(t)} \in [-\rho, \rho]^n$.
 > 
 > If $T \ge (4\rho^2 \ln n) / \epsilon^2$, then for any expert $i$:
@@ -2065,7 +2046,7 @@ $$
 \rho = \max_{1 \le i \le m} \set{max(b_i, A_i \vec{1} - b_i)}
 $$
 
-This means that $\rho \ge b_i$ and $\rho \ge \sum_j A_{ij} b_i$, $\forall i \in [n]$. By corollary 3, for $\epsilon \in [0, 1]$ and $T \ge (4\rho^2 \ln m) / \epsilon^2$, and for any constraint $i$, we have:
+This means that $\rho \ge b_i$ and $\rho \ge \sum_j A_{ij} b_i$, $\forall i \in [n]$. By [the corollary](#corollary:long-term-average-regret), for $\epsilon \in [0, 1]$ and $T \ge (4\rho^2 \ln m) / \epsilon^2$, and for any constraint $i$, we have:
 
 $$
 \frac{1}{T}\sum_{t=1}^T \vec{p}^{(t)} \cdot \vec{m}^{(t)}
@@ -2092,7 +2073,7 @@ $$
 \end{align}
 $$
 
-Note that $(*)$ is non-negative since we're working in a covering LP and because the oracle only outputs feasible solutions $x^{(t)}$, which allows us to conclude in the final step that the whole expression is non-negative. The inequality we derived from corollary 3 is therefore:
+Note that $(*)$ is non-negative since we're working in a covering LP and because the oracle only outputs feasible solutions $x^{(t)}$, which allows us to conclude in the final step that the whole expression is non-negative. The inequality we derived from [the corollary](#corollary:long-term-average-regret) is therefore:
 
 $$
 0 \le
@@ -2237,7 +2218,7 @@ Let $(S^\*, \bar{S^\*})$ be the optimal minimum cut of $G$, of size $k$. We'll w
 
 First, let's take a look at the probability that a single edge is in the optimal min-cut. This corresponds to the probability of the algorithm chose "the wrong edge" when picking uniformly at random: if it contracts an edge that should have been in $E(S^\*, \bar{S^\*})$, then it will not output the optimal solution.
 
-> claim "Karger Claim 1"
+> claim "Probability of picking an edge in the cut"
 > The probability that a uniformly random edge is in $E(S^\*, \bar{S^\*})$ is at most $2/n$
 
 Consider the first contraction of the algorithm (this is without loss of generality). Let $e$ be a uniformly random edge in $G$:
@@ -2278,14 +2259,14 @@ $$
 
 In the following, we'll need to use the following property of the algorithm:
 
-> claim "Karger Fact 2"
+> claim "Min-cut size does not decrease"
 > For any graph $G$, when we contract an edge $e$, the size of the minimum cut does not decrease.
 
 We won't prove this, but it seems intuitive. If $G'$ is a version of $G$ where $e$ has been contracted, then $\text{MINCUT}(G) \le \text{MINCUT}(G')$.
 
 Now, let's try to analyze the probability that the full algorithm returns the correct solution:
 
-> theorem "Karger Theorem 3"
+> theorem "Karger probability of success"
 > For any graph $G = (V, E)$ with $n$ nodes and a min-cut $(S^\*, \bar{S^\*})$, Karger's algorithm returns $(S^\*, \bar{S^\*})$ with probability at least $\frac{2}{n(n-1)} = 1 / {n \choose 2}$
 
 Let $A_i$ be the probability that the edge picked in step $i$ of the loop is not in $\mincutedges$. The algorithm succeeds in finding the min-cut $\mincut$ if $A_1, A_2, \dots, A_{n-2}$ all occur. By the chain rule, the probability of this is:
@@ -2335,10 +2316,12 @@ Finally, $(4)$ uses the definition of the binomial coefficient. $\qed$
 
 This leads us to the following corollary:
 
-> corollary "Karger Corollary 4"
+> corollary "Maximum number of min-cuts"
 > Any graph has at most $n \choose 2$ min-cuts.
 
 The proof for this is short and sweet: suppose that there is a graph $G$ that has more than $n \choose 2$ min-cuts. Then, for one of those cuts, the algorithm would find that exact cut with probability less that $1 / {n \choose 2}$, which is a contradiction. $\qed$
+
+An example of a graph with $n \choose 2$ min-cuts is a cycle. We can choose any two vertices, and define a min-cut of size 2 by letting $S$ be all the nodes between them.
 
 #### Boosting the probability of success
 The algorithm runs in $\bigO{n^2}$, but the probability of success is $\ge 1 {n \choose 2}$, which is $\bigO{1/n^2}$. As [we said above](#randomized-algorithms), we can "boost" this probability of success to $1 - 1/n$ by running the same algorithm a bunch of times. If we run it $\bigO{n^2 \log n}$ times, we can get a probability of success of $1 - 1/n$:
@@ -2383,25 +2366,84 @@ $$
 
 Using the [master theorem](/algorithms/#master-theorem) to solve this recursion, we find that the algorithm runs in $\bigO{n^2 \log n}$.
 
-> theorem "Karger-Stein Theorem 5"
-> The Karger-Stein algorithm finds a min-cut with probability at least $1 / 2\log n$.
+> theorem "Karger-Stein probability of success"
+> The Karger-Stein algorithm finds a min-cut with probability at least $\frac{1}{2\log_2 n}$.
 
-Proof todo $\qed$
+Suppose we have a graph $H$, which is a version of $G$ on which some contractions have been made. Suppose it has $r$ vertices, and let $(S^\*, \bar{S^\*})$ be a min-cut of $H$. Just as in [the proof of success probability of Karger](#theorem:theorem:karger-probability-of-success), the probability of not picking an edge in $(S^\*, \bar{S^\*})$ in any of the $r - \frac{2}{\sqrt{2}}$ steps of the loop is:
 
-We can boost this probability to $1 - 1/n$ by running the algorithm $\log^2 n$ times.
+$$
+\frac{r-2}{r} \cdot \frac{r-3}{r-1} \cdot \frac{r-4}{r-2}
+\cdot \dots \cdot
+\frac{r/\sqrt{2} - 2}{r/\sqrt{2}}
+\approx \frac{(r/\sqrt{2})^2}{r^2}
+= \frac{1}{2}
+$$
+
+As before, the terms of the fraction cancel out, and we're left with two terms $\approx r/\sqrt{2}$ in the numerator, and two terms $\approx r$ in the denominator, hence the above conclusion.
+
+As long as we don't contract an edge of $(S^\*, \bar{S^\*})$ in the loop, we're guaranteed success. We'll prove inductively that the probability of success is $\ge \frac{1}{2\log_2 n}$. 
+
+The algorithm calls itself recursively with $G_2$, the graph resulting from our $r - r/\sqrt{2}$ contractions on $H$.  Let $p$ be the probability of success on the recursive call on $G_2$. Our induction hypothesis is that the algorithm succeeds on $G_2$ with probability $\ge \frac{1}{2 \log_2 (n/\sqrt{2})}$. 
+
+The probability that either (or both) of the recursive calls succeeds is $p + p - p^2$ (because $\prob{A\cup B} = \prob{A} + \prob{B} - \prob{A \cap B}$, and because the two events are independent).
+
+The probability of the algorithm succeeding in $G$ is therefore that of not picking any edge in $(S^\*, \bar{S^\*})$, and of either of the recursive calls succeeding:
+
+$$
+\frac{1}{2}(p + p - p^2) = p - \frac{p^2}{2}
+$$
+
+To prove this theorem, we must show:
+
+$$
+p - \frac{p^2}{2} \ge \frac{1}{2 \log_2 n}
+$$
+
+Using the induction hypothesis, we have that $p = \frac{1}{2 \log_2 (n/\sqrt{2})}$ in the worst case. Plugging this into the above leaves us to prove:
+
+$$
+\frac{1}{2 \log_2(n/\sqrt{2})} - \frac{1}{8 \log_2(n/\sqrt{2})^2}
+\ge
+\frac{1}{2\log_2 n}
+$$
+
+Multiplying by 2 and rearranging the terms, we get:
+
+$$
+\frac{1}{\log_2(n/\sqrt{2})} - \frac{1}{\log_2 n}
+\ge
+\frac{1}{4 \log_2(n/\sqrt{2})^2}
+$$
+
+However, we can observe that:
+
+$$
+\begin{align}
+\frac{1}{\log_2(n/\sqrt{2})} - \frac{1}{\log_2 n}
+& = \frac{\log_2 n - \log_2(n/\sqrt{2})}{\log_2 n \log_2(n/\sqrt{2})} \\
+& = \frac{1/2}{\log_2 n \log_2(n/\sqrt{2})} \\
+& \ge \frac{1}{4\log_2(n/\sqrt{2})^2} \\
+\end{align}
+$$
+
+as desired. $\qed$
+
+We can run $\log^2 n$ independent copies of the algorithm to achieve a $1 - 1/n$ probability of success, in a total runtime of $\bigO{n^2\log^3 n}$.
 
 ## Polynomial identity testing
 Suppose that we're given two polynomials $p(x)$ and $q(x)$ of degree $d$. We only have access to an oracle that allows us to evaluate the polynomial, but not to see its definition. We'd like to know if $p$ and $q$ are identical, i.e. whether $p(x) - q(x) = 0$ for all inputs $x \in \mathbb{R}^d$.
 
-### Schwartz-Zippel
-The Schwartz-Zippel lemma tells us the following.
+### Schwartz-Zippel lemma
+For polynomials of a single variable, it's quite easy to test if it is zero. By the [fundamental theorem of algebra](https://en.wikipedia.org/wiki/Fundamental_theorem_of_algebra), a degree $d$ polynomial of a single variable has at most $d$ real roots. We can therefore test $d + 1$ roots. The polynomial is zero if all evaluations return 0.
 
-> lemma "Schwartz-Zippel Lemma"
+For the multivariate case, things aren't so simple. In fact, a multivariate polynomial may have infinitely many roots. However, not all hope is lost. The Schwartz-Zippel lemma tells us:
+
+> lemma "Schwartz-Zippel"
 > Let $p(x_1, \dots, x_n)$ be a **nonzero** polynomial of $n$ variables with degree $d$. Let $S \subseteq \mathbb{R}$ be a finite set, with at least $d$ elements in it. If we assign $x_1, \dots, x_n$ values from $S$ independently and uniformly at random, then:
 > 
 > $$
 > \prob{p(x_1, \dots, x_n) = 0} \le \frac{d}{\abs{S}} 
-> $$ 
+> $$
 
 #### Proof for one dimension
 Let's start by proving this for $d = 1$. We want to know whether $p(x) = q(x)$ for all inputs $x$. As we saw above, this is equivalent to answering whether $g(x) = p(x) - q(x) = 0$. When the polynomial is one-dimensional, we can write it as follows:
@@ -2426,7 +2468,7 @@ $$
 \prob{a_i x_i = c}
 $$
 
-There are $\abs{S}$ choices for $x_i$, and at most one satisfies $a_i x_1 = c$, so the final result is:
+There are $\abs{S}$ choices for $x_i$, and at most one satisfies $a_i x_i = c$, so the final result is:
 
 $$
 \prob{g(x_1, \dots, x_n) = 0}
@@ -2437,10 +2479,64 @@ $$
 $$
 
 #### General proof
-Todo.
+We proceed by strong induction.
 
-#### Matrix identity
-We can use this for identity testing of matrices too; suppose we are given three $n\times n$ matrices $A, B, C$. We'd like to test whether $AB = C$. Matrix multiplication is expensive ($\bigO{n^3}$ or [slightly less](/algorithms/#strassens-algorithm-for-matrix-multiplication)). Instead, we can use the Schwartz-Zippel:
+**Base case**: $n = 1$, which is the univariate case, which we talked about above. The fundamental theorem of algebra proves this case.
+
+**Inductive step**: Suppose that the lemma holds for any polynomial with less than $n$ variables. We need to show that it also holds for $n$.
+
+Fix $x_1, \dots, x_{n-1}$ arbitrarily. All values in $p(x_1, \dots, x_n)$ are known except $x_n$, so $p$ becomes a univariate of $x_n$ of degree $\le d$. 
+
+We've reduced it to the univariate case again, but this is actually not enough. An adversary could select $x_1, \dots, x_{n-1}$ such that the resulting polynomial is 0, despite $p$ being nonzero. To salvage the argument, we must prove that this adversarial scenario is rare. We'll need to make use of long division for this.
+
+> definition "Long division for polynomials"
+> Let $p(x)$ be a polynomial of degree $d$ and $d(x)$ be the polynomial with degree $k \le d$. Then we can write $p(x)$ as:
+> 
+> $$
+> p(x) = d(x) q(x) + r(x)
+> $$
+> 
+> Where the **quotient** $q(x)$ has degree at most $d-k$, the **remainder** $r(x)$ has degree at most $k - 1$. The polynomial $d(x)$ is the **divisor**.
+
+Let $k$ be the largest degree of $x_n$ in all monomials in $p$. This means $p$ can be "long divided" by $x_n$ as follows:
+
+$$
+p(x_1, \dots, x_n) = x_n^k q(x_1,\dots, x_{n-1}) + r(x_1, \dots, x_n)
+$$
+
+Using the principle of deferred decision, we assign values to $x_1, \dots, x_{n-1}$ uniformly at random from $S$. We save the randomness of $x_n$ for later use. Under our induction hypothesis, we have:
+
+$$
+\mathbb{P}_{x_1, \dots x_{n-1} \overset{\text{i.i.d}}{\sim} S} \left[
+    q(x_1, \dots, x_{n-1}) = 0
+\right]
+\le \frac{d-k}{\abs{S}}
+$$
+
+If $q$ is nonzero, then it follows from the formulation of the long division that $p$ is a univariate polynomial in $x_n$, as the coefficient of $x_n^k$ is nonzero. We therefore have:
+
+$$
+\mathbb{P}_{x_n \sim S}\left[p = 0 \mid q \ne 0\right] 
+\le \frac{k}{\abs{S}}
+$$
+
+Using these two probabilities, by Bayes rule, we have:
+
+$$
+\begin{align}
+\prob{p = 0}
+& = \prob{p = 0 \mid q = 0} \cdot \prob{q = 0}
+  + \prob{p = 0 \mid q \ne 0} \cdot \prob{q \ne 0} \\
+& \le 1 \cdot \prob{q = 0} + \prob{p = 0 \mid q \ne 0} \\
+& \le \frac{d-k}{\abs{S}} + \frac{k}{\abs{S}} \\
+& = \frac{d}{\abs{S}}
+\end{align}
+$$
+
+Note that in the second step, we don't need to know $\prob{q \ne 0}$, we just upper-bound it by 1. $\qed$
+
+### Matrix identity
+We can use Schwartz-Zippel for identity testing of matrices too; suppose we are given three $n\times n$ matrices $A, B, C$. We'd like to test whether $AB = C$. Matrix multiplication is expensive ($\bigO{n^3}$ or [slightly less](/algorithms/#strassens-algorithm-for-matrix-multiplication)). Instead, we can use the Schwartz-Zippel:
 
 > theorem "Schwartz-Zippel for matrices"
 > If $AB \ne C$ then:
@@ -2451,11 +2547,32 @@ We can use this for identity testing of matrices too; suppose we are given three
 > \right] \ge 1 - \frac{1}{\abs{S}}
 > $$
 
-Rather than infer it from Schwartz-Lippel, we'll give a direct proof of this.
+Rather than infer it from Schwartz-Zippel, we'll give a direct proof of this. Let's write $AB$ and $C$ as row vectors:
 
-### Perfect matching
-### Adjacency matrix
-Let $G = (A \cup B, E)$ be a $n\times n$ bipartite graph.We can represent the graph as a $n\times n$ adjacency matrix having an entry if nodes are connected by an edge:
+$$
+\newcommand{\horzbar}{\rule[.5ex]{2.5ex}{0.5pt}}
+AB = \begin{bmatrix}
+\horzbar & a_1    & \horzbar \\
+         & \vdots &          \\
+\horzbar & a_n    & \horzbar \\
+\end{bmatrix}, \quad
+C = \begin{bmatrix}
+\horzbar & c_1    & \horzbar \\
+         & \vdots &          \\
+\horzbar & c_n    & \horzbar \\
+\end{bmatrix}
+$$
+
+If $AB \ne C$ then there exists at least one row $i$ where $a_i \ne c_i$. The inner products $\inner{a_i, x}$ and $\inner{c_i, x}$ are likely different:
+
+$$
+\prob{\inner{a_i, x} \ne \inner{c_i, x}} \ge 1 - \frac{1}{\abs{S}}
+$$
+
+This follows from the [proof for one dimension](#proof-for-one-dimension), as $\inner{a_i, x}$ and $\inner{c_i, x}$ are degree 1 polynomials of variables $x_1, \dots, x_n$.
+
+### Bipartite perfect matching
+Let $G = (A \cup B, E)$ be a $n\times n$ bipartite graph. We can represent the graph as a $n\times n$ adjacency matrix having an entry if nodes are connected by an edge:
 
 $$
 A_{ij} = \begin{cases}
@@ -2495,16 +2612,51 @@ x_{ab} & 0      & 0      \\
 \end{bmatrix}
 $$
 
-#### Bipartite graphs
 We have a nice theorem on this adjacency matrix:
 
 > theorem "Perfect Matching and Determinant"
 > A graph $G$ has a perfect matching **if and only if** the determinant $\det(A)$ is not identical to zero.
 
-Proof todo
+Let's first prove the $\Rightarrow$ direction. Suppose $G$ has a perfect matching, i.e. a bijection $f$ mapping every $a \in A$ to a unique $b \in B$. We can see $f$ as a permutation on the set of integers $[n]$. 
+
+$$
+\prod_{i=1}^n A_{i, f(i)}
+$$
+
+This is one term (monomial) of the polynomial $\det(A)$. One way to define the determinant is by summing over all possible permutations $\sigma$:
+
+$$
+\det(A) 
+= \sum_{\sigma: [n]\rightarrow [n]} \text{sgn}(\sigma)
+  \prod_{i=1}^n A_{i, \sigma(i)}
+$$
+
+The sign of a permutation is the number of swaps needed to order it[^mind-blowing-fact][^not-important].
+
+[^mind-blowing-fact]: No matter the sort algorithm, the parity of the number of swaps to sort is always the same 🤯
+
+[^not-important]: This is not hugely important for the following discussion, so you can safely disregard it if it doesn't make a lot of sense. Just understand that some terms may cancel out because of the sign of the permutation.
+
+In particular, when $\sigma = f$ in the sum (we sum over all possible permutations, so we're guaranteed to get this case), we get a monomial with non-zero coefficient (we know that $A_{i, f(i)}$ is non-zero as $f$ describes edges, so there's a variable in that location of the matrix). This monomial is different from all other monomials in $A$, there are no cancellations. This means $\det(A)$ is non-zero.
+
+Now, onto the $\Leftarrow$ direction. Suppose $\det(A)$ is non-zero. Therefore, using the above definition of determinant, there is some permutation $\sigma$ for which all terms $A_{i, \sigma(i)}$ are non-zero. Since $\sigma$ is a bijection, this indicates a perfect matching. $\qed$
+
+However, this algorithm doesn't give us the matching, it only tells us whether we have one. To fix this, we can run the following procedure. We pick a big set $\abs{S} \gg n$ and set $x_{ij} = 2^{w_{ij}}$ where $w_{ij}$ is chosen independently and uniformly at random in $S$. With high probability, there is a *unique* minimum weight perfect matching[^mulmuley-et-al], call it $M$. We won't prove it here, but we can write the determinant in the following form to reveal $M$:
+
+[^mulmuley-et-al]: See the isolation lemma from the 1987 paper ["Matching is as easy as a matrix inversion"](https://people.eecs.berkeley.edu/~vazirani/pubs/matching.pdf) by Mulmuley, Vazirani and Vazirani.
+
+$$
+\det(A) = 2^{w(M)} (\pm 1 + \text{even number})
+$$
+
+The $\pm 1$ ensures that the term $2^{w(M)}$ exists in the sum, and the even number ensures that it is the smallest (i.e. that all other powers of 2 in the determinant can be divided by $2^{w(M)}$).
+
+With this in hand, for every edge $(i, j)$ in $G$ we can check whether it is part of $M$ by deleting the edge, compute the determinant as above, and see whether the newly found $w(M')$ is equal to $w(M) - w_{ij}$. If yes, then $(i, j) \in M$, otherwise not.
+
+This algorithm can be implemented in $\bigO{\text{polylog}(n)}$ using polynomial parallelism.
 
 #### General graphs
-This result actually generalizes to general graphs, though the proof is much more difficult. If we construct the following matrix (called the skew-symmetric matrix, or Tutte matrix):
+This result actually generalizes to general graphs, though the proof is much more difficult. For general graphs, we must construct the following matrix $A$ (called the skew-symmetric matrix, or Tutte matrix) instead of the adjacency matrix.
 
 $$
 A_{ij} = \begin{cases}
@@ -2514,11 +2666,6 @@ x_{ij}  & \text{if } (v_i, v_j) \in E, \text{ and } i < j \\
 \end{cases}
 $$
 
-> theorem "General Graph Matching"
-> Graph $G$ has a perfect matching **if and only if** $\det(A)$ is not identical to zero.
-
-
-Todo finish lecture 12
 
 ## Sampling and Concentration Inequalities
 For this chapter, suppose that there is an unknown distribution $D$, and that we draw independent samples $X_1, X_2, \dots, X_n$ from $D$ and return the mean:
@@ -2621,8 +2768,9 @@ Taking the square root on both sides yields:
 
 $$
 \prob{\abs{X - \expect{X}} \ge \epsilon} \ge \frac{\var{X}}{\epsilon^2}
-\qed
 $$
+
+Taking $\epsilon = k\sigma$, where $\sigma = \sqrt{\var{X}}$ trivially gives us the equivalent formulation. $\qed$
 
 ### Polling
 We can use Chebyshev's inequality to answer the question we raised in the beginning of this section, namely of estimating a mean $\mu$ using independent samples of the distribution $D$.
@@ -2669,7 +2817,19 @@ $$
 \end{align}
 $$
 
-In step $(1)$ we used pairwise independence. $\qed$
+In step $(1)$ we used pairwise independence as follows:
+
+$$
+\expect{X_i \cdot X_j} = \begin{cases}
+\expect{X_i}\cdot\expect{X_j} & \text{if } i \ne j \\
+\expect{X_i^2} & \text{if } i = j \\
+\end{cases}
+$$
+
+This means that the terms where $i \ne j$ cancel out with the subtracted sum. We are thus left with terms where $i = j$ after step $(1)$.
+
+$\qed$
+
 
 Going back the polling example, we use the above lemma. Since the samples are independent, they're also pairwise independent, so by the lemma:
 
@@ -2863,7 +3023,7 @@ $$
 = 1 + \frac{\abs{S} - 1}{N}
 $$
 
-Usually we'll choose $N > \abs{S}$, in which case we expect less than 2 collisions.
+Usually we'll choose $N > \abs{S}$, in which case we expect less than one collision (so 2 items in the linked list).
 
 The last step in the above uses our assumption that if we choose a function $h$ uniformly at random in $\mathcal{H}$, then a given value hashes to a uniformly random location in the table. This means that for a value $x$:
 
@@ -3003,7 +3163,7 @@ Intuitively, a collection of events is $k$-wise independent if any subset of $k$
 > A family $\mathcal{H}$ of has functions is $k$-wise independent if for any $k$ distinct elements $(x_1, \dots, x_k) \in U^k$ and any numbers $(u_1, \dots, u_k)$ we have:
 > 
 > $$
-> \mathcal{P}_{h\in\mathcal{H}}\left[
+> \mathbb{P}_{h\in\mathcal{H}}\left[
 >   h(x_1) = u_1 \land \dots \land h(x_k) = u_k
 > \right] = \left(
 >   \frac{1}{\abs{U}}
@@ -3034,7 +3194,7 @@ We can adapt the [discussion on 2-universality](#2-universal-hash-families) to p
 > We say that $\mathcal{H}$ is 2-wise independent if for any $x \ne y$ and any pair of $s, t \in [N]$,
 > 
 > $$
-> \mathcal{P}_{h\in\mathcal{H}}\left[h(x) = s \land h(y) = t\right]
+> \mathbb{P}_{h\in\mathcal{H}}\left[h(x) = s \land h(y) = t\right]
 > = \frac{1}{N^2}
 > $$
 
@@ -3044,7 +3204,7 @@ Note that 2-wise independence implies 1-wise independence.
 > We say that $\mathcal{H}$ is 1-wise independent if for any $x\in U$ and any pair of $s \in [N]$,
 > 
 > $$
-> \mathcal{P}_{h\in\mathcal{H}}\left[h(x) = s\right]
+> \mathbb{P}_{h\in\mathcal{H}}\left[h(x) = s\right]
 > = \frac{1}{N}
 > $$
 
@@ -3286,14 +3446,14 @@ $$
 \end{align}
 $$
 
-Step $(2)$ uses the fact that $X_{j, r}$ is an indicator variable that is either 0 or 1, so $X_{j, r}^2 = X_{j, r}^2$. Step $(1)$ uses pairwise independence as follows:
+Step $(2)$ uses the fact that $X_{j, r}$ is an indicator variable that is either 0 or 1, so $X_{j, r}^2 = X_{j, r}$. Step $(1)$ uses pairwise independence as follows:
 
 $$
 \sum_{j, j' : j \ne j'} \expect{X_{j, r} X_{j', r}}
 = \sum_{j, j' : j \ne j'} \expect{X_{j, r}}\expect{X_{j', r}}
 $$
 
-Applying this in the left-hand side of $(1)$ cancels out the $X_{j, r}$ and $X_{j', r}$ where $j \ne j'$, as those terms are subtracted by sum of expectations.
+Applying this in the left-hand side of $(1)$ cancels out the $X_{j, r}$ and $X_{j', r}$ where $j \ne j'$, as those terms are subtracted by sum of expectations. Note that this is exactly the same argument as in [our proof of the lemma on the variance of a sum](#lemma:variance-of-a-sum).
 
 By using Markov's inequality, we get:
 
@@ -4166,7 +4326,7 @@ a_i + b_i
 & = f(X_{i-1}\cup\set{u_i}) - f(X_{i-1}) 
   + f(Y_{i-1}\setminus\set{u_i}) - f(Y_{i-1}) \\
 & = f(X_{i-1}\cup\set{u_i}) + f(Y_{i-1}\setminus\set{u_i}) 
-  - \left(f(X_{i-1}) + f(Y_{i-1})\right \\
+  - \left(f(X_{i-1}) + f(Y_{i-1})\right) \\
 & \ge 0
 \end{align}
 $$
