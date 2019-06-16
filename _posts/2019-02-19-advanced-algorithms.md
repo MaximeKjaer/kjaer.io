@@ -4456,3 +4456,226 @@ $$
 
 We want to maximize the above. For large enough $r$, this is at $r = \frac{n}{e}$, which gives us a probability of selecting the best candidate of at least $\frac{1}{e}$, which is optimal!
 
+## Spectral Graph Theory
+In spectral graph theory, we look at the eigenvectors and eigenvalues of the (normalized) adjacency matrix of a graph.
+
+### Adjacency matrix
+> definition "Adjacency matrix"
+> The adjacency matrix $A$ of a graph $G = (V, E)$ of $n = \abs{V}$ vertices is a $\mathbb{R}^{n\times n}$ matrix defined by:
+> 
+> $$
+> A_{ij} = \begin{cases}
+> 1 & \text{if } \set{i, j} \in E \\
+> 0 & \text{otherwise} \\
+> \end{cases}
+> $$
+> 
+> for every pair $i, j \in V$
+
+For this course, we'll assume without loss of generality that all graphs are $d$-regular (all vertices have $d$ edges, degree $d$). This will greatly simplify notation.
+
+> definition "Normalized adjacency matrix"
+> The normalized adjacency matrix $M$ of a $d$-regular graph is $\frac{1}{d}A$, where $A$ is the adjacency matrix.
+> 
+> $$
+> D_{ij} = \begin{cases}
+> \frac{1}{d} & \text{if } \set{i, j} \in E \\
+> 0 & \text{otherwise} \\
+> \end{cases}
+> $$
+
+This matrix $M$ is also called the *random walk matrix* of the graph. To see why, consider the following graph:
+
+{% graph %}
+bgcolor="transparent"
+A -- B -- C -- D -- A
+{% endgraph %}
+
+The normalized adjacency matrix will look like this:
+
+$$
+M = \begin{bmatrix}
+0           & \frac{1}{2} & 0           & \frac{1}{2} \\
+\frac{1}{2} & 0           & \frac{1}{2} & 0           \\
+0           & \frac{1}{2} & 0           & \frac{1}{2} \\
+\frac{1}{2} & 0           & \frac{1}{2} & 0           \\
+\end{bmatrix}
+$$
+
+Consider that we currently stand at $A$. Our position can be summarized by the following position:
+
+$$
+p = \begin{bmatrix}
+1 \\ 0 \\ 0 \\ 0 \\
+\end{bmatrix}
+$$
+
+Notice now that $Mp$ is the probability distribution of our position after a single step:
+
+$$
+Mp = \begin{bmatrix}
+0 \\ \frac{1}{2} \\ 0 \\ \frac{1}{2} \\
+\end{bmatrix}
+$$
+
+More generally, $M^k p$ is the probability distribution after $k$ steps.
+
+### Eigenvalues and eigenvectors
+> definition "Eigenvalues and eigenvectors"
+> A vector $v$ is an eigenvector of a matrix $M$, with eigenvalue $\lambda$, if:
+> 
+> $$
+> Mv = \lambda v
+> $$
+
+We'll state the following as a fact of linear algebra. We can use this because our normalized adjacency matrix $M$ is real and symmetric.
+
+> lemma "Eigenvalues"
+> If $M \in \mathbb{R}^{n \times n}$ is symmetric, then:
+> 
+> 1. $M$ has $n$ non-necessarily distinct real eigenvalues $\lambda_1 \ge \lambda_2 \ge \dots \ge \lambda_n$
+> 2. If $v_1, v_2, \dots, v_{i-1}$ are eigenvectors for $\lambda_1, \lambda_2, \dots, \lambda_{i-1}$ then $\exists v_i : Mv_i = \lambda_i$. If there are multiple vectors satisfying the above, then any such vector $v_i$ can be selected to be the eigenvector corresponding to $\lambda_i$.
+
+The second point in particular means that we can always find an orthonormal basis, corresponding to the eigenvectors.
+
+### Relating eigenvalues to graph properties
+Let's state the following observation without proof. This will be very important for the rest of this section.
+
+> lemma "Observation on product with normalized adjacency matrix"
+> Consider a vector $x \in \mathbb{R}^n$, which assigns a value $x(i)$ to each vertex $i \in V$. Let $y = Mx$, where $M$ is the normalized adjacency matrix of a graph $G=(V, E)$. Then:
+> 
+> $$
+> y(i) = \sum_{\set{i, j}\in E} \frac{x(j)}{d}
+> $$
+
+That is, the value that $y$ assigns to a vertex $i$ is the average of the value assigned to the neighbors. Using this observation, we can prove the following properties:
+
+> lemma "Eigenvalues and graph properties"
+> Let $M$ be the normalized adjacency matrix of a $d$-regular graph $G$ and let $\lambda_1 \ge \lambda_2 \ge \dots \ge \lambda_n$ be its eigenvalues. Then:
+> 
+> 1. $\lambda_1 = 1$
+> 2. $\lambda_2 = 1 \iff G$ is disconnected
+> 3. $\lambda_n = -1 \iff$ one component of $G$ is bipartite
+
+Let's prove these properties.
+
+#### Proof of 1
+We'll prove this in two steps: $\lambda_1 \ge 1$ and $\lambda_1 \le 1$.
+
+Since $M\vec{1} = 1\times\vec{1}$, $1$ is an eigenvalue, and since $\lambda_1$ is the greatest eigenvalue, $\lambda_1 \ge 1$
+
+Additionally, we consider any eigenvector $x$ and vertex $i \in V$ such that $x(i)$ is maximized. We let $y = Mx$. Then, by [our observation](lemma:observation-on-product-with-normalized-adjacency-matrix)
+
+$$
+\begin{align}
+y(i) 
+& =   \sum_{\set{i, j} \in E} \frac{x(j)}{d} \\
+& \le \sum_{\set{i, j} \in E} \frac{x(i)}{d} \\
+& = x(i)
+\end{align}
+$$
+
+The inequality follows from the fact that $x(i)$ is the maximal value in the vector $x$. From this inequality $y(i) \le x(i)$, we conclude that $\lambda_1 \le 1$ (as $y = Mx = \lambda x$ since we considered $x$ to be an eigenvector). $\qed$
+
+This proof not only tells us that $\lambda_1 = 1$, but also that we can select $v_1 = \vec{1}$, which we will do from now on.
+
+#### Proof of 2
+We will show that there is a vector $v_2 \perp v_1$ such that $Mv_2 = v_2$ iff $G$ is disconnected.
+
+Let's start with the $\Leftarrow$ direction. Suppose $G$ is disconnected. This means that there is a subset $S \subset V$ of vertices that are not connect to vertices in $V \setminus S$. Let $v_2$ be defined by:
+
+$$
+v_2(i) = \begin{cases}
+\frac{1}{\abs{S}} & \text{if } i \in S \\
+-\frac{1}{\abs{V\setminus S}} & \text{if } i \in V\setminus S \\
+\end{cases}
+$$
+
+Notice that $v_2 \perp v_1$, where $v_1 = \vec{1}$. We now show $Mv_2 = v_2$. To do so, we fix an $i \in V$, and let $y = Mv_2$:
+
+$$
+y(i) = \frac{1}{d}\sum_{\set{i, j} \in E} v_2(j)
+     = \frac{1}{d}\sum_{\set{i, j} \in E} v_2(i)
+     = v_2(i)
+$$
+
+The first step uses [the observation we previously noted](lemma:observation-on-product-with-normalized-adjacency-matrix). The second uses the fact that every neighbor $j$ of $i$ has $v_2(j) = v_2(i)$, by the definition we gave of $v_2$ (wherein vertices only have different values when they are not neighbors).
+
+This shows that $\lambda_2 = 1$ if $G$ is disconnected.
+
+Now, let's prove the $\Rightarrow$ direction. We'll prove the contrapositive, so suppose that $G$ is connected. Let $v_2$ be an eigenvector corresponding to the second eigenvalue $\lambda_2$. We have $v_2 \perp v_1$. We must now show $\lambda_2 < 1$.
+
+Since $v_2 \perp v_1$ where $v_1 = \vec{1}$, $v_2$ cannot assign the same value to all vertices. Therefore, as $G$ is connected, there must be a vertex $i$ that has at least one neighbor $j$ for which $v_2(i) \ne v_2(j)$. Select such a vertex that maximizes $v_2(i)$. By selection of $i$ we have:
+
+$$v_2(i) \ge v_2(j), \quad \forall\set{i, j}\in E$$
+
+Since $v_2$ doesn't have the same value for all vertices, for at least one neighbor $j^\*$ of $j$, we have $v_2(i) > v_2(j^\*)$. Again, we let $y = Mv_2$. It follows that
+
+$$
+\begin{align}
+y(i)
+= \frac{1}{d}\sum_{\set{i, j} \in E} v_2(j)
+\le \frac{1}{d}\left(\sum_{\set{i, j} \in E : j \ne j^*}
+    v_2(i) + v_2(j^*)
+\right)
+\le v_2(i)
+\end{align}
+$$
+
+It follows that $\lambda_2 < 1$. Since we were proving the contrapositive, this successfully proves the $\Rightarrow$ direction. $\qed$
+
+#### Proof of 3
+Todo exercise 11.4.
+
+### Mixing time of random walks
+### Conductance
+> definition "Conductance"
+> Let $G = (V, E)$ be a $d$-regular graph with $n = \abs{V}$ vertices. We define the conductance $h(S)$ of a cut $S \subseteq V$:
+> 
+> $$
+> h(S) = \frac{\abs{\delta(S)}}{d\cdot\min\set{\abs{S}, \abs{S\setminus V}}}
+> $$
+> 
+> where $\delta(S)$ denotes the set of edges crossing the cut. We also define the conductance of the graph $G$:
+> 
+> $$
+> h(G) = \min_{S\subset V : S \ne \emptyset} h(S)
+> $$
+
+In other words, the conductance of a cut is the number of edges crossing the cut, divided by the number of edges that *could* cross the cut (if the smaller component's vertices all used their $d$ edges to cross the cut, and not internally).
+
+The conductance of the graph is that of the cut with the smallest conductance.
+
+### Cheeger's inequalities
+Note that a disconnected graph has conductance 0, and that a fully connected graph has conductance 1. Indeed, the conductance is closely related to $\lambda_2$. Cheeger's inequalities give us a quantified version of the fact that $\lambda_2 = 1 \iff G$ is disconnected:
+
+> theorem "Cheeger's inequalities"
+> $$
+> \frac{1 - \lambda_2}{2} \le h(G) \le \sqrt{2(1 - \lambda_2)}
+> $$
+
+### Spectral partitioning algorithm
+The spectral partitioning algorithm outputs a cut that cuts relatively few edges, with a small conductance.
+
+{% highlight python linenos %}
+def spectral_partitioning(G, v2):
+    """
+    Input   G   graph G = (V, E)
+            v2  second eigenvector of the normalized adjacency matrix
+
+    Output  S   cut with low conductance
+    """
+    # Sort vertices in non-decreasing order of values in v2:
+    vertices = sorted(V, key = lambda v: v2[v], reverse = True)
+    
+    # Find prefix cut of smallest conductance:
+    minimum = 1
+    best_cut = []
+    for i in range(len(vertices)):
+        cut = vertices[:i]
+        if h(cut) < minimum:
+            minimum = h(cut)
+            best_cut = cut
+    return best_cut
+{% endhighlight %}
+
