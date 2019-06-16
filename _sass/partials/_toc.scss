@@ -11,6 +11,7 @@
 	display: inline-block;
 	background-color: lighten($light-grey, 10%);
 
+	// Print styles:
 	page-break-after: always;
 	@media print {
 		background: none;
@@ -33,6 +34,7 @@
 		}
 	}
 
+	// Number sections in table of contents:
 	&, ul {
 		counter-reset: section;
 		list-style: none;
@@ -45,6 +47,25 @@
 	li::before {
 		padding-right: 0.4em;
 		counter-increment: section;
-		content: counters(section, ".")" ";
+		content: counters(section, ".")". ";
+	}
+
+	// Number h1 through h6 if a #markdown-toc is present:
+	@for $i from 1 through 6 {
+		~ h#{$i} {
+			@if $i > 1 {
+				counter-increment: h#{$i}counter;
+				$numbering: "";
+				@for $j from 2 through $i {
+					$numbering: $numbering counter(h#{$j}counter) ".";
+				}
+				&:before {
+					content: $numbering $nbsp;
+				}
+			}
+			@if $i < 6 {
+				counter-reset: h#{$i + 1}counter;
+			}
+		}
 	}
 }
