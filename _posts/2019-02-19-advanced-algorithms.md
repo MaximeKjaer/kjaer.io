@@ -21,6 +21,7 @@ $$
 \newcommand{\stream}[1]{\left\langle#1\right\rangle}
 \newcommand{\inner}[1]{\left\langle#1\right\rangle}
 \newcommand{\bigO}[1]{\mathcal{O}\left(#1\right)}
+\newcommand{\smallO}[1]{\mathcal{o}\left(#1\right)}
 \newcommand{\vec}[1]{\mathbf{#1}}
 \newcommand{\expect}[1]{\mathbb{E}\left[#1\right]}
 \newcommand{\prob}[1]{\mathbb{P}\left[#1\right]}
@@ -2668,14 +2669,14 @@ $$
 
 
 ## Sampling and Concentration Inequalities
-For this chapter, suppose that there is an unknown distribution $D$, and that we draw independent samples $X_1, X_2, \dots, X_n$ from $D$ and return the mean:
+### Law of large numbers
+Suppose that there is an unknown distribution $D$, and that we draw independent samples $X_1, X_2, \dots, X_n$ from $D$ and return the mean:
 
 $$
 X = \frac{1}{n} \sum_{i=1}^n X_i
 $$
 
 The law of large numbers tells us that as $n$ goes to infinity, the empirical average $X$ converges to the mean $\expect{X}$. In this chapter, we address the question of how large $n$ should be to get an $\epsilon$-additive error in our empirical measure.
-
 
 ### Markov's inequality
 Consider the following simple example. Suppose that the average Swiss salary is 6000 CHF per month. What fraction of the working population receives at most 8000 CHF per month?
@@ -2697,7 +2698,7 @@ Markov's inequality tells us about this worst-case scenario. It allows us to giv
 > \prob{X \ge k} \le \frac{\expect{X}}{k}
 > $$
 
-In the salary example, $X$ denotes the average salary. We know that $\expect{X} = 6000$ and $k = \frac{4}{3}$. 
+In the salary example, $X$ denotes the average salary. We know that $\expect{X} = 6000$; we want to look at the probability that $X \ge 8000$, which we can write as $X \ge k\cdot\expect{X}$ for $k = \frac{4}{3}$. This confirms what we said above. The probability that the salary $X$ is at most $8000$ is at most $\frac{1}{k} = \frac{3}{4}$.
 
 The proof can be stated in a single line:
 
@@ -2761,7 +2762,8 @@ $$
 In other words:
 
 $$
-\prob{\abs{X - \epsilon{X}}^2 \ge \epsilon^2} \ge \frac{\var{X}}{\epsilon^2}
+\prob{\abs{X - \expect{X}}^2 \ge \epsilon^2} 
+\ge \frac{\var{X}}{\epsilon^2}
 $$
 
 Taking the square root on both sides yields:
@@ -3375,7 +3377,7 @@ $$
 = \frac{1}{r}
 $$
 
-Therefore, if we have $r$ distinct numbers, we expect at least one  number $j$ to have $\text{zeros}(h(j)) \ge \log r$.
+Therefore, if we have $r$ distinct numbers, we expect at least one  number $j$ to have $\text{zeros}(h(j)) \ge \log_2 r$.
 
 With this intuition in mind, the algorithm is:
 
@@ -3442,7 +3444,7 @@ $$
   \right) \\
 & \le \sum_{j : f_j > 0} \expect{X_{r, j}^2} \\
 & \overset{(2)}{=} \sum_{j : f_j > 0} \expect{X_{r, j}}
-= \frac{d}{2r}
+= \frac{d}{2^r}
 \end{align}
 $$
 
@@ -3453,7 +3455,7 @@ $$
 = \sum_{j, j' : j \ne j'} \expect{X_{j, r}}\expect{X_{j', r}}
 $$
 
-Applying this in the left-hand side of $(1)$ cancels out the $X_{j, r}$ and $X_{j', r}$ where $j \ne j'$, as those terms are subtracted by sum of expectations. Note that this is exactly the same argument as in [our proof of the lemma on the variance of a sum](#lemma:variance-of-a-sum).
+Applying this in the left-hand side of $(1)$ cancels out the $X_{j, r}$ and $X_{j', r}$ where $j \ne j'$, as those terms are subtracted by sum of expectations. We're left only with terms where $j=j'$, which is why we can rewrite the sum to only sum over $j$ instead of over $j$ and $j'$. Note that this is exactly the same argument as in [our proof of the lemma on the variance of a sum](#lemma:variance-of-a-sum).
 
 By using Markov's inequality, we get:
 
@@ -3503,7 +3505,7 @@ This gives us failure bounds on both sides of $\frac{\sqrt{2}}{3}$, which is qui
 #### Median trick
 If we run $k$ copies of the above algorithm in parallel, using mutually independent random hash functions, we can output the median of the $k$ answers.
 
-If this median exceeds $3d$ then $k/2$ individual answers must exceed $3d$. We can expect $\le k\sqrt{\sqrt{2}}{3}$ of them to exceed $3d$, so by the Chernoff bounds, the probability of this event is $\le 2^{-\Omega(k)}$. This works similarly for the lower bound.
+If this median exceeds $3d$ then $k/2$ individual answers must exceed $3d$. We can expect $\le k\frac{\sqrt{2}}{3}$ of them to exceed $3d$, so by the Chernoff bounds, the probability of this event is $\le 2^{-\Omega(k)}$. This works similarly for the lower bound.
 
 If we choose $k = \Theta(\log(1 - \delta))$ we can get to a probability of success of $\delta$. This means increasing total memory to $\bigO{\log(1 - \delta) \log n}$.
 
@@ -3712,7 +3714,7 @@ $$
 
 $\qed$
 
-Note that we didn't use the [median trick] in this case, but we used the average instead. Using the median is especially problematic when the failure probability is $\ge \frac{1}{2}$. As an analogy, when you flip a coin that gives tails 60% of the time, the median will always give tails as $n \rightarrow \infty$, so be careful!
+Note that we didn't use the [median trick](#median-trick) in this case, but we used the average instead. Using the median is especially problematic when the failure probability is $\ge \frac{1}{2}$. As an analogy, when you flip a coin that gives tails 60% of the time, the median will always give tails as $n \rightarrow \infty$, so be careful!
 
 ## Locality sensitive hashing
 ### Definition
@@ -3859,7 +3861,7 @@ Here, $c$ is the approximation factor.
 #### Reduction to LSH
 With the following algorithm, the ANNS problem is reduced to that of finding a LSH.
 
-The idea of the algorithm is to take a $(r, c\cdot r, p_1, p_2)$-LSH family with $p_1 \approx 1$ and $p_2 \approx 0$ (we can [boost the probabilities](#boosting-probabilities) if we need to), and to build a hash table in which we store $h(p)$ for each $p \in P$. For a query point $q$, we can do a lookup in the hash table in $\bigO{1}$: we can then traverse the linked list of points hashing to the same value, and pick the first one satisfying $\text{dist}(p, q) \le c \cdot r$.
+The idea of the algorithm is to take a $(r, c\cdot r, p_1, p_2)$-LSH family with $p_1 \approx 1$ and $p_2 \approx 0$ (we can [boost the probabilities](#boosting-probabilities) if we need to), and to build a hash table in which we store $h(p)$ for each $p \in P$. For a query point $q$, we can do a lookup in the hash table in $\bigO{1}$: we can then traverse the linked list of points hashing to the same value, and pick the first point $p$ satisfying $\text{dist}(p, q) \le c \cdot r$.
 
 {% highlight python linenos %}
 def preprocess():
@@ -4111,15 +4113,42 @@ Note that for any $\lambda \in [z_i, z_{i+1}[$ (the probability of this event be
 All of this leads us to the following formulation:
 
 > definition "Lovász extension formulation"
-> Let $S_i = \set{1, 2, \dots, i}$ (where $S_0 = \emptyset$. Let $1 = z_1 \ge z_2 \ge \dots \ge z_n \ge z_{n+1} = 0$ be the non-increasingly ordered components of $z$. Then:
+> Let $1 = z_0 \ge z_1 \ge z_2 \ge \dots \ge z_n \ge z_{n+1} = 0$ be the non-increasingly ordered components of $z$.
+> 
+> Let $S_i = \set{1, 2, \dots, i}$ where $\emptyset = S_0 \subseteq S_1 \subseteq \dots \subseteq S_n = [n]$. We let $S_i$ be ordered by the same permutation that ordered the $z_i$.
+> 
+> Then:
 > 
 > $$
-> \hat{f}(z) = \sum_{i=1}^n (z_i - z_{i+1})f(S_i)
+> \hat{f}(z) = \sum_{i=0}^n (z_i - z_{i+1})f(S_i)
 > $$
+
+This stems from the fact that the probability of $\lambda \in [z_i, z_{i+1})$ is equal to $z_i - z_{i+1}$, for any $i \in [n]\cup\set{0}$, as $\lambda$ is uniformly distributed in $[0, 1]$. Additionally, if this event happens, then $\set{j \mid z_j \ge \lambda} = S_i$. $\qed$
 
 This means that we can evaluate $\hat{f}$ at any $z$ using $n+1$ evaluations of $f$ (we assumed a call to take constant time).
 
+For instance, let $N = \set{1, 2, 3, 4}$. Then $\hat{f}(0.75, 0.3, 0.2, 0.3)$ gives rise to the following values:
+
+- $z_0 = 1, S_0 = \emptyset$
+- $z_1 = 0.75, S_1 = \set{1}$
+- $z_2 = 0.3, S_2 = \set{1, 2}$
+- $z_3 = 0.3, S_3 = \set{1, 2, 4}$
+- $z_4 = 0.2, S_4 = \set{1, 2, 3, 4}$
+- $z_5 = 0$
+
+The result of the function can be computed from $n + 1$ evaluations of $f$:
+
+$$
+\begin{align}
+\hat{f}(0.75, 0.3, 0.2, 0.3)
+& = (1 - 0.75)f(S_0) + (0.75 - 0.3) f(S_1) + (0.3 - 0.3) f(S_2) \\
+& \qquad + (0.3 - 0.2) f(S_3) + (0.2 - 0) f(S_4) \\
+& = 0.25f(\emptyset) + 0.45f(\set{1}) + 0.1f(\set{1, 2, 4}) + 0.2f(\set{1, 2, 3, 4}) \\
+\end{align}
+$$
+
 #### Convexity of the Lovász extension
+If the Lovász extension is convex, we have a whole host of convex optimization methods that we can apply (subgradient descent, ellipsoid, ...). Therefore, the following theorem is crucial.
 
 > theorem "Convexity of the Lovász extension"
 > Let $\hat{f}$ be the Lovász extension of $f : \set{0, 1}^n \rightarrow \mathbb{R}$. Then:
@@ -4128,7 +4157,144 @@ This means that we can evaluate $\hat{f}$ at any $z$ using $n+1$ evaluations of 
 > \hat{f}\text{ is convex} \iff f\text{ is submodular}
 > $$
 
-The proof is quite long (todo).
+This proof is quite long, we will only show the $\Rightarrow$ direction, that is, $f$ submodular $\implies \hat{f}$ convex. Let's start with an outline of the proof:
+
+1. Redefine $\hat{f}(z)$ as a maximization problem
+2. Observe that the problem is convex
+3. Prove that $\hat{f}(z)$ is equal to the objective function by upper-bounding and lower-bounding it.
+
+For this proof, we assume that $f$ is normalized, meaning $f(\emptyset) = 0$ (without loss of generality, as we could just "shift" $f$ to achieve this). We [previously gave a formulation of the Lovász extension](#definition:lovasz-extension-formulation), and we'll give a second one here, as an LP. For $z \in [0, 1]^n$, and $f$ submodular, $\hat{f}$ is the solution to the following LP:
+
+$$
+\begin{align}
+\textbf{maximize: }   & g(z) = \max_x z^T x  & \\
+\textbf{subject to: } 
+    & \sum_{i\in S} x_i \le f(S) & \forall S \subseteq N \\
+    & \sum_{i\in N} x_i = f(N) & \\
+\end{align}
+$$
+
+This may seem to come out of nowhere, but we'll see the rationale once we see the dual formulation. This LP has exponentially many constraints, as $\forall S \subseteq N$ is equivalent to $\forall S \in 2^N$.
+
+Our main claim is that the objective function $g(z) = \hat{f}(z)$, $\forall z \in [0, 1]^n$. Note that the objective function $g$ is convex, as it is the max of a linear function over a convex set. To prove this, we observe that for $0 \le \lambda \le 1$ and $z_1, z_2 \in [0, 1]^n$:
+
+$$
+\begin{align}
+g(\lambda z_1 + (1 - \lambda) z_2)
+& =   \max_x (\lambda z_1^T x + (1 - \lambda) z_2^T x) \\
+& \le \lambda (\max_x (z_1^T x)) + (1 - \lambda) (\max_x (z_2^T x)) \\
+& = \lambda g(z_1) + (1-\lambda)g(z_2) \\
+\end{align}
+$$
+
+Now, we need to prove $\hat{f} = g$ to finish the proof. We'll do so using [weak duality](#weak-duality). The dual program is given by:
+
+$$
+\begin{align}
+\textbf{minimize: }   & \sum_{S \subseteq N} y_S f(S)  & \\
+\textbf{subject to: } 
+    & \sum_{S \ni i} Y_s = z_i & \forall i \in N \\
+    & y_S \ge 0                & \forall S \subset N \\
+\end{align}
+$$
+
+By weak duality, for any $x$ feasible in the primal, and $y$ feasible in the dual, we have:
+
+$$
+z^T x \le \sum_{S \subseteq N} y_S f(S)
+$$
+
+By strong duality, we achieve equality if $x$ and $y$ are optimal solutions. 
+
+We'll assume the same notation as in the [closed formulation of the Lovász extension](#definition:lovasz-extension-formulation), meaning that we have $1 = z_0 \ge z_1 \ge z_2 \ge \dots \ge z_n \ge z_{n+1} = 0$. We also have $S_i = \set{1, 2, \dots, i}$ where $\emptyset = S_0 \subseteq S_1 \subseteq \dots \subseteq S_n = [n]$. Once again, we let $S_i$ be ordered by the same permutation that ordered the $z_i$.
+
+We define:
+
+$$
+\begin{align}
+x_i^* & = f(S_i) - f(S_{i-1}) \\
+y_S^* & = \begin{cases}
+    z_i - z_{i+1} & \text{for } S = S_i \text{ with } i \in [n] \\
+    0             & \text{otherwise} \\
+\end{cases} \\
+\end{align}
+$$
+
+Now, we'll make a few claims that complete the proof. To prove these claims, we'll first need:
+
+$$
+\begin{align}
+z^T x^*
+& = \sum_{i=1}^n z_i \cdot (f(S_i) - f(S_{i-1})) 
+\tag{1}\label{eq:convexity-step-2} \\
+
+& = \sum_{i=0}^n (z_i - z_{i+1}) f(S_i) 
+\tag{2}\label{eq:convexity-step-3} \\
+
+& = \sum_{S \subseteq N} y_S^* f(S)
+\tag{3}\label{eq:convexity-step-4} \\
+\end{align}
+$$
+
+> claim "Convexity proof claim 1"
+> $$
+> z^T x^* = \hat{f}(z)
+> $$
+
+This follows from the [closed formulation of the Lovász extension](#definition:lovasz-extension-formulation) and from $(\ref{eq:convexity-step-3})$. $\qed$
+
+> claim "Convexity proof claim 2"
+> $$
+> z^T x^* = \sum_{S\subseteq N} y_S f(S)
+> $$
+
+This is proven by $(\ref{eq:convexity-step-4})$. $\qed$
+
+> claim "Convexity proof claim 3"
+> $y^*$ is feasible for the dual.
+
+Observe that $y^*$ has all non-negative entries because $z_i \ge z_{i+1} \ge \dots \ge z_{n+1} = 0$. Further, for any $i$:
+
+$$
+\sum_{S : S \ni i} y_S^* 
+= \sum_{j \ge i} y_{S_j}^*
+= \sum_{j = i}^n z_j - z_{j+1}
+= z_i - z_{n+1}
+= z_i
+$$
+
+The third step happens because the sum is telescoping. This exactly satisfies the dual LP, as required. $\qed$
+
+> claim "Convexity proof claim 4"
+> $x^*$ is feasible for the primal.
+
+Observe that:
+
+$$
+\sum_{i=1}^n x_i^*
+= \sum_{i \le n} f(S_i) - f(S_{i-1})
+= f(N) - f(\emptyset)
+= f(N)
+$$
+
+Here, we used that $f$ is normalized so $f(\emptyset) = 0$. Let $S \subset N$. Then, for $x^*$ to be feasible, we must show:
+
+$$
+\sum_{i \in S} x_i^* \le f(S)
+$$
+
+This can be done by induction on the size of the set. The base case trivially holds as we sum over $S_0 = \emptyset$, which gives us 0, which is equal to $f(\emptyset)$. For the inductive step, we argue that if $i$ is the largest index in $S$. The [classic definition of submodularity](#definition:classic-definition-of-submodularity) can be rearranged to: 
+
+$$
+f(S) 
+\ge f(S_i) - f(S_{i-1}) + f(S \setminus \set{i})
+=   x_i^* + f(S \setminus \set{i})
+\ge \sum_{i \in S} x_i^*
+$$
+
+The final inequality uses the induction hypothesis. $\qed$
+
+With these four claims proven, we have proven the theorem in the $\Rightarrow$ direction. $\qed$
 
 ### Submodular function maximization
 For this part, we'll assume that all set functions we deal with are:
@@ -4580,14 +4746,14 @@ We'd like to hire the best candidate (we can assume they all have an objective a
 If we select the first candidate, regardless of their score, we get:
 
 $$
-\prob{\text{hiring the best candidate}} = \frac{1}{n}
+\prob{\text{hiring best candidate}} = \frac{1}{n}
 $$
 
 Another strategy would be to interview but not hire the first $\frac{n}{2}$ candidates ("sampling phase"), and then pick whoever is better than the best candidate in the sampling phase ("hiring phase").
 
 $$
 \begin{align}
-\prob{\text{hiring the best candidate}}
+\prob{\text{hiring best candidate}}
 & \ge \prob{\text{second best is in the first half} \land \text{best is in the second half}} \\
 & \ge \prob{\text{second best is in the first half}}
 \cdot \prob{\text{best is in the second half}} \\
@@ -4603,12 +4769,12 @@ We can optimize the previous strategy by changing the point at which we switch f
 
 $$
 \begin{align}
-\prob{\text{hiring the best candidate}}
+& \prob{\text{hiring the best candidate}} \\
 & = \sum_{i=1}^n \prob{\text{selecting } i \land i \text{ is the best}} \\
-& = \sum_{i=1}^n \prob{\text{selecting } i \mid i \text{ is the best}} 
+& = \sum_{i=1}^n \prob{\text{selecting } i\mid i\text{ is the best}}
     \cdot \prob{i \text{ is the best}} \\
 & = \sum_{i=1}^{r-1} 0 
-  + \frac{1}{n} \sum_{i=r}^n \prob{\text{second best of the first } i \text{candidates is among the first } r - 1 \mid i \text{is the best}} \\
+  + \frac{1}{n} \sum_{i=r}^n \prob{2^\text{nd} \text{ best of the first } i \text{ people is among the first } r - 1 \mid i \text{ is the best}} \\
 & = \frac{1}{n} \sum_{i=r}^n \frac{r-1}{i-1} \\
 & = \frac{r-1}{n}\sum_{i=r}^n \frac{1}{i-1} \\
 \end{align}
@@ -4638,7 +4804,7 @@ For this course, we'll assume without loss of generality that all graphs are $d$
 > The normalized adjacency matrix $M$ of a $d$-regular graph is $\frac{1}{d}A$, where $A$ is the adjacency matrix.
 > 
 > $$
-> D_{ij} = \begin{cases}
+> M_{ij} = \begin{cases}
 > \frac{1}{d} & \text{if } \set{i, j} \in E \\
 > 0 & \text{otherwise} \\
 > \end{cases}
@@ -4788,6 +4954,75 @@ It follows that $\lambda_2 < 1$. Since we were proving the contrapositive, this 
 Todo exercise 11.4.
 
 ### Mixing time of random walks
+As we said earlier, we can use the normalized adjacency matrix $M$ to get the probability distribution after taking a single step by computing $Mp$. If we want the probability distribution after $k$ steps, we compute $M^k p$.
+
+Intuitively, *mixing time* is about how many steps one must take to have a uniform probability of being at any given node $v$. More formally, the question is which $k$ should be picked to have $M^k p$ close to a uniform distribution.
+
+The mixing time is highly dependent on graph structure. Some observations:
+
+- If the graph is not connected ($\lambda_2 = 1$) then we will only reach vertices in the same component as the starting node $s$ and will never come close to the uniform distribution, no matter the choice of $k$.
+- If the graph is bipartite ($\lambda_n = -1$) then the random walk will alternate between left and right, and will never converge to a uniform distribution (the side we are currently on will only have 0 components in $M^k p$).
+
+To fix the second point, we can do a "lazy random walk" in which we have a probability $\frac{1}{2}$ of staying where we are at each step.
+
+In any case, the above observations tell us that the mixing time has to do with the values $\lambda_2$ and $\lambda_n$. The following lemma tells us that the quantity $\max(\abs{\lambda_2}, \abs{\lambda_n})$ is important to mixing time:
+
+> lemma "Mixing time"
+> Let $G = (V, E)$ be a $d$-regular graph and let $1 = \lambda_1 \ge \lambda_2 \ge \dots \ge \lambda_n \ge -1$ be the eigenvalues of the normalized adjacency matrix $M$ of $G$.
+> 
+> If $\max(\abs{\lambda_2}, \abs{\lambda_n}) \le 1-\epsilon$ then no matter from which vertex $s$ we start, we will be at any vertex with probability $\approx\frac{1}{n}$ after $k=\bigO{\frac{1}{\epsilon}\log n}$ steps.
+> 
+> More precisely, if $p$ is the vector of our starting position (a one-hot vector taking value 1 only on the vertex $s$ on which we started), then:
+> 
+> $$
+> \norm{M^k p - \left(\frac{1}{n}, \dots, \frac{1}{n}\right)}_2^2
+> \le \smallO{\frac{1}{n^2}}
+> $$
+> 
+> when $k = \frac{c}{\epsilon}\log n$ for some constant $c$.
+
+This lemma tells us that after $k = \frac{c}{\epsilon}\log n$ steps, we'll be within a distance $\frac{1}{n^2}$ from a truly uniform distribution. The parameter $\epsilon$ is controlled by $\lambda_2$ and $\lambda_n$, so the number of steps to do will depend on the graph structure, as anticipated.
+
+To prove this, let $p = (1, 0, 0, 0, \dots)$, i.e. we assume (w.l.o.g) that the vertices are ordered and our start vertex $s$ is first. 
+
+Let $(v_1, v_2, \dots, v_n)$ be the eigenvectors corresponding to the eigenvalues $(\lambda_1, \lambda_2, \dots, \lambda_n)$. These form an orthonormal basis, meaning that we can write $p$ in terms of this basis:
+
+$$
+p = \sum_{i=1}^n \alpha_i v_i
+$$
+
+where $\alpha_i = \inner{p, v_i}$.
+
+Seeing that $\lambda_1 = 1$, we have in particular that $\alpha_1 = \inner{p, v_1} = \frac{1}{\sqrt{n}}$. Our goal of $\left(\frac{1}{n}, \dots, \frac{1}{n}\right)$ can be written $\alpha_1 \left(\frac{1}{\sqrt{n}}, \dots, \frac{1}{\sqrt{n}}\right)$. In practice, this means that we can also write our goal in the eigenvector basis, and that it corresponds to the first component of $M^k p$.
+
+Let's use this to determine how long it takes for the random walk to be mixed; to get a quantitative measure of this, we measure the distance to a uniform distribution. We could use any norm, but we chose the 2<sup>nd</sup> one here.
+
+$$
+\begin{align}
+\norm{M^k p - \left(\frac{1}{n}, \dots, \frac{1}{n}\right)}_2^2
+& = \norm{\sum_{i=2}^n \alpha_i \lambda_i^k v_i}_2^2 \\
+& \overset{(1)}{=}
+    \sum_{i=2}^n \abs{\lambda_i}^k \norm{\alpha_i v_i}_2^2 \\
+& \overset{(2)}{\le}
+    1-\epsilon)^k \sum_{i=2}^n \norm{\alpha_i v_i}_2^2 \\
+& \overset{(3)}{=}
+    (1-\epsilon)^k \norm{\sum_{i=2}^n \alpha_i v_i}_2^2 \\
+\end{align}
+$$
+
+Step $(1)$ stems from the fact that the eigenvectors $v_1, \dots, v_n$ are orthogonal. Step $(2)$ comes from our assumption in the lemma that $\max(\abs{\lambda_2}, \abs{\lambda_n}) \le 1-\epsilon$, which means that $\abs{\lambda_i} \le 1-\epsilon$ for all $i\ge 2$. Finally, step $(3)$ follows from the orthogonality of the eigenvectors.
+
+If we take $k = \frac{c}{\epsilon}\log n$ and let $A = \norm{\sum_{i=2}^n \alpha_i v_i}_2^2 \le 1$, we have:
+
+$$
+\norm{M^k p - \left(\frac{1}{n}, \dots, \frac{1}{n}\right)}_2^2
+\le A(1-\epsilon)^{\frac{\log n}{\epsilon} c}
+\le A\left(\frac{1}{e}\right)^{c \log n}
+\le \frac{1}{n^c}
+$$
+
+With $c > 2$, we get the result we wanted. $\qed$
+
 ### Conductance
 > definition "Conductance"
 > Let $G = (V, E)$ be a $d$-regular graph with $n = \abs{V}$ vertices. We define the conductance $h(S)$ of a cut $S \subseteq V$:
