@@ -12,8 +12,6 @@ A prerequisite for this course is [CS-250 Algorithms](/algorithms/).
 * TOC
 {:toc}
 
-⚠ *Work in progress*
-
 $$
 \newcommand{\abs}[1]{\left\lvert#1\right\rvert}
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
@@ -221,7 +219,7 @@ However, since $T\in\mathcal{I}$ and $\abs{T} > \abs{S}$, we expect the optimal 
 <br/>
 
 ##### Graphic matroid
-In our initial example about maximum spanning trees, we were actually considering a matroid in which $E$ is the set of edges, and $\mathcal{I}$ is defined as:
+In our [initial example about maximum spanning trees](#maximum-weight-spanning-trees), we were actually considering a matroid in which $E$ is the set of edges, and $\mathcal{I}$ is defined as:
 
 $$
 \mathcal{I} = \set{X \subseteq E : X \text{ is acyclic}}
@@ -237,7 +235,7 @@ $$
 $(I_1)$ is satisfied because dropping elements still satisfies $\mathcal{I}$. $(I_2)$ is satisfied because $\abs{X} < \abs{Y}$ and $X < k$ implies that $\abs{X + e} \le k$.
 
 ##### Partition matroid
-In a partition monoid, the ground set $E$ is partitioned into *disjoint* subsets $E_1, E_2, \dots, E_l$ (we can think of them as representing $l$ different colors, for example). Each such subset has an integer $k_i$ associated to it, stating how many elements can be picked from each subset at most.
+In a partition matroid, the ground set $E$ is partitioned into *disjoint* subsets $E_1, E_2, \dots, E_l$ (we can think of them as representing $l$ different colors, for example). Each such subset has an integer $k_i$ associated to it, stating how many elements can be picked from each subset at most.
 
 $$
 \mathcal{I} = \set{X \subseteq E : \abs{E_i \cap X} \le k_i \text{ for } i = 1, 2, \dots, l}
@@ -294,7 +292,7 @@ Here, efficient means polynomial time, if we assume a polynomial time membership
 #### Definition of bipartite matching
 For instance, we can consider the example of [bipartite matching](/algorithms/#bipartite-matching).
 
-- **Input**: A bipartite graph $G(V = A \cup B, E)$, where $A$ and $B$ are two disjoint vertex sets
+- **Input**: A bipartite graph $G = (V = A \cup B, E)$, where $A$ and $B$ are two disjoint vertex sets
 - **Output**: Matching $M\subseteq E$ of maximum weight (or maximum cardinality[^equivalent-bipartite]).
 
 [^equivalent-bipartite]: Maximum cardinality is a special case of maximum weight, where all the weights are equal.
@@ -572,7 +570,9 @@ $$
 \end{align}
 $$ 
 
-This proves $c^T x^\* = \sum_j \lambda_j c^T x^{(j)}$. In other words, the value of the objective function is a weighted average of the extreme points. If we measured the height of all the people in a class, and got the average value of 170cm, we could say that at least one person has height $\ge$ 170cm. For the same reason, we can conclude from the above:
+This proves $c^T x^\* = \sum_j \lambda_j c^T x^{(j)}$. In other words, the value of the objective function is a weighted average of the extreme points. 
+
+We conclude the proof with the "tallest person in the class" argument. If we measured the height of all the people in a class, and got the average value of 170cm, we could say that at least one person has height $\ge$ 170cm. For the same reason, we can conclude from the above:
 
 $$
 c^T x^* = \sum_j \lambda_j c^T x^{(j)}
@@ -1343,7 +1343,7 @@ To get this bound, we typically proceed as follows:
 
 1. Give an exact formulation of the problem as an Integer Linear Program (ILP), usually with $x_i \in \set{0, 1}$.
 2. Relax the ILP to a LP with $x_i \in [0, 1]$
-3. Solve the LP to get an optimal solution $x^\*\_{\text{LP}}$ which is a lower (respectively upper) bound on the optimal solution $x^\*\_{\text{ILP}}$ to the ILP, and thus also on the original problem.
+3. Solve the LP to get an optimal solution $x^\*\_{\text{LP}}$ which is a lower bound (or upper bound for a maximization problem) on the optimal solution $x^\*\_{\text{ILP}}$ to the ILP, and thus also on the original problem.
 4. Somehow round $x^\*\_{\text{LP}}$ "without losing too much", which will determine $\alpha$.
 
 ### Vertex Cover for general graphs
@@ -1409,9 +1409,15 @@ As a recap, we're talking about the following programs:
 - **ILP**: Integral LP, the original definition of the problem.
 - **LP**: Relaxation of the ILP. Its optimal solution has the lowest cost of all the programs; it's lower or equal to that of the ILP because the LP allows variables to take on more values than the ILP ($[0, 1]$ instead of $\set{0, 1}$).
 - **Approximation algorithm**: Rounding of LP. Rounding increases cost by a factor $\alpha$.
+
+The solutions we're looking at are:
+
+- **OPT<sub>LP</sub>**: The optimal solution to the LP 
 - **OPT**: The (hypothetical) optimal solution
 
-The notion of *integrality gap* allows us to bound the power of our LP relaxation. It defines the "gap" in cost between the optimal LP solution and the optimal OPT solution.
+Because the LP is a relaxation, it admits more solutions. So for a minimization problem, $\text{OPT}_{\text{LP}} \le \text{OPT}$.
+
+The notion of *integrality gap* allows us to bound the power of our LP relaxation. It defines the "gap" in cost between the the optimal solution to the LP (OPT<sub>LP</sub>), and the hypothetical perfect, optimal solution (OPT).
 
 Let $\mathcal{I}$ be the set of all instances of a given problem. For minimization problems, the integrality gap is defined as:
 
@@ -1428,9 +1434,9 @@ This allows us to give some guarantees on bounds: for instance, suppose $g=2$ an
 > 
 > $$g \ge 2 - \frac{2}{n}$$
 
-On a *complete* graph with $n$ vertices, we have $OPT = n - 1$ because if there are two vertices we don't choose, the edge between them isn't covered. 
+On a *complete* graph with $n$ vertices, we have $\text{OPT} = n - 1$ because if there are two vertices we don't choose, the edge between them isn't covered. 
 
-Assigning $\frac{1}{2}$ to every vertex is a feasible solution of cost $\frac{n}{2}$ so the optimum must be smaller or equal.
+Assigning $\frac{1}{2}$ to every vertex is a feasible solution to the LP of cost $\frac{n}{2}$, so the optimum must be smaller or equal.
 
 We can use these two facts to compute the integrality gap:
 
@@ -1439,7 +1445,7 @@ g \ge \frac{n-1}{\frac{n}{2}} = 2 - \frac{2}{n}
 \qed
 $$
 
-Our 2-approximation algorithm for vertex cover implies that the integrality gap is at most 2, so we have:
+Our [2-approximation algorithm for vertex cover](#vertex-cover-for-general-graphs) implies that the integrality gap is at most 2, so we have:
 
 $$
 2 - \frac{2}{n} \le g \le 2
@@ -4977,7 +4983,7 @@ Now, let us prove the $\Rightarrow$ direction, namely that $\lambda_n = -1 \impl
 
 Let $x = v_n$ be the eigenvector associated to $\lambda_n$. We therefore have $Mx = -x$. Let $i \in V$ be the vertex maximizing $\abs{x(i)}$. Let $D = x_i$ be the signed value behind the maximal absolute value. Since $(Mx)_i = -x_i$, by [our observation](#lemma:observation-on-product-with-normalized-adjacency-matrix), it means that the neighbors of $i$ must all have value $-D$. The same goes for the neighbors of $i$, whose neighbors must have value $D$, and so on.
 
-This means that we can split the graph into a vertex set $A$ of nodes with value $D$, and a set $B$ of nodes with values $-D$. All nodes $A$ only have neighbors in $B$ and vice versa. Therefore, $G$ is bipartite, with $V = A \cup B$.
+This means that we can split the graph into a vertex set $A$ of nodes with value $D$, and a set $B$ of nodes with values $-D$. All nodes $A$ only have neighbors in $B$ and vice versa. Therefore, $G$ is bipartite, with $V = A \cup B$. $\qed$
 
 ### Mixing time of random walks
 As we said earlier, we can use the normalized adjacency matrix $M$ to get the probability distribution after taking a single step by computing $Mp$. If we want the probability distribution after $k$ steps, we compute $M^k p$.
