@@ -27,6 +27,7 @@ $$
 \newcommand{\prob}[1]{\mathbb{P}\left[#1\right]}
 \newcommand{\var}[1]{\text{Var}\left(#1\right)}
 \newcommand{\qed}[0]{\tag*{$\blacksquare$}}
+\DeclareMathOperator*{\argmin}{\arg\!\min}
 $$
 
 ## When does the greedy algorithm work? 
@@ -3842,7 +3843,7 @@ Therefore, $\mathcal{H}$ is $(r, c\cdot r, e^{-r/d}, e^{-c\cdot r/d})$-LSH. $\qe
 Consider the following problem, called the Nearest Neighbor Search (NNS): consider a set $P \subset \mathbb{R}^d$ of $n$ points in (potentially) high-dimensional space. For any query $q \in \mathbb{R}^d$, find the closest point $p$:
 
 $$
-\min_{p \in P} \text{dist}(p, q)
+\argmin_{p \in P} \text{dist}(p, q)
 $$
 
 The naive solution would be to loop over all points in $P$, but this takes $\bigO{n\cdot d}$ time and space. 
@@ -3869,12 +3870,12 @@ def preprocess():
      construct l hash tables
      for i in range(l):
         for p in P:
-            store p at location fᵢ(p) = (hᵢ₁(p), ..., hᵢₖ(p)) in i-th hash table
+            store p at location f[i](p) = (h[i, 1](p), ..., h[i, k](p)) in i-th hash table
 
 def query(q):
     for i in range(l):
-        compute fᵢ(q)
-        go over all points where fᵢ(p) = fᵢ(q)
+        compute f[i](q)
+        go over all points where f[i](p) = f[i](q)
         return first point p satisfying dist(p, q) <= c * r
 {% endhighlight %}
 
@@ -4325,7 +4326,7 @@ def greedy_submodular_maximization(N, f, k):
     """
     S = set()
     for i in range(k):
-        u_i = argmax over u∈N\S of f(u|S)
+        u_i = argmax over u in (N\S) of f(u|S)
         S += u_i
     return S
 {% endhighlight %}
@@ -4372,9 +4373,13 @@ This allows us to prove the following theorem:
 
 If this is true for any set $O$, it is also true for the optimal solution; therefore, the theorem tells us that the greedy algorithm is a $(1 - 1/e)$ approximation algorithm.
 
-Let us prove this. Since $f$ is monotone, we can assume $\abs{O} = k$; if we had $\abs{O} \le k$ we could always add elements to achieve $\abs{O} = k$, without decreasing $f(O)$.
+Let us prove this. Since $f$ is monotone, we can assume $\abs{O} = k$; if we had $\abs{O} \le k$ we could always add elements to achieve $\abs{O} = k$, without decreasing $f(O)$. Our proof outline is the following:
 
-Let $u_i$ be the $i$<sup>th</sup> element selected by the greedy algorithm. Let $S_i = \set{u_j : j \le i}$ be the set of the first $i$ elements selected. Note that $S_0 = \emptyset$ and $S_k = S$. Consider an iteration $i$ and let $e$ be any element in $O \setminus S_{i-1}$ (i.e. in the optimal solution, but that we haven't picked yet). Then, by our greedy choice criterion:
+1. Do some work to restate the element selection criterion in terms of the optimal solution
+2. Set up a recurrence defining $f(S_i)$ in terms of $f(S_{i-1})$
+3. Solve the recurrence to find a closed form of the bound
+
+**Part 1**. Let $u_i$ be the $i$<sup>th</sup> element selected by the greedy algorithm. Let $S_i = \set{u_j : j \le i}$ be the set of the first $i$ elements selected. Note that $S_0 = \emptyset$ and $S_k = S$. Consider an iteration $i$ and let $e$ be any element in $O \setminus S_{i-1}$ (i.e. in the optimal solution, but that we haven't picked yet). Then, by our greedy choice criterion:
 
 $$
 f(u_i \mid S_{i-1}) \ge f(e \mid S_{i-1})
@@ -4411,7 +4416,7 @@ f(S_i) - f(S_{i-1})
 \ge \frac{1}{k} (f(O) - f(S_{i-1}))
 $$
 
-Rearranging the terms, we get:
+**Part 2**. Rearranging the terms, we get:
 
 $$
 f(S_i) 
@@ -4424,7 +4429,7 @@ $$
 f(S_i) \ge \left( 1 - \left(1 - \frac{1}{k}\right)^i \right) f(O)
 $$
 
-To complete the proof, it suffices to plug in $i = k$ and note that $(1 - \frac{1}{k})^k \le e^{-1}$ using the usual trick of $1 + x \le e^x$ because of the Taylor expansion of the exponential function. $\qed$
+**Part 3**. To complete the proof, it suffices to plug in $i = k$ and note that $(1 - \frac{1}{k})^k \le e^{-1}$ using the usual trick of $1 + x \le e^x$ because of the Taylor expansion of the exponential function. $\qed$
 
 Note that this is the best possible bound. It is NP-hard to do better.
 
@@ -4660,8 +4665,8 @@ A few examples of deterministic caching algorithms are:
 
 We'll divide the request sequence $\sigma$ into phases as follows:
 
-- Phase 1 begins at the first page of $\sigma$
-- Phase $i$ begins as soon as we have seen the $k$<sup>th</sup> distinct page after phase $i-1$ has begun.
+- Phase 1 begins at the first page of $\sigma$,
+- Phase $i$ begins when we see the $k$<sup>th</sup> distinct page in phase $i-1$.
 
 For instance, for $k=3$, the following stream would be divided as follows:
 
@@ -4673,7 +4678,7 @@ $$
 }
 $$
 
-We will now show that $\text{OPT}(I)$ makes at least one cache miss each time a new phase begins. Let $p_j^i$ denote the $j$<sup>th</sup> page in phase $i$. Consider pages $p_2^i$ to $p_k^i$ and page $p_1^{i+1}$ (i.e. pages 2 to $k$ in phase $i$, and the first page of phase $i+1$). These are $k$ pages. 
+We will now show that $\text{OPT}(I)$ makes at least one cache miss each time a new phase begins. Let $p_j^i$ denote the $j$<sup>th</sup> *distinct* page in phase $i$. Consider pages $p_2^i$ to $p_k^i$ and page $p_1^{i+1}$ (i.e. pages 2 to $k$ in phase $i$, and the first page of phase $i+1$). These are $k$ distinct pages.
 
 If none of the pages $p_2^i$ to $p_k^i$ have a cache miss, then $p_1^{i+1}$ must have one (because we've now seen more distinct pages than we can fit in our cache). Let $N$ be the number of phases. Then we have $\text{OPT}(I) \ge N - 1$ (the best we can do is no misses in pages 2 to $k$ of the phase, and then a miss in the first one). 
 
@@ -4890,7 +4895,7 @@ We'll prove this in two steps: $\lambda_1 \ge 1$ and $\lambda_1 \le 1$.
 
 Since $M\vec{1} = 1\times\vec{1}$, $1$ is an eigenvalue, and since $\lambda_1$ is the greatest eigenvalue, $\lambda_1 \ge 1$
 
-Additionally, we consider any eigenvector $x$ and vertex $i \in V$ such that $x(i)$ is maximized. We let $y = Mx$. Then, by [our observation](lemma:observation-on-product-with-normalized-adjacency-matrix)
+Additionally, we consider any eigenvector $x$ and vertex $i \in V$ such that $x(i)$ is maximized. We let $y = Mx$. Then, by [our observation](#lemma:observation-on-product-with-normalized-adjacency-matrix)
 
 $$
 \begin{align}
@@ -4903,7 +4908,9 @@ $$
 
 The inequality follows from the fact that $x(i)$ is the maximal value in the vector $x$. From this inequality $y(i) \le x(i)$, we conclude that $\lambda_1 \le 1$ (as $y = Mx = \lambda x$ since we considered $x$ to be an eigenvector). $\qed$
 
-This proof not only tells us that $\lambda_1 = 1$, but also that we can select $v_1 = \vec{1}$, which we will do from now on.
+This proof not only tells us that $\lambda_1 = 1$, but also that we can select $v_1 = \vec{1}$, which we will do from now on[^eigenvector-normalization].
+
+[^eigenvector-normalization]: Eigenvectors cannot be the zero vector. Any scalar multiple of an eigenvector is also considered an eigenvector, so we can normalize eigenvectors without loss of generality. For instance, we can consider $v_1 = \vec{1}$ or $v_1 = \vec{1}/\sqrt{n}$ if we need to.
 
 #### Proof of 2
 We will show that there is a vector $v_2 \perp v_1$ such that $Mv_2 = v_2$ iff $G$ is disconnected.
@@ -4925,7 +4932,7 @@ y(i) = \frac{1}{d}\sum_{\set{i, j} \in E} v_2(j)
      = v_2(i)
 $$
 
-The first step uses [the observation we previously noted](lemma:observation-on-product-with-normalized-adjacency-matrix). The second uses the fact that every neighbor $j$ of $i$ has $v_2(j) = v_2(i)$, by the definition we gave of $v_2$ (wherein vertices only have different values when they are not neighbors).
+The first step uses [the observation we previously noted](#lemma:observation-on-product-with-normalized-adjacency-matrix). The second uses the fact that every neighbor $j$ of $i$ has $v_2(j) = v_2(i)$, by the definition we gave of $v_2$ (wherein vertices only have different values when they are not neighbors).
 
 This shows that $\lambda_2 = 1$ if $G$ is disconnected.
 
@@ -4951,7 +4958,26 @@ $$
 It follows that $\lambda_2 < 1$. Since we were proving the contrapositive, this successfully proves the $\Rightarrow$ direction. $\qed$
 
 #### Proof of 3
-Todo exercise 11.4.
+First, let us prove the $\Leftarrow$ direction, namely that $G$ bipartite $\implies \lambda_n = -1$. For that, it suffices to find a vector $x$ such that $Mx = -x$. Suppose $G = (A\cup B, E)$ is a bipartite graph. Let $x$ be defined as follows:
+
+$$
+x_i = \begin{cases}
+-1 & \text{if } i \in A \\
+1  & \text{if } i \in B \\
+\end{cases}
+$$
+
+Recall [our observation](#lemma:observation-on-product-with-normalized-adjacency-matrix) of $y(i) = \frac{1}{d} \sum_{(i, j) \in E} x(j)$. It says that $y(i)$ is the average of the neighboring $x(j)$. Now, vertices in $A$ only have neighbors in $B$, and vertices in $B$ only have neighbors in $A$. Therefore, by multiplying by this vector $x$, vertices in $A$ get value $-1$, and vertices in $B$ get $1$. In other words:
+
+$$
+Mx = -x
+$$
+
+Now, let us prove the $\Rightarrow$ direction, namely that $\lambda_n = -1 \implies G$ has a disconnected component.
+
+Let $x = v_n$ be the eigenvector associated to $\lambda_n$. We therefore have $Mx = -x$. Let $i \in V$ be the vertex maximizing $\abs{x(i)}$. Let $D = x_i$ be the signed value behind the maximal absolute value. Since $(Mx)_i = -x_i$, by [our observation](#lemma:observation-on-product-with-normalized-adjacency-matrix), it means that the neighbors of $i$ must all have value $-D$. The same goes for the neighbors of $i$, whose neighbors must have value $D$, and so on.
+
+This means that we can split the graph into a vertex set $A$ of nodes with value $D$, and a set $B$ of nodes with values $-D$. All nodes $A$ only have neighbors in $B$ and vice versa. Therefore, $G$ is bipartite, with $V = A \cup B$.
 
 ### Mixing time of random walks
 As we said earlier, we can use the normalized adjacency matrix $M$ to get the probability distribution after taking a single step by computing $Mp$. If we want the probability distribution after $k$ steps, we compute $M^k p$.
@@ -4993,24 +5019,24 @@ $$
 
 where $\alpha_i = \inner{p, v_i}$.
 
-Seeing that $\lambda_1 = 1$, we have in particular that $\alpha_1 = \inner{p, v_1} = \frac{1}{\sqrt{n}}$. Our goal of $\left(\frac{1}{n}, \dots, \frac{1}{n}\right)$ can be written $\alpha_1 \left(\frac{1}{\sqrt{n}}, \dots, \frac{1}{\sqrt{n}}\right)$. In practice, this means that we can also write our goal in the eigenvector basis, and that it corresponds to the first component of $M^k p$.
-
 Let's use this to determine how long it takes for the random walk to be mixed; to get a quantitative measure of this, we measure the distance to a uniform distribution. We could use any norm, but we chose the 2<sup>nd</sup> one here.
+
+Seeing that $\lambda_1 = 1$, we have in particular that $\alpha_1 = \inner{p, v_1} = \frac{1}{\sqrt{n}}$. Our goal of $\left(\frac{1}{n}, \dots, \frac{1}{n}\right)$ can be written $\alpha_1 v_1$, where $v_1 = \vec{1}/\sqrt{n}$ is the normalized first eigenvector. In practice, this means that we can also write our goal in the eigenvector basis, and thus subtract it from the sum resulting from $M^k p$. This will be step $(1)$ below.
 
 $$
 \begin{align}
 \norm{M^k p - \left(\frac{1}{n}, \dots, \frac{1}{n}\right)}_2^2
-& = \norm{\sum_{i=2}^n \alpha_i \lambda_i^k v_i}_2^2 \\
-& \overset{(1)}{=}
+& \overset{(1)}{=} \norm{\sum_{i=2}^n \alpha_i \lambda_i^k v_i}_2^2 \\
+& \overset{(2)}{=}
     \sum_{i=2}^n \abs{\lambda_i}^k \norm{\alpha_i v_i}_2^2 \\
-& \overset{(2)}{\le}
+& \overset{(3)}{\le}
     1-\epsilon)^k \sum_{i=2}^n \norm{\alpha_i v_i}_2^2 \\
-& \overset{(3)}{=}
+& \overset{(4)}{=}
     (1-\epsilon)^k \norm{\sum_{i=2}^n \alpha_i v_i}_2^2 \\
 \end{align}
 $$
 
-Step $(1)$ stems from the fact that the eigenvectors $v_1, \dots, v_n$ are orthogonal. Step $(2)$ comes from our assumption in the lemma that $\max(\abs{\lambda_2}, \abs{\lambda_n}) \le 1-\epsilon$, which means that $\abs{\lambda_i} \le 1-\epsilon$ for all $i\ge 2$. Finally, step $(3)$ follows from the orthogonality of the eigenvectors.
+Step $(2)$ stems from the fact that the eigenvectors $v_1, \dots, v_n$ are orthogonal. Step $(3)$ comes from our assumption in the lemma that $\max(\abs{\lambda_2}, \abs{\lambda_n}) \le 1-\epsilon$, which means that $\abs{\lambda_i} \le 1-\epsilon$ for all $i\ge 2$. Finally, step $(4)$ follows from the orthogonality of the eigenvectors.
 
 If we take $k = \frac{c}{\epsilon}\log n$ and let $A = \norm{\sum_{i=2}^n \alpha_i v_i}_2^2 \le 1$, we have:
 
@@ -5049,6 +5075,188 @@ Note that a disconnected graph has conductance 0, and that a fully connected gra
 > \frac{1 - \lambda_2}{2} \le h(G) \le \sqrt{2(1 - \lambda_2)}
 > $$
 
+We'll only prove the lower bound. The lecture notes contain a very long and tedious proof of the upper bound. For the lower bound, it'll be useful to introduce an alternative way to define eigenvalues of $M$, namely as an optimization problem on the Rayleigh coefficient $\frac{x^T M x}{x^Tx}$.
+
+> lemma "$\lambda_1$ in Rayleigh form"
+> $$
+> \lambda_1 = \max_{x\in\mathbb{R}^n : x \ne 0} \frac{x^T M x}{x^Tx}
+> $$
+
+We'll prove this by upper-bounding and lower-bounding $\lambda_1$. Let's start with $\lambda_1 \le \max_{x\in\mathbb{R}^n : x \ne 0} \frac{x^T M x}{x^Tx}$:
+
+$$
+\frac{v_1^T M v_1}{v_1^Tv_1}
+= \frac{v_1^T \lambda_1 v_1}{v_1^Tv_1}
+= \lambda_1 \frac{v_1^T v_1}{v_1^Tv_1}
+= \lambda_1
+$$
+
+This proves the upper bound, because if $\lambda_1$ is equal to some value of the maximization problem, it's less than the maximal one.
+
+For the lower bound $\lambda_1 \ge \max_{x\in\mathbb{R}^n : x \ne 0} \frac{x^T M x}{x^Tx}$, we let $y$ be the vector that attains the maximal value. Since $(v_1, \dots, v_n)$ is a basis, we can write $y$ in that basis using factors $(\alpha_1, \dots, \alpha_n)$:
+
+$$
+y = \sum_{i=1}^n \alpha_i v_i
+$$
+
+Then:
+
+$$
+\frac{y^T M y}{y^T y} 
+= \frac{\sum_{i=1}^n \alpha_i^2 \lambda_i}{\sum_{i=1}^n \alpha_i^2}
+\le \lambda_1 \frac{\sum_{i=1}^n \alpha_i^2}{\sum_{i=1}^n \alpha_i^2}
+= \lambda_1
+$$
+
+The inequality follows from the "tallest person in the class" argument which we've used previously. $\qed$
+
+> lemma "$\lambda_2$ in Rayleigh form"
+> Let $v_1$ be the eigenvector corresponding to $\lambda_1$. Then:
+> 
+> $$
+> \lambda_2 
+> = \max_{x\in\mathbb{R}^n : x \perp v_1} \frac{x^T M x}{x^T x}
+> $$
+
+The proof is very similar to that of the previous lemma. We will first upper-bound $\lambda_2$. Let $v_2$ be the eigenvector associated to $\lambda_2$. We have $v_2 \perp v_1$, so:
+
+$$
+\max_{x\in\mathbb{R}^n : x \perp v_1} \frac{x^T M x}{x^T x}
+\ge \frac{v_1^T M v_1}{v_1^T v_1}
+= \lambda_2
+$$
+
+Once again, this is because the maximum is greater than any value in the maximization problem.
+
+The lower bound of $\lambda_2$ is a little harder. Let's look at the search space $\mathcal{S}$ of this maximization problem:
+
+$$
+\mathcal{S} = \set{x \in \mathbb{R}^n : x \perp v_1}
+$$
+
+Let $y \in \mathcal{S}$ be the vector that attains the maximum objective value $\frac{y^T M y}{y^T y}$ in this search space. $\mathcal{S}$ has dimension $n-1$ (seeing that a degree of freedom is removed by the constraint of orthogonality to $v_1$), so we can find a basis $(v_2, \dots, v_n)$ for $\mathcal{S}$; these are the eigenvectors corresponding to the eigenvalues $(\lambda_2, \dots, \lambda_n)$. With that basis, we can describe vectors in $\mathcal{S}$ by using factors $(\alpha_2, \dots, \alpha_n)$:
+
+$$
+y = \sum_{i=2}^n \alpha_i v_i
+$$
+
+With this in mind, we now have:
+
+$$
+\max_{x\in\mathcal{S}} \frac{x^T M x}{x^T x}
+= \frac{y^T M y}{y^T y}
+= \frac{y^T \sum_{i=2}^n \alpha_i M v_i}{y^T y}
+= \frac{y^T \sum_{i=2}^n \alpha_i \lambda_i v_i}{y^T y}
+\le \frac{y^T \lambda_2 v_i}{y^T y}
+= \lambda_2
+$$
+
+The inequality step can be done because a single term in a sum is smaller than the whole sum itself. $\qed$
+
+With this proven, we can go on to prove the lower bound of Cheeger's inequality. Because $\lambda_1 = 1$, we consider that the associated eigenvector is $v_1 = \vec{1}$. By the [above lemma](#lemma:lambda-2-in-rayleigh-form) on $\lambda_2$, we have:
+
+$$
+\begin{align}
+1 - \lambda_2
+& = 1 - \max_{x \in \mathbb{R}^n : x \perp v_1} \frac{x^T M x}{x^T x} \\
+& = \min_{x \in \mathbb{R}^n : x \perp v_1} \left(1 - \frac{x^T M x}{x^T x}\right) \\
+& = \min_{x \in \mathbb{R}^n : x \perp v_1} \frac{x^T (I-M) x}{x^T x} \\
+\end{align}
+$$
+
+The matrix $L := I - M$ is the *normalized Laplacian matrix*. This is another matrix that is nice to study in spectral graph theory. With this matrix, we have the following identity:
+
+$$
+x^T L x
+= \frac{1}{d} \sum_{(i, j) \in E} (x(i) - x(j))^2
+$$
+
+Using this in the previous equality, we get:
+
+$$
+1 - \lambda_2
+= \min_{x \in \mathbb{R}^n : x \perp v_1}
+    \frac{\sum_{(i, j) \in E} (x(i) - x(j))^2}{d\cdot x^T x}
+$$
+
+
+> note ""
+> What happens if we let $x$ be a vector taking value 1 for vertices in $S$, and 0 everywhere else? 
+> 
+> **Numerator**. To determine the value of the numerator, let's look at the tree possible cases in the sum:
+> 
+> - Edges $(i, j)$ where $i, j\in S$ have $x(i) - x(j) = 1 - 1 = 0$
+> - Edges $(i, j)$ where $i, j\notin S$ have $x(i) - x(j) = 0 - 0 = 0$
+> - Edges $(i, j)$ where $i \in S$ and $j \notin S$ (or vice versa) have $(x(i) - x(j))^2 = (\pm 1)^2 = 1$
+> 
+> So in total, only edges crossing the cut count towards the total, and the numerator thus sums up to $\abs{E(S, \bar{S})}$. 
+> 
+> **Denominator**. For the denominator, $x^T x = \sum_{i\in V} x(i)^2$. Again, since the values are all 0 or 1, this sums up to $\abs{S}$. 
+> 
+> **Result**. In summary, we get:
+> 
+> $$
+> 1 - \lambda_2 = \frac{\abs{E(S, \bar{S})}}{d\cdot\abs{S}}
+> $$
+> 
+> Notice that this is the formulation of conductance. This is obviously a special case of the previous more general formulation, which we can consider as a continuous relaxation of the cut problem. That is indeed the intuition behind Cheeger's inequalities. Let's therefore generalize this result for the continuous case.
+
+We consider (w.l.o.g.) that $\abs{S} \le \abs{V}/2$ (otherwise we could swap the set we consider to be called $S$, i.e. consider $V\setminus S$). We define $y \in \mathbb{R}^n$ as follows:
+
+$$
+y(i) = \begin{cases}
+1 - \frac{\abs{S}}{\abs{V}} & \text{if } i \in S \\
+-\frac{\abs{S}}{\abs{V}}    & \text{if } i \notin S \\
+\end{cases}
+$$
+
+We define it this way to make sure that $y \perp v_1$ (recall that $v_1 = \vec{1}$). Hence:
+
+$$
+1 - \lambda_2
+= \min_{x \in \mathbb{R}^n : x \perp v_1}
+    \frac{\sum_{(i, j) \in E} (x(i) - x(j))^2}{d\cdot x^T x}
+\le \frac{\sum_{(i, j) \in E} (y(i) - y(j))^2}{d\cdot y^T y}
+$$
+
+Indeed, if $1 - \lambda_2$ is equal to the minimal value, it's less than any value that is part of the minimization problem. Let's now analyze what this fraction is.
+
+**Numerator**. With our selection of $y$, the numerator is actually equal to $\abs{\delta(S)}$:
+
+$$
+\sum_{(i, j) \in E} (y(i) - y(j))^2
+= \sum_{(i, j) \in E} \left(1 - \frac{\abs{S}}{\abs{V}} + \frac{\abs{S}}{\abs{V}} \right)^2
+= \abs{\delta(S)}
+$$
+
+This is because, as before, all edges not in the cut cancel out. Only edges in the cut contribute by 1, so the final result of the sum is the number of edges in the cut.
+
+**Denominator**. For the denominator, we have:
+
+$$
+\begin{align}
+y^T y 
+& = \sum_{i \in V} = y(i)^2 \\
+& = \abs{S} \left( 1 - \frac{\abs{S}}{\abs{V}} \right)^2 + (\abs{V} - \abs{S}) \cdot \left(\frac{\abs{S}}{\abs{V}} \right)^2 \\
+& = \frac{\abs{S}\cdot\abs{V \setminus S}}{\abs{V}} \\
+& \ge \frac{S}{2} \\
+\end{align}
+$$
+
+The last inequality holds because $\abs{V\setminus S} \ge \frac{\abs{V}}{2}$ holds by assumption.
+
+**Result**. Combining the two results above, we get:
+
+$$
+\frac{1-\lambda_2}{2} 
+\le \frac{1}{2} \frac{\sum_{(i, j) \in E} (y(i) - y(j))^2}{d\cdot y^T y}
+\le \frac{1}{2} \frac{\abs{\delta(S)}}{d\cdot\frac{S}{2}}
+= \frac{\abs{\delta(S)}}{d\cdot \abs{S}} = h(S)
+$$
+
+It follows that the conductance of every cut is at least $\frac{1-\lambda_2}{2}$, so $\frac{1-\lambda_2}{2} \le h(G)$ as required. $\qed$
+
+
 ### Spectral partitioning algorithm
 The spectral partitioning algorithm outputs a cut that cuts relatively few edges, with a small conductance.
 
@@ -5074,3 +5282,6 @@ def spectral_partitioning(G, v2):
     return best_cut
 {% endhighlight %}
 
+Assuming that we are given eigenvalues and eigenvectors, sorting is the bottleneck here; everything else is in linear time. This algorithm is therefore $\bigO{\abs{V} \log(\abs{V}) + \abs{E}}$.
+
+Note that the upper bound of Cheeger tells us that the returned set satisfies $h(S) \le \sqrt{2(1 - \lambda_2)}$.
