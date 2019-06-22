@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e 
+
 echo "Deploying to remote"
 cd _site
 git fetch deploy master

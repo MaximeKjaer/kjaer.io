@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e 
 
 echo "Fetching staged build"
 cd _site
