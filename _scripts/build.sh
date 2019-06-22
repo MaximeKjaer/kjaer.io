@@ -8,4 +8,4 @@ cd _site
 git checkout -b staging
 git add .
 git commit -q -m "Build #$TRAVIS_BUILD_NUMBER"
-git push deploy
+git push -u deploy staging
