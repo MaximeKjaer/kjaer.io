@@ -11,15 +11,20 @@ cache:
 env:
   global:
     - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
+    - CXX=g++-4.8
 
 addons:
   ssh_known_hosts: 
     - kjaermaxi.me
     - kjaer.io
   apt:
+    sources:
+      - ubuntu-toolchain-r-test # for GCC 4.9, needed for webp and others
     packages:
-    - graphviz              # to compile graphs to svg
-    - libcurl4-openssl-dev  # to avoid SSL errors
+      - graphviz              # to compile graphs to svg
+      - libcurl4-openssl-dev  # to avoid SSL errors
+      - g++-4.9
+
 
 before_install:
   - bash _scripts/install.sh
