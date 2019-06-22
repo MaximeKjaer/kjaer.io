@@ -39,5 +39,5 @@ jobs:
       script: bash _scripts/optimize.sh
     - stage: deploy
       name: Deploy
+      if: branch = master
       script: bash _scripts/deploy.sh
-
