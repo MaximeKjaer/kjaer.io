@@ -6,12 +6,16 @@ rm raindrop-deploy.enc
 chmod 600 raindrop-deploy
 mv raindrop-deploy ~/.ssh/id_rsa
 
-echo "Installing zopfli"
-git clone https://github.com/google/zopfli.git
-cd zopfli
-make
-chmod +x zopfli
+echo "Setting up git"
+mkdir _site
+cd _site
+git init
+git remote add deploy "deploy@kjaer.io:/var/www/kjaermaxi.me"
+git config user.name "Travis CI"
+git config user.email "maxime.kjaer+travisCI@gmail.com"
 cd ..
 
-echo "Installing npm dependencies"
+echo "Installing dependencies"
+gem update --system
+gem install bundler
 npm install

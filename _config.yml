@@ -125,7 +125,7 @@ exclude:
   - Rakefile
   - Gemfile
   - Gemfile.lock
-  - Gruntfile.js
+  - gulpfile.js
   - LICENSE
   - nohup.out
   - npm-debug.log
