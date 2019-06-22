@@ -33,7 +33,7 @@ jobs:
       script: bash _scripts/build.sh
     - stage: test
       name: Test HTML
-      script: bash _scripts/build.sh
+      script: bash _scripts/test.sh
     - stage: test
       name: Optimize
       script: bash _scripts/optimize.sh
