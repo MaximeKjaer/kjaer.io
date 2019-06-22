@@ -10,7 +10,7 @@ echo "Setting up git"
 mkdir _site
 cd _site
 git init
-git remote add deploy "deploy@kjaer.io:/var/www/kjaermaxi.me"
+git remote add deploy "deploy@kjaer.io:/var/www/kjaer.io"
 git config user.name "Travis CI"
 git config user.email "maxime.kjaer+travisCI@gmail.com"
 cd ..
