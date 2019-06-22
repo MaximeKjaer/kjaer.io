@@ -6,4 +6,4 @@ git checkout --track deploy/staging
 cd ..
 
 echo "Test"
-travis_wait 15 npm run test
+npm run test
