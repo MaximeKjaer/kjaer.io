@@ -55,7 +55,6 @@ function html() {
   const gz = modifiedExt(".gz").pipe(zopfli());
   const br = modifiedExt(".br").pipe(brotli.compress());
   return merge(gz, br).pipe(dest(paths.html.dest));
-  // .pipe(touch()); // these compression algorithms don't set the modified date
 }
 
 function heroImages() {
@@ -87,11 +86,10 @@ function heroImages() {
     .pipe(changed(paths.heroImages.dest, transform(replaceExt(".webp"))))
     .pipe(webp())
     .pipe(dest(paths.heroImages.dest));
-  // .pipe(touch());
 }
 
 function images() {
-  return modified(paths.images) // todo changed doesn't find things :(
+  return modified(paths.images)
     .pipe(imagemin())
     .pipe(webp())
     .pipe(dest(paths.images.dest));
@@ -106,9 +104,10 @@ function renameExt(from, to) {
 
 function modified(paths, changedOptions) {
   if (process.env.CI) {
-    return git
-      .diff("master", { cwd: "_site", log: false })
-      .pipe(filter(paths.src));
+    return src(paths.src);
+    // return git
+    //   .diff("master", { cwd: "_site", log: false })
+    //   .pipe(filter(paths.src));
   } else {
     return src(paths.src).pipe(changed(paths.dest, changedOptions));
   }
@@ -131,5 +130,5 @@ function replaceExt(ext) {
 }
 
 exports.clean = clean;
-exports.optimize = heroImages;
+exports.optimize = parallel(images, styles, html, heroImages);
 exports.default = exports.build;
