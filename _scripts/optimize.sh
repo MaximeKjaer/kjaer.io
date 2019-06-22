@@ -2,6 +2,8 @@
 
 echo "Fetching staged build"
 cd _site
+git fetch deploy master
+git fetch deploy staging
 git checkout --track deploy/master
 git checkout --track deploy/staging
 git branch
