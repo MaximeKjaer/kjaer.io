@@ -106,7 +106,9 @@ function renameExt(from, to) {
 
 function modified(paths, changedOptions) {
   if (process.env.CI) {
-    return git.diff("master", { log: false }).pipe(filter(paths.src));
+    return git
+      .diff("master", { cwd: "_site", log: false })
+      .pipe(filter(paths.src));
   } else {
     return src(paths.src).pipe(changed(paths.dest, changedOptions));
   }
