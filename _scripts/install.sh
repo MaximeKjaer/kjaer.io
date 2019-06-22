@@ -16,6 +16,6 @@ git config user.email "maxime.kjaer+travisCI@gmail.com"
 cd ..
 
 echo "Installing dependencies"
-gem update --system
+gem update --system --silent
 gem install bundler
 npm install
