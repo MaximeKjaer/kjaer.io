@@ -8,4 +8,4 @@ echo "Staging optimized build"
 cd _site
 git add .
 git commit -q -m "Optimize build #$TRAVIS_BUILD_NUMBER"
-git push
+git push --set-upstream origin staging 

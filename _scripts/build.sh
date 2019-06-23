@@ -15,4 +15,4 @@ echo "Staging build"
 cd _site
 git add .
 git commit -m "Build #$TRAVIS_BUILD_NUMBER"
-git push --force
+git push --force --set-upstream origin staging 
