@@ -2,9 +2,11 @@
 set -e
 
 echo "Resetting staging"
+cd _site
 git checkout master
 git branch -D staging || true
 git checkout -b staging
+cd ..
 
 echo "Building"
 npm run build
