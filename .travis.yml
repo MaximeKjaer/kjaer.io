@@ -36,7 +36,7 @@ jobs:
     - stage: test
       name: Optimize
       language: node_js
-      node_js: "node"
+      node_js: "lts/*"
       script: bash _scripts/optimize.sh
     - stage: deploy
       name: Deploy
