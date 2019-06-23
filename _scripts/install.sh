@@ -20,3 +20,4 @@ if [[ -v TRAVIS_RUBY_VERSION ]]; then
     gem update --system --silent --quiet
     gem install bundler --silent --quiet
 fi
+npm install
