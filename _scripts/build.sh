@@ -1,13 +1,16 @@
 #!/bin/bash
-set -e 
+set -e
+
+echo "Resetting staging"
+git checkout master
+git branch -D staging || true
+git checkout -b staging
 
 echo "Building"
 npm run build
 
 echo "Staging build"
 cd _site
-git status
 git add .
-git status
 git commit -m "Build #$TRAVIS_BUILD_NUMBER"
-git push --force --set-upstream deploy staging
+git push --force
