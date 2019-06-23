@@ -9,3 +9,7 @@ Gemfile.lock
 .jekyll-metadata
 _posts/drafts
 _sass/.scss-lint.yml
+*.log
+*.iml
+.idea
+.directory
