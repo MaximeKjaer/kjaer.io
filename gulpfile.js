@@ -82,21 +82,17 @@ function heroImages() {
   });
 
   const fullSize = modified(paths.heroImages).pipe(imagemin());
-  return (
-    merge(fullSize, ...pipes)
-      .pipe(changed(paths.heroImages.dest, transform(replaceExt(".webp"))))
-      // .pipe(webp())
-      .pipe(dest(paths.heroImages.dest))
-  );
+  return merge(fullSize, ...pipes)
+    .pipe(changed(paths.heroImages.dest, transform(replaceExt(".webp"))))
+    .pipe(webp())
+    .pipe(dest(paths.heroImages.dest));
 }
 
 function images() {
-  return (
-    modified(paths.images)
-      .pipe(imagemin())
-      // .pipe(webp())
-      .pipe(dest(paths.images.dest))
-  );
+  return modified(paths.images)
+    .pipe(imagemin())
+    .pipe(webp())
+    .pipe(dest(paths.images.dest));
 }
 
 // Utility functions

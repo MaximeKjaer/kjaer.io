@@ -17,6 +17,10 @@ git config user.email "maxime.kjaer+travisCI@gmail.com"
 cd ..
 
 echo "Installing dependencies"
-gem update --system --silent --quiet
-gem install bundler --silent --quiet
-npm install
+if [[ -v TRAVIS_RUBY_VERSION ]]; then
+    gem update --system --silent --quiet
+    gem install bundler --silent --quiet
+fi
+if [[ -v TRAVIS_NODE_VERSION ]]; then
+    npm install
+fi

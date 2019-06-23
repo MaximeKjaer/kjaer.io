@@ -11,19 +11,15 @@ cache:
 env:
   global:
     - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
-    - CXX=g++-4.8
 
 addons:
   ssh_known_hosts: 
     - kjaermaxi.me
     - kjaer.io
   apt:
-    sources:
-      - ubuntu-toolchain-r-test # for GCC 4.9, needed for webp and others
     packages:
       - graphviz              # to compile graphs to svg
       - libcurl4-openssl-dev  # to avoid SSL errors
-      - g++-4.9
 
 
 before_install:
@@ -39,8 +35,11 @@ jobs:
       script: bash _scripts/test.sh
     - stage: test
       name: Optimize
+      language: node_js
+      node_js: "node"
       script: bash _scripts/optimize.sh
     - stage: deploy
       name: Deploy
+      language: minimal
       if: branch = master
       script: bash _scripts/deploy.sh
