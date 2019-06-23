@@ -3,6 +3,7 @@ set -e
 
 echo "Fetching staged build"
 cd _site
+git fetch deploy staging
 git checkout --track deploy/staging
 cd ..
 
