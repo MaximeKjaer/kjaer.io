@@ -1,10 +1,10 @@
 #!/bin/bash
-if [ $TRAVIS_BRANCH == 'master' ] ; then
-	echo "Deploying to remote"
-	cd _site
-	git add .
-	git commit -m "Deploy build #$TRAVIS_BUILD_NUMBER"
-	git push deploy master
-else
-	echo "Not deploying, since this branch isn't master."
-fi
+set -e 
+
+echo "Deploying to remote"
+cd _site
+git checkout staging
+git merge --strategy=ours master # keep staging content, record merge
+git checkout master
+git merge staging # fast-forward master
+git push origin --delete staging

@@ -2,8 +2,6 @@ language: ruby
 rvm:
   - 2.5.1
 
-sudo: false # use container-based infrastructure for a faster build
-
 cache:
   bundler: true
   directories:
@@ -20,18 +18,28 @@ addons:
     - kjaer.io
   apt:
     packages:
-    - graphicsmagick        # for image compression
-    - graphviz              # to compile graphs to svg
-    - libcurl4-openssl-dev  # to avoid SSL errors
+      - graphviz              # to compile graphs to svg
+      - libcurl4-openssl-dev  # to avoid SSL errors
+
 
 before_install:
-  - gem update --system
-  - gem install bundler
   - bash _scripts/install.sh
 
-script:
-  - bash _scripts/build.sh
-  - travis_wait 30 bundle exec rake test
-
-after_success:
-  - bash _scripts/deploy.sh
+jobs:
+  include:
+    - stage: build
+      name: Jekyll build
+      script: bash _scripts/build.sh
+    - stage: test
+      name: Test HTML
+      script: npm run test
+    - stage: test
+      name: Optimize
+      language: node_js
+      node_js: "lts/*"
+      script: bash _scripts/optimize.sh
+    - stage: deploy
+      name: Deploy
+      language: minimal
+      if: branch = master
+      script: bash _scripts/deploy.sh
