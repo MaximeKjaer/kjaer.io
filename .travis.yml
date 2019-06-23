@@ -32,7 +32,7 @@ jobs:
       script: bash _scripts/build.sh
     - stage: test
       name: Test HTML
-      script: bash _scripts/test.sh
+      script: npm run test
     - stage: test
       name: Optimize
       language: node_js
