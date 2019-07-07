@@ -59,30 +59,32 @@ function html() {
 
 function heroImages() {
   const sizes = config.hero.breakpoints;
-  const pipes = sizes.map(size => {
-    return modified(paths.heroImages, transform(suffix(`-${size}`)))
-      .pipe(
-        responsive(
-          {
-            "*": {
-              width: size,
-              rename: { suffix: `-${size}` },
-              withoutEnlargement: false
-            }
-          },
-          {
-            silent: true,
-            errorOnUnusedConfig: false
+  const resized = sizes.map(size => {
+    return modified(paths.heroImages, transform(suffix(`-${size}`))).pipe(
+      responsive(
+        {
+          "*": {
+            width: size,
+            rename: { suffix: `-${size}` },
+            withoutEnlargement: false
           }
-        )
+        },
+        {
+          silent: true,
+          errorOnUnusedConfig: false
+        }
       )
-      .pipe(renameExt(".jpeg", ".jpg"))
-      .pipe(imagemin())
-      .pipe(dest(paths.heroImages.dest));
+    );
   });
 
+  const minified = merge(...resized)
+    .pipe(renameExt(".jpeg", ".jpg"))
+    .pipe(imagemin())
+    .pipe(dest(paths.heroImages.dest));
+
   const fullSize = modified(paths.heroImages).pipe(imagemin());
-  return merge(fullSize, ...pipes)
+
+  return merge(fullSize, minified)
     .pipe(changed(paths.heroImages.dest, transform(replaceExt(".webp"))))
     .pipe(webp())
     .pipe(dest(paths.heroImages.dest));
