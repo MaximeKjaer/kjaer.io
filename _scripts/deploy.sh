@@ -8,3 +8,4 @@ git merge --strategy=ours master # keep staging content, record merge
 git checkout master
 git merge staging # fast-forward master
 git push origin --delete staging
+cd ..

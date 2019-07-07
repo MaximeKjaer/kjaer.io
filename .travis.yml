@@ -1,6 +1,8 @@
 language: ruby
 rvm:
   - 2.5.1
+node_js:
+  - node
 
 cache:
   bundler: true
@@ -21,25 +23,10 @@ addons:
       - graphviz              # to compile graphs to svg
       - libcurl4-openssl-dev  # to avoid SSL errors
 
-
 before_install:
   - bash _scripts/install.sh
 
-jobs:
-  include:
-    - stage: build
-      name: Jekyll build
-      script: bash _scripts/build.sh
-    - stage: test
-      name: Test HTML
-      script: travis_wait 25 npm run test
-    - stage: test
-      name: Optimize
-      language: node_js
-      node_js: "lts/*"
-      script: bash _scripts/optimize.sh
-    - stage: deploy
-      name: Deploy
-      language: minimal
-      if: branch = master
-      script: bash _scripts/deploy.sh
+script:
+  - bash _scripts/build.sh
+  - bash _scripts/optimize.sh
+  - bash _scripts/deploy.sh
