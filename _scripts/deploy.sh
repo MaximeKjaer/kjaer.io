@@ -1,11 +1,13 @@
 #!/bin/bash
 set -e 
 
-echo "Deploying to remote"
+echo "Merging build to master"
 cd _site
-git checkout staging
-git merge --strategy=ours master # keep staging content, record merge
 git checkout master
-git merge staging # fast-forward master
+git merge --squash -m "Deploy build #$TRAVIS_BUILD_NUMBER" --allow-unrelated-histories -X theirs staging
+git commit -m "Deploy build #$TRAVIS_BUILD_NUMBER"
+
+echo "Deploying to remote"
+git push -u origin master
 git push origin --delete staging
 cd ..

@@ -1,18 +1,11 @@
 language: ruby
 rvm:
   - 2.5.1
-node_js:
-  - node
 
 cache:
   bundler: true
   directories:
     - node_modules
-    - $TRAVIS_BUILD_DIR/tmp/.htmlproofer # https://github.com/gjtorikian/html-proofer/issues/381
-
-env:
-  global:
-    - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
 
 addons:
   ssh_known_hosts: 
@@ -26,7 +19,16 @@ addons:
 before_install:
   - bash _scripts/install.sh
 
-script:
-  - bash _scripts/build.sh
-  - bash _scripts/optimize.sh
-  - bash _scripts/deploy.sh
+jobs:
+  include:
+    - stage: build
+      name: Build
+      script: bash _scripts/build.sh
+    - stage: prod
+      name: Production
+      language: node_js
+      node_js: "lts/*"
+      if: branch = master
+      script:
+        - bash _scripts/optimize.sh
+        - bash _scripts/deploy.sh

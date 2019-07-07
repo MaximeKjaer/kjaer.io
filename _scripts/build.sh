@@ -9,10 +9,11 @@ git checkout -b staging
 cd ..
 
 echo "Building"
-npm run build
+bundle exec jekyll build
 
 echo "Staging build"
 cd _site
 git add .
 git commit -m "Build #$TRAVIS_BUILD_NUMBER"
+git push --force --set-upstream origin staging
 cd ..
