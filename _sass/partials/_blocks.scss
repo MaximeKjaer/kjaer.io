@@ -22,7 +22,15 @@
 		margin-top: 0.5em;
 	}
 
+	&.definition {
+		@include block(hsl(195, 36, 91));
+	}
+
+	&.theorem {
+		@include block(hsl(100, 36, 91));
+	}
+
 	&.note {
-		@include block(#e1edf1);
+		@include block(hsl(195, 36, 91));
 	}
 }
