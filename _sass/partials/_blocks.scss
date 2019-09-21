@@ -7,6 +7,7 @@
 .block {
 	@include block(#eee);
 	padding: 0.3em 2em;
+	margin: 1em 0;
 	background-color: var(--block-bg-color);
 	border-bottom: 1px solid var(--block-border-color);
 	border-top: 1px solid var(--block-border-color);
