@@ -30,12 +30,22 @@ code, pre {
 	}
 }
 
+figure.highlight, div.highlight {
+	border: 1px solid $light-grey;
+
+	// For Liquid code blocks, Rouge output a `figure.highlight > div.highlight`.
+	// For Markdown code blocks, Rouge simply outputs a `div.highlight`.
+	// In the latter case, we do not want to have a second border inside the figure.
+	div.highlight {
+		border: 0;
+	}
+}
+
 .highlight {
 	margin: 20px 0;
 	-webkit-margin-before: 1em;
 	
 	background-color: $white;
-	border: 1px solid $light-grey;
 
 	page-break-inside: avoid;
 	

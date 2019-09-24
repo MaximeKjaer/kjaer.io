@@ -20,14 +20,11 @@
 	}
 	
 	// Inline code
-	p, li, dl, h1, h2, h3, h4, h5, h6, summary {
-		code {
-			padding: 1px 2px;
-			border-radius: 4px;
+	code.highlighter-rouge {
+		padding: .1em;
+		border-radius: .15em;
 
-			background-color: #e3e3e3;
-			color: darken($dark-grey, 35%);	
-		}
+		background-color: #ddd;
 	}
 	
 	// Various other elements
