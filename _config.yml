@@ -115,10 +115,18 @@ premonition:
       id: definition
   default:
     template: >
-      <div class="block {{type}}" {% if header %}id="{{ type }}:{{ title | slugify: "latin" }}"{% endif %}>
-        <p class="header">{{ type | capitalize}}{% if header %}: {{ title }}{% endif %}</p>
-        {{ content }}
-      </div>
+      {% if header %}
+        {% capture id %}{{ type }}:{{ title | slugify: "latin" }}{% endcapture %}
+        <div class="block {{ type }}" id="{{ id }}">
+          <a class="header" href="#{{ id }}">{{ type | capitalize }}: {{ title }}</a>
+          {{ content }}
+        </div>
+      {% else %}
+        <div class="block {{ type }}">
+          <p class="header">{{ type | capitalize }}</p>
+          {{ content }}
+        </div>
+      {% endif %}
 
 # Exclude these files from your production _site
 exclude:
