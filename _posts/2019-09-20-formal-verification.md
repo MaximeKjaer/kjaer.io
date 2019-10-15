@@ -578,7 +578,14 @@ digraph G {
 {% endgraphviz %}
 
 ### Provability
-TODO assumptions
+A formula is provable if we can derive it from a set of initial assumptions. We'll start by formally defining what an assumption even is:
+
+> definition "Assumptions"
+> Given $\seq{\mathscr{F}, \text{Infer}}$ where $\text{Infer} \subseteq \mathscr{F}^* \times \mathscr{F}$, and given a set of *assumptions* $A \subseteq \mathscr{F}$, a derivation from $A$ in $\seq{\mathscr{F}, \text{Infer}}$ is a proof in $\seq{\mathscr{F}, \text{Infer}'}$ where:
+> 
+> $$ \text{Infer}' = \text{Infer} \cup \set{\frac{\quad}{F} \mid F \in A} $$
+
+In other words, assumptions from $A$ are just treated as axioms (i.e. they are rules that have no prerequisites, hence $\seq{(), F}$). A derivation is a proof that starts from assumptions.
 
 > definition "Provable"
 > We say that "a formula $F \in \mathscr{F}$ is *provable* from a set of assumptions $A$", denoted $A \vdash_{\text{Infer}} F$, $\iff$ there exists a derivation from $A$ in $\text{Infer}$ that contains an inference step whose conclusion is $F$.
@@ -586,25 +593,248 @@ TODO assumptions
 > We write $\emptyset \vdash_{\text{Infer}} F$ (or simply $\vdash_{\text{Infer}} F$) to denote that there exists a proof in $\text{Infer}$ containing $F$ as a conclusion.
 
 ### Consequence and soundness in propositional logic
+> definition "Semantic consequence"
+> Given a set of assumptions $A \subseteq \mathscr{F}$, where $\mathscr{F}$ is in propositional logic, and given $C \in \mathscr{F}$, we say that $C$ is a *semantic consequence* of $A$, denoted $A \models C$, $\iff$ for every environment $e$ that defines all variables in $\text{FV}(C) \cup \bigcup_{P \in A} \text{FV}(P)$, we have:
+> 
+> $$ \eval{P}_e = 1 \quad \forall P \in A \implies \eval{C}_e = 1 $$
+
+In other words, iff an environment makes all assumptions true, and $C$ is true in an environment $e$ when the set of assumptions $A$ are all true in that environment, then we call $C$ a semantic consequence.
+
 > definition "Soundness"
 > A step $((P_1, \dots, P_n), C) \in \text{Infer}$ is sound $\iff \set{P_1, \dots, P_n} \models C$
 > 
-> A proof system is sound if every inference step is sound.
+> A proof system $\text{Infer}$ is sound if every inference step is sound.
 
-> theorem ""
+In other words, a conclusion of step is sound if it is a semantic consequence of the previous steps. A proof is sound if all steps are sound.
+
+If $C$ is an axiom (which has no precondition, meaning that $n = 0$ in the above), this definition of soundness means that $C$ is always a valid formula. We call this a **tautology**.
+
+> theorem "Semantic consequence and provability in sound proof systems"
 > Let $(\mathscr{F}, \text{Infer})$ where $\mathscr{F}$ are propositional logic formulas. If every inference rule in $\text{Infer}$ is sound, then $A \vdash_{\text{Infer}} F$ implies $A \models F$.
 
-The proof is immediate by induction on the length of the formal proof. As a consequence $\vdash_{\text{Infer}} F$ implies that $F$ is a tautology (always true? Todo).
+This theorem tells us that that if all the inference rules are sound, then $F$ is a semantic consequence of $A$ if $F$ is provable from $A$. This may sound somewhat straightforward (if everything is sound, then it seems natural that the semantic consequence follows from provability), but is a nice way to restate the previous definitions.
 
-Todo
+The proof is immediate by induction on the length of the formal proof. As a consequence $\emptyset \vdash_{\text{Infer}} F$ implies that $F$ is a tautology.
 
 ### Proving unsatisfiability
+Let's take a look at two propositional formulas $F$ and $G$. These are semantically equivalent if $F \models G$ and $G \models F$. 
+
+We can prove equivalence by repeatedly applying the following "case analysis" rule, which replaces a given variable $x$ by 0 in $F$ and by 1 in $G$:
+
+> definition "Case analysis rule"
+> $$\frac{F \qquad G}{F[x := 0] \lor G[x := 1]}$$
+
+This is [sound](#definition:soundness), because if we consider an environment $e$ defining $x \in \text{FV}(F) \cup \text{FV}(G)$, and assume $\eval{F}_e = 1$ and $\eval{G}_e = 1$, then:
+
+- if $e(x) = 0$ then $\eval{F[x := 0]}_e = \eval{F}_e = 1$
+- if $e(x) = 1$ then $\eval{G[x := 1]}_e = \eval{G}_e = 1$
+
+In either case $F[x := 0] \lor G[x := 1]$ remains true when $F$ and $G$ are sound.
+
+Strictly speaking, the above rule may not be quite enough, so we'll also introduce a few simplification rules that preserve the equivalence:
+
+$$\begin{align}
+0 \land F & \rightsquigarrow 0 \\
+1 \land F & \rightsquigarrow F \\
+0 \lor F & \rightsquigarrow F \\
+1 \lor F & \rightsquigarrow F \\
+\neg 0 & \rightsquigarrow 1 \\
+\neg 1 & \rightsquigarrow 0 \\
+\end{align}$$
+
+Those rules together form the sound system $\text{Infer}_D$, where:
+
+$$\text{Infer}_D = \set{\frac{F}{F'} \mid F' \text{ is simplified from } F}$$
+
+Remember that a set $A$ of formulas is [satisfiable](#definition:satisfiability) if there exists an environment $e$ such that for every formula $F \in A$, $\eval{F}_e = 1$. We can use $\text{Infer}_D$ to conclude unsatisfiability:
+
 > theorem "Refutation soundness"
 > If $A \vdash_{\text{Infer}_D} 0$ then $A$ is *unsatisfiable*
 
-This follows from the soundness of $\vdash_{\text{Infer}_D}$.
+Here, $0$ means false. This follows from the soundness of $\vdash_{\text{Infer}_D}$. More interestingly, the converse is also true.
 
 > theorem "Refutation completeness"
 > If a finite set $A$ is unsatisfiable, then $A \vdash_{\text{Infer}_D} 0$
 
+This means that $A$ unsatisfiable $\iff A \vdash_{\text{Infer}_D} 0$. 
+
 For the proof, we can take the conjunction of formulas in $A$ and existentially quantify it to get $A'$ (i.e. $\exists x. A$)
+
+### Conjunctive normal form
+To define conjunctive normal form, we need to define the three levels of the formula:
+
+- CNF is the conjunction of clauses
+- A clause is a disjunction of literals
+- A literal is either a variable $x$ or its negation $\neg x$
+
+This is a nice form to work with, because we have the following property: if $C$ is a clause then $\eval{C}_e = 1 \iff$ there exists a literal $x_i \in C$ such that $\eval{x_i}_e = 1$.
+
+We can represent formulas in CNF as a set of sets. For instance:
+
+$$
+A = a \land b \land (\neg a \lor \neg b) 
+\equiv \set{\set{a}, \set{b}, \set{\neg a, \neg b}}
+$$
+
+The false value can be represented as the empty clause $\emptyset$. Note that seeing an empty clause in CNF means that the whole formula is unsatisfiable.
+
+### Clausal resolution
+> definition "Clausal resolution rule"
+> Let $C_1$ and $C_2$ be two clauses.
+> 
+> $$\frac{C_1 \cup \set{x} \quad C_2 \cup \set{\neg x}}{C_1 \cup C_2}$$
+
+This rule resolves two clauses with respect to $x$. It says that if clause $C_1$ contains $x$, and clause $C_2$ contains $\neg x$, then we can remove the variable from the clauses.
+
+> theorem "Soundness of the clausal resolution rule"
+> Clausal resolution is sound for all clauses $C_1, C_2$ and propositional variables $x$.
+
+This tells us that clausal resolution is a valid rule. A stronger result is that we can use clausal resolution to determine satisfiability for any CNF formula:
+
+> theorem "Refutational completeness of the clausal resolution rule"
+> A finite set of clauses $A$ is satisfiable $\iff$ there exists a derivation to the empty clause from $A$ using clausal resolution.
+
+### Unit resolution
+A *unit* clause is a clause that has precisely one literal: it's of the form $\set{L}$ where $L$ is a literal. Note that the literal in a unit clause must be true.
+
+Given a literal $L$ we define the dual $\bar{L}$ as $\bar{\neg x} = x$ and $\bar{x} = \neg x$.
+
+Unit resolution is a special case of resolution where at least one of the clauses is a unit clause. 
+
+> definition "Unit resolution"
+> Let $C$ be a clause, and let $L$ be a literal.
+> 
+> $$\frac{C \qquad \set{L}}{C \setminus \set{\bar{L}}}$$
+
+This is sound (if $L$ is true then $\bar{L}$ is false and can thus be removed from another clause $C$). When applying this rule we get a clause $C' \subseteq C$: this gives us progress towards $\emptyset$, which is good.
+
+### Equivalence and equisatisfiability
+Let's recall that two formulas $F_1$ and $F_2$ are satisfiable iff $F_1 \models F_2$ and $F_2 \models F_1$.
+
+> definition "Equisatisfiability"
+> Two formulas $F_1$ and $F_2$ are *equisatisfiable* $\iff F_1$ is satisfiable whenever $F_2$ is satisfiable.
+
+Equivalent formulas are always equisatisfiable, but equisatisfiable formulas are not necessarily equivalent.
+
+### Tseytin's Transformation
+Tseytin's transformation is based on the following insight: if $F$ and $G$ are two formulas, and we let $x \notin \text{FV}(F)$ be a fresh variable, then $F$ is equisatisfiable with:
+
+$$(x \leftrightarrow G) \land F[G := x]$$
+
+[Tseytin's transformation](https://en.wikipedia.org/wiki/Tseytin_transformation) applies this recursively in order to transform an expression to CNF. To show this, let's consider a formula using $\neg, \land, \lor, \oplus, \rightarrow, \leftrightarrow$:
+
+$$
+F = ((p \lor q) \land r) \rightarrow (\neg s)
+$$
+
+The transformation works by introducing a fresh variable for each operation (we can think of it as being for each AST node):
+
+$$\begin{align}
+x_1 & \leftrightarrow \neg s \\
+x_2 & \leftrightarrow p \lor q \\
+x_3 & \leftrightarrow x_2 \land r \\
+x_4 & \leftrightarrow x_3 \rightarrow x_1 \\
+\end{align}$$
+
+Note that these formulas refer to subterms by their newly introduced equivalent variable. This prevents us from having an explosion of terms when converting to CNF.
+
+Each of these equivalences can be converted to CNF by using De Morgan's law, and switching between $\oplus$ and $\leftrightarrow$. The resulting conversions are:
+
+| Operation             | CNF                                              |
+| :-------------------- | :----------------------------------------------- |
+| $x = \neg a$          | $(\neg a \lor \neg x) \land (a \lor x)$          |
+| $x = a \land b$       | $(\neg a \lor \neg b \lor x) \land (a \lor \neg x) \land (b \lor \neg x)$ |
+| $x = a \lor b$        | $(a \lor b \lor \neg x) \land (\neg a \lor x) \land (\neg b \lor x)$ |
+| $x = a \rightarrow b$ | $(\neg a \lor b \lor \neg x) \land (a \lor x) \land (\neg b \lor x)$ |
+| $x = a \leftrightarrow b$ | $(\neg a \lor \neg b \lor x) \land (a \lor b \lor x) \land (a \lor \neg b \lor \neg c) \land (\neg a \lor b \lor \neg c)$ |
+| $x = a \oplus b$      | $(\neg a \lor \neg b \lor \neg x) \land (a \lor b \lor \neg x) \land (a \lor \neg b \lor c) \land (\neg a \lor b \lor c)$ |
+
+Note that the Tseytin transformations can be read as implications.
+For instance, the $x = a \lor b$ transformation can be read as:
+
+- If $a$ and $b$ are true, then $x$ is true
+- If $a$ is false, then $x$ is false
+- If $b$ is false, then $x$ is false
+
+It then takes the conjunction of all these equivalences:
+
+$$
+x_4 \land
+(x_4 \leftrightarrow x_3 \rightarrow x_1) \land
+(x_3 \leftrightarrow x_2 \land r) \land
+(x_2 \leftrightarrow p \lor q) \land
+(x_1 \leftrightarrow \neg s)
+$$
+
+$$
+x_4 \land
+(x_4 & \leftrightarrow x_3 \rightarrow x_1) \land
+(x_1 & \leftrightarrow \neg s) \land
+(x_2 & \leftrightarrow p \lor q) \land
+(x_3 & \leftrightarrow x_2 \land r) \land
+$$
+
+### SAT Algorithms for CNF
+Now that we know how to transform to CNF, let's look into algorithms that solve SAT for CNF formulas.
+
+#### Backtracking
+Perhaps the most intuitive algorithm is to construct a binary decision tree. At each node, we take a random decision. If that leads to a conflict, we go back one step, and take the opposite decision.
+
+This is quite simple, but the complexity is exponential. We'll therefore see some smarter algorithms.
+
+#### Non-chronological backtracking
+We still construct a binary decision tree. Each decision may also force some other variables into a certain value: we will track these implications in a directed graph.
+
+In this graph, each node represents a value assignment to a variable; let's say we color a node blue if it has been set directly by a decision, and in green if the value is a consequence of a decision. Edges go from nodes (which may be blue or green) to their consequences.
+
+As we construct the graph, we may create conflicts, meaning that we have two (green) nodes assigning different values to the same variable. In this case, we look at the set of nodes pointing to the conflicting pair of nodes:
+
+{% graphviz %}
+digraph G {
+    graph [bgcolor="transparent"]
+    node [style="filled",fillcolor="#e0ecf0"]
+    x1 [label="x1 = 0"]
+    x2 [label="x2 = 0"]
+    x3 [label="x3 = 1"]
+    x4 [label="x4 = 1", fillcolor="#e5f0e0"]
+    x7 [label="x7 = 1"]
+    x8 [label="x8 = 0", fillcolor="#e5f0e0"]
+    x11 [label="x11 = 1", fillcolor="#e5f0e0"]
+    x12 [label="x12 = 1"]
+
+    subgraph cluster_conflict {
+        graph [style="bold", color="red"]
+        x9a [label="x9 = 0", fillcolor="#e5f0e0"]
+        x9b [label="x9 = 1", fillcolor="#e5f0e0"]
+    }
+
+    x1->x4
+    x1->x8
+    x1->x12
+    x2->x11
+    x3->x9b
+    x3->x8
+    x7->x9a
+    x7->x9b
+    x8->x9a
+    x8->x12
+} 
+{% endgraphviz %}
+
+In the above example, the variables $x_3$, $x_7$ and $x_8$ point to the conflicting pair of $x_9$'s. This means that one of the assignments to these variables was incorrect, because it lead us to the conflict. We can learn from this conflict, and add the following **conflict clause** to the formula:
+
+$$(\neg x_3 \lor \neg x_7 \lor x_8)$$
+
+We can then backtrack to the first decision where we set $x_3$, $x_7$ or $x_8$ (which may be much earlier than the parent decision in the tree). Every once in a while, it may be useful to completely abandon the search tree (but keep the conflict clauses): this is called a restart.
+
+This approach significantly prunes the search tree; by introducing this conflict clause, we've learned something that will be useful forever. 
+
+#### 2-literal watching
+This algorithm does the standard trick of unit propagation, but avoids expensive book-keeping by only picking 2 literals in each clause to "watch". We ignore assignments to other variables in the clause.
+
+For each variable, we keep two sets of pointers:
+
+- Pointers to clauses in which the variable is watched in its negated form
+- Pointers to clauses in which the variable is watched in its non-negated form
+
+Then, when a variable is assigned true, we only need to visit clauses where its watched literal is negated. This means we don't have to backtrack!
