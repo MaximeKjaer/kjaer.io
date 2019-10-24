@@ -310,11 +310,22 @@ $$
 
 The initial carry is $c_1 = 0$. Every individual adder gets 3 bits of input to add: two bits, and the previous carry. It outputs a carry of 1 iff two or more input bits are 1. It outputs a single bit as the result of the addition, which is the XOR of all inputs.
 
-### Definitions and operations on formulas
-To continue the discussion of encoding, we'll have to introduce some concepts related to formulas.
+## Propositional logic
+### Definition
+Propositional logic is a language for representing Boolean functions $f: \set{0,1}^n \rightarrow {0, 1}$ as formulas. The grammar of this language is:
 
-#### QBF
-We've looked at boolean formulas, but let's now look at a small generalization, QBFs:
+$$
+P ::= x \mid
+      0 \mid 1 \mid
+      P \land P \mid P \lor P \mid
+      P \oplus P \mid P \rightarrow P \mid P \leftrightarrow P
+      \neg P
+$$
+
+Where $x$ denotes variable identifiers.
+
+### QBF
+Having looked at boolean formulas let's now look at a small generalization, QBFs:
 
 > definition "Quantified Boolean Formulas"
 > *Quantified Boolean Formulas* (QBFs) is built from:
@@ -325,7 +336,7 @@ We've looked at boolean formulas, but let's now look at a small generalization, 
 
 We will use $=$ as alternative notation for $\leftrightarrow$. A boolean formula is QBF without quantifiers ($\forall$ and $\exists$).
 
-#### Free variables
+### Free variables
 > definition "Free variables"
 > The free variables of a formula is the set of variables that are not bound by a quantifier:
 >  
@@ -341,7 +352,7 @@ We will use $=$ as alternative notation for $\leftrightarrow$. A boolean formula
 > \end{align}
 > $$
  
-#### Environment
+### Environment
 > definition "Environment"
 > An environment $e$ is a partial map from propositional variables to $\set{0, 1}$ ("false" or "true").
 > 
@@ -376,7 +387,7 @@ With this notation in hand, we can introduce the following shorthand:
 > definition "Models"
 > We write $e \models F$ to denote that $F$ is true in environment $e$, i.e. that $\eval{F}_e = 1$.
 
-#### Substitution
+### Substitution
 > definition "Substitution"
 > Let $F$ and $G$ be propositional formulas, and let $c$ be a variable. Let $F[c := G]$ denote the result of replacing each occurrence of $c$ in $F$ by $G$:
 > 
@@ -391,7 +402,7 @@ With this notation in hand, we can introduce the following shorthand:
 
 We'll also introduce a general notation to simultaneously replace many variables: $F[\vec{c} := \vec{G}]$ denotes the substitution of a vector $\vec{c}$ of variables with a vector of expressions $\vec{G}$.
 
-#### Validity, Satisfiability and Equivalence
+### Validity, Satisfiability and Equivalence
 > definition "Satisfiability"
 > A formula $F$ is *satisfiable* $\iff \exists e .\ e \models F$
 
@@ -415,8 +426,8 @@ This means that two formulas are equivalent if and only if they always return th
 > theorem "Equivalence and validity"
 > $F$ and $G$ are equivalent $\iff$ the formula $F \leftrightarrow G$ is valid.
 
-### Formula representation
-#### Formula representation of sequential circuits
+## Bounded model checking
+### Formula representation of sequential circuits
 > definition "Sequential circuit"
 > We represent a sequential circuit as a 5-tuple $C = (\vec{s}, \text{Init}, R, \vec{x}, \vec{a})$ where:
 > 
@@ -443,7 +454,7 @@ The sequential circuit is a representation of a transition system $C = (S, I, r,
 - $I = \set{\vec{v}\in\set{0,1}^n \mid [\vec{s} \mapsto \vec{v}] \models \text{Init}}$, meaning that the initial states of a transition system is given by an assignment of state variables that verifies the $\text{Init}$ formula
 - $r = \set{(\vec{v}, \vec{u}, \vec{v'}) \in \set{0,1}^{m+n+m} \mid [(\vec{s}, \vec{a}, \vec{s}') \mapsto (\vec{v}, \vec{u}, \vec{v'})] \models \exists \vec{x}.\ R }$, meaning that the transition relation is given by a mapping of states $\vec{s}$ and inputs $\vec{a}$ to next-states $\vec{s'}$, such that the mapping satisfies the transition formula. Here, the auxiliary variables are existentially quantified so that we can express the criterion without them.
 
-#### Inductive invariant checking
+### Inductive invariant checking
 Given a sequential circuit representation $C = (\vec{s}, \text{Init}, R, \vec{x}, \vec{a})$ of a transition system $M = (S, I, r, A)$, and a formula $\text{Inv}$, how can we check that $\text{Inv}$ is an [inductive invariant](#definition:inductive-invariant)? According to the definition, we require:
 
 - $I \subseteq \text{Inv}$
@@ -458,7 +469,7 @@ We'll ask the SAT solver to check if it's possible to break either of the two co
 
 If the SAT solver returns `UNSAT` to both, we have proven that $\text{Inv}$ is an inductive invariant. Note that this resembles a proof by induction (because it is!).
 
-#### Bounded model checking for reachability
+### Bounded model checking for reachability
 How do we check whether a given state is reachable? Often, we're interested in knowing if we can reach an error state or not; being able to do so would be bad. To simplify the question a little, we can ask whether we can reach this error state in $j$ steps.
 
 Let $E$ be the error formula corresponding to the error state, so $FV(E) \subseteq \set{s_1, \dots, s_n}$. When we talked about circuits, we said that the state and inputs change at each step, so let us denote the state at step $i$ as $\vec{s}^i$, and the inputs at step $i$ as $\vec{a}^i$. 
@@ -480,19 +491,6 @@ This formula starts at the initial state, then computes all states $\vec{s}^i$, 
 If the SAT solver returns `UNSAT`, the error state is not reachable. If it returns `SAT`, the 
 
 ## Satisfiability checking
-### Propositional boolean logic
-Propositional logic is a language for representing Boolean functions $f: \set{0,1}^n \rightarrow {0, 1}$ as formulas. The grammar of this language is:
-
-$$
-P ::= x \mid
-      0 \mid 1 \mid
-      P \land P \mid P \lor P \mid
-      P \oplus P \mid P \rightarrow P \mid P \leftrightarrow P
-      \neg P
-$$
-
-Where $x$ denotes variable identifiers.
-
 ### SAT problem
 The SAT problem is to determine whether a given formula $F$ is [satisfiable](#definition:satisfiability). The problem is NP-complete, but useful heuristics exist.
 
@@ -660,7 +658,7 @@ This means that $A$ unsatisfiable $\iff A \vdash_{\text{Infer}_D} 0$.
 
 For the proof, we can take the conjunction of formulas in $A$ and existentially quantify it to get $A'$ (i.e. $\exists x. A$)
 
-### Conjunctive normal form
+### Conjunctive Normal Form (CNF)
 To define conjunctive normal form, we need to define the three levels of the formula:
 
 - CNF is the conjunction of clauses
@@ -684,10 +682,10 @@ The false value can be represented as the empty clause $\emptyset$. Note that se
 > 
 > $$\frac{C_1 \cup \set{x} \quad C_2 \cup \set{\neg x}}{C_1 \cup C_2}$$
 
-This rule resolves two clauses with respect to $x$. It says that if clause $C_1$ contains $x$, and clause $C_2$ contains $\neg x$, then we can remove the variable from the clauses.
+This rule resolves two clauses with respect to $x$. It says that if clause $C_1$ contains $x$, and clause $C_2$ contains $\neg x$, then we can remove the variable from the clauses and merge them.
 
 > theorem "Soundness of the clausal resolution rule"
-> Clausal resolution is sound for all clauses $C_1, C_2$ and propositional variables $x$.
+> Clausal resolution is [sound](#definition:soundness) for all clauses $C_1, C_2$ and propositional variables $x$.
 
 This tells us that clausal resolution is a valid rule. A stronger result is that we can use clausal resolution to determine satisfiability for any CNF formula:
 
@@ -736,7 +734,7 @@ x_3 & \leftrightarrow x_2 \land r \\
 x_4 & \leftrightarrow x_3 \rightarrow x_1 \\
 \end{align}$$
 
-Note that these formulas refer to subterms by their newly introduced equivalent variable. This prevents us from having an explosion of terms when converting to CNF.
+Note that these formulas refer to subterms by their newly introduced equivalent variable. This prevents us from having an explosion of terms in this transformation.
 
 Each of these equivalences can be converted to CNF by using De Morgan's law, and switching between $\oplus$ and $\leftrightarrow$. The resulting conversions are:
 
@@ -746,8 +744,8 @@ Each of these equivalences can be converted to CNF by using De Morgan's law, and
 | $x = a \land b$       | $(\neg a \lor \neg b \lor x) \land (a \lor \neg x) \land (b \lor \neg x)$ |
 | $x = a \lor b$        | $(a \lor b \lor \neg x) \land (\neg a \lor x) \land (\neg b \lor x)$ |
 | $x = a \rightarrow b$ | $(\neg a \lor b \lor \neg x) \land (a \lor x) \land (\neg b \lor x)$ |
-| $x = a \leftrightarrow b$ | $(\neg a \lor \neg b \lor x) \land (a \lor b \lor x) \land (a \lor \neg b \lor \neg c) \land (\neg a \lor b \lor \neg c)$ |
-| $x = a \oplus b$      | $(\neg a \lor \neg b \lor \neg x) \land (a \lor b \lor \neg x) \land (a \lor \neg b \lor c) \land (\neg a \lor b \lor c)$ |
+| $x = a \leftrightarrow b$ | $(\neg a \lor \neg b \lor x) \land (a \lor b \lor x) \land (a \lor \neg b \lor \neg x) \land (\neg a \lor b \lor \neg x)$ |
+| $x = a \oplus b$      | $(\neg a \lor \neg b \lor \neg x) \land (a \lor b \lor \neg x) \land (a \lor \neg b \lor x) \land (\neg a \lor b \lor x)$ |
 
 Note that the Tseytin transformations can be read as implications.
 For instance, the $x = a \lor b$ transformation can be read as:
@@ -766,16 +764,34 @@ x_4 \land
 (x_1 \leftrightarrow \neg s)
 $$
 
-$$
-x_4 \land
-(x_4 & \leftrightarrow x_3 \rightarrow x_1) \land
-(x_1 & \leftrightarrow \neg s) \land
-(x_2 & \leftrightarrow p \lor q) \land
-(x_3 & \leftrightarrow x_2 \land r) \land
-$$
-
 ### SAT Algorithms for CNF
 Now that we know how to transform to CNF, let's look into algorithms that solve SAT for CNF formulas.
+
+#### DPLL
+The basic algorithm that we'll use is DPLL, which applies clausal resolution recursively until an empty clause appears, or all clauses are unit clauses. This works thanks to the [theorem on refutational completeness of the clausal resolution rule](#theorem:refutational-completeness-of-the-clausal-resolution-rule).
+
+{% highlight scala linenos %}
+def DPLL(S: Set[Clause]): Bool = {
+    val S' = subsumption(UnitProp(S))
+    if (∅ ∈ S') false // an empty clause means the whole thing is unsat
+    else if (S' has only unit clauses) true // the unit clauses give e
+    else {
+        val L = a literal from a clause of S' where {L} not in S'
+        DPLL(S' + Set(L)) || DPLL(S' + Set(complement(L)))
+    }
+}
+
+// Unit Propagation
+def UnitProp(S: Set[Clause]): Set[Clause] =
+    if (C ∈ S && unit U ∈ S && resolve(U, C) not in S)
+        UnitProp((S - C) + resolve(U, C))
+    else S
+
+def subsumption(S: Set[Clause]): Set[Clause] =
+    if (C1, C2 ∈ S such that C1 ⊆ C2)
+        subsumption(S - C2)
+    else S
+{% endhighlight %}
 
 #### Backtracking
 Perhaps the most intuitive algorithm is to construct a binary decision tree. At each node, we take a random decision. If that leads to a conflict, we go back one step, and take the opposite decision.
@@ -838,3 +854,229 @@ For each variable, we keep two sets of pointers:
 - Pointers to clauses in which the variable is watched in its non-negated form
 
 Then, when a variable is assigned true, we only need to visit clauses where its watched literal is negated. This means we don't have to backtrack!
+
+## Interpolation
+> definition "Interpolant"
+> Let $F$ and $G$ be propositional formulas. An *interpolant* for $F$ and $G$ is a formula $H$ such that:
+> 
+> - $F \models H$
+> - $H \models G$
+> - $\text{FV}(H) \subseteq \text{FV}(F) \cup \text{FV}(G)$
+
+Note that if these conditions hold, we have $F \models G$. The goal of $H$ is to serve as an explanation of why $F$ implies $G$.
+
+> theorem "Existence and Lattice of Interpolants"
+> Let $F$ and $G$ be propositional formulas such that $F \models G$ and let $S$ be the set of interpolants of $(F, G)$. Then:
+> 
+> - If $H_1, H_2 \in S$ then $H_1 \land H_2 \in S$ and $H_1 \lor H_2 \in S$
+> - $S \ne \emptyset$
+> - $\exists H_{\text{min}}.\ \forall H\in S.\ H_{\text{min}} \models H$
+> - $\exists H_{\text{max}}.\ \forall H\in S.\ H \models H_{\text{max}}$
+
+## Linear Temporal Logic
+### Definition
+With bounded model checking, we've seen how to check for a property over a finite trace. However, there are certain properties that we cannot prove by just seeing a finite trace. For instance, program termination or eventual delivery cannot be proven with the semantics of propositional logic. This will prompt us to introduce linear temporal logic, with which we can study events on a trace.
+
+Let $B$ be a boolean formula over state and input variables.
+
+$$
+F ::= B \mid
+      \neg F \mid
+      F_1 \lor  F_2 \mid
+      F_1 \land F_2 \mid
+      \text{next } F \mid
+      \text{prev } F \mid
+      F_1 \text{ until } F_2 \mid
+      F_1 \text{ since } F_2 
+$$
+
+We write $t, i \models F$ to say that a trace $t$ satisfies formula $F$ at time $i$. The rules for the above constructs are:
+
+$$\begin{align}
+t, i \models B & \iff \eval{B}_e = 1 \text{ where } e \text{ is the state of } t \text{ at step } i\\
+t, i \models \neg F & \iff \neg (t, i \models F)\\
+t, i \models F_1 \lor F_2 & \iff (t, i \models F_1) \lor (t, i \models F_2) \\
+t, i \models F_1 \land F_2 & \iff (t, i \models F_1) \land (t, i \models F_2) \\
+t, i \models \text{next } F & \iff (t, (i+1) \models F) \\
+t, i \models \text{prev } F & \iff i > 0 \land (t, (i-1) \models F) \\
+t, i \models F_1 \text{ until } F_2 & \iff \exists k, k \ge i .\ \forall j, i \le j < k .\ (t, k \models F_2) \land (t, j \models F_1) \\
+t, i \models F_1 \text{ since } F_2 & \iff \exists k, 0 \le k \le i .\ \forall j, k < j \le i .\ (t, k \models F_2) \land (t, j \models F_1) \\
+\end{align}$$
+
+We can interpret *until* to mean that $F_1$ is true until $F_2$ becomes true. For instance, we can guarantee something until an overflow bit is on, at which point all bets are off. Note that this does not impose any constraints on $F_1$ once $F_2$ is true.
+
+Note that *next* and *prev*, and *since* and *until* are duals of each other[^almost-duals].
+
+[^almost-duals]: Or rather, they're almost duals, because the future is infinite but the past is finite.
+
+We can add some derived operations from these:
+
+$$\begin{align}
+\text{eventually } F 
+    & \equiv 1 \text{ until } F 
+    & \iff \exists k \ge i .\ (t, k \models F) \\
+
+\text{globally } F
+    & \equiv \neg (\text{eventually } (\neg F))
+    & \iff \forall k \ge i .\ (t, k \models F) \\
+\end{align}$$
+
+The operation *globally* can be thought of as meaning "forever, from now on" (where "now" is step $i$). For instance, $\text{globally }(p \rightarrow \text{eventually } q)$ means that from now on, every point in the trace satisfying $p$ is followed by a point in the trace satisfying $q$ at some point.
+
+## Binary Decision Diagrams
+### Definition
+Binary Decision Diagrams (BDDs) are a representation of Boolean functions: we can represent a Boolean function $f: \set{0, 1}^n \rightarrow \set{0, 1}$ as a directed acyclic graph (DAG). We distinguish terminal from non-terminal nodes. Each edge is labeled with a *decision*: a solid edge ("high edge") means the variable is 1, and a dashed edge ("low edge") means that it is 0. The leaf nodes are labeled with the outcome. 
+
+For instance, the BDD for $x \lor y$ is:
+
+{% graphviz %}
+digraph G {
+    graph [bgcolor="transparent"]
+
+    subgraph cluster_output {
+        graph [color="transparent"]
+        f1a [label="1",shape="square",fontcolor="red"]
+        f1b [label="1",shape="square",fontcolor="red"]
+        f0 [label="0",shape="square",fontcolor="red"]       
+    }
+    x -> y [style="dashed"]
+    x -> f1a
+    y -> f1b
+    y -> f0 [style="dashed"]
+}
+{% endgraphviz %}
+
+We can also think of this DAG as a finite automaton, or as a (loop-free)branching program. 
+
+### Canonicity
+The key idea of BDDs is that specific forms of BDDs are *canonical*, and that BDDs can be transformed into their canonical form. For instance, the previous example can be rewritten as:
+
+{% graphviz %}
+digraph G {
+    graph [bgcolor="transparent"]
+    f1 [label="1",shape="square",fontcolor="red"]
+    f0 [label="0",shape="square",fontcolor="red"]
+    x -> y [style="dashed"]
+    x -> f1
+    y -> f1
+    y -> f0 [style="dashed"]
+}
+{% endgraphviz %}
+
+Let's define this transformation more formally. 
+
+We first assign an arbitrary total ordering to variables: variables must appear in that order along all paths. Here, we picked $x < y$ as our ordering. Note that in general, selecting a good ordering is an intractable problem, but decent application-specific heuristics exist. 
+
+Then, the reduced ordered BDD (RO-BDD) is obtained by:
+
+- Merging equivalent leaf nodes (which is what we did above)
+- Merging isomorphic nodes (same variables and same children)
+- Eliminating redundant tests (where both outgoing edges go to the same child)
+
+Doing this brings us to the following property:
+
+> theorem "Unicity of RO-BDD"
+> With a fixed variable order, the RO-BDD for a Boolean function $f$ is unique
+
+In the following, we'll always refer to RO-BDDs, and just call them BDDs.
+
+### Data structures for BDDs
+To encode a BDD, we'll map number all nodes as 0, 1, 2, ..., where 0 and 1 are terminals. The variables are also numbered as $x_1, x_2, \dots, x_n$. We also number the levels in the diagram, according to the total ordering that we selected: level 1 is the root node, and level $n+1$ contains terminal nodes.
+
+{% graphviz %}
+digraph G {
+    graph [bgcolor="transparent"]
+    subgraph cluster_level1 {
+        graph [label="Level 1"]
+        x
+    }
+    subgraph cluster_level2 {
+        graph [label="Level 2"]
+        y
+    }
+    subgraph cluster_level3 {
+        graph [label="Level 3"]
+        f1 [label="1",shape="square",fontcolor="red"]
+        f0 [label="0",shape="square",fontcolor="red"]
+    }
+    x -> y [style="dashed"]
+    x -> f1
+    y -> f1
+    y -> f0 [style="dashed"]
+}
+{% endgraphviz %}
+
+A data structure for BDDs is the node table $T : u \rightarrow (i, l, h)$, mapping a node $u$ to its low child $l$ and high child $h$. The node table also contains an entry $i$ describing the level in the ordering as well as the name of the variable.
+
+For instance, for the example we used above, the table would be:
+
+| Node number $u$ | Level and name $i$ | Low edge $l$ | High edge $h$ |
+| --- | ----- | --- | --- |
+| 0   | 3     |     |     |
+| 1   | 3     |     |     |
+| 2   | 2 $y$ | 0   | 1   |
+| 3   | 1 $x$ | 2   | 1   |
+
+We'll assume we have some methods for querying this table:
+
+- `init(T)`: initialize $T$ with 0 and 1 terminal nodes
+- `u = add(T, i, l, h)`: add node $u$ with $\seq{i, l, h}$ to $T$
+- `var(u)`: get $i$ of node $u$
+- `low(u)`: get $l$ of node $u$
+- `high(u)`: get $h$ of node $u$
+
+We can also define the inverse $H : (i, l, h) \rightarrow u$ of a node table, allowing us to find a node if we have all the information about it. We'll assume that we have some methods to query and update this structure:
+
+- `init(H)`: initialize $H$ with 0 and 1 terminal nodes
+- `u = lookup(H, i, l, h)`: get node $u$ from $(i, l, h)$
+- `insert(H, i, l, h, u)`: add an entry from $(i, l, h)$ to $u$
+
+### Basic operations on BDDs
+Somewhat surprisingly, given a BDD for a formula $f$, we can check whether it is a tautology, satisfiable or inconsistent in *constant time*:
+
+- $f$ is a tautology $\iff$ the BDD is $1$
+- $f$ is satisfiable $\iff$ the BDD is not $0$
+- $f \equiv g \iff$ their BDDs are equal[^consequence-unicity-ro-bdd]
+
+[^consequence-unicity-ro-bdd]: This is a consequence of the the [theorem of unicity of the RO-BDD](#theorem:unicity-of-ro-bdd)
+
+To insert a node into $T$, we ensure that we're keeping a RO-BDD by eliminating redundant tests, and preventing isomorphic nodes. If that is not the case, we can update the tabée $T$ and the reverse mapping $H$.
+
+{% highlight scala linenos %}
+type NodeId = Int
+type Level = Int
+
+def mk(i: Level, l: NodeId, h: NodeId): NodeId = {
+  // eliminate redundant tests:
+  if (l == h) l
+  // prevent isomorphic nodes:
+  else if (lookup(H, i, l, h) != null) lookup(H, i, l, h) 
+  else {
+    u = add(T, i, l, h) // insert node
+    insert(H, i, l, h, u) // update reverse mapping
+    u
+  }
+}
+{% endhighlight %}
+
+With this method in hand, we can see how to build a BDD from a formula $f$. The key idea is to use Shannon's expansion:
+
+$$f= (\neg x \land f\mid_{x=0}) \lor (x \land f\mid_{x=1})$$
+
+Here, $f\mid_{x=1}$ means that we replace all $x$ nodes by their high-edge subtree. In the formula, we can think of it as a substitution of $x$ by 1. We call this basic operation `Restrict`.
+
+This breaks the problem into two subproblems, which we can solve recursively:
+
+{% highlight scala linenos %}
+def build(f: Formula): NodeId = build2(f, 1)
+private def build2(f: Formula, level: Level): NodeId =
+  if (level > n)
+    if (f == False) 0 else 1
+  else {
+    xi = f.variables.head
+    f0 = build2(f.subst(xi, 0), level + 1)
+    f1 = build2(f.subst(xi, 1), level + 1)
+    mk(level, f0, f1)
+  }
+{% endhighlight %}
+
