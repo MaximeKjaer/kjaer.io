@@ -74,7 +74,12 @@ figure.highlight, div.highlight {
 			background-color: $white;
 		}
 	}
-	
+
+	// Command prompts ("$" in console mode, corresponding to the
+	// `Generic.Prompt` Rouge token) should not be selectable.
+	.gp {
+		user-select: none;
+	}	
 
 	// Syntax highlighting!
 	.c {
