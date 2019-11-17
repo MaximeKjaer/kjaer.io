@@ -8,27 +8,24 @@ cache:
     - node_modules
 
 addons:
-  ssh_known_hosts: 
+  ssh_known_hosts:
     - kjaermaxi.me
     - kjaer.io
   apt:
     packages:
-      - graphviz              # to compile graphs to svg
-      - libcurl4-openssl-dev  # to avoid SSL errors
+      - graphviz # to compile graphs to svg
+      - libcurl4-openssl-dev # to avoid SSL errors
 
-before_install:
+install:
   - bash _scripts/install.sh
 
-jobs:
-  include:
-    - stage: build
-      name: Build
-      script: bash _scripts/build.sh
-    - stage: prod
-      name: Production
-      language: node_js
-      node_js: "lts/*"
-      if: branch = master
-      script:
-        - bash _scripts/optimize.sh
-        - bash _scripts/deploy.sh
+script:
+  - npm run build
+  - npm run optimize
+
+deploy:
+  provider: script
+  script: bash _scripts/deploy.sh
+  skip_cleanup: true
+  on:
+    branch: master

@@ -10,14 +10,8 @@ mv raindrop-deploy ~/.ssh/id_rsa
 echo "Setting up git"
 git config user.name "Travis CI"
 git config user.email "maxime.kjaer+travisCI@gmail.com"
-git clone --depth 1 --no-single-branch deploy@kjaer.io:/var/www/kjaer.io/ _site
-cd _site
-git checkout staging || git checkout -b staging
-cd ..
+git clone --depth 1 --single-branch deploy@kjaer.io:/var/www/kjaer.io/ _site
 
 echo "Installing dependencies"
-if [[ -v TRAVIS_RUBY_VERSION ]]; then
-    gem update --system --silent --quiet
-    gem install bundler --silent --quiet
-fi
+bundle install
 npm install
