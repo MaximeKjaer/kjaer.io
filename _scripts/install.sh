@@ -12,6 +12,5 @@ git config user.name "Travis CI"
 git config user.email "maxime.kjaer+travisCI@gmail.com"
 git clone --depth 1 --single-branch deploy@kjaer.io:/var/www/kjaer.io/ _site
 
-echo "Installing dependencies"
-bundle install
+echo "Installing NPM dependencies"
 npm install
