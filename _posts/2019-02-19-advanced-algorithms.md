@@ -4731,7 +4731,9 @@ The following randomized caching strategy is known as the marking algorithm. Sim
     + If the page is in the cache, mark it
     + Otherwise:
         * If there is an unmarked page in the cache, evict an unmarked page chosen uniformly at random, bring the requested page in, mark it.
-        * Otherwise, unmark all pages and start a new phase
+        * Otherwise, unmark all pages and start a new phase.
+
+Let's state the following about the competitive ratio of this strategy:
 
 > lemma "Competitive ratio of the marking algorithm"
 > The above strategy achieves a competitive ratio of:
