@@ -17,6 +17,10 @@
 		font-size: $title-weight-light;
 		color: var(--block-border-color);
 		font-variant: small-caps;
+
+		.mjx-math {
+			font-variant: normal;
+		}
 	}
 
 	p {
