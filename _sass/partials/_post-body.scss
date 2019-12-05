@@ -34,6 +34,11 @@
 		width: 20%;
 	}
 
+	// Do not add extra margins between list items with paragraphs:
+	li p:first-child {
+		margin-top: 0;
+	}
+
 	ol {
 		padding-left: 80px;
 	}
