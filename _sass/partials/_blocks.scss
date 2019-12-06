@@ -38,4 +38,8 @@
 	&.note {
 		@include block(hsl(195, 36, 91));
 	}
+
+	&.lemma {
+		@include block(hsl(220, 36, 91));
+	}
 }
