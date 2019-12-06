@@ -14,6 +14,11 @@ $$
 \newcommand{\qed}[0]{\tag*{$\blacksquare$}}
 \newcommand{\bigland}{\bigwedge} 
 \newcommand{\biglor}{\bigvee} 
+\newcommand{\post}{\text{post}}
+\newcommand{\postapprox}{\post^{\text{#}}}
+\newcommand{\triple}[3]{\set{#1}\ #2 \ \set{#3}}
+\newcommand{\wp}[1]{\text{wp}\!\left(#1\right)}
+\newcommand{\sp}[1]{\text{sp}\!\left(#1\right)}
 $$
 
 Throughout these notes, vectors are denoted in bold and lowercase (e.g. $\vec{x}$).
@@ -148,14 +153,14 @@ We'll introduce another definition in order to give an alternative definition of
 > definition "Post"
 > If $X \subseteq S$, define:
 > 
-> $$\text{post}(X) = \bar{r}[X]$$
+> $$\post(X) = \bar{r}[X]$$
 > 
 > We also define: 
 > 
 > $$
 > \begin{align}
-> \text{post}^0(X)     & := X \\
-> \text{post}^{n+1}(X) & := \text{post}\left(\text{post}^n(X)\right)
+> \post^0(X)     & := X \\
+> \post^{n+1}(X) & := \post\left(\post^n(X)\right)
 > \end{align}
 > $$
 
@@ -163,14 +168,14 @@ This definition of post leads us to another formulation of reach:
 
 > theorem "Definition 2 of reach"
 > $$
-> \bigcup_{n \ge 0} \text{post}^n(I) = \text{Reach}(M)
+> \bigcup_{n \ge 0} \post^n(I) = \text{Reach}(M)
 > $$
 
 The proof is done by expanding the post:
 
 $$
 \begin{align}
-\bigcup_{n \ge 0} \text{post}^n(I)
+\bigcup_{n \ge 0} \post^n(I)
 \overset{(1)}{=} \bigcup_{n \ge 0} \bar{r}[\dots \bar{r}[I] \dots]
 \overset{(2)}{=} \bigcup_{n \ge 0} \bar{r}^n[I]
 \overset{(3)}{=} \left(\bigcup_{n \ge 0} \bar{r}^n\right)[I]
@@ -181,7 +186,7 @@ $$
 
 Where:
 
-- Step (1) is by [the definition of $\text{post}$](#definition:post).
+- Step (1) is by [the definition of $\post$](#definition:post).
 - Step (2) is by [the definition of iteration](#definition:iteration), and using the identity $\bar{r_1}[\bar{r_2}[X]] = (\bar{r_1}\circ\bar{r_2})[X]$[^proof-ex-1-2-1-1].
 - Step (3) is done by moving terms around. We won't go into too many details, but it's easy to convince oneself of this step by thinking about what the terms mean intuitively: the union of states reachable in $1, 2, \dots, n$ steps is equal to the states reachable in the union of $1, 2, \dots, n$ steps.
 - Step (4) is by [the definition of transitive closure](#definition:transitive-closure).
@@ -474,7 +479,7 @@ How do we check whether a given state is reachable? Often, we're interested in k
 
 Let $E$ be the error formula corresponding to the error state, so $FV(E) \subseteq \set{s_1, \dots, s_n}$. When we talked about circuits, we said that the state and inputs change at each step, so let us denote the state at step $i$ as $\vec{s}^i$, and the inputs at step $i$ as $\vec{a}^i$. 
 
-We'll construct an error formula $T_j$ that is satisfiable if and only if there exists a trace of length $j$ starting from the initial state that satisfies $E$:
+We'll construct an error formula $T_j$ that is satisfiable if and only if there exists a trace of length $j$ starting from the initial state $\text{Init}$ that satisfies $E$:
 
 $$
 T_j \equiv 
@@ -661,20 +666,20 @@ For the proof, we can take the conjunction of formulas in $A$ and existentially 
 ### Conjunctive Normal Form (CNF)
 To define conjunctive normal form, we need to define the three levels of the formula:
 
-- CNF is the conjunction of clauses
+- <abbr title="Conjunctive Normal Form">CNF</abbr> is the conjunction of clauses
 - A clause is a disjunction of literals
 - A literal is either a variable $x$ or its negation $\neg x$
 
 This is a nice form to work with, because we have the following property: if $C$ is a clause then $\eval{C}_e = 1 \iff$ there exists a literal $x_i \in C$ such that $\eval{x_i}_e = 1$.
 
-We can represent formulas in CNF as a set of sets. For instance:
+We can represent formulas in <abbr title="Conjunctive Normal Form">CNF</abbr> as a set of sets. For instance:
 
 $$
 A = a \land b \land (\neg a \lor \neg b) 
 \equiv \set{\set{a}, \set{b}, \set{\neg a, \neg b}}
 $$
 
-The false value can be represented as the empty clause $\emptyset$. Note that seeing an empty clause in CNF means that the whole formula is unsatisfiable.
+The false value can be represented as the empty clause $\emptyset$. Note that seeing an empty clause in <abbr title="Conjunctive Normal Form">CNF</abbr> means that the whole formula is unsatisfiable.
 
 ### Clausal resolution
 > definition "Clausal resolution rule"
@@ -687,7 +692,7 @@ This rule resolves two clauses with respect to $x$. It says that if clause $C_1$
 > theorem "Soundness of the clausal resolution rule"
 > Clausal resolution is [sound](#definition:soundness) for all clauses $C_1, C_2$ and propositional variables $x$.
 
-This tells us that clausal resolution is a valid rule. A stronger result is that we can use clausal resolution to determine satisfiability for any CNF formula:
+This tells us that clausal resolution is a valid rule. A stronger result is that we can use clausal resolution to determine satisfiability for any <abbr title="Conjunctive Normal Form">CNF</abbr> formula:
 
 > theorem "Refutational completeness of the clausal resolution rule"
 > A finite set of clauses $A$ is satisfiable $\iff$ there exists a derivation to the empty clause from $A$ using clausal resolution.
@@ -707,7 +712,7 @@ Unit resolution is a special case of resolution where at least one of the clause
 This is sound (if $L$ is true then $\bar{L}$ is false and can thus be removed from another clause $C$). When applying this rule we get a clause $C' \subseteq C$: this gives us progress towards $\emptyset$, which is good.
 
 ### Equivalence and equisatisfiability
-Let's recall that two formulas $F_1$ and $F_2$ are satisfiable iff $F_1 \models F_2$ and $F_2 \models F_1$.
+Let's recall that two formulas $F_1$ and $F_2$ are satisfiable iff $F_1 \models F_2$ and $F_2 \models F_1$. TODO is this a typo? Should it be "equivalent"?
 
 > definition "Equisatisfiability"
 > Two formulas $F_1$ and $F_2$ are *equisatisfiable* $\iff F_1$ is satisfiable whenever $F_2$ is satisfiable.
@@ -715,11 +720,11 @@ Let's recall that two formulas $F_1$ and $F_2$ are satisfiable iff $F_1 \models 
 Equivalent formulas are always equisatisfiable, but equisatisfiable formulas are not necessarily equivalent.
 
 ### Tseytin's Transformation
-Tseytin's transformation is based on the following insight: if $F$ and $G$ are two formulas, and we let $x \notin \text{FV}(F)$ be a fresh variable, then $F$ is equisatisfiable with:
+Tseytin's transformation is based on the following insight: if $F$ and $G$ are two formulas, and we let $x \notin \text{FV}(F)$ be a fresh variable, then $F$ is [equisatisfiable](#definition:equisatisfiability) with:
 
 $$(x \leftrightarrow G) \land F[G := x]$$
 
-[Tseytin's transformation](https://en.wikipedia.org/wiki/Tseytin_transformation) applies this recursively in order to transform an expression to CNF. To show this, let's consider a formula using $\neg, \land, \lor, \oplus, \rightarrow, \leftrightarrow$:
+[Tseytin's transformation](https://en.wikipedia.org/wiki/Tseytin_transformation) applies this recursively in order to transform an expression to <abbr title="Conjunctive Normal Form">CNF</abbr>. To show this, let's consider a formula using $\neg, \land, \lor, \oplus, \rightarrow, \leftrightarrow$:
 
 $$
 F = ((p \lor q) \land r) \rightarrow (\neg s)
@@ -736,7 +741,7 @@ x_4 & \leftrightarrow x_3 \rightarrow x_1 \\
 
 Note that these formulas refer to subterms by their newly introduced equivalent variable. This prevents us from having an explosion of terms in this transformation.
 
-Each of these equivalences can be converted to CNF by using De Morgan's law, and switching between $\oplus$ and $\leftrightarrow$. The resulting conversions are:
+Each of these equivalences can be converted to <abbr title="Conjunctive Normal Form">CNF</abbr> by using De Morgan's law, and switching between $\oplus$ and $\leftrightarrow$. The resulting conversions are:
 
 | Operation             | CNF                                              |
 | :-------------------- | :----------------------------------------------- |
@@ -765,10 +770,10 @@ x_4 \land
 $$
 
 ### SAT Algorithms for CNF
-Now that we know how to transform to CNF, let's look into algorithms that solve SAT for CNF formulas.
+Now that we know how to transform to <abbr title="Conjunctive Normal Form">CNF</abbr>, let's look into algorithms that solve SAT for <abbr title="Conjunctive Normal Form">CNF</abbr> formulas.
 
 #### DPLL
-The basic algorithm that we'll use is DPLL, which applies clausal resolution recursively until an empty clause appears, or all clauses are unit clauses. This works thanks to the [theorem on refutational completeness of the clausal resolution rule](#theorem:refutational-completeness-of-the-clausal-resolution-rule).
+The basic algorithm that we'll use is [<abbr title="Davis–Putnam–Logemann–Loveland">DPLL</abbr>](https://en.wikipedia.org/wiki/DPLL_algorithm), which applies clausal resolution recursively until an empty clause appears, or all clauses are unit clauses. This works thanks to the [theorem on refutational completeness of the clausal resolution rule](#theorem:refutational-completeness-of-the-clausal-resolution-rule).
 
 {% highlight scala linenos %}
 def DPLL(S: Set[Clause]): Bool = {
@@ -854,24 +859,6 @@ For each variable, we keep two sets of pointers:
 - Pointers to clauses in which the variable is watched in its non-negated form
 
 Then, when a variable is assigned true, we only need to visit clauses where its watched literal is negated. This means we don't have to backtrack!
-
-## Interpolation
-> definition "Interpolant"
-> Let $F$ and $G$ be propositional formulas. An *interpolant* for $F$ and $G$ is a formula $H$ such that:
-> 
-> - $F \models H$
-> - $H \models G$
-> - $\text{FV}(H) \subseteq \text{FV}(F) \cup \text{FV}(G)$
-
-Note that if these conditions hold, we have $F \models G$. The goal of $H$ is to serve as an explanation of why $F$ implies $G$.
-
-> theorem "Existence and Lattice of Interpolants"
-> Let $F$ and $G$ be propositional formulas such that $F \models G$ and let $S$ be the set of interpolants of $(F, G)$. Then:
-> 
-> - If $H_1, H_2 \in S$ then $H_1 \land H_2 \in S$ and $H_1 \lor H_2 \in S$
-> - $S \ne \emptyset$
-> - $\exists H_{\text{min}}.\ \forall H\in S.\ H_{\text{min}} \models H$
-> - $\exists H_{\text{max}}.\ \forall H\in S.\ H \models H_{\text{max}}$
 
 ## Linear Temporal Logic
 ### Definition
@@ -1079,4 +1066,204 @@ private def build2(f: Formula, level: Level): NodeId =
     mk(level, f0, f1)
   }
 {% endhighlight %}
+
+## Interpolation-based model checking
+
+### Interpolation
+> definition "Interpolant"
+> Let $F$ and $G$ be propositional formulas. An *interpolant* for $F$ and $G$ is a formula $H$ such that:
+> 
+> - $F \models H$
+> - $H \models G$
+> - $\text{FV}(H) \subseteq \text{FV}(F) \cap \text{FV}(G)$
+
+Note that if these conditions hold, we have $F \models G$. The goal of $H$ is to serve as an explanation of why $F$ implies $G$, using variables that the two have in common.
+
+> theorem "Existence and Lattice of Interpolants"
+> Let $F$ and $G$ be propositional formulas such that $F \models G$ and let $S$ be the set of interpolants of $(F, G)$. Then:
+> 
+> - If $H_1, H_2 \in S$ then $H_1 \land H_2 \in S$ and $H_1 \lor H_2 \in S$
+> - $S \ne \emptyset$
+> - $\exists H_{\text{min}}.\ \forall H\in S.\ H_{\text{min}} \models H$
+> - $\exists H_{\text{max}}.\ \forall H\in S.\ H \models H_{\text{max}}$
+
+For instance, let's consider two formulas $F(\vec{x}, \vec{y})$ and $G(\vec{y}, \vec{z})$. The variables they have in common are $\vec{y}$ so we're looking for an interpolant $I(\vec{y})$.
+
+### Reverse interpolants
+We know that $F \rightarrow G \equiv \neg F \lor G$. The negation of this is $F \land \neg G$. Let $A = F$ and $B = \neg G$. Instead of looking at the [validity](#definition:validity) of $F \rightarrow G$, we can look at [unsatisfiability](#definition:satisfiability) of $A \land B$. To aid us in this, we'll define $H$ as an interpolant for $A \land B$, meaning that we have:
+
+- $A \models H$
+- $H \models B$, meaning that $B \models \neg H$
+- $\text{FV}(H) \subseteq \text{FV}(A) \cap \text{FV}(B)$
+
+As previously seen, we can determine whether $A \land B$ is unsatisfiable by using the [theorem on completeness of clause resolution](#theorem:refutational-completeness-of-the-clausal-resolution-rule): it is unsatisfiable iff we can derive the empty clause using resolution. A key insight here is that we can use the resolution proof to construct an interpolant $H$ for $A \land B$.
+
+Let's define $I(C)$ as the interpolant for $A \land (\neg C \mid_A)$ and $B \land (\neg C \mid_B)$, where $C \mid_A$ denotes the clause $C$, but only with literals belong in $\text{FV}(A)$. The idea here is that we can construct it recursively, and that $I(\emptyset)$ is the interpolant for $A$ and $B$.
+
+There are multiple ways of constructing this $I(C)$, like the Symmetric System or McMillan's System (which uses a SAT solver). There are many interpolants that exist, and it's unclear which is best. Small formulas are good, but we do not currently know any efficient algorithms to find them.
+
+### Tseytin's transformation and interpolants
+Remember that [Tseytin's transformation](#tseytins-transformation) transforms an expression into <abbr title="Conjunctive Normal Form">CNF</abbr> by introducing fresh variables. Suppose we have converted $A$ and $B$ to $\text{cnf}(A)$ and $\text{cnf}(B)$, and that the newly introduced variables are $\vec{p_A}$ and $\vec{p_B}$, respectively. The results of the Tseytin transformations are:
+
+$$
+\emptyset \models A \leftrightarrow \exists \vec{p_A}.\ \text{cnf}(A) 
+\quad\text{and}\quad
+\emptyset \models B \leftrightarrow \exists \vec{p_B}.\ \text{cnf}(B)
+$$
+
+> lemma "Interpolant for CNF"
+> The interpolant $H$ for $\text{cnf}(A)$ and $\text{cnf}(B)$ is also an interpolant for $A$ and $B$
+
+We'll prove this by showing that all [three properties of interpolants](#definition:interpolant) are preserved:
+
+- todo
+- todo
+- By assumption of $H$ being an interpolant for $\text{cnf}(A)$ and $\text{cnf}(B)$, we have:
+  
+  $$\begin{align}
+  \text{FV}(H)
+  & \subseteq \text{FV}(\text{cnf}(A))\cap\text{FV}(\text{cnf}(B)) \\
+  & \subseteq (\text{FV}(A)\cup\vec{p_A}) \cap (\text{FV}(B)\cup\vec{p_B}) \\
+  & = \text{FV}(A) \cap \text{FV}(B)
+  \end{align}$$
+
+  The second step is by the above definition of the transformation's results. The last step is because $\vec{p_A}$ and $\vec{p_B}$ are disjoint.
+
+$\qed$
+
+### Reachability checking using interpolants
+We can use interpolants to improve upon bounded model checking, in order to prove properties without having to unfold up to the maximum length. To do this, we'll need to recall two concepts that we've seen previously:
+
+- Remember that [bounded model checking](#bounded-model-checking-for-reachability) constructs a formula $T_k$ that is satisfiable iff there exists a trace of length $\le k$ starting from the initial state, satisfying an error formula $E$.
+- Also, recall the [$\post$ function](#post).
+
+#### Reachability checking
+To check for reachability, we can keep adding $\post^i$ to the set of reachable states until one of the following two situations arises:
+
+- We reach a fixpoint: $\post^{i+1}(\text{Init}) = \post^i(\text{Init})$)
+- We find that an error state is reachable: $\post^i(\text{Init}) \cap E \ne \emptyset$.
+
+The algorithm would look something like this:
+
+{% highlight scala linenos %}
+val errorStates: Set[State] = ???
+
+def reachable(currentStates: Set[State]): Boolean = {
+  val nextStates = currentStates union post(currentStates)
+  if (nextStates intersect errorStates != emptyset)
+    true
+  else if (nextStates == currentStates)
+    false
+  else
+    reachable(nextStates)
+}
+
+reachable(Init)
+{% endhighlight %}
+
+The problem with this approach is that computing $\post$ may result in a complex image (a large formula or BDD), and it may take many steps to compute all reachable states. To fix this problem, we can do the same trick we always do in formal verification: simplifying the model.
+
+#### Approximated reachability checking
+The insight to simplify is that we can drop complex and uninteresting parts of the $\post$ formula: instead of $F_\text{interesting} \land F_\text{complex}$, we'll only look at $F_\text{interesting}$. This allows us to be faster: indeed, a formula that says nothing about certain boolean variables describes a **larger set of states** (meaning that we grow faster), and has a **smaller formula** (meaning that the result of $\post$ is less complex).
+
+So how does one approximate the post? There are many possible approximations of it, so we'll use a subscript to denote the (potentially) different approximations. We'll use a superscript $\text{#}$ to denote an approximation of something. Note that a superscript number $n$ still denotes $n$ recursive applications of the function.
+
+Let $\postapprox_j(X)$ denote any over-approximation of $\post$:
+
+$$\post(X) \subseteq \postapprox_j(X)$$
+
+We'll consider a monotonic $\post$[^why-monotonic], meaning that:
+
+[^why-monotonic]: Why do we consider $\post$ to be monotonic? Well, that will become clear [later in the course](#bounded-model-checking-of-a-program): for our application of verifying programs, we will work with monotonic relations.
+
+$$X \subseteq Y \implies \text{post}(X) \subseteq \post(Y)$$
+
+Now, consider the following sequence:
+
+| $\text{Init}$                | $\text{Init}$ |
+| $\text{post}(\text{Init})$   | $\postapprox_1(\text{Init})$ |
+| $\text{post}^2(\text{Init})$ | $\postapprox_2(\postapprox_1(\text{Init}))$ |
+| ... | ... |
+| $\text{post}^n(\text{Init})$ | $\postapprox_n(\dots\postapprox_2(\postapprox_1(\text{Init}))\dots)$ |
+
+The relationship here is that:
+
+$$
+\text{post}(\text{post}^i(\text{Init}))
+\subseteq \text{post}(\postapprox_i(\dots\postapprox_1(\text{Init})\dots))
+\subseteq \postapprox_{i+1}(\postapprox_i(\dots))
+$$
+
+This means that we can replace $\post^n$ with recursive applications of different $\postapprox_j$ approximations. This leads us to the following algorithm:
+
+{% highlight scala linenos %}
+val errorStates: Set[State] = ???
+val post#: Array[Set[State] => Set[State]] = ???
+
+def maybeReachable(
+  currentStates: Set[State], 
+  postAcc: Set[State], // accumulator of post#[i-1](post#[i-2](...))
+  i: Int
+): Boolean = {
+  // compute post#[i](...post#[1](Init)...)
+  val nextPostAcc = post#[i](postAcc)
+
+  val nextStates = currentStates union nextPostAcc
+  if (nextStates intersect errorStates != emptySet)
+    true
+  else if (nextStates == currentStates)
+    false
+  else
+    maybeReachable(nextStates, nextPostAcc, i + 1)
+}
+
+maybeReachable(Init, Init, 1)
+{% endhighlight %}
+
+If `maybeReachable` returns `false`, then we know *for sure* that the system is safe, that the error states are not reachable. However, crucially, if `maybeReachable` returns `true`, then we cannot really conclude anything. Maybe the error states are reachable, and maybe we just need to try again with better approximations $\postapprox$.
+
+#### Constructing approximations from interpolants
+We have discussed how to use an approximation, but not how to choose one. We'll start out by showing how to find one from $k=0$, and how to continue from there. Let's look at the [formula for bounded model checking](#bounded-model-checking-for-reachability) again:
+
+$$
+T_j \equiv 
+    \text{Init}[\vec{s} := \vec{s}^0] \land 
+    \left(\bigland_{i=0}^{j-1} R\left[
+        \seq{\vec{s},   \vec{a},   \vec{x},   \vec{s'}} :=
+        \seq{\vec{s}^i, \vec{a}^i, \vec{x}^i, \vec{s}^{i+1}}
+    \right]\right) \land
+    E[\vec{s} := \vec{s}^j]
+$$
+
+To simplify the formula a little, we'll define:
+
+$$
+R_i = R\left[
+  \seq{\vec{s},   \vec{a},   \vec{x},   \vec{s'}} :=
+  \seq{\vec{s}^i, \vec{a}^i, \vec{x}^i, \vec{s}^{i+1}}
+\right]
+$$
+
+This allows us to rewrite the formula as:
+
+$$
+T_j \equiv 
+    \underbrace{\text{Init}[\vec{s} := \vec{s}^0] \land R_0}_A \land
+    \underbrace{
+      \left(\bigland_{i=1}^{j-1} R_i \right) \land
+      E[\vec{s} := \vec{s}^j]
+    }_B
+$$
+
+We define $A$ and $B$ as above, and are now interested in finding an interpolant $H$ between the two. The first thing we can look at is which variables $A$ and $B$ have in common; by the third property of [interpolants](#definition:interpolant):
+
+$$\text{FV}(H) \subseteq \text{FV}(A) \cap \text{FV}(B) = \vec{s}^1$$
+
+We also need the two first properties of interpolants:
+
+- $A \models H$, which is equivalent to $\text{Init}[\vec{s} := \vec{s}^0] \land R_0 \models H$. Intuitively, this is like $\text{Init}\bullet\bar{r} \subseteq H$, so we can define $\postapprox_1(\text{Init}) = H$. This is a valid approximation, as $\post(\text{Init})\subseteq\postapprox_1(\text{Init})$.
+
+- $H \models B$, which is equivalent to $B \models \neg H$. We can just impose the constraint of $\text{unsat}(H\land B)$ to prevent $H$ from being too general.
+
+Once we have an approximation for $\postapprox_1$, we can find the $\postapprox_2$ by treating $H[\vec{s}^1 := \vec{s}^0]$ as the new $\text{Init}$ and repeating the process, and so on for all the other approximations.
 
