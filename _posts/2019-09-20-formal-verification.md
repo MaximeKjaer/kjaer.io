@@ -19,9 +19,10 @@ $$
 \newcommand{\triple}[3]{\set{#1}\ #2 \ \set{#3}}
 \newcommand{\wp}[1]{\text{wp}\!\left(#1\right)}
 \newcommand{\sp}[1]{\text{sp}\!\left(#1\right)}
+\newcommand{\ar}{\text{ar}}
 $$
 
-Throughout these notes, vectors are denoted in bold and lowercase (e.g. $\vec{x}$).
+Throughout these notes, vectors are denoted in bold and lowercase (e.g. $\vec{x}$). Booleans are denoted interchangeably by $\text{true}$ and $\text{false}$, or $\top$ and $\bot$.
 
 <!-- More --> 
 
@@ -107,12 +108,24 @@ To understand what a composition means, intuitively, we'll introduce a visual me
 > 
 > $$
 > \begin{align}
-> \bar{r}^0     & := \Delta = \set{(x, x) \mid x \in S} \\ 
+> \bar{r}^0     & := \Delta \\ 
 > \bar{r}^{n+1} & := \bar{r} \circ \bar{r}^n 
 > \end{align}
 > $$
 
-Here, $\Delta$ describes the *identity relation*, i.e. a relation mapping every node to itself.
+Here, $\Delta$ describes the *identity relation*, i.e. a relation mapping every node to itself. We'll see a small generalization below, which will be useful for the rest of the course:
+
+> definition "Identity relation"
+> The *identity relation* $\Delta$ (also called "diagonal relation" or "triangular relation") is the relation mapping every item in the universe $S$ to itself:
+> 
+> $$\Delta = \set{(x, x) \mid x \in S}$$
+> 
+> This relation can be conditioned, so as to only include elements in a set $A$ (or satisfying a condition $A$):
+> 
+> $$\Delta_A = \set{(x, x) \mid x \in A}$$
+> 
+
+In any case, applying the iteration an arbitrary number of times leads us to the transitive closure:
 
 > definition "Transitive closure"
 > The transitive closure $\bar{r}^*$ of a relation $\bar{r}$ is:
@@ -1267,3 +1280,637 @@ We also need the two first properties of interpolants:
 
 Once we have an approximation for $\postapprox_1$, we can find the $\postapprox_2$ by treating $H[\vec{s}^1 := \vec{s}^0]$ as the new $\text{Init}$ and repeating the process, and so on for all the other approximations.
 
+## LCF Approach to Formal Proofs
+Logic for Computable Functions (LCF) is a logic for reasoning about computable partial functions based on domain theory.
+
+In "[A metalanguage for Interactive Proof in LCF](http://www-public.imtbs-tsp.eu/~gibson/Teaching/CSC4504/ReadingMaterial/GordonMMNW78.pdf)", the idea is:
+
+- A `Theorem` is an abstract data type that stores a formula
+- We cannot create a theorem out of an arbitrary formula (the constructor is private)
+- We can create formulas by:
+  + Creating axiom instances given some parameters (static methods)
+  + Use inference rules to get theorems from other theorems (instance methods)
+
+The idea is that this allows us to maintain invariants about the theorems. For instance:
+
+{% highlight scala linenos %}
+final class Theorem private(val formula: Formula) {
+  def modusPonens(pq: Theorem, p: Theorem): Theorem = pq.formula match {
+    case Implies(pf, qf) if p.formula == pf => Theorem(qf)
+    case _ => throw new Exception("illegal use of modus ponens")
+  }
+}
+{% endhighlight %}
+
+## First order logic
+### Grammar
+We have formulas $F$ and terms $t$:
+
+$$\begin{align}
+F ::= \ 
+  & p(t_1, \dots, t_n) \mid
+    t_1 = t_2 \mid 
+    \top \mid \bot \\
+  & \mid \neg F \mid
+    F_1 \land F_2 \mid F_1 \lor F_2 \mid
+    F_1 \rightarrow F_2 \mid F_1 \leftrightarrow F_2 \\
+  & \mid \forall x.\ F \mid \exists x.\ F \\ \\
+
+t ::= \ 
+  & x \mid c \mid f(t_1, \dots, t_n)
+\end{align}$$
+
+Where:
+
+- $x$ denotes a variable
+- $p$ denotes a predicate symbol
+- $f$ denotes a function symbol
+- $c$ denotes a constant. We can think of it as a function symbol of arity 0.
+
+To denote how many arguments a function or predicate symbol takes, we define a function $\ar$. For instance, if $\ar(f) = 2$ then $f$ takes two arguments.
+
+We'll also define granularity levels of a formula:
+
+- We call $p(t_1, \dots, t_n)$ an *atomic formula* if it contains no logical connectives or formulas.
+- A *literal* is an atomic formula or its negation.
+- A *clause* is a disjunction of literals
+
+### Interpretation
+> definition "First-order logic interpretation"
+> A first-order interpretation is denoted $I = (D, e)$, where:
+> 
+>  - $D \ne \emptyset$ is the set of constants
+>  - $e$ maps constants, functions and predicate functions as follows:
+>    + Each constant $c$ into an element of $D$, i.e. $e(c) \in D$
+>    + Each function symbol $f$ with $\ar(f) = n$ into a total function of $n$ arguments, i.e. $e(f): D^n \rightarrow D$
+>    + Each predicate symbol $p$ with $\ar(p) = n$ into an $n$-ary relation, i.e. $e(p) \subseteq D^n$
+
+One thing that's important to understand about first-order logic is that it is not defined over a fixed set of constants. It can be *interpreted* with an arbitrary set of constants $D$, which is not necessarily just booleans (which would be $D = \set{\text{true}, \text{false}}$). Much like with SAT solvers which can return a boolean assignment $e$, in an interpretation of a first-order formula, the choice of $e$ maps constants, function symbols and predicate symbols into actual values.
+
+We can evaluate a given formula $F$ with a given interpretation $I$. We denote this as $\eval{F}_I$. 
+
+- If the result of the evaluation is true, we write $I \models F$ or $\eval{F}_I = 1$.
+- If the result of the evaluation is is false, we write $I \nvDash F$ or $\eval{F}_I = 0$.
+
+Since the constants in $D$ aren't necessarily booleans, how does the result of the evaluation return a boolean? Well, we can "push down" evaluation and compute logical operations on those results[^incomplete-rules]:
+
+[^incomplete-rules]: These rules are not complete, but suffice if we've translated the formula to [negational normal form](#negational-normal-form).
+
+$$
+\begin{align}
+\eval{\neg F}_I & = \neg \eval{F}_I \\
+\eval{F_1 \land F_2}_I & = \eval{F_1}_I \land \eval{F_2}_I \\
+\eval{F_1 \lor F_2}_I & = \eval{F_1}_I \lor \eval{F_2}_I \\
+\eval{\forall x.\ F}_I & = \forall d \in D.\ \eval{F}_{(D, e[x := d])} \\
+\eval{\exists x.\ F}_I & = \exists d \in D.\ \eval{F}_{(D, e[x := d])} \\
+\end{align}
+$$
+
+We say that:
+
+> definition "Validity and satisfiability in first-order logic"
+> - $F$ is **valid** if $\forall I.\ \eval{F}_I = 1$
+> - $F$ is **satisfiable** if $\exists I.\ \eval{F}_I = 1$
+
+As an example, let's take a formula $F$ with function symbols $p$ and $q$:
+
+$$F = \forall x.\ \exists y.\ (p(x, y) \land q(y, x))$$
+
+- Validity: $\forall \vec{D}\ne\emptyset .\ \exists \vec{p}, \vec{q} \subseteq \vec{D}^2 .\ \forall x\in D.\ \exists y\in D.\ ((x, y)\in p \land (y, x) \in q)$
+- Satisfiability: $\exists \vec{D}\ne\emptyset .\ \exists \vec{p}, \vec{q} \subseteq \vec{D}^2 .\ \forall x\in D.\ \exists y\in D.\ ((x, y)\in p \land (y, x) \in q)$
+
+This leads us to the following observation:
+
+> lemma ""
+> $F$ is valid $\iff \neg F$ is not satisfiable
+
+This means that to check validity, we can instead check satisfiability of the negation. Looking into negations will lead us to defining a normal form for negation. 
+
+### Negational normal form
+In negational normal form, negation only applies to atomic formulas, and the only other connectives are $\land$ and $\lor$ (we've translated $\rightarrow$ and $\leftrightarrow$ away). It essentially "pushes down" negation. We can transform formulas to negational normal form as follows:
+
+$$
+\begin{align}
+F_1 \leftrightarrow F_2
+  & \rightsquigarrow (F_1 \rightarrow F_2) \land (F_2 \rightarrow F_1) \\
+F_1 \rightarrow F_2 
+  & \rightsquigarrow \neg F_1 \lor F_2 \\
+\neg \neg F
+  & \rightsquigarrow F \\
+\neg(F_1 \land F_2)
+  & \rightsquigarrow \neg F_1 \lor \neg F_2 \\
+\neg(F_1 \lor F_2)
+  & \rightsquigarrow \neg F_1 \land \neg F_2 \\
+\neg \forall x.\ F
+  & \rightsquigarrow \exists x.\ \neg F \\
+\neg \exists x.\ F
+  & \rightsquigarrow \forall x.\ \neg F \\
+\neg \bot
+  & \rightsquigarrow \top \\
+\neg \top
+  & \rightsquigarrow \bot \\
+\end{align}
+$$
+
+### Prenex normal form
+Prenex normal form is a form where are all quantifiers appear first, and then we have a formula without quantifiers. Once we are in negational normal form, we can pull quantifiers to the top by the following:
+
+$$
+\begin{align}
+(\forall x.\ F) \lor G
+  & \rightsquigarrow \forall x.\ (F \lor G) \\
+(\forall x.\ F) \land G
+  & \rightsquigarrow \forall x.\ (F \land G) \\
+(\exists x.\ F) \lor G
+  & \rightsquigarrow \exists x.\ (F \lor G) \\
+(\exists x.\ F) \land G
+  & \rightsquigarrow \exists x.\ (F \land G) \\
+\end{align}
+$$
+
+### Skolem functions
+Observe that the following formula is valid:
+
+$$(\forall x.\ p(x, f(x)))) \rightarrow (\forall x.\ \exists y.\ p(x, y))$$
+
+Indeed, if we assume the left-hand side of the implication to be true, we need to prove that the right-hand side also holds. To do this, we can simply pick $y$ to be the value of $f(x)$. This seems obvious.
+
+What's less obvious is a sort of converse: if we assume that the right-hand side holds, we can prove that there exists an $f$ satisfying the whole formula. Note that we can't write $\exists f$ because $f$ is a symbol and the FOL grammar doesn't allow this, but what we can do instead is to extend the signature with a new function symbol $f$ that does not appear in the formula. We call this a Skolem function.
+
+> definition "Skolemization"
+> We can **skolemize** a formula in prenex normal form by replacing:
+> 
+> $$\forall x_1, \dots, x_n.\ \exists y.\ F(x_1, \dots, x_n, y)$$
+> 
+> with
+> 
+> $$\forall x_1, \dots, x_n.\ F(x_1, \dots, x_n, g(x_1, \dots, x_n))$$
+> 
+> Where $g$ is a fresh function symbol (called a Skolem function) of arity $n$.
+
+{% comment %}
+TODO this whole section was (probably) presented in class but isn't on the slides.
+
+Skolemization gives a name to this $y$ that depends on $x_1, \dots, x_n$. Note that skolemization also gets rid of the existential quantifier.
+
+The above definition says prenex normal form, but we can also skolemize a negational normal form.
+
+Let's run through an example. We consider the following formula:
+
+$$todo big formula$$
+
+Skolemizing this, we get:
+
+$$todo skolemized$$
+
+Where $g$ and $b$ are fresh, and $\text{ar}(g) = 1$, $\text{ar}(b) = 0$, so $b$ is a constant. For $b$, we do this because the $\exists$ is before the $\forall$, so it depends on nothing.
+
+
+***
+
+> definition "Herbrand interpretation"
+> Given $I = (D, E)$ such that $\eval{F}_I = 1$ we can define:
+> 
+> $$I_H = (T, e_H) \text{ such that } \eval{F}_{I_H}=1$$
+> 
+> Where $I_H$ is the [Herbrand interpretation](https://en.wikipedia.org/wiki/Herbrand_interpretation), and $T$ is the Herbrand universe, containing all atomic terms:
+> 
+> $$T ::= c \mid f(T_1, \dots, T_n)$$
+
+Note that $T$ may be infinite, but it's countably infinite.
+
+{% endcomment %}
+
+## Converting imperative programs to formulas
+### Motivating example
+An imperative program can be thought of as a relation between initial state and final state. For instance, let's consider the following instructions:
+
+{% highlight scala linenos %}
+x = x + 2
+y = x + 10
+{% endhighlight %}
+
+We can think of this as the relation:
+
+$$
+\set{((x, y), (x', y')) \mid x' = x + 2 \land y = x + 12}
+$$
+
+We can ensure postconditions on this. In [Stainless](https://github.com/epfl-lara/stainless), we could check the following condition: 
+
+{% highlight scala linenos %}
+import stainless.lang._
+import stainless.lang.StaticChecks._
+
+case class FirstExample(var x: BigInt, var y: BigInt) {
+  def increase: Unit = {
+    x = x + 2
+    y = x + 10
+  }.ensuring(_ => old(this).x > 0 ==> (x > 0 && y > 0))
+}
+{% endhighlight %}
+
+This is equivalent to the following condition, which says that the relation of the program should be a subset of the relation of the pre- and postconditions.
+
+$$
+\begin{align}
+& \set{((x, y), (x', y')) \mid x' = x + 2 \land y = x + 12} \\
+\subseteq &
+\set{((x, y), (x', y')) \mid x > 0 \rightarrow (x' > 0 \land y' > 0)}
+\end{align}
+$$
+
+This is equivalent to checking the validity of the following formula:
+
+$$
+\seq{x' = x + 2 \land y = x + 12}
+\rightarrow
+\seq{x > 0 \rightarrow (x' > 0 \land y' > 0)}
+$$
+
+### Translating commands
+We'll first define a general formulation of the translation, and then look into commands on a case-by-case basis.
+
+Suppose we want to translate a program containing $n$ mutable variables $\vec{V} = \set{x_1, \dots, x_n}$. Let $c$ be an arbitrary command. Let $R(c)$ be the formula describing the relation between initial state $\vec{V}$ and final state $\vec{V}'$. We define the relation as $\rho(c)$:
+
+$$\rho(c) = \set{(\vec{x}, \vec{x}') \mid R(c)}$$
+
+#### Assignment
+We formulate assignment (`x = t`) as follows:
+
+$$
+x' = t \land \bigland_{v \in \vec{v}\setminus\set{x}} v' = v
+$$
+
+The formula says that $x$ now has value $t$, but also fixes everything that hasn't changed. We need to constrain the other variables so that they cannot take arbitrary values.
+
+#### Conditions
+We formulate conditions (`if (b) c1 else c2`) as follows:
+
+$$(b \land R(c_1)) \lor (\neg b \land R(c_2))$$
+
+This is a fairly straightforward transformation that corresponds to the boolean formulation of a condition.
+
+#### Non-deterministic choice
+What if we have a condition where we do not know what happens in the condition (e.g. `if (*) c1 else c2`)? We can simply translate that into a disjunction:
+
+$$R(c_1) \lor R(c_2)$$
+
+#### Sequences
+We formulate sequences (`c1; c2`) as [composition of the relations](#definition:composition-of-relations) $r_1$ and $r_2$ corresponding to $c_1$ and $c_2$:
+
+$$
+\rho(c_1; c_2) = 
+\rho(c_1) \circ \rho(c_2) =
+\set{(\vec{x}, \vec{x}') \mid \exists \vec{z}.\ 
+  (\vec{x}, \vec{z}) \in r_1 \land
+  (\vec{z}, \vec{x}') \in r_2
+)}
+$$
+
+This simply tells us that there must exist an intermediary state $\vec{z}$ that binds initial and final state together. The formula is thus:
+
+$$
+R(c_1; c_2) =
+  \exists \vec{z}.\ 
+    R(c_1)[\vec{x}' := \vec{z}] \land 
+    R(c_2)[\vec{x} := \vec{z}]
+$$
+
+Where $\vec{z}$ are freshly picked. This relation places the constraint that the output variables of $c_1$ should be the input variables of $c_2$. This is a little reminiscent of [the formula for bounded model checking](#bounded-model-checking-for-reachability).
+
+As a useful convention when converting larger programs, we can name $\vec{z}$ after the position in the program.
+
+#### Non-deterministic commands
+Let's introduce a potentially dangerous command, which we'll call `havoc` (a word meaning destruction and confusion). How can we formulate `havoc(x)`? A conservative approach would be to let $x$ be arbitrary henceforth, but keep all other variables as they are:
+
+$$
+R(\text{havoc}(x)) = \bigland_{v \in \vec{v}\setminus\set{x}} v' = v
+$$
+
+#### Assumption
+An assumption (which we'll call `assume(F)`) limits the space of possibilities. We can use `assume` to recover from `havoc` (e.g. `havoc(x); assume(x == e)` is equivalent to `x = e` if `x` isn't in the free variables of `e`). The command doesn't change anything, but if the condition doesn't hold, execution should be stopped.
+
+$$R(\text{assume}(F)) = F \land \bigland_{v \in \vec{v}} v' = v$$
+
+The relation created by this translation is the [identity relation](#definition:identity-relation) over the set $A = \set{\vec{x} \mid F}$ of variables satisfying $F$. To justify the name "assume", we can look at the following example.
+
+- $R(\text{assume}(F); c) = F \land R(c)$
+- $R(c; \text{assume}(F)) = R(c) \land F[\vec{x} := \vec{x}']$, where $\vec{x}'$ are the final values that we get from executing $c$.
+
+Note that `if (b) c1 else c2` is equivalent to `if (*) { assume(b); c1 } else { assume(!b); c2 }`; the generated formulas will be equivalent.
+
+### Full example
+Consider the following code:
+
+{% highlight scala linenos %}
+(if (b) { x = x + 1 } else { y = x + 2});
+x = x + 5;
+(if (*) { y = y + 1} else {x = y})
+{% endhighlight %}
+
+Notice the line numbers; we'll use those to name our intermediary variables. The translation becomes:
+
+$$
+\begin{align}
+\exists x_2, y_2, x_3, y_3.\  
+  & ((b \land x_1 = x + 1 \land y_1 = y) \lor (\neg b \land x_1 = x \land y_1 = x + 2)) \\
+  & (x_2 = x_1 + 5 \land y_2 = y_1) \\
+  & ((x' = x_2 \land y' = y_2 + 1) \lor (x' = y_2 \land y' = y_2))
+\end{align}
+$$
+
+Here, $x$ and $y$ denote the variables' initial state (before execution), and $x'$ and $y'$ denote their final state.
+
+## Hoare Logic
+Hoare logic (named after [Sir Tony Hoare](https://en.wikipedia.org/wiki/Tony_Hoare)) is a logic that was introduced to reason about programs. We can think of it as a way of inserting annotations into code, in order to make proofs about (imperative) program behavior simpler.
+
+As an example, annotations have been added in the program below:
+
+{% highlight scala linenos %}
+// {0 <= y}
+i = y;
+// {0 <= y && i = y}
+r = 0;
+// {0 <= y && i = y && r = 0}
+while // {r = (y-i)*x && 0 <= i}
+  (i > 0) {
+    // {r = (y-i)*x && 0 < i}
+    r = r + x;
+    // {r = (y-i+1)*x && 0 < i}
+    i = i - 1
+    // {r = (y-i)*x && 0 <= i}
+}
+// {r = x * y}
+{% endhighlight %}
+
+Let's look at the first three lines:
+
+{% highlight scala linenos %}
+// {0 <= y}
+i = y;
+// {0 <= y && i = y}
+{% endhighlight %}
+
+This constitutes a Hoare triple, which we'll study in more detail now.
+
+### Hoare triples
+Central to Hoare logic are **Hoare triples**.
+
+> definition "Hoare Triple"
+> Let $S$ be the set of possible states. Let $P, Q \subseteq S$. Let $r\subset S \times S$ be a relation over the states $S$. A Hoare triple is defined as:
+> 
+> $$
+> \triple{P}{r}{Q} \iff \forall s, s' \in S.\ (s \in P \land (s, s') \in r \rightarrow s' \in Q)
+> $$
+
+We call $P$ the precondition and $Q$ the postcondition.
+
+Note that $\set{P}$ does not mean "singleton set of $P$", but is notation for an "assertion" around a command. A Hoare triple may or may not hold; after all it is simply a shorthand for a logical formula, as the definition shows. Let's look at examples of triples that do and do not hold:
+
+- `{j = a} j = j + 1 {a = j + 1}`
+  
+  This triple does not hold: if $j$ is equal to $a$ initially, and we then increment $j$ by 1, then $a \ne j + 1$.
+
+- `{i != j} if (i > j) then m=i-j else m=j-i {m > 0}`
+  
+  This triple does hold. If $i > j$ then $m > 0$, and if $j < i$ then it is also positive.
+
+### Preconditions and postconditions
+Here are a few cues as to how to think of stronger vs. weaker conditions:
+
+- A stronger condition is a smaller set than the weaker condition.
+- A stronger condition is a subset of a weaker condition.
+- A stronger condition implies a weaker condition.
+
+In other words, putting conditions on a set makes it smaller.
+
+The strongest possible condition is "false", which is the set $\emptyset$. The weakest condition is "true", which is the biggest set (all tuples).
+
+#### Definitions
+> definition "Strongest postcondition"
+> $$\sp{P, r} = \set{s' \mid \exists s.\ s \in P \land (s, s') \in r}$$
+
+To visualize this, let's look at a diagram of the relation $r$:
+
+<figure markdown="1">
+  ![Strongest postcondition of a relation](/images/fv/strongest-postcondition.png)
+  <figcaption>Image from <a href="https://lara.epfl.ch/w/sav08/hoare_logic">lara.epfl.ch</a></figcaption>
+</figure>
+
+If we let $P$ be the red set, then $\sp{P, r}$ is the blue set: it's the smallest set of values that *all* are pointed to from $P$ by $r$. In other words, it's the image of $P$ ($\text{post}(P)$ or $P\bullet r$), which we can notice has the [same definition](#definition:image-of-a-set).
+
+> definition "Weakest precondition"
+> $$\wp{r, Q} = \set{s \mid \forall s'.\ (s, s') \in r \rightarrow s' \in Q}$$
+
+<figure markdown="1">
+  ![Weakest precondition of a relation](/images/fv/weakest-precondition.png)
+  <figcaption>Image from <a href="https://lara.epfl.ch/w/sav08/hoare_logic">lara.epfl.ch</a></figcaption>
+</figure>
+
+Dually, if we let $Q$ be the blue set, then $\wp{r, Q}$ is the red set: it's the largest set of values that *only* point to $Q$. Notice that there are points that point to $S$ and $Q$ (since $r$ doesn't need to be injective), but those are not included in $\wp{r, Q}$. The weakest precondition is the largest possible set from which we will definitely end up in $Q$ from.
+
+#### Equivalence
+> lemma "Three forms of Hoare Triple"
+> The following three conditions are equivalent.
+> 
+> - $\triple{P}{r}{Q}$
+> - $P \subseteq \wp{r, Q}$
+> - $\sp{P, r} \subseteq Q$
+
+These conditions expand into the following formulas, respectively:
+
+- $\forall s, s'. [(s \in P \land (s, s') \in R) \rightarrow s' \in Q]$ by [definition of a Hoare triple](#definition:hoare-triple)
+- $\forall s.\ [s \in P \rightarrow (\forall s'.\ (s, s')\in r \rightarrow s' \in Q)]$, by [definition of the weakest postcondition](#definition:weakest-precondition) and definition of subset.
+- $\forall s'.\ [(\exists s.\ s\in P \land (s, s') \in r) \rightarrow s' \in Q)]$ by [definition of the strongest postcondition](#definition:strongest-postcondition) and definition of subset.
+
+From here on, we can prove equivalence using first-order logic properties:
+
+- $(P \land Q \rightarrow R) \iff (P \rightarrow (Q \rightarrow R))$ 
+- $(\forall u.\ (A \rightarrow B)) \iff (A \rightarrow \forall u.\ B)$ when $u\notin \text{FV}(A)$
+- $(\forall u.\ (A \rightarrow B)) \iff ((\exists u. A) \rightarrow B)$ when $u\notin \text{FV}(B)$
+
+$\qed$
+
+#### Characterization
+The above lemma also gives us a good intuitive grip of what wp and sp are: they're the best possible values for $P$ and $Q$, respectively. For the triple to hold, any other $P$ must be a subset of wp (i.e. stronger), and any other $Q$ must be a supserset of $Q$ (i.e. weaker). This leads us to the following characterization lemmas.
+
+> lemma "Characterization of sp"
+> $\sp{P, r}$ is the smallest set $Q$ such that $\triple{P}{r}{Q}$, that is, the two following hold:
+> 
+> - $\triple{P}{r}{\sp{P, r}}$
+> - $\forall Q \subseteq S. \triple{P}{r}{Q} \rightarrow \sp{P, r}\subseteq Q$
+
+The first condition immediately follows from the equivalence in the above lemma: it is equivalent to $\sp{P, r} \subseteq \sp{P, r}$. The second condition ensures that the strongest precondition is the smallest one (as it's a subset of all $Q\subseteq S$).
+
+> lemma "Characterization of wp"
+> $\wp{r, Q}$ is the largest set $P$ such that $\triple{P}{r}{Q}$, that is, the two following hold:
+> 
+> - $\triple{\wp{r, Q}}{r}{Q}$
+> - $\forall P \subseteq S. \triple{P}{r}{Q} \rightarrow P \subseteq \wp{P, r}$
+
+The reasoning is the same as above.
+
+#### Duality
+When [defining wp](#definition:weakest-precondition), we could see from the diagram that $\wp{r, Q}$ *almost* corresponded to going backwards from $Q$. And it is *almost*, because we must deal with the cases where values outside of $\wp{r, Q}$ point to $Q$ (which is possible when the relation is not injective). To deal with this, we don't look at $Q\bullet r^{-1}$, but at the complement set of "error states" $S \setminus Q$ (in brown in the diagram).
+
+> lemma "Duality of postcondition-of-inverse and wp"
+> $S \setminus \wp{r, Q} = \sp{S\setminus Q, r^{-1}}$
+ 
+Note that $r^{-1} = \set{(y, x) \mid (x, y) \in r}$ and is always defined.
+
+To prove this lemma, we can expand both sides and apply basic first-order logic properties. We first prove it from the left-hand side:
+
+$$\begin{align}
+x \in S \setminus \wp{r, Q} 
+& = x \notin \wp{r, Q} \\
+& = \neg\left(\forall x'.\ (x, x') \in r \rightarrow x' \in Q\right) \\
+& = \exists x'.\ (x, x') \in r \land x' \notin Q
+\end{align}$$
+
+Now on the right-hand side:
+
+$$\begin{align}
+x \in \sp{S \setminus Q, r^{-1}}
+& = \exists x'.\ x' \notin Q \land (x', x) \in r^{-1} \\
+& = \exists x'.\ x' \notin Q \land (x, x') \in r
+\end{align}$$
+
+As these are equal, we have proven equality. $\qed$
+
+#### More laws
+First, we'll state a lemma telling us that sp can be applied to each point of a set, or the the whole set, and we get the same results:
+
+> lemma "Pointwise sp"
+> $$\sp{P, r} = \bigcup_{s \in P} \sp{\set{s}, r}$$
+
+From this, it should be clear what the sp of unions is:
+
+> lemma "Disjunctivity of sp"
+> $$\begin{align}
+> \sp{P_1 \cup P_2, r} & = \sp{P_1, r} \cup \sp{P_2, r} \\
+> \sp{P, r_1 \cup r_2} & = \sp{P, r_1} \cup \sp{P, r_2}
+> \end{align}$$
+
+For wp, the wp can be obtained by selected each point for which the sp is in $Q$. To understand this, remember that the sp is like the image, so we can select all points that only point to $Q$, which is the [intuitive explanation we had](#definition:weakest-precondition) for wp.
+
+> lemma "Pointwise wp"
+> $$\wp{r, Q} = \set{s \mid s \in S \land \sp{\set{s}, r} \subseteq Q}$$
+
+Likewise, this should give us an idea of how to deal with intersections of sets:
+
+> lemma "Conjunctivity of wp"
+> $$\begin{align}
+> \wp{r, Q_1 \cap Q_2} & = \wp{r, Q_1} \cap \wp{r, Q_2} \\
+> \wp{r_1 \cup r_2, Q} & = \wp{r_1, Q} \cap \wp{r_2, Q}
+> \end{align}$$
+
+All of these can be proven by expanding to formulas and using basic first-order logic.
+
+### Hoare Logic for loop-free programs
+By now, we've seen how to annotate a single relation, and how to reason about preconditions and postconditions. How do we scale this up to a whole program? Specifically, we'll need to reason over unions and compositions of relations. To do that, we'll introduce two theorems telling us how to do that.
+
+Suppose the possible paths of a program are $J$, a set of relations.
+
+> theorem "Expanding paths"
+> The condition:
+> 
+> $$\triple{P}{\bigcup_{i\in J} r_i}{Q}$$
+> 
+> is equivalent to:
+> 
+> $$\forall i.\ i\in J \rightarrow \triple{P}{r_i}{Q}$$
+
+This simply says that to a triple is valid over a set of relations when it is valid over all relations in the set: it serves as a generalization when we're considering multiple possible paths.
+
+To prove this, we can use the definitions to expand into formulas. Alternatively, we can use the previous lemmas:
+
+$$\begin{align}
+\triple{P}{\bigcup_{i\in J} r_i}{Q}
+& = \sp{P, \bigcup_{i\in J} r_i} \subseteq Q \\
+& = \left(\bigcup_{i\in J} \sp{P, r_i}\right) \subseteq Q \\
+& = \forall i.\ i \in J. \rightarrow \sp{P, r_i} \subseteq Q \\
+& = \forall i.\ i\in J \rightarrow \triple{P}{r_i}{Q}
+\end{align}$$
+
+The first step translates into the [third equivalent form](#lemma:three-forms-of-hoare-triple), and the second step uses [disjunctivity of sp](#lemma:disjunctivity-of-sp). The third step translates the union to a quantified formula, and the last step translates back the the [first equivalent form](#lemma:three-forms-of-hoare-triple). $\qed$
+
+> theorem "Transitivity of Hoare triples"
+> If $\triple{P}{r_1}{Q}$ and $\triple{Q}{r_2}{R}$ then $\triple{P}{r_1 \circ r_2}{R}$. We can write this as the following inference rule:
+> 
+> $$
+> \frac{
+>   \triple{P}{r_1}{Q} \qquad \triple{Q}{r_2}{R}
+> }{
+>   \triple{P}{r_1 \circ r_2}{R}
+> }
+> $$
+
+We won't go into too much detail for this theorem. The two theorems above tell us that if we can annotate Hoare triples for individual statements, we can annotate the whole program.
+
+### Hoare logic for loops
+For general loops, the simplest rule that we can have is the following. It says that if a single iteration of the loop doesn't change the precondition, then the whole loop doesn't change the precondition.
+
+> lemma "Rule for non-deterministic loops"
+> $$\frac{\triple{P}{r}{P}}{\triple{P}{r^*}{P}}$$
+
+This is obviously going to be true by transitivity, but let's prove it formally nonetheless. We can generalize the previous results to programs with loops. A special case of the [transitivity theorem of Hoare triples](#theorem:transitivity-of-hoare-triples) is when $r_1 = r_2$ and $P = Q = R$. In that case, we have:
+
+$$\frac{\triple{P}{r}{P} \qquad \triple{P}{r}{P}}{\triple{P}{r^2}{P}}$$
+
+We can keep applying the [transitivity rule](#theorem:transitivity-of-hoare-triples) to achieve a more general form:
+
+$$\frac{\triple{P}{r}{P} \qquad n \ge 0}{\triple{P}{r^n}{P}}$$
+
+By the [Expanding Paths condition](#theorem:expanding-paths), we then have:
+
+$$\frac{\triple{P}{r}{P}}{\triple{P}{\bigcup_{n\ge 0} r^n}{P}}$$
+
+Note that we have the [transitive closure](#definition:transitive-closure) in the denominator, $r^* = \bigcup_{n\ge 0} r^n$. $\qed$
+
+### Hoare logic for loops with conditions
+Also known as `while` loops. We did not previously define the relation for while loops like `while (b) { c }`, so let's do it now. 
+
+Let $b_s$ be the set corresponding to the command `b`, and $(\neg b)_s$ be the set corresponding to the command `!b`. Recall the definition of [identity relation](#definition:identity-relation). Let $r = \rho(c)$ be the relation of the loop body. The relation of the while loop is:
+
+$$
+\rho(\text{while }(b)\ c) = (\Delta_{b_s} \circ r)^* \circ \Delta_{(\neg b)_s}
+$$
+
+The relation follows the $r$ relation an arbitrary number of times while the $b$ condition is true, and then finally the $b$ condition is false. This translates almost directly into the following rule:
+
+> lemma "Rule for loop with condition"
+> For a `while (b) { c }` loop, we have:
+> 
+> $$
+> \frac{
+>   \triple{P\cap b_s}{r}{P}
+> }{\triple{P}{(\Delta_{b_s} \circ r)^* \circ \Delta_{(\neg b)_s}}{P\cap(\neg b)_s}}
+> $$
+> 
+> Restated with commands and conditions instead of relations and sets:
+> 
+> $$\frac{\triple{P\land b}{c}{P}}{\triple{P}{\text{while }(b)\ c}{P \land \neg b}}$$
+
+We trivially have:
+
+$$
+\triple{P}{\Delta_{b_s}}{P \cap b_s} \\
+\triple{P}{\Delta_{(\neg b)_s}}{P \cap (\neg b)_s}
+$$
+
+So by transitivity:
+
+$$
+\frac{
+  \triple{P\cap b_s}{r}{P}
+}{\set{P}\ \Delta_{b_s} \ \set{P \cap b_s}\ r \ \set{P}}
+\equiv
+\frac{\triple{P\cap b_s}{r}{P}}{\triple{P}{\Delta_{b_s} \circ r}{P}}
+$$
+
+From the [rule for non-deterministic loops](#lemma:rule-for-non-deterministic-loops), we have:
+
+$$\frac{\triple{P}{\Delta_{b_s} \circ r}{P}}{\triple{P}{(\Delta_{b_s} \circ r)^*}{P}}$$
+
+Applying these rules, we get the lemma. $\qed$
