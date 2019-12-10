@@ -22,7 +22,9 @@ $$
 \newcommand{\ar}{\text{ar}}
 $$
 
-Throughout these notes, vectors are denoted in bold and lowercase (e.g. $\vec{x}$). Booleans are denoted interchangeably by $\text{true}$ and $\text{false}$, or $\top$ and $\bot$.
+Throughout these notes, vectors are denoted in bold and lowercase (e.g. $\vec{x}$). Booleans are denoted interchangeably by $\text{true}$ and $\text{false}$, or $\top$ and $\bot$. Generally, I try to use $\rightarrow$ and $\leftrightarrow$ for formulas, and $\implies$ and $\iff$ for mathematical notation[^equivalent-notation].
+
+[^equivalent-notation]: These are of course equivalent, but it sometimes helps to be able to distinguish whether an operator is written in the context of a formula or in the context of a mathematical statement.
 
 <!-- More --> 
 
@@ -92,6 +94,7 @@ $$
 
 Generally, we'll use a bar for relations that disregard input. Note that even when $r$ is deterministic, $\bar{r}$ can become non-deterministic.
 
+#### Composition
 Relations can be composed:
 
 > definition "Composition of relations"
@@ -103,6 +106,7 @@ Note that composition is not commutative, but is associative.
 
 To understand what a composition means, intuitively, we'll introduce a visual metaphor. Imagine the nodes of the graph as airports, and the edges as possible routes. Let $\bar{r_1}$ be the routes operated by United Airlines, and $\bar{r_2}$ be the routes operated by Delta. Then $\bar{r_1} \circ \bar{r_2}$ is the set of routes possible by taking a United flight followed by a Delta flight.
 
+#### Iteration
 > definition "Iteration"
 > An iteration $\bar{r}^n$ describes paths of length $n$ in a relation $\bar{r}$. It is defined recursively by:
 > 
@@ -113,7 +117,8 @@ To understand what a composition means, intuitively, we'll introduce a visual me
 > \end{align}
 > $$
 
-Here, $\Delta$ describes the *identity relation*, i.e. a relation mapping every node to itself. We'll see a small generalization below, which will be useful for the rest of the course:
+#### Identity
+In the above, $\Delta$ describes the *identity relation*, i.e. a relation mapping every node to itself. We'll see a small generalization below, which will be useful for the rest of the course:
 
 > definition "Identity relation"
 > The *identity relation* $\Delta$ (also called "diagonal relation" or "triangular relation") is the relation mapping every item in the universe $S$ to itself:
@@ -125,7 +130,8 @@ Here, $\Delta$ describes the *identity relation*, i.e. a relation mapping every 
 > $$\Delta_A = \set{(x, x) \mid x \in A}$$
 > 
 
-In any case, applying the iteration an arbitrary number of times leads us to the transitive closure:
+#### Transitive closure
+Applying [iteration](#iteration) an arbitrary number of times leads us to the transitive closure:
 
 > definition "Transitive closure"
 > The transitive closure $\bar{r}^*$ of a relation $\bar{r}$ is:
@@ -136,6 +142,24 @@ In any case, applying the iteration an arbitrary number of times leads us to the
 
 In our airport analogy, the transitive closure is the set of all airports reachable from our starting airports.
 
+A few properties of transitive closure follow from the definition:
+
+- **Reflexivity**: $\Delta \subseteq r^*$, so every item is mapped back onto itself (among others, potentially)
+- **Transitivity**: $(a, b) \in r^* \land (b, c) \in r^* \implies (a, c) \in r^*$
+- **Distributivity (under certain conditions)**: if $s$ is reflexive and transitive and $r \subseteq s$, then $r^* \subseteq s$
+- **Monotonicity**: $r_1 \subseteq r_2 \implies r_1^* \subseteq r_2^*$
+
+A few bonus facts:
+
+- $r^*$ is the smallest reflexive transitive relation containing $r$.
+- $\left(r^{-1}\right)^* = (r^*)^{-1}$
+- $r^* = \Delta \cup (r \circ r^*)$
+- $r^* = \Delta \cup (r^* \circ r)$
+- An edge is in the transitive closure if and only if there is a path in the graph $r$. In mathematical notation, this is:
+  
+  $$(x_0, x_n)\in r^* \iff \exists n \ge 0.\ \exists x_1, \dots, x_{n-1}.\ \forall i\in\set{0, \dots, n-1}.\ (x_i, x_{i+1}) \in r$$
+
+#### Image
 Finally, we'll introduce one more definition:
 
 > definition "Image of a set"
@@ -153,6 +177,7 @@ Finally, we'll introduce one more definition:
 
 The alternative notation may make it simpler to read images; $(X \bullet \bar{r_1}) \bullet \bar{r_2}$ can be read as "$X$ following $\bar{r_1}$ then following $\bar{r_2}$".
 
+### Reach
 The above definitions lead us to a first definition of reach:
 
 > theorem "Definition 1 of reach"
@@ -946,7 +971,7 @@ digraph G {
 }
 {% endgraphviz %}
 
-We can also think of this DAG as a finite automaton, or as a (loop-free)branching program. 
+We can also think of this DAG as a finite automaton, or as a (loop-free) branching program. 
 
 ### Canonicity
 The key idea of BDDs is that specific forms of BDDs are *canonical*, and that BDDs can be transformed into their canonical form. For instance, the previous example can be rewritten as:
@@ -1792,7 +1817,7 @@ From this, it should be clear what the sp of unions is:
 > \sp{P, r_1 \cup r_2} & = \sp{P, r_1} \cup \sp{P, r_2}
 > \end{align}$$
 
-For wp, the wp can be obtained by selected each point for which the sp is in $Q$. To understand this, remember that the sp is like the image, so we can select all points that only point to $Q$, which is the [intuitive explanation we had](#definition:weakest-precondition) for wp.
+For wp, the wp can be obtained by selecting each point for which the sp is in $Q$. To understand this, remember that the sp is like the image, so we can select all points that only point to $Q$, which is the [intuitive explanation we had](#definition:weakest-precondition) for wp.
 
 > lemma "Pointwise wp"
 > $$\wp{r, Q} = \set{s \mid s \in S \land \sp{\set{s}, r} \subseteq Q}$$
@@ -1914,3 +1939,320 @@ From the [rule for non-deterministic loops](#lemma:rule-for-non-deterministic-lo
 $$\frac{\triple{P}{\Delta_{b_s} \circ r}{P}}{\triple{P}{(\Delta_{b_s} \circ r)^*}{P}}$$
 
 Applying these rules, we get the lemma. $\qed$
+
+## Properties of program contexts
+### Properties of relations
+> lemma "Monotonicity over composition"
+> $$
+> \begin{align}
+> (r_1 \subseteq r_2) & \implies (r_1 \circ s) \subseteq (r_2 \circ s) \\
+> (r_1 \subseteq r_2) & \implies (s \circ r_1) \subseteq (s \circ r_2)
+> \end{align}
+> $$
+
+> lemma "Monotonicity over union"
+> $$(r_1 \subseteq r_2) \land (s_1 \subseteq s_2) \implies (r_1 \cup s_1) \subseteq (r_2 \cup s_2)$$
+
+> lemma "Union distributivity"
+> $$(r_1 \cup r_2) \circ s = (r_1 \circ s) \cup (r_2 \circ s)$$
+
+### Properties of expressions
+Expressions are functions that take relations, and construct a more complex relation from them. We'll only consider expressions that use union ($\cup$) and composition ($\circ$). An example of such an expression would be: 
+
+$$E(r) = (b_1 \circ r)\cup (r\circ b_2)$$
+
+We'll see two theorems stating that expressions are monotonic, and that they "sort of distribute" over union (meaning sometimes with equality, but always at least with $\subseteq$).
+
+> theorem "Monotonicity of expressions using union and composition"
+> Let $S$ be the universe, and let $C = \set{r\mid r \subseteq S^2}$ be the set of all possible relations in $S$. Let $E: C \rightarrow C$ be any function building one relation from another, where $E(r)$ is built from:
+> 
+> - $r$,
+> - some additional constant expressions $b_1, \dots, b_n$,
+> - using $\cup$ and $\circ$. 
+> 
+> Such expressions $E$ are monotonic on $C$:
+> 
+> $$r_1 \subseteq r_2 \implies E(r_1) \subseteq E(r_2)$$
+
+This theorem can be proven by induction on the expression tree defining $E$, using the monotonicity properties of $\cup$ and $\circ$ that we [have seen above](#properties-of-relations).
+
+> theorem "Union &ldquo;distributivity&rdquo; of expressions in one direction"
+> Let $r_i$ with $i \in I$ be a family of relations. Then:
+> 
+> $$E\left(\bigcup_{i \in I} r_i \right) \supseteq \bigcup_{i \in I} E(r_i)$$
+
+Let $s = \bigcup_{i\in I} r_i$. Note that $\forall i.\ r_i \subseteq s$. Since $E$ is monotonic, $\forall i.\ E(r_i) \subseteq E(s)$. Since all the $E(r_i)$ are included in $E(s)$, so is their union, so $\bigcup_{i \in I} E(r_i) \subseteq E(s)$. 
+
+$\qed$
+
+Note that we **do not have equality** and we therefore don't really have a real union distributivity! To see this, take $E(r) = r\circ r$, and consider the family of relations $I = \set{1, 2}$ where $r_1 = \set{(1, 2)}$ and $r_2 = \set{(2, 3)}$. In this case:
+
+$$
+\begin{align}
+E\left(\bigcup_{i \in I} r_i \right) & = E(r_1 \cup r_2) = \set{(1, 3)} \\
+\bigcup_{i \in I} E(r_i) & = E(r_1) \cup E(r_2) = \emptyset \\
+\end{align}
+$$
+
+*However*, under some special assumptions on $E$, we actually have full, normal distributivity with equality:
+
+> theorem "Refined union distributivity of expressions"
+> If $E$ satisfies one of the conditions below:
+> 
+> 1. $E(r)$ contains $r$ at most once
+> 2. $E(r)$ contains $r$ any number of times, but $I$ is a set of natural numbers and $r_i$ is an increasing sequence $r_1 \subseteq r_2 \subseteq \dots$
+> 3. $E(r)$ contains $r$ any number of times, but $r_i, i \in I$ is a **directed family** of relations, meaning that for each $i, j$ there exists a $k$ such that $r_i \cup r_j \subseteq r_k$ (and $I$ is possibly uncountably infinite)
+> 
+> Then $E$ distributes over union:
+> 
+> $$E\left(\bigcup_{i \in I} r_i \right) = \bigcup_{i \in I} E(r_i)$$
+
+The third case is actually a generalization of the second. With the increasing sequence, the $r_k$ can just be the bigger relation between $r_i$ and $r_j$. In this second case, $I$ can be finite or countably infinite, which is also less general than the third case.
+
+All the proofs are done by induction, but we will not go into much detail on them.
+
+## More on mapping programs to formulas
+We've seen how to translate really basic constructs like conditions, while loops and assignment, but will now see some more advanced constructs that many real programming languages.
+
+### Mutable local variables
+When translating code into formulas, each statement is a relation between variables in scope. What happens if we introduce a variable in local scope? Suppose `x` and `z` are global variables, and we have a block introducing a local variable `y`:
+
+{% highlight scala linenos %}
+x = x + 1;
+{
+  var y;
+  y = x + 3;
+  z = x + y + z
+};
+x = x + z
+{% endhighlight %}
+
+The final formula should not depend on `y`. Therefore, we need to do some kind of local variable translation, which we can do with existential quantification.
+
+Let's call the whole expression in brackets $P$. Inside $P$, we have variables $V = \set{x, y, z}$. Let $R_V(P)$ be the formula for $P$, containing variables $V$ in the scope. This is a refinement of the [previous definition](#translating-commands) of $R$, which only used the top-level scope $V$; here, we can give it a local scope.
+
+The variable initialization in the bracket block can be translated into a formula by:
+
+$$R_V(\set{\text{var } y; P}) = \exists y, y'.\ R_{V \cup \set{y}}(P)$$
+
+This lets $y$ and $y'$ be unconstrained, and translates the rest of the block with $y$ now added into the scope $V$. This lets $y$ take any value in $P$. Note that the translation of this is quite similar to what `havoc` does. In fact, we can express `havoc` using these semantics:
+
+$$
+R_V(\text{havoc}(x)) \iff R_V(\set{\text{var } y; x = y})
+$$
+
+This equivalence will serve as a handy shorthand: when we initialize multiple variables, we can write it as:
+
+$$
+\text{havoc}(y_1, \dots, y_m)
+\equiv 
+\text{havoc}(y_1); \dots; \text{havoc}(y_m)
+$$
+
+Note that the order of havocs does not matter.
+
+### Specifications
+A specification (a.k.a. spec) is a formula that expresses some pre- and postconditions that the program should respect. Note that the spec is often more general than the strongest postcondition, but it could very well be the actual sp. 
+
+There are three ways in which we can think of a spec; we give a translation of the same example for each:
+
+- **Formula**: $(z' = z) \land (x' > 0) \land (y' > 0)$
+- **Relation**: $\set{(x, y, z, x', y', z') \mid (z' = z) \land (x' > 0) \land (y' > 0)}$
+- **Program**: `havoc(x, y); assume(x > 0 && y > 0)`
+
+A program adheres to the spec if its relation is a subset of the spec's relation. 
+
+Note that the above program representation lets $x$ and $y$ be unconstrained by the `havoc`, and constrains $x'$ and $y'$ through the `assume`. We get $z = z'$ by default, by not writing anything about $z$.
+
+### Program refinement and equivalence
+> definition "Refinement"
+> For two programs $P_1$ and $P_2$, we define *refinement* $P_1 \sqsubseteq P_2$ if and only if the following is a valid formula:
+> 
+> $$R(P_1) \rightarrow R(P_2)$$
+
+We can define the operator in the other direction in the obvious manner:
+
+$$P_2 \sqsupseteq P_1 \iff P_1 \sqsubseteq P_2$$
+
+Note that this is nothing more than a new notation for relation subset, since:
+
+$$P_1 \sqsubseteq P_2 \iff \rho(P_1) \subseteq \rho(P_2)$$
+
+> definition "Equivalence"
+> We define *equivalence* of two programs $P_1$ and $P_2$ as: 
+> 
+> $$P_1 \equiv P_2 \iff P_1 \sqsubseteq P_2 \land P_2 \sqsubseteq P_1$$
+
+From the above comment, we can see that this is just new notation for relation equality, since:
+
+$$P_1 \equiv P_2 \iff \rho(P_1) = \rho(P_2)$$
+
+> theorem "Monotonicity of refinement over sequences and if-statements"
+> $$\begin{align}
+> P_1 \sqsubseteq P_2 & \implies (P_1; P) \sqsubseteq (P_2; P) \\
+> P_1 \sqsubseteq P_2 & \implies (P; P_1) \sqsubseteq (P; P_2) \\
+> (P_1 \sqsubseteq P_2) \land (Q_1 \sqsubseteq Q_2) & \implies
+>   (\text{if } (*) \ P_1 \text{ else } P_2) \sqsubseteq
+>   (\text{if } (*) \ Q_1 \text{ else } Q_2) \\
+> \end{align}$$
+
+This follows directly from our lemmas of [monotonicity of relations over composition](#lemma:monotonicity-over-composition) and [monotonicity over union](#lemma:monotonicity-over-union). $\qed$
+
+### Stepwise refinement
+Why is this notion of refinement useful? It allows us to model one possible execution of very general, possibly non-deterministic program. We can do this by refining the program in steps, until it becomes deterministic, simple, efficiently executable:
+
+$$P_0 \sqsupseteq P_1 \sqsupseteq \dots \sqsupseteq P_n$$
+
+### Loops, revisited
+Let's examine the following program $L$, which has variables $V = \set{x, y}$:
+
+{% highlight scala linenos %}
+while (x > 0) {
+  x = x - y
+}
+{% endhighlight %}
+
+We're interested in finding the smallest relation $\rho(L)$ between initial state $(x, y)$ and final state $(x', y')$. Let $k$ be the number of time the loop executes. We can see that there are two different cases here: 
+
+- When $k = 0$, we never enter the loop because the initial $x$ did not satisfy the loop condition; therefore, all variables are kept the same
+- When $k > 0$, we enter the loop, and decrement $x$ by $y$ $k$ times, and finally the loop condition no longer holds.
+
+This leads us to the following formulas:
+
+$$
+\begin{align}
+k = 0 & \implies R(L) = (x \le 0) \land (x' = x) \land (y' = y) \\
+k = 1 & \implies R(L) = (x > 0) \land (x' = x - y) \land (y' = y) \land (x' \le 0) \\
+      & \vdots \\
+k > 0 & \implies R(L) = (x > 0) \land (x' = x - ky) \land (y' = y) \land (x' \le 0) \\
+\end{align}
+$$
+
+To find a formula that fits both the $k=0$ and $k>0$ cases, we can take the disjunction of the two. For $k > 0$, there will be a single value of $k$ at runtime, so we existentially quantify to express that:
+
+$$
+\begin{align}
+R(L) = & [(x \le 0) \land (x' = x) \land (y' = y)] \\
+       & \lor [\exists k.\ (k > 0) \land (x > 0) \land (x' = x - ky) \land (y' = y) \land (x' \le 0)]
+\end{align}
+$$
+
+This existential quantifier is annoying, and we will see later how to apply to one-point rule to eliminate it. (TODO, note that the bar in the slides is notation for "y divides ...")
+
+### Fixpoints
+Before we see how to translate recursive functions, we need a bit of theory on fixpoints:
+
+> definition "Fixpoint"
+> $s\in C$ is a **fixpoint** of $E: C\rightarrow C$ if $E(s) = s$
+
+This is analogous to what exists on real function: the fixpoints of $f(x) = x^2 - x - 3$ are $x_1 = -1$ and $x_2 = 3$.
+
+We are often interested in the fixpoint that is smaller than all others, which we call the **least fixpoint**. In the example on the polynomial, it would be $x_1 = -1$. For relations, we're looking for the fixpoint that is $\subseteq$ of all other fixpoints.
+
+### Recursion
+A recursive function will result in a recursive relation; say that we're translating the following function `f` into a relation:
+
+{% highlight scala linenos %}
+def f() = if (x > 0) {
+    x = x -1;
+    f();
+    y = y + 2
+} else { }
+{% endhighlight %}
+
+We know how to translate most of these constructs, but what postconditions can we assume on the recursive call? We're not done inferring postconditions on the body, so we don't know what the final result should be. The solution to find a relation $s$ for $f$ such that $E(s) = s$.
+
+For now, let's suppose $s$ has this property, and leave it as a variable. Translating the above function `f`, we get:
+
+$$
+E(s) = [
+  \Delta_{(x > 0)_s} \circ 
+  (\rho(x = x - 1) \circ s \circ \rho(y = y + 2))
+] \cup \Delta_{(x \le 0)_s}
+$$
+
+Here, the subscript s means "the set corresponding to this formula". We'll how to find this relation $s$:
+
+> theorem "Relation for recursion"
+> Let $E(s)$ be the expression translating the body of a recursive function, where $s$ is the relation of the recursive call. Let $s$ be defined as follows:
+> 
+> $$s = \bigcup_{k \ge 0} E^k(\emptyset)$$
+> 
+> where $E^0(\emptyset) = \emptyset$. The relation $s$ is the least fixpoint of $E$, and $E(s)$ is the relation corresponding to the recursive function.
+
+We'll prove that $s$ is indeed a fixpoint of $E$. Note that, according to the [theorem of monotonicity of expressions using union and composition](#theorem:monotonicity-of-expressions-using-union-and-composition), $E$ is monotonic. This fact means that we actually satisfy the [second condition of union-distributivity](#theorem:refined-union-distributivity-of-expressions) of $E$. To see this, pick $r_0, r_1, \dots, r_k$ as follows:
+
+- $r_0 = \emptyset$
+- $r_1 = E(r_0) = E(\emptyset)$
+- ...
+- $r_k = E^k(\emptyset)$
+
+We indeed have $r_0 \subseteq r_1 \subseteq \dots \subseteq r_k$ by monotonicity of $E$. Therefore, $E$ distributes over union. Having union-distributivity will be crucial in finding a relation $s$ such that $E(s) = s$. Indeed, we can pick $s$ as follows:
+
+$$s = \bigcup_{k \ge 0} r_k$$
+
+With union-distributivity, we can show that this choice of $s$ satisfies $E(s) = s$:
+
+$$
+E(s) 
+= E\left(\bigcup_{k \ge 0} r_k \right)
+\overset{(1)}{=} \bigcup_{k \ge 0} E(r_k)
+= \bigcup_{k \ge 0} r_{k+1}
+= \bigcup_{k \ge 1} r_k
+= \emptyset \cup \bigcup_{k \ge 1} r_k
+= s
+$$
+
+The step $(1)$ is the one that needs the union-distributivity property. 
+
+$\qed$
+
+Let's follow this up with a proof that $s$ is the least fixpoint. We obtained $s$ by solving $E(s) = s$; now, suppose $r$ is an arbitrary relation such that $E(r) \subseteq r$. Note that $s$ does satisfies this condition. We now claim that $s \subseteq r$, i.e. that it is the smallest. If we expand $s$ to its definition, we'll see that we need to prove:
+
+$$\bigcup_{k\ge 0} E^k(\emptyset) \subseteq r$$
+
+If we can show $E^k(\emptyset) \subseteq r$ for every $k$, we'll have proven this. This can be done by induction: the base case is $\emptyset \subseteq r$, which is trivially true. The induction step is by monotonicity of $E$:
+
+$$
+E^k(\emptyset) \subseteq r
+\overset{(1)}{\implies}
+E(E^k(\emptyset)) \subseteq E(r) 
+\overset{(2)}{\implies}
+E(E^k(\emptyset)) \subseteq r
+$$
+
+Step $(1)$ is by monotonicity of $E$, and step $(2)$ is by the original assumption of $E(r) \subseteq r$.
+
+$\qed$
+
+Note that this second proof is actually stronger than we strictly need it to be: not only did we prove that $s$ is the least fixpoint (smaller than any $r$ such that $E(r) = r$), we proved that $s$ is also smaller than any other $r$ such that $E(r) \subseteq r$. We'll see some vocabulary for this later (todo link), with which we can say that $s$ is the least postfix point.
+
+This model has the advantage of being simple, but also has limitations; for one, it translates programs that never terminate in the same way as programs that do. Therefore, the correct semantics of the translation is that it only applies to terminating executions. The alternative would be error states for non-termination, but we won't look into that.
+
+### Specification of recursive functions
+In the previous section, we had $E(r) \subseteq r$. Let's think about what that means, from a more intuitive perspective. It means that when we plug $r$ into $E$, we get something that conforms to the $r$ spec. This is exactly what we wanted in the first place: finding a translation of a recursive call that also satisfies the spec for the function itself.
+
+Now, suppose that we want to check a user-defined specification $q$:
+
+$$q = \set{\seq{\seq{x, y}, \seq{x', y'}} \mid y' \ge y}$$
+
+As for any spec, we need to check that the relation of the program is a subset of the spec, $s \subseteq q$. This is actually equivalent to proving $E(q) \subseteq q$.
+
+### Mutual recursion
+Suppose we have two mutually recursive procedures $r_1 = E_1(r_1, r_2)$ and $r_2 = E_2(r_1, r_2)$. We can extend the previous approach to work on pairs. We define $\vec{E}(r_1, r_2) = \seq{E_1(r_1, r_2), E_2(r_1, r_2)}$ and $\vec{r} = (r_1, r_2)$. We want to find a pair of relations $\vec{r}$ such that:
+
+$$\vec{E}(\vec{r}) = \vec{r}$$
+
+In order to do this, we introduce the a partial ordering (more on this later, todo link), where $(r_1, r_2) \sqsubseteq (r_1', r_2')$ means $r_1 \subseteq r_1'$ and $r_2 \subseteq r_2'$. This will allow us to express [refinements](#definition:refinement).
+
+Pairs aren't sets, but we can define set-like operations on them by applying the operation to both members of the pair. We denote these operations using the square variant of the set operation in question. For instance:
+
+$$(r_1, r_2) \sqcup (r_1', r_2') = (r_1 \cup r_1', r_2 \cup r_2')$$
+
+The entire theory is preserved as long as we have a partial order $\sqsubseteq$ with some "good properties" (i.e. lattice elements are a generalization of sets), so this extension can be done without too much extra work.
+
+To find the least fixpoint, the semantics are now:
+
+$$(s_1, s_2) = \bigsqcup_{i\ge 0} \vec{E}^i(\emptyset, \emptyset)$$
+
+As before, we can prove that if we consider any relations $c_1, c_2$ such that $E_1(c_1, c_2) \subseteq c_1$ and $E_2(c_1, c_2) \subseteq c_2$ then $\vec{s}$ is the least fixpoint, meaning $s_1 \subseteq c_1$ and $s_2 \subseteq c_2$.
