@@ -51,7 +51,11 @@ function styles() {
 }
 
 function html() {
-  const modifiedExt = ext => modified(paths.html, transform(p => p + ext));
+  const modifiedExt = ext =>
+    modified(
+      paths.html,
+      transform(p => p + ext)
+    );
   const gz = modifiedExt(".gz").pipe(zopfli());
   const br = modifiedExt(".br").pipe(brotli.compress());
   return merge(gz, br).pipe(dest(paths.html.dest));
@@ -78,7 +82,6 @@ function heroImages() {
   });
 
   const minified = merge(...resized)
-    .pipe(renameExt(".jpeg", ".jpg"))
     .pipe(imagemin())
     .pipe(dest(paths.heroImages.dest));
 
