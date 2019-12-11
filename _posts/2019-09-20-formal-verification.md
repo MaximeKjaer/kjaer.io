@@ -20,6 +20,7 @@ $$
 \newcommand{\wp}[1]{\text{wp}\!\left(#1\right)}
 \newcommand{\sp}[1]{\text{sp}\!\left(#1\right)}
 \newcommand{\ar}{\text{ar}}
+\newcommand{\divides}{\mid}
 $$
 
 Throughout these notes, vectors are denoted in bold and lowercase (e.g. $\vec{x}$). Booleans are denoted interchangeably by $\text{true}$ and $\text{false}$, or $\top$ and $\bot$. Generally, I try to use $\rightarrow$ and $\leftrightarrow$ for formulas, and $\implies$ and $\iff$ for mathematical notation[^equivalent-notation].
@@ -2256,3 +2257,220 @@ To find the least fixpoint, the semantics are now:
 $$(s_1, s_2) = \bigsqcup_{i\ge 0} \vec{E}^i(\emptyset, \emptyset)$$
 
 As before, we can prove that if we consider any relations $c_1, c_2$ such that $E_1(c_1, c_2) \subseteq c_1$ and $E_2(c_1, c_2) \subseteq c_2$ then $\vec{s}$ is the least fixpoint, meaning $s_1 \subseteq c_1$ and $s_2 \subseteq c_2$.
+
+## Quantifier elimination in Presburger arithmetic
+### Quantifier elimination
+> definition "Quantifier elimination"
+> Given a formula $F(\vec{y})$, the goal of quantifier elimination (QE) is to find a formula $G(\vec{y})$ that:
+> 
+> - is [equivalent](#definition:equivalence) to $F(\vec{y})$
+> - has no quantifiers
+> - has $\text{FV}(G)\subseteq\text{FV}(F)$
+
+Generally, given an assignment $\vec{y}$, it's easier to check the truth value of $G(\vec{y})$ because it has no quantifiers. 
+
+The third above condition may prompt an interesting question; what if $F$ has no free variables, for instance because they're all bound by quantifiers? The condition still holds, so $G$ would have no variables at all, it would simply be a constant expression, which we can immediately verify the truth of it.
+
+This also means that we can check satisfiability and validity of $H(\vec{y})$ by: 
+
+- **Satisfiability**: do QE on $\exists \vec{y}.\ H(\vec{y})$ and evaluate
+- **Validity**: do QE on $\forall \vec{y}.\ H(\vec{y})$ and evaluate
+
+### Presburger arithmetic
+Let's talk about how to use what we've discussed in order to verify programs. We can do this in three steps:
+
+1. Compile programs to logical formulas
+2. Express properties in logic or code
+3. Use an automated theorem prover for generated conditions (SAT, SMT, rewrite, interactive provers)
+
+Which logic should we use? We'll look into integer linear arithmetic, also known as Presburger arithmetic.
+
+This is integer arithmetic with logical operations ($\land, \lor, \neg$), quantifiers ($\forall, \exists$), addition ($+$), and comparison ($<, =$). This is one of the earliest theories that was shown to be decidable[^presburger-backstory].
+
+[^presburger-backstory]: The story goes that Presburger solved this in his MSc thesis with Tarski in 1929, but that Tarski was not impressed.
+
+We'll see that we can [extend Presburger arithmetic](#making-presburger-arithmetic-admit-qe) to admit quantifier elimination (QE): this is not a trivial result, as not all theories admit QE. The reason for which we want to do QE in the first place is that formulas are hard to decide when they have formulas. A Presburger arithmetic formula of size $n$ with $m$ quantifiers is decidable by a single-tape alternating Turing machine in time $2^{n^{O(m)}}$. This is very sensitive to the value of $m$.
+
+Another reason to do QE is to remove quantifiers from interpolants, which is useful in generalizing counterexamples to invariants. Note that **if a logic has QE, it also has quantifier-free interpolants**.
+
+### One-point rule
+The one-point rule is one of the many steps used in quantifier elimination procedures. Note that it is not enough on its own, because it only handles equalities, and not inequalities .
+
+> theorem "One-point rule"
+> If $\vec{y}$ is a tuple of variables not containing $x$, then:
+> 
+> $$
+> \exists x.\ (x = t(\vec{y}) \land F(x, \vec{y})) \iff F(t(\vec{y}), \vec{y})
+> $$
+
+This rule should make intuitive sense; it's somewhat akin to inlining (in the $\Rightarrow$ direction) or extracting to a variable (in the $\Leftarrow$ direction). In the $\Rightarrow$ direction, we say that we apply the **one-point rule**, and in the $\Leftarrow$ direction we call it **flattening**.
+
+We can also state the dual of this rule, which is the negated version of this statement
+
+> theorem "Dual one-point rule"
+> $$
+> \forall x.\ (x = t(\vec{y}) \rightarrow F(x, \vec{y})) \iff F(t(\vec{y}), \vec{y})
+> $$
+
+The proof for this is easy; we negate both sides and see that it reduces to the rule for $\exists$:
+
+$$
+\exists x.\ (x = t(\vec{y}) \land \neg F(x, \vec{y})) 
+\iff \neg F(t(\vec{y}), \vec{y})
+\qed
+$$
+
+### Making Presburger arithmetic admit QE
+As is, Presburger arithmetic (PA) does not admit QE. If we lack some operations that can be expressed with quantifiers, there may be no equivalent without quantifiers. For instance, we can state divisibility by 3 in PA as follows:
+
+$$\exists y.\ x = y + y + y$$
+
+This indicates to us that we need a divisibility operator (e.g. $3 \divides x$), because in order to do QE we must have a quantifier-free equisatisfiable variant of the above formula. We will therefore extend PA with the following, where we always have $K \in \mathbb{Z}$.
+
+- Comparison $x < y$
+- Subtraction $x - y$
+- Divisibility $K \divides y$
+- Multiplication by a constant factor $K \cdot x$ (this is just shorthand for very long additions)
+
+The resulting language has operators $\set{+, -, =, <, \divides, \cdot}$ on numbers and variables, and $\set{\land, \lor, \neg, \rightarrow, \exists, \forall}$ on atomic formulas.
+
+### Normalized Presburger arithmetic
+To normalize terms in PA, we can rearrange each term to be of the form: 
+
+$$K_0 + \sum_{i=1}^n K_i x_i$$
+
+A term in this form is called a *linear term*. To normalize literals in PA, we do the following translation:
+
+$$
+\begin{align}
+\neg(t_1 < t_2) & \rightsquigarrow t_2 < t_1 + 1 \\
+\neg(t_1 = t_2) & \rightsquigarrow (t_1 < t_2) \lor (t_2 < t_1) \\
+t_1 = t_2       & \rightsquigarrow (t_1 < t_2 + 1) \land (t_2 < t_1 + 1) \\
+\neg(K \divides t) & \rightsquigarrow \biglor_{i=1}^{K-1} K\divides t+i \\
+t_1 < t_2       & \rightsquigarrow 0 < t_2 - t_1
+\end{align}
+$$
+
+This generates some disjunctions and conjunctions, but we can convert back to DNF again.
+
+### Eliminating existential quantifiers
+Let's see how to eliminate $\exists$ from the following, where $F$ is quantifier-free:
+
+$$\exists x.\ F(x, \vec{y})$$
+
+To do that, we can convert $F$ to disjunctive normal form, a disjunction of clauses $C_i$, each of which is a conjunction of literals.
+
+$$F \iff \biglor_{i=1}^m C_i$$
+
+The elimination is then done by:
+
+$$
+\exists x.\ F \iff 
+\left(\exists x.\ \biglor_{i=1}^m C_i \right) \iff
+\biglor_{i=1}^m \exists x.\ C_i
+$$
+
+### Eliminating universal quantifiers
+Suppose $F_0(x, \vec{y})$ is quantifier-free, and we want to eliminate $\forall$ from the following formula:
+
+$$\forall x.\ F_0(x, \vec{y})$$
+
+This is equivalent to:
+
+$$\forall x.\ F_0(x, \vec{y}) \iff \neg(\exist x.\ \neg F_0(x, \vec{y}))$$
+
+We know how to handle this right-hand side: we can [eliminate the existential quantifier](#eliminating-existential-quantifiers) in $\exists x.\ \neg F_0(x, \vec{y})$ to obtain $F_1(\vec{y})$. The result of elimination is therefore:
+
+$$\neg F_1(\vec{y})$$
+
+### Exposing the variable to eliminate
+Sometimes, we want to do QE of a quantified variable $y$, but $y$ appears in a multiplied in the formula, or with bounds.
+
+#### Multiplication
+For comparison and "divides" terms, we can rely on the following observations, for $c \in \mathbb{N}^+$:
+
+- $0 < t \equiv 0 < ct$
+- $K \divides t \equiv ck \divides cT$
+
+Let $K_1, \dots, K_n$ be the coefficients next to $y$; we choose $M = \text{lcm}(K_1, \dots, K_n)$. Then, to ensure coefficient 1, we multiply all literals by $M/\abs{K_i}$ to obtain multiples $M$ or $-M$ (as in the example above, in which $M = 30$). Then, we let $x = My$ and solve:
+
+$$\exists x.\ F(x) \land (M \divides x)$$
+
+As an example of this, let's consider the following formula:
+
+$$
+\exists y.\ 
+  (0 < -w + 3y + 1) \land
+  (0 < -2y + z + 6) \land 
+  4\divides (5y + 1)
+$$
+
+In this case, the we can take the least common multiple (lcm) of the coefficients of $y$:
+
+$$M = \text{lcm}(3, 2, 5) = 30$$
+
+We now make all occurrences of $y$ by have coefficient $M$ (but preserving mathematical equivalence, so we need to update other coefficients too):
+
+$$
+\exists y.\ 
+  (0 < -10w + 30y + 10) \land
+  (0 < -30y + 15z + 90) \land 
+  (24\divides (30y + 6))
+$$
+
+Let $x$ denote $30y$. Note that this is not an arbitrary $x$, it must be divisible by 30, so we add a condition for that at the end. The formula is now:
+
+$$
+\exists x.\ 
+  (0 < -10w + x + 10) \land
+  (0 < -x + 15z + 90) \land 
+  (24\divides (x + 6)) \land
+  (30 \divides x)
+$$
+
+#### Bounds
+Let's focus on a single variable $x$. We can reorganize the formula in terms of $x$ to fit the following form, so that there are $L$ lower bounds on $x$, and $U$ upper bounds, and $D$ divisibility constraints. We call this form $F_1(x)$:
+
+$$
+F_1(x) =
+\left( \bigland_{i=1}^L a_i < x \right) \land
+\left( \bigland_{j=1}^U x < b_j \right) \land
+\left( \bigland_{i=1}^D K_i \mid (x + t_i) \right)
+$$
+
+If there are no divisibility constraints ($D = 0$), then the formula can be rewritten as:
+
+$$F_1(x) \equiv (\max_i a_i + 1 \le \min_j b_j - 1)$$
+
+The min and the max are not something that we can express directly in PA, but we can convert that into the following equivalent form:
+
+$$
+F_1(x) \equiv
+(\max_i a_i + 1 \le \min_j b_j - 1) \equiv
+\bigland_{i, j} a_i + 1 < b_j
+$$
+
+Alternatively, we can express this as follows, where $t_k$ does not contain $x$ (after all, our goal is to eliminate $x$):
+
+$$F_1(x) \equiv \biglor_k F_1(t_k)$$
+
+Let's see a few instances of this, depending on the values of $L$, $U$ and $D$:
+
+- $D = 0$ and $L > 0$:
+  
+  $$F_1(x) \equiv \biglor_{k=1}^L F_1(a_k + 1)$$
+
+  At least one of the terms in $\biglor$ will evaluate to $\max a_i + 1$, so this is valid.
+
+- $D > 0$:
+  
+  $$\biglor_{k=1}^L \biglor_{i = 1}^N F_1(a_k + i)$$
+
+  where $N = \text{lcm}(K_1, \dots, K_D)$. This works because if $F_1(u)$ holds, then $F_1(u-N)$ holds too.
+
+- $L = 0$:
+
+  $$\biglor_{x=1}^N \bigland_{i=1}^D K_i \divides (x+t_i)$$
+
+### Generalization of Presburger arithmetic
+Let's consider a generalization of Presburger logic: first-order formulas with equality and comparison, interpreted over *rationals* instead of integers. This is called **dense linear order without endpoints**. The solution for QE is actually simpler than for PA, because there are no divisibility constraints.
