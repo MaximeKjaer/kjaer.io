@@ -735,7 +735,7 @@ Therefore:
 $$
 \begin{align}
 T(n) & \leq (c+d)k + c + (c+d)(n-k-1) + c + d
-     & = (c+d)n + c - (c+d) + 2c $
+     & = (c+d)n + c - (c+d) + 2c
      & \leq (c+d)n + c + (c -d) \leq (c+d)n + c
 \end{align}
 $$
@@ -2147,7 +2147,7 @@ $$
 The expectancy is thus:
 
 $$
-\mathbb{E}[\text{# comparisons}] = \mathbb{E}\left[X\right[ = 
+\mathbb{E}[\text{# comparisons}] = \mathbb{E}\left[X\right] = 
 \mathbb{E}\left[\sum_{i=1}^n{\sum_{j=i+1}^n{X_{ij}}}\right]
 $$
 
