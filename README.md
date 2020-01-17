@@ -1,6 +1,6 @@
 # [kjaer.io](https://kjaer.io)
 
-[![Build Status](https://travis-ci.org/MaximeKjaer/kjaer.io.svg?branch=master)](https://travis-ci.org/MaximeKjaer/kjaer.io)
+[![Build Status](https://travis-ci.com/MaximeKjaer/kjaer.io.svg?branch=master)](https://travis-ci.com/MaximeKjaer/kjaer.io)
 
 My personal blog. Built with Jekyll.
 
