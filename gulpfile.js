@@ -10,7 +10,6 @@ const imagemin = require("gulp-imagemin");
 const merge = require("merge-stream");
 const path = require("path");
 const readYaml = require("read-yaml");
-const rename = require("gulp-rename");
 const responsive = require("gulp-responsive");
 const webp = require("gulp-webp");
 const zopfli = require("gulp-zopfli-green");
@@ -101,12 +100,6 @@ function images() {
 }
 
 // Utility functions
-function renameExt(from, to) {
-  return rename(path => {
-    if (path.extname === from) path.extname = to;
-  });
-}
-
 function modified(paths, changedOptions) {
   if (process.env.CI) {
     return src(paths.src);

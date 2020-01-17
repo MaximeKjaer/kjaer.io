@@ -14,7 +14,6 @@
 		"gulp-filter": "^6.0.0",
 		"gulp-git": "^2.9.0",
 		"gulp-imagemin": "^6.0.0",
-		"gulp-rename": "^1.4.0",
 		"gulp-responsive": "^3.0.1",
 		"gulp-webp": "^4.0.1",
 		"gulp-zopfli-green": "^3.0.1",
