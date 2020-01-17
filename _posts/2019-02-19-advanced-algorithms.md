@@ -428,49 +428,53 @@ An efficient algorithm to find an augmenting path $P$ is make edges in $M$ direc
 
 Here's how the algorithm works. Suppose we already have a graph with a matching $M$ (in red):
 
-{% graph %}
-graph [nodesep=0.3, ranksep=2]
-bgcolor="transparent"
-rankdir="LR"
+{% graphviz %}
+graph G {
+    graph [nodesep=0.3, ranksep=2]
+    bgcolor="transparent"
+    rankdir="LR"
 
-subgraph cluster_left {
-    color=invis
-    B A C
+    subgraph cluster_left {
+        color=invis
+        B A C
+    }
+
+    subgraph cluster_right {
+        color=invis
+        F E D
+    }
+
+    B -- F [color=red, penwidth=3.0]
+    A -- E [color=red, penwidth=3.0]
+    B -- E
+    A -- D
+    C -- F
 }
-
-subgraph cluster_right {
-    color=invis
-    F E D
-}
-
-B -- F [color=red, penwidth=3.0]
-A -- E [color=red, penwidth=3.0]
-B -- E
-A -- D
-C -- F
-{% endgraph %}
+{% endgraphviz %}
 
 The path $P$ corresponds to all the edges in the graph. The symmetric difference $M \bigtriangleup P$ corresponds to a new matching $M'$ of cardinality $\abs{M'} = \abs{M} + 1$:
 
-{% graph %}
-graph [nodesep=0.3, ranksep=2]
-bgcolor="transparent"
-rankdir="LR"
+{% graphviz %}
+graph G {
+    graph [nodesep=0.3, ranksep=2]
+    bgcolor="transparent"
+    rankdir="LR"
 
-subgraph cluster_left {
-    color=invis
-    A B C
+    subgraph cluster_left {
+        color=invis
+        A B C
+    }
+
+    subgraph cluster_right {
+        color=invis
+        D E F
+    }
+
+    B -- E [color=red, penwidth=3.0]
+    A -- D [color=red, penwidth=3.0]
+    C -- F [color=red, penwidth=3.0]
 }
-
-subgraph cluster_right {
-    color=invis
-    D E F
-}
-
-B -- E [color=red, penwidth=3.0]
-A -- D [color=red, penwidth=3.0]
-C -- F [color=red, penwidth=3.0]
-{% endgraph %}
+{% endgraphviz %}
 
 #### Correctness proof
 We now prove the correctness of this algorithm, which is to say that it indeed finds a maximum matching. The algorithm returns a set $M$ with respect to which there are no augmenting paths, so to prove correctness we must prove the following:
@@ -1130,27 +1134,29 @@ The Hungarian algorithm finds a min-cost perfect matching. It works with the dua
 #### Example
 Consider the following bipartite graph:
 
-{% graph %}
-graph [nodesep=0.3, ranksep=2]
-bgcolor="transparent"
-rankdir="LR"
+{% graphviz %}
+graph G {
+    graph [nodesep=0.3, ranksep=2]
+    bgcolor="transparent"
+    rankdir="LR"
 
-subgraph cluster_left {
-    color=invis
-    A B C
+    subgraph cluster_left {
+        color=invis
+        A B C
+    }
+
+    subgraph cluster_right {
+        color=invis
+        D E F
+    }
+
+    A -- D
+    B -- D
+    B -- E [color=red, penwidth=3.0]
+    C -- D
+    C -- F
 }
-
-subgraph cluster_right {
-    color=invis
-    D E F
-}
-
-A -- D
-B -- D
-B -- E [color=red, penwidth=3.0]
-C -- D
-C -- F
-{% endgraph %}
+{% endgraphviz %}
 
 The thin black edges have cost 1, and the thick red edge has cost 2. The Hungarian algorithm uses the [lemma from above](#lemma:min-cost-perfect-matching-and-dual-solution) to always keep a dual solution $y = (u, v)$ that is *feasible at all times*. For any fixed dual solution, the lemma tells us that the perfect matching can only contain **tight edges**, which are edges $e = (a, b)$ for which $u_a + v_b = c(e)$. 
 
@@ -1163,30 +1169,32 @@ $$
 
 The right vertices get weight 0, and the left vertices get the weight of the smallest edge they're incident to. The weights $u$ and $v$, and the set of tight edges $E'$ is displayed below. 
 
-{% graph %}
-graph [nodesep=0.3, ranksep=2]
-bgcolor="transparent"
-rankdir="LR"
+{% graphviz %}
+graph G {
+    graph [nodesep=0.3, ranksep=2]
+    bgcolor="transparent"
+    rankdir="LR"
 
-subgraph cluster_left {
-    color=invis
-    A[label="A = 1"];
-    B[label="B = 1"];
-    C[label="C = 1"];
+    subgraph cluster_left {
+        color=invis
+        A[label="A = 1"];
+        B[label="B = 1"];
+        C[label="C = 1"];
+    }
+
+    subgraph cluster_right {
+        color=invis
+        D[label="D = 0"];
+        E[label="E = 0"];
+        F[label="F = 0"];
+    }
+
+    A -- D
+    B -- D
+    C -- D
+    C -- F
 }
-
-subgraph cluster_right {
-    color=invis
-    D[label="D = 0"];
-    E[label="E = 0"];
-    F[label="F = 0"];
-}
-
-A -- D
-B -- D
-C -- D
-C -- F
-{% endgraph %}
+{% endgraphviz %}
 
 Then, we try to find a perfect matching in this graph using the [augmenting path algorithm](#algorithm-1), for instance. However, this graph has no perfect matching (node $E$ is disconnected, $A$ and $B$ are both only connected to $D$). Still, we can use this fact to improve the dual solution $(u, v)$, using Hall's theorem:
 
@@ -1195,38 +1203,40 @@ Then, we try to find a perfect matching in this graph using the [augmenting path
 
 Here, $N(S)$ is the *neighborhood* of $S$. In the example above, we have no perfect matching, and we have $S = \set{A, B}$ and $N(S) = \set{D}$.
 
-{% graph %}
-graph [nodesep=0.3, ranksep=2]
-bgcolor="transparent"
-rankdir="LR"
+{% graphviz %}
+graph G {
+    graph [nodesep=0.3, ranksep=2]
+    bgcolor="transparent"
+    rankdir="LR"
 
-subgraph cluster_left {
-    color=invis
-    subgraph cluster_S {
-        color=black;
-        label="S";
-        A[label="A = 1"];
-        B[label="B = 1"];
+    subgraph cluster_left {
+        color=invis
+        subgraph cluster_S {
+            color=black;
+            label="S";
+            A[label="A = 1"];
+            B[label="B = 1"];
+        }
+        C[label="C = 1"];
     }
-    C[label="C = 1"];
-}
 
-subgraph cluster_right {
-    color=invis
-    subgraph cluster_NS {
-        color=black;
-        label="N(S)";
-        D[label="D = 0"];
+    subgraph cluster_right {
+        color=invis
+        subgraph cluster_NS {
+            color=black;
+            label="N(S)";
+            D[label="D = 0"];
+        }
+        E[label="E = 0"];
+        F[label="F = 0"];
     }
-    E[label="E = 0"];
-    F[label="F = 0"];
-}
 
-A -- D
-B -- D
-C -- D
-C -- F
-{% endgraph %}
+    A -- D
+    B -- D
+    C -- D
+    C -- F
+}
+{% endgraphviz %}
 
 This set $S$ is a *certificate* that can be used to update the dual lower bound. If we pick a $\epsilon > 0$ (we'll see which value to pick later), we can increase $u_a$ for all vertices in $S$ by an amount $+\epsilon$, and decrease $v_b \in N(S)$ by $-\epsilon$. Let's take a look at which edges remain tight:
 
@@ -1237,30 +1247,32 @@ This set $S$ is a *certificate* that can be used to update the dual lower bound.
 
 Because we've changed the set of tight edges, we've also changed our solution set $E'$ to something we can maybe find an augmenting path in. For instance, picking $\epsilon = 1$ in the graph above gives us a new set $E'$ of tight edges:
 
-{% graph %}
-graph [nodesep=0.3, ranksep=2]
-bgcolor="transparent"
-rankdir="LR"
+{% graphviz %}
+graph G {
+    graph [nodesep=0.3, ranksep=2]
+    bgcolor="transparent"
+    rankdir="LR"
 
-subgraph cluster_left {
-    color=invis
-    A[label="A = 2"];
-    B[label="B = 2"];
-    C[label="C = 1"];
+    subgraph cluster_left {
+        color=invis
+        A[label="A = 2"];
+        B[label="B = 2"];
+        C[label="C = 1"];
+    }
+
+    subgraph cluster_right {
+        color=invis
+        D[label="D = -1"];
+        E[label="E = 0"];
+        F[label="F = 0"];
+    }
+
+    A -- D
+    B -- D
+    B -- E [color=red, penwidth=3.0]
+    C -- F
 }
-
-subgraph cluster_right {
-    color=invis
-    D[label="D = -1"];
-    E[label="E = 0"];
-    F[label="F = 0"];
-}
-
-A -- D
-B -- D
-B -- E [color=red, penwidth=3.0]
-C -- F
-{% endgraph %}
+{% endgraphviz %}
 
 The augmenting path algorithm can find a perfect matching in this graph, which is optimal by [the lemma](#lemma:min-cost-perfect-matching-and-dual-solution).
 
@@ -2196,28 +2208,32 @@ def karger(G, n):
 
 Let's define how the contracting procedure happens. Consider the following graph:
 
-{% graph %}
-graph [nodesep=0.7, ranksep=0]
-bgcolor="transparent"
-rankdir="LR"
+{% graphviz %}
+graph G {
+    graph [nodesep=0.7, ranksep=0]
+    bgcolor="transparent"
+    rankdir="LR"
 
-a -- b [label="e"]
-a -- b -- c -- d -- a
-b -- c -- d
-b -- c
-{% endgraph %}
+    a -- b [label="e"]
+    a -- b -- c -- d -- a
+    b -- c -- d
+    b -- c
+}
+{% endgraphviz %}
 
 If we contract edge $e$, we get the following graph:
 
-{% graph neato %}
-graph [nodesep=0.7, ranksep=0]
-bgcolor="transparent"
-rankdir="LR"
+{% graphviz neato %}
+graph G {
+    graph [nodesep=0.7, ranksep=0]
+    bgcolor="transparent"
+    rankdir="LR"
 
-ab -- c -- d -- ab
-ab -- c -- d
-ab -- c
-{% endgraph %}
+    ab -- c -- d -- ab
+    ab -- c -- d
+    ab -- c
+}
+{% endgraphviz %}
 
 We've created a new super-node $ab$. This reduces the total number of nodes in the graph by 1. We do not remove loops when contracting an edge.
 
@@ -2591,24 +2607,26 @@ $$
 
 For instance:
 
-{% graph %}
-graph [nodesep=0.3, ranksep=2]
-bgcolor="transparent"
-rankdir="LR"
+{% graphviz %}
+graph G {
+    graph [nodesep=0.3, ranksep=2]
+    bgcolor="transparent"
+    rankdir="LR"
 
-subgraph cluster_left {
-    color=invis
-    a b c
+    subgraph cluster_left {
+        color=invis
+        a b c
+    }
+
+    subgraph cluster_right {
+        color=invis
+        d e f
+    }
+
+    a -- d
+    b -- e -- c -- f -- b
 }
-
-subgraph cluster_right {
-    color=invis
-    d e f
-}
-
-a -- d
-b -- e -- c -- f -- b
-{% endgraph %}
+{% endgraphviz %}
 
 The above graph would have the following matrix representation:
 
@@ -4825,10 +4843,12 @@ For this course, we'll assume without loss of generality that all graphs are $d$
 
 This matrix $M$ is also called the *random walk matrix* of the graph. To see why, consider the following graph:
 
-{% graph %}
-bgcolor="transparent"
-A -- B -- C -- D -- A
-{% endgraph %}
+{% graphviz %}
+graph G {
+    bgcolor="transparent"
+    A -- B -- C -- D -- A
+}
+{% endgraphviz %}
 
 The normalized adjacency matrix will look like this:
 

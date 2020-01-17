@@ -92,13 +92,6 @@ defaults:
       edited: false
       note: false
 
-diagrams:
-  graphviz:
-    engine: dot
-    options: '-Tsvg'
-  diag:
-    options: '-Tsvg --nodoctype'
-
 premonition:
   types:
     note:
@@ -131,18 +124,13 @@ premonition:
 # Exclude these files from your production _site
 exclude:
   - Rakefile
-  - Gemfile
-  - Gemfile.lock
   - gulpfile.js
   - LICENSE
   - nohup.out
   - npm-debug.log
-  - node_modules
   - package.json
   - package-lock.json
-  - .sass-cache
   - .git
   - README.md
   - serve.bat
-  - vendor
   - zopfli

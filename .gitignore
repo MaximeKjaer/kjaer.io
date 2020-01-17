@@ -2,6 +2,7 @@ _site
 .sass-cache
 .DS_Store
 .jekyll
+.jekyll-cache
 .bundle
 node_modules
 *.bat

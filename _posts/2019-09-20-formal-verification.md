@@ -2377,7 +2377,7 @@ $$\forall x.\ F_0(x, \vec{y})$$
 
 This is equivalent to:
 
-$$\forall x.\ F_0(x, \vec{y}) \iff \neg(\exist x.\ \neg F_0(x, \vec{y}))$$
+$$\forall x.\ F_0(x, \vec{y}) \iff \neg(\exists x.\ \neg F_0(x, \vec{y}))$$
 
 We know how to handle this right-hand side: we can [eliminate the existential quantifier](#eliminating-existential-quantifiers) in $\exists x.\ \neg F_0(x, \vec{y})$ to obtain $F_1(\vec{y})$. The result of elimination is therefore:
 

@@ -1,11 +1,11 @@
 source "https://rubygems.org"
 
-gem "jekyll", "~> 3.8.4"
+gem "jekyll", "~> 4.0.0"
 group :jekyll_plugins do
-  gem "jekyll-sitemap", "~> 1.2.0"      # sitemap
-  gem "jekyll-mathjax-csp", "~> 1.1.0"  # mathjax
-  gem "jekyll-diagrams", "~> 0.4.2"     # graphviz
-  gem "premonition", "~> 2.0.0"         # content blocks
+  gem "jekyll-sitemap", "~> 1.4.0"      # sitemap
+  gem "jekyll-mathjax-csp", "~> 1.1.0", github: "MaximeKjaer/jekyll-mathjax-csp", branch: "jekyll4" # mathjax
+  gem "jekyll-diagrams", "~> 0.5.0"     # graphviz
+  gem "premonition", "~> 2.0.0", github: "MaximeKjaer/premonition", branch: "jekyll4"         # content blocks
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
