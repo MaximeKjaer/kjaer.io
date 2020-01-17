@@ -8,8 +8,6 @@ note: true
 * TOC
 {:toc}
 
-⚠ *Work in progress*
-
 <!-- More --> 
 
 ## XML
