@@ -2474,3 +2474,275 @@ Let's see a few instances of this, depending on the values of $L$, $U$ and $D$:
 
 ### Generalization of Presburger arithmetic
 Let's consider a generalization of Presburger logic: first-order formulas with equality and comparison, interpreted over *rationals* instead of integers. This is called **dense linear order without endpoints**. The solution for QE is actually simpler than for PA, because there are no divisibility constraints.
+
+{% comment %}
+
+## Satisfiability Modulo Theories
+We have [discussed how SAT solvers work](#sat-algorithms-for-cnf). Let's see how we can use a SAT solver to determine the satisfiability of a quantifier-free (QF) formula. 
+
+Let's consider formula $F \equiv p \lor (q \land r))$. A SAT solver can give us an assignment for this ($p=1$ and $q, r$ are anything, for instance). Now, let's consider a more complex formula:
+
+$$
+\begin{align}
+G & \equiv (x < y + 1) \lor ((y < x) \land (x < 0)) \\
+  & \equiv F[p := (x < y+1), q := (y<x), r := (x < 0)]
+\end{align}
+$$
+
+The SAT solver can give us values of $p, q, r$. We have the following theorem:
+
+> theorem "Satisfiability of QF formulas using SAT"
+> $G$ is satisfiable $\iff$ there is an assignment for $p, q, r$ that satisfies $F$
+
+This result generalizes to any $G$ that can be described in terms of $F$ as above. 
+
+Let's consider another example:
+
+$$
+1 \le x \land 
+x \le 2 \land
+f(x) \ne f(1)
+$$
+
+This is not true for every $f$, but we can pick $f$ to be whatever we want. In this case, this is satisfiable with $x = 2$ (and $f(x) = x$). Note that we usually constrain $x$ to be integer, so we only need to consider the cases of $x=1$ and $x=2$ in this example.
+
+Internally, an SMT solver uses a SAT solver. A simple implementation is to give a name to each subterm, by introducing a propositional variable for each atomic formula. In our first example, we can rewrite the formula as $p \land (\neg q \lor r) \land \neg s$. The SAT solver can give us assignments for $p, q, r, s$ that we can use as a starting point to try to solve the formula.
+
+Then, we have two theory solvers that solve equalities between uninterpreted functions, and between linear integer arithmetic. Let's look into those.
+
+### Theory of uninterpreted function symbols
+This solver works on quantifier-free first-order logic with equality. The key inference rule is:
+
+$$
+\frac{t_1 = t_1' \quad \dots \quad t_n = t_n'}
+     {f(t_1, \dots, t_n) = f(t_1', \dots, t_n')}
+$$
+
+This rule also applies backwards (this allows us to encode algebraic data types! If we view $f$ as a `case class` constructor, and the arguments are the same, then the constructed `case class`es are equal). Other rules are that $=$ is an equivalence relation, and $t \ne t$ is contradictory.
+
+The implementation can be done as an E-graph storing congruence relations computed so far. Applying a rule is merging nodes in the graph; this can be done efficiently using a [union-find data structure](/algorithms/#data-structures-for-disjoint-sets). The algorithm is known as the **congruence closure algorithm**. Let's look at an example:
+
+$$
+(f^3(a) = a) \land (f^5(a) = a) \land (f^2(a) \ne a)
+$$
+
+Where $f^n$ represents $n$ applications of $f$. Because $f^3(a) = a$, we can conclude that $f^4(a) = f(a)$ and $f^5(a) = f^2(a)$. Merging those nodes in the union-find shows us a conflict: $f^5(a) = a$ but this implies $f^5(a) = f^2(a) = a$, which is a conflict. However, we can check the negated equalities to see if this creates conflicts. In this case, there is a conflict, as we were supposed to have $f^2(a) \ne a$.
+
+In general, the conjunction is satisfiable *if and only if* there is a literal $t_1 \ne t_2$ where $t_1$ and $t_2$ have been merged, so this algorithm is correct.
+
+## Return of bounded model checking
+### Bounded-model checking of a program
+For each program, there is a monotonic, [Lipschitz $\omega$-continuous](https://en.wikipedia.org/wiki/Modulus_of_continuity) function $F: C^n \rightarrow C^n$ such that the following describes the set of reachable states for each program point.
+
+$$\vec{c_*} = \bigcup_{i\ge 0} F^i(\emptyset, \dots, \emptyset)$$
+
+This function starts with the empty set so that we start from the smallest possible set. Verification means that we check whether this is a subset of the set of "good states" $G$. This is equivalent to asking:
+
+$$\forall n.\ F^n(\emptyset, \dots, \emptyset)$$
+
+We can also ask the opposite question, i.e.:
+
+$$\exists k\in\mathbb{N}, \vec{c}\in C^n.\ F^k(\emptyset, \dots, \emptyset) \land \vec{c} \notin G$$
+
+For a fixed $k$, we can do quantifier elimination on this. This will allow us to formulate a bounded model checking algorithm. As usual, we check 
+
+{% highlight scala linenos %}
+B = Set.empty
+while (true) {
+  checksat(!(B subseteq G)) match {
+    case Assignment(v) => return CounterExample(v)
+    case Unsat =>
+      B2 = F(B)
+      if (B2 subseteq B) return Valid // fixed point
+      else B = B2
+  }
+}
+{% endhighlight %}
+
+Here, we have denote the program as `F`, the current set of reachable states as `B`, and the good states as `G`. As `k` increases, it may become harder and harder to run `checksat`; for a large $k$ the formula for $F^k$ becomes so large that deep bugs are hard to find. Still, in practice, for a buggy program, it allows us to very quickly find a counter-example for a small `k`.
+
+### k-Induction
+A problem with the above approach is that bounded model checking may check many values of $k$ for otherwise simple instructions. For instance, consider the following (very common) case of initializing a large array:
+
+{% highlight scala linenos %}
+var i = 0
+var z = 0
+while (i < 1000) {
+  a(i) = 0
+}
+var y = 1/z
+{% endhighlight %}
+
+Suppose we want to check a property that does not depend on $i$ (for instance, we may want to check that $z \ne 0$ at the end as to ensure that the division works). Here, bounded model checking would need to check the large loop even though the condition is unrelated to $i$.
+
+Remember that our goal was to prove $\forall n.\ F^n(\emptyset, \dots, \emptyset)$. Suppose that this is the case. In particular, for some $k \ge 1$, we have $F^k \subseteq G$. By induction, for every $p \ge 1$ we have:
+
+$$F^{pk}(G) \subseteq G$$
+
+Because we specified that $F$ is monotonic, if $n \le pk$ then:
+
+$$
+F^n(\vec{\emptyset}) 
+\subseteq F^{pk}(\vec{\emptyset})
+\subseteq F^{pk}(G)
+\subseteq G
+$$
+
+## Abstract interpretation
+This is a method for discovering loop invariants. It's a way of inferring properties of program computations.
+
+It's called abstract interpretation because it works much like regular interpretation, but instead of working with values, it works with sets of values. The idea is to evaluate arithmetic as set arithmetic. Sometimes, we may not be able to derive the exact interval, but we can always find an interval that contains the results by taking $]-\infty, +\infty[$ (or `MIN_INT` to `MAX_INT`).
+
+The goal of abstract interpretation is to soundly approximate the semantics of a computer program, by modeling the concrete world into a simpler abstract world. In the image below, the idea is to have a $A$ be a smaller set than $C$, and to be able to translate between them using $\alpha$ (abstraction) and $\gamma$ (concretisation? todo find on Wiki)
+
+Todo paste nice picture
+
+In this chapter, we'll see a bunch of various topics, and bring it all together to see how abstract interpretation is done.
+
+### Least fixpoint
+Suppose we want to model a program $F$ (mapping from one set of states to the next). The idea is to model the execution from a starting state to a least fixpoint of $F$ (which we write $\text{lfp}(F)$, but doing so in fewer steps than the real program would go through by generalizing things.
+
+> definition "Least fixpoint"
+> $$\text{lfp}(F) = \bigcup_{i=0}^\infty F^i(\emptyset)$$
+
+We're given a specification $s$, which describes some set of "good states". Our goal is to prove $\text{lfp}(F)\subseteq s$, which we can do by cases:
+
+- If $F(s) \subseteq s$ then $\text{lfp}(F) \subseteq s$ and we are done
+- $\text{lfp}(F) = \bigcup_{i=0}^\infty F^i(\emptyset)$ but that is too hard to compute because this infinite (unless we get lucky and there exists an $n$ for which $F^{n+1}(\emptyset) = F^n(\emptyset)$).
+
+So this turns out to be hard. If we relax our goal a little, we can find an [inductive strengthening](#definition:inductive-strengthening) $s'$ of $s$. As we established, it's hard work computing $F$, so we can simplify by taking some simpler function $F_\text{\#}$, which functions as an approximation of $F$:
+
+$$F(r) \subseteq F_\text{\#}(r), \quad \forall r$$
+
+We'll try to take an $F_\text{\#}$ such that $F_\text{\#}(s') \subseteq s'$; with the above subset relation, we would then have $F(s') \subseteq s'$.
+
+### Control flow analysis
+Done as in Advanced Compiler Construction, starting with empty set and applying a function until a fixpoint is reached.
+
+### Partial order
+A Hasse diagram presents a partial ordering some elements. An edge tells us which set is a subset of which other set. The direction of the edge is given by which node is above. The transitive and reflexive edges aren't drawn (but can be derived).
+
+Note that in a partial ordering, the nodes on the same level aren't ordered!
+
+We can define the following terms to navigate around the lattice:
+
+- **Upper bound**
+- **Lower bound**
+- **Minimal element**
+- **Maximal element**
+- **Greatest element**
+- **Least element**
+- **Least upper bound** (a.k.a lub, supremum, join, $\sqcup$)
+- **Greatest lower bound** (a.k.a glb, infimum, meet, $\sqcap$)
+
+Note that the lub of a set $S$ can actually belong to $S$ (e.g. take a set of a single element: the lub is the element itself). The lub must be unique; there cannot be two possible lubs. Also note that lub is associative, commutative, idempotent.[^also-glb]
+
+[^also-glb]: This whole paragraph also applies to the glb, the dual of the lub.
+
+Looking at open intervals on reals, $(0, 1)$ has no maximal or greatest elements. Its lub is 1.
+
+### Lattice
+> definition "Lattice"
+> A lattice is a partial order in which every two-element set has a lub and a glb.
+
+We generally define a lattice as $(A, \sqsubseteq)$ where:
+
+- $A$ is the alphabet
+- elements of the lattice are from $2^A$, the powerset of $A$
+- $\sqsubseteq$ is the operator that compares elements[^subset-operator-notation]
+
+[^subset-operator-notation]: Here, I used $\sqsubseteq$ as a generic "less-than" operator. It represents whatever concrete operator is used for a specific lattice. To use a specific operator, say, $\supseteq$, we write $(A, \supseteq)$ to say that the comparison between two elements is done by it (i.e. $a \sqsubseteq b \iff a \supseteq b$).
+
+By induction, this implies the more general lemma:
+
+> lemma ""
+> In a lattice every non-empty finite set has a lub and a glb.
+
+An example of a lattice is a linear ordering, for which:
+
+$$\forall x, y.\ (x \le y \lor y \le x)$$
+
+Indeed, either $x$ or $y$ is the lub.
+
+> definition "Complete lattice"
+> A lattice $(A, \sqsubseteq)$ is complete if every subset of $A$ has a lub and a glb:
+> 
+> $$\forall S \subseteq A.\ \exists \sqcap S, \sqcup S$$
+
+### Tarski's fixed point theorem
+Let $(A, \sqsubseteq)$ be a complete lattice, and $G: A \rightarrow A$ be a monotonic function. We define $\text{Post}$ as the set of postfix points of $xG$, $\text{Pre}$ as the set of prefix points of $G$, and $\text{Fix}$ as the set of fixed points of $G$
+
+$$\begin{align}
+\text{Post} & = \set{x \mid G(x) \sqsubseteq x} \\
+\text{Pre}  & = \set{x \mid x \sqsubseteq G(x)} \\
+\text{Post} & = \set{x \mid G(x) = x} \\
+\end{align}$$
+
+> theorem "Tarski's Fixed Point theorem"
+> Let $a = \sqcap \text{Post}$ Then $a$ is the least element of $\text{Fix}$. Dually, $\sqcup \text{Pre}$ is the largest element of $\text{Fix}$.
+
+Let's prove this. Let $x \in \text{Post}$:
+
+- Since $G$ is monotonic and $a\sqsubseteq x$ so $G(a) \sqsubseteq G(x) \sqsubseteq x$
+- Therefore, $G(a)$ is a lower bound on $\text{Post}$ but $a$ is the greatest lower bound so $G(a) \sqsubseteq a$
+- Therefore $a \in \text{Post}$
+- todo
+
+$\qed$
+
+Tarski's Fixed Point theorem shows that in a complete lattice with a monotonic function $G$ on this lattice, there is at least one fixed point of $G$, namely $\sqcap\text{Post}$. 
+
+It also guarantees that fixpoints exist in complete lattices, but this proof does not say how to find them. How difficult it is depends on the structure of the lattice.
+
+> lemma ""
+> Let $G$ be a monotonic function on a lattice. Let $a_0 = \bot$ and $a_{n+1}= G(a_n)$. Let $a_* = todo$
+
+### Omega continuity
+> definition "Omega continuity"
+> A function $G$ is $\omega$-continuous if for every chain $x_0 \sqsubseteq x_1 \sqsubseteq x_2 \sqsubseteq \dots$ we have:
+> 
+> $$G\left(\bigsqcup_{i\ge 0} x_i \right) = \bigsqcup_{i \ge 0} G(x_i)$$
+
+Todo what's the intuition here? This looks a lot like the theorem in section 12.
+
+> lemma ""
+> For an $\omega$-continuous function $G$, the value $a_* = \bigsqcup_{n \ge 0} G^n(\bot)$ is the least fixpoint of $G$.
+
+### Galois connection
+> definition "Galois connection"
+> A galois connection is defined by two monotonic functions $\alpha: C \rightarrow A$ and $\gamma: A \rightarrow C$ between partial orders $\le$ on $C$ and $\sqsubseteq$ on $A$, such that:
+> 
+> $$\forall c, a.\ \alpha(c) \sqsubseteq a \iff c \le \gamma(a)$$
+
+Intuitively, this tells us that $c$ is approximated by $a$.
+
+> lemma ""
+> The condition of the Galois connection hold iff the conjunction of these two conditions holds:
+> 
+> $$\begin{align}
+> \forall c.\  & c                 & \le \         & \gamma(\alpha(c)) \\
+> \forall a.\  & \alpha(\gamma(a)) & \sqsubseteq \ & a \\
+> \end{align}$$
+
+As a small bonus lemma, we can state that the following three conditions are equivalent:
+
+- $\forall a.\ \alpha(\gamma(a)) = a$
+- $\alpha$ is surjective
+- $\gamma$ is injective
+
+### Bringing it all together
+We're given a control-flow graph $(V, E, r)$ where:
+
+- $V = \set{v_1, \dots, v_n}$ is a set of program points
+- $E \subseteq V \times V$ are the edges
+- $r: E \rightarrow 2^{S \times S}$ is a relation that "describes the meaning?"
+
+(we skipped a whole bunch of slides here, and went straight to predicate abstraction).
+
+
+### Predicate abstraction
+We have a set of predicates $\mathcal{P} = \set{P_0, P_1, P_2, P_3}$, which is our vocabulary to describe the state[^predicates-in-practice]: we cannot come up with new predicates. We'll assume we have some kind of constraint solver (say, Z3) that can help us answer questions over these predicates.
+
+[^predicates-in-practice]: In practice, we may often define this set of predicates as a set of "templates". Instead of having, say, $x < 0$ we may have something like "a variable is less than 0".
+
+{% endcomment %}
