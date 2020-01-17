@@ -22,7 +22,7 @@ We'll work under a model that assumes that:
 
 - Instructions are executed one after another
 - Basic instructions (arithmetic, data movement, control) take constant O(1) time
-- We don’t worry about precision, although it is crucial in certain
+- We don’t worry about numerical precision, although it is crucial in certain
 numerical applications
 
 We usually concentrate on finding the worst-case running time. This gives a guaranteed upper bound on the running time. Besides, the worst case often occurs in some algorithms, and the average is often as bad as the worst-case.
@@ -35,20 +35,23 @@ The sorting problem's definition is the following:
 
 
 ### Insertion sort
-Works in the same way as sorting a deck of cards.
+This algorithm works somewhat in the same way as sorting a deck of cards. We take a single element and traverse the list to insert it in the right position. This traversal works by swapping elements at each step.
 
+<figure>
 {% highlight python linenos %}
 def insertion_sort(A, n):
-    for j=2 to n: # We start at 2 because 1 is already sorted.
+    # We start at 2 because a single element is already sorted.
+    # The upper bound in range is exclusive, so we set it to n+1
+    for j in range(2, n+1):
         key = A[j]
         # Insert A[j] in to the sorted sequence A[1..j-1]
         i = j-1
         while i > 0 and A[i] > key:
+            # swap
             A[i+1] = A[i]
             i = i-1
         A[i+1] = key
 {% endhighlight %}
-<figure>
     <figcaption>Note that pseudocode arrays start at index 1</figcaption>
 </figure>
 
@@ -72,7 +75,7 @@ We need to verify:
 
 
 <figure>
-    $ c_5 \sum_{j=2}^{n} t_j = c_5 \frac{n(n-1)}{2}=\mathcal{O}(n^2) $
+    $$ c_5 \sum_{j=2}^{n} t_j = c_5 \frac{n(n-1)}{2}=\mathcal{O}(n^2) $$
     <figcaption>The first equality is achieved using Gauss' summation formula</figcaption>
 </figure>
 
@@ -170,21 +173,16 @@ However, merge sort is not *in-place*, meaning that it does not operate directly
 
 Generally, we can solve recurrences in a black-box manner thanks to the Master Theorem:
 
-***
-
-Let $a \geq 1$ and $b > 1$ be constants, let $T(n)$ be defined on the nonnegative integers by the recurrence:
-
-$$
-T(n) = aT(n/b) + f(n) 
-$$
-
-Then, $T(n)$ has the following asymptotic bounds
-
-1. If $f(n) = \mathcal{O}(n^{\log_b{a}-\epsilon})$ for some constant $\epsilon > 0 $, then $T(n)=\Theta(n^{\log_b{a}}) $
-2. If $ f(n) = \Theta(n^{\log_b{a}}) $, then $ T(n) = \Theta(n^{\log_b{a}} \log{n}) $
-3. If $ f(n) = \Omega(n^{\log_b{a}+\epsilon}) $ for some constant $ \epsilon > 0 $, and if $a \cdot f(n/b) \leq c\cdot f(n)$ for some constant $c < 1$ and all sufficiently large $n$, then $T(n) = \Theta(f(n))$
-
-***
+> theorem "Master Theorem"
+> Let $a \geq 1$ and $b > 1$ be constants, let $T(n)$ be defined on the nonnegative integers by the recurrence:
+> 
+> $$ T(n) = aT(n/b) + f(n) $$
+> 
+> Then, $T(n)$ has the following asymptotic bounds
+> 
+> 1. If $f(n) = \mathcal{O}(n^{\log_b{a}-\epsilon})$ for some constant $\epsilon > 0$, then $T(n)=\Theta(n^{\log_b a})$
+> 2. If $f(n) = \Theta(n^{\log_b{a}})$, then $T(n) = \Theta(n^{\log_b a} \log n)$
+> 3. If $f(n) = \Omega(n^{\log_b a + \epsilon})$ for some constant $\epsilon > 0$, and if $a \cdot f(n/b) \leq c\cdot f(n)$ for some constant $c < 1$ and all sufficiently large $n$, then $T(n) = \Theta(f(n))$
 
 The 3 cases correspond to the following cases in a recursion tree:
 
@@ -642,7 +640,7 @@ All of the following algorithms can be implemented in $\mathcal{O}(h)$.
 ##### Searching
 {% highlight python linenos %}
 def tree_search(x, k):
-    if x == Nil or k == x.key:
+    if x == None or k == x.key:
         return x
     if k < x.key:
         return tree_search(x.left, k)
@@ -655,12 +653,12 @@ By the key property, the minimum is in the leftmost node, and the maximum in rig
 
 {% highlight python linenos %}
 def tree_minimum(x):
-    while x.left != Nil:
+    while x.left != None:
         x = x.left
     return x
 
 def tree_maximum(x):
-    while x.right != Nil:
+    while x.right != None:
         x = x.right
     return x
 {% endhighlight %}
@@ -675,10 +673,10 @@ There are 2 cases when finding the successor of `x`:
 
 {% highlight python linenos %}
 def tree_successor(x):
-    if x.right != Nil:
+    if x.right != None:
         return tree_minimum(x.right)
     y = x.parent
-    while y != Nil and x == y.right:
+    while y != None and x == y.right:
         x = y
         y = y.parent
     return y
@@ -687,6 +685,8 @@ def tree_successor(x):
 In the worst-case, this will have to traverse the tree upward, so it indeed runs in $\mathcal{O}(h)$.
 
 #### Printing a binary search tree
+Let's consider the following tree:
+
 ![A sample binary search tree](/images/algorithms/binary_tree.png)
 
 ##### Inorder
@@ -696,7 +696,7 @@ In the worst-case, this will have to traverse the tree upward, so it indeed runs
 
 {% highlight python linenos %}
 def inorder_tree_walk(x):
-    if x != Nil:
+    if x != None:
         inorder_tree_walk(x.left)
         print x.key
         inorder_tree_walk(x.right)
@@ -753,7 +753,7 @@ Preorder and postorder follow a very similar idea.
 
 {% highlight python linenos %}
 def inorder_tree_walk(x):
-    if x != Nil:
+    if x != None:
         print x.key
         inorder_tree_walk(x.left)
         inorder_tree_walk(x.right)
@@ -772,7 +772,7 @@ This would print:
 
 {% highlight python linenos %}
 def inorder_tree_walk(x):
-    if x != Nil:
+    if x != None:
         inorder_tree_walk(x.left)
         inorder_tree_walk(x.right)
         print x.key
@@ -794,9 +794,9 @@ The data structure must be modified to reflect the change, but in such a way tha
 {% highlight python linenos %}
 def tree_insert(T, z):
     # Search phase:
-    y = Nil
+    y = None
     x = T.root
-    while x != Nil:
+    while x != None:
         y = x
         if z.key < x.key:
             x = x.left
@@ -1732,7 +1732,7 @@ def prim(G, w, r):
         u.pi = Nil
         insert(Q, u)
     decrease_key(Q, r, 0)  # root.key = 0
-    while !Q.isEmpty:
+    while not Q.isEmpty:
         u = extract_min(Q)
         for each v in G.adj[u]:
             if v in Q and w(u, v) < v.key:
