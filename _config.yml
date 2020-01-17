@@ -57,10 +57,7 @@ baseurl: ""
 ### ADVANCED OPTIONS BELOW ###
 ##############################
 
-markdown: kramdown
-highlighter: rouge
 permalink: /:title/
-
 excerpt_separator: "<!--"
 
 sass:
