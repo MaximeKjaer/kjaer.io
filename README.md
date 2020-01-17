@@ -93,8 +93,3 @@ The last one is (for now) a simple bash command to the zopfli binary. It would b
 
 Luckily, this is all done automagically with Travis CI. You can see the scripts it runs in the [`_scripts` folder](/tree/master/_scripts).
 
-## Wishlist / Todo :star:
-- [ ] Rework `_config.yml` file to provide more optional switches
-- [ ] Rework `_config.yml`'s [prose.io](http://prose.io/) settings
-- [ ] Rework 404 page
-- [ ] Set up Grunt to take care of Zopfli compression
