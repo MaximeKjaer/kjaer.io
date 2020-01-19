@@ -67,6 +67,7 @@ sass:
 # Use the following gems when building the site
 plugins:
   - jekyll-sitemap # Automatically create a sitemap on build
+  - jekyll-feed # Automatically create an RSS feed on build
   - jekyll-mathjax-csp # Server-side rendering of math with MathJax
   - jekyll-diagrams # Server-side rendering of graphs with Graphviz
   - premonition # block-styled content (notes, theorems, etc)
