@@ -1,8 +1,8 @@
 ---
 title: CS-525 Foundations and tools for tree-structured data
 description: "My notes from the CS-525 course given at EPFL, in the 2018 autumn semester (MA1)"
-edited: true
-note: true
+date: 2018-09-18
+course: CS-525
 ---
 
 * TOC

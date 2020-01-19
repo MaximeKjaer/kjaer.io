@@ -1,8 +1,8 @@
 ---
 title: CS-451 Distributed Algorithms
 description: "My notes from the CS-451 Distributed Algorithms course given at EPFL, in the 2018 autumn semester (MA1)"
-edited: true
-note: true
+date: 2018-09-18
+course: CS-451
 ---
 
 - [Course website](http://dcl.epfl.ch/site/education/da)

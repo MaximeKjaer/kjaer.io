@@ -1,10 +1,10 @@
 ---
 title: CS-206 Parallelism and Concurrency
 description: "My notes from the CS-206 course at EPFL, spring semester 2017: Parallelism and Concurrency"
+date: 2017-02-22
 image: /images/hero/epfl-bc.jpg
 fallback-color: "#4a4c45"
-edited: true
-note: true
+course: CS-206
 ---
 
 * TOC

@@ -1,8 +1,8 @@
 ---
 title: CS-550 Formal Verification
 description: "My notes from the CS-550 Formal Verification course given at EPFL, in the 2019 autumn semester (MA3)"
-edited: true
-note: true
+date: 2019-09-20
+course: CS-550
 ---
 
 $$

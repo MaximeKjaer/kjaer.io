@@ -1,8 +1,8 @@
 ---
 title: CS-450 Advanced Algorithms
 description: "My notes from the CS-450 Advanced Algorithms course given at EPFL, in the 2019 spring semester (MA2)"
-edited: true
-note: true
+date: 2019-02-19
+course: CS-450
 ---
 
 A prerequisite for this course is [CS-250 Algorithms](/algorithms/).

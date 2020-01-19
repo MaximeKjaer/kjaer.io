@@ -1,8 +1,8 @@
 ---
 title: CS-443 Machine Learning
 description: "My notes from the CS-443 Machine Learning course given at EPFL, in the 2018 autumn semester (MA1)"
-edited: true
-note: true
+date: 2018-09-18
+course: CS-443
 ---
 
 The course follows a few books:

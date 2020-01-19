@@ -10,15 +10,10 @@ As such, I've accumulated a collection of fairly comprehensive notes for a few c
 
 I hope that they may be useful for other people too!
 
-{% assign sorted_posts = site.posts | sort %}
 <ul>
-{% for post in sorted_posts %}
-	{% if post.note %}
-    {% unless post.unlisted %}        
-            <li>
-                <a href="{{ post.url }}">{{ post.title }}</a>
-            </li>
-    {% endunless %}
-    {% endif %}
+{% for post in site.notes %}
+    <li>
+        <a href="{{ post.url }}">{{ post.title }}</a>
+    </li>
 {% endfor %}
 </ul>

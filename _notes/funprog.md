@@ -1,10 +1,10 @@
 ---
 title: CS-210 Functional Programming Principles in Scala
 description: "My notes from the CS-210 course at EPFL, fall semester 2016: Functional Programming Principles in Scala"
+date: 2016-09-21
 image: /images/hero/epfl-bc.jpg
 fallback-color: "#4a4c45"
-edited: true
-note: true
+course: CS-210
 ---
 
 * TOC

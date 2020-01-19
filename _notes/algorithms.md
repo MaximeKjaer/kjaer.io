@@ -1,10 +1,10 @@
 ---
 title: CS-250 Algorithms
 description: "My notes from the CS-250 Algorithms course given at EPFL, in the 2016 autumn semester (BA3)"
+date: 2016-09-23
 image: /images/hero/algorithms.jpg
 fallback-color: "#7c6850"
-edited: true
-note: true
+course: CS-250
 ---
 
 * TOC

@@ -1,8 +1,8 @@
 ---
 title: CS-323 Operating Systems
 description: "My notes from the CS-323 OS course given at EPFL, in the 2018 spring semester (BA6)"
-edited: true
-note: true
+date: 2018-02-21
+course: CS-323
 ---
 
 * TOC

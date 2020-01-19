@@ -1,8 +1,8 @@
 ---
 title: CS-452 Foundations of Software
 description: "My notes from the CS-452 Foundations of Software course given at EPFL, in the 2018 autumn semester (MA1)"
-edited: true
-note: true
+date: 2018-09-18
+course: CS-452
 ---
 
 <!-- More -->

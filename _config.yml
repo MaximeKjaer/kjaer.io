@@ -23,7 +23,7 @@ url: https://kjaer.io
 author:
   name: Maxime Kjaer
   email: maxime.kjaer@gmail.com
-  twitter: "@maximekjaer"
+  twitter: maximekjaer
   url: https://kjaer.io
 
 # Your disqus shortname. Entering this will enable commenting on posts by default
@@ -60,6 +60,14 @@ baseurl: ""
 permalink: /:title/
 excerpt_separator: "<!--"
 
+collections:
+  notes:
+    output: true
+    permalink: /:title/
+    sort_by: title
+  unlisted:
+    output: true
+
 sass:
   sass_dir: _sass
   style: :compressed # Can also be :expanded
@@ -72,6 +80,9 @@ plugins:
   - jekyll-diagrams # Server-side rendering of graphs with Graphviz
   - premonition # block-styled content (notes, theorems, etc)
 
+feed:
+  excerpt_only: true
+  
 mathjax_csp:
   output: CommonHTML    # SVG, CommonHTML, or MML (default: SVG)
   single_dollars: true  # allow single dollar delimiters for inline math (default: false)
@@ -86,9 +97,16 @@ defaults:
       layout: post
       published: true
       comments: true
-      unlisted: false
       edited: false
-      note: false
+  -
+    scope:
+      type: notes
+    values:
+      layout: post
+      published: true
+      comments: true
+      edited: true
+    
 
 premonition:
   types:
