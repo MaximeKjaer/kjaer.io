@@ -7,14 +7,6 @@ GIT
       html-pipeline (~> 2.12)
       jekyll (>= 3.0, < 5.0)
 
-GIT
-  remote: https://github.com/MaximeKjaer/premonition.git
-  revision: 803f2cffd2efddae4ac81b857e17186811d6ab05
-  branch: jekyll4
-  specs:
-    premonition (2.0.0)
-      jekyll (>= 2.0, < 5.0)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -121,7 +113,6 @@ DEPENDENCIES
   jekyll-feed
   jekyll-mathjax-csp (~> 1.1.0)!
   jekyll-sitemap (~> 1.4.0)
-  premonition (~> 2.0.0)!
   rake
   tzinfo-data
 

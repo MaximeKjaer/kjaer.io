@@ -173,16 +173,17 @@ However, merge sort is not *in-place*, meaning that it does not operate directly
 
 Generally, we can solve recurrences in a black-box manner thanks to the Master Theorem:
 
-> theorem "Master Theorem"
-> Let $a \geq 1$ and $b > 1$ be constants, let $T(n)$ be defined on the nonnegative integers by the recurrence:
-> 
-> $$ T(n) = aT(n/b) + f(n) $$
-> 
-> Then, $T(n)$ has the following asymptotic bounds
-> 
-> 1. If $f(n) = \mathcal{O}(n^{\log_b{a}-\epsilon})$ for some constant $\epsilon > 0$, then $T(n)=\Theta(n^{\log_b a})$
-> 2. If $f(n) = \Theta(n^{\log_b{a}})$, then $T(n) = \Theta(n^{\log_b a} \log n)$
-> 3. If $f(n) = \Omega(n^{\log_b a + \epsilon})$ for some constant $\epsilon > 0$, and if $a \cdot f(n/b) \leq c\cdot f(n)$ for some constant $c < 1$ and all sufficiently large $n$, then $T(n) = \Theta(f(n))$
+{% block theorem "Master Theorem" %}
+Let $a \geq 1$ and $b > 1$ be constants, let $T(n)$ be defined on the nonnegative integers by the recurrence:
+
+$$ T(n) = aT(n/b) + f(n) $$
+
+Then, $T(n)$ has the following asymptotic bounds
+
+1. If $f(n) = \mathcal{O}(n^{\log_b{a}-\epsilon})$ for some constant $\epsilon 0$, then $T(n)=\Theta(n^{\log_b a})$
+2. If $f(n) = \Theta(n^{\log_b{a}})$, then $T(n) = \Theta(n^{\log_b a} \log n)$
+3. If $f(n) = \Omega(n^{\log_b a + \epsilon})$ for some constant $\epsilon > 0$, and if $a \cdot f(n/b) \leq c\cdot f(n)$ for some constant $c < 1$ and all sufficiently large $n$, then $T(n) = \Theta(f(n))$
+{% endblock %}
 
 The 3 cases correspond to the following cases in a recursion tree:
 

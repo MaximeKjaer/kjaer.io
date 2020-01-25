@@ -78,7 +78,6 @@ plugins:
   - jekyll-feed # Automatically create an RSS feed on build
   - jekyll-mathjax-csp # Server-side rendering of math with MathJax
   - jekyll-diagrams # Server-side rendering of graphs with Graphviz
-  - premonition # block-styled content (notes, theorems, etc)
 
 feed:
   excerpt_only: true
@@ -106,36 +105,6 @@ defaults:
       published: true
       comments: true
       edited: true
-    
-
-premonition:
-  types:
-    note:
-      id: note
-    theorem:
-      id: theorem
-    lemma:
-      id: lemma
-    claim:
-      id: claim
-    corollary:
-      id: corollary
-    definition:
-      id: definition
-  default:
-    template: >
-      {% if header %}
-        {% capture id %}{{ type }}:{{ title | slugify: "latin" }}{% endcapture %}
-        <div class="block {{ type }}" id="{{ id }}">
-          <a class="header" href="#{{ id }}">{{ type | capitalize }}: {{ title }}</a>
-          {{ content }}
-        </div>
-      {% else %}
-        <div class="block {{ type }}">
-          <span class="header">{{ type | capitalize }}</span>
-          {{ content }}
-        </div>
-      {% endif %}
 
 # Exclude these files from your production _site
 exclude:

@@ -37,15 +37,16 @@ Throughout these notes, vectors are denoted in bold and lowercase (e.g. $\vec{x}
 ### Definition
 We'll start by introducing transition systems, a generalization of DFAs. They may be not finite, and not deterministic.
 
-> definition "Transition system"
-> A transition system is a 4-tuple $M = (S, I, r, A)$ where:
->
-> - $S$ is the set of states
-> - $I \subseteq S$ is the set of starting states
-> - $r \subseteq S \times A \times S$ is the transition relation
-> - $A$ is the alphabet
-> 
-> For $s, s' \in S$ and $a \in A$, $(s, a, s') \in r$ means that ther is a transition from $s$ to $s'$ on input $a$.
+{% block definition "Transition system" %}
+A transition system is a 4-tuple $M = (S, I, r, A)$ where:
+
+- $S$ is the set of states
+- $I \subseteq S$ is the set of starting states
+- $r \subseteq S \times A \times S$ is the transition relation
+- $A$ is the alphabet
+
+For $s, s' \in S$ and $a \in A$, $(s, a, s') \in r$ means that ther is a transition from $s$ to $s'$ on input $a$.
+{% endblock %}
 
 A few special cases of this general form exist:
 
@@ -54,33 +55,36 @@ A few special cases of this general form exist:
 
 ### Traces and reachability
 
-> definition "Trace"
-> A *trace* is a finite or infinite sequence, describing steps taken by a transition system:
-> 
-> $$
-> (s_0, a_0, s_1, a_1, s_2, \dots)
-> $$
-> 
-> where we require, $\forall i$:
-> 
-> - $s_0 \in I$
-> - $s_i \in S$
-> - $a_i\in A$
-> - $(s_i, a_i, s_{i+1})\in r$
+{% block definition "Trace" %}
+A *trace* is a finite or infinite sequence, describing steps taken by a transition system:
+
+$$
+(s_0, a_0, s_1, a_1, s_2, \dots)
+$$
+
+where we require, $\forall i$:
+
+- $s_0 \in I$
+- $s_i \in S$
+- $a_i\in A$
+- $(s_i, a_i, s_{i+1})\in r$
+{% endblock %}
 
 A trace may or may not be finite. If they are finite, we can assume that the trace ends with a state $s_n$. We'll introduce some notation for traces:
 
-> definition "Trace of a transition system"
-> $\text{Traces}(M)$ is the set of all traces of a transition system $M = (S, I, r, A)$, starting from $I$.
+{% block definition "Trace of a transition system" %}
+$\text{Traces}(M)$ is the set of all traces of a transition system $M = (S, I, r, A)$, starting from $I$.
+{% endblock %}
 
-> definition "Reachable states of a transition system"
-> The reachable states are states for which there exists a trace that ends in $s_n$:
-> 
-> $$
-> \text{Reach}(M) = \set{s_n \mid 
->   \exists n .\ \exists (s_0, a_0, s_1, a_1, \dots, s_n) \in \text{Traces}(M)
-> }
-> $$
+{% block definition "Reachable states of a transition system" %}
+The reachable states are states for which there exists a trace that ends in $s_n$:
+
+$$
+\text{Reach}(M) = \set{s_n \mid 
+  \exists n .\ \exists (s_0, a_0, s_1, a_1, \dots, s_n) \in \text{Traces}(M)
+}
+$$
+{% endblock %}
 
 To check for reachability, for a finite $S$, we can simply run DFS.
 
@@ -98,48 +102,51 @@ Generally, we'll use a bar for relations that disregard input. Note that even wh
 #### Composition
 Relations can be composed:
 
-> definition "Composition of relations"
-> $$
-> \bar{r_1} \circ \bar{r_2} = \set{(x, z) \mid \exists y.\ (x, y) \in \bar{r_1} \land (y, z) \in \bar{r_2}}
-> $$
+{% block definition "Composition of relations" %}
+$$
+\bar{r_1} \circ \bar{r_2} = \set{(x, z) \mid \exists y.\ (x, y) \in \bar{r_1} \land (y, z) \in \bar{r_2}}
+$$
+{% endblock %}
 
 Note that composition is not commutative, but is associative. 
 
 To understand what a composition means, intuitively, we'll introduce a visual metaphor. Imagine the nodes of the graph as airports, and the edges as possible routes. Let $\bar{r_1}$ be the routes operated by United Airlines, and $\bar{r_2}$ be the routes operated by Delta. Then $\bar{r_1} \circ \bar{r_2}$ is the set of routes possible by taking a United flight followed by a Delta flight.
 
 #### Iteration
-> definition "Iteration"
-> An iteration $\bar{r}^n$ describes paths of length $n$ in a relation $\bar{r}$. It is defined recursively by:
-> 
-> $$
-> \begin{align}
-> \bar{r}^0     & := \Delta \\ 
-> \bar{r}^{n+1} & := \bar{r} \circ \bar{r}^n 
-> \end{align}
-> $$
+{% block definition "Iteration" %}
+An iteration $\bar{r}^n$ describes paths of length $n$ in a relation $\bar{r}$. It is defined recursively by:
+
+$$
+\begin{align}
+\bar{r}^0     & := \Delta \\ 
+\bar{r}^{n+1} & := \bar{r} \circ \bar{r}^n 
+\end{align}
+$$
+{% endblock %}
 
 #### Identity
 In the above, $\Delta$ describes the *identity relation*, i.e. a relation mapping every node to itself. We'll see a small generalization below, which will be useful for the rest of the course:
 
-> definition "Identity relation"
-> The *identity relation* $\Delta$ (also called "diagonal relation" or "triangular relation") is the relation mapping every item in the universe $S$ to itself:
-> 
-> $$\Delta = \set{(x, x) \mid x \in S}$$
-> 
-> This relation can be conditioned, so as to only include elements in a set $A$ (or satisfying a condition $A$):
-> 
-> $$\Delta_A = \set{(x, x) \mid x \in A}$$
-> 
+{% block definition "Identity relation" %}
+The *identity relation* $\Delta$ (also called "diagonal relation" or "triangular relation") is the relation mapping every item in the universe $S$ to itself:
+
+$$\Delta = \set{(x, x) \mid x \in S}$$
+
+This relation can be conditioned, so as to only include elements in a set $A$ (or satisfying a condition $A$):
+
+$$\Delta_A = \set{(x, x) \mid x \in A}$$
+{% endblock %}
 
 #### Transitive closure
 Applying [iteration](#iteration) an arbitrary number of times leads us to the transitive closure:
 
-> definition "Transitive closure"
-> The transitive closure $\bar{r}^*$ of a relation $\bar{r}$ is:
-> 
-> $$
-> \bar{r}^* = \bigcup_{n \ge 0} \bar{r}^n
-> $$
+{% block definition "Transitive closure" %}
+The transitive closure $\bar{r}^*$ of a relation $\bar{r}$ is:
+
+$$
+\bar{r}^* = \bigcup_{n \ge 0} \bar{r}^n
+$$
+{% endblock %}
 
 In our airport analogy, the transitive closure is the set of all airports reachable from our starting airports.
 
@@ -163,52 +170,48 @@ A few bonus facts:
 #### Image
 Finally, we'll introduce one more definition:
 
-> definition "Image of a set"
-> The image $\bar{r}[X]$ of a state set $X$ under a relation $\bar{r}$ is the set of states reachable in one step from $X$:
->  
-> $$
-> \bar{r}[X] := \set{y \mid \exists x \in X .\ (x, y) \in \bar{r}}
-> $$
-> 
-> We also introduce an alternative notation:
-> 
-> $$
-> X \bullet \bar{r} := \bar{r}[X]
-> $$
+{% block definition "Image of a set" %}
+The image $\bar{r}[X]$ of a state set $X$ under a relation $\bar{r}$ is the set of states reachable in one step from $X$:
+ 
+$$\bar{r}[X] := \set{y \mid \exists x \in X .\ (x, y) \in \bar{r}}$$
+
+We also introduce an alternative notation:
+
+$$X \bullet \bar{r} := \bar{r}[X]$$
+{% endblock %}
 
 The alternative notation may make it simpler to read images; $(X \bullet \bar{r_1}) \bullet \bar{r_2}$ can be read as "$X$ following $\bar{r_1}$ then following $\bar{r_2}$".
 
 ### Reach
 The above definitions lead us to a first definition of reach:
 
-> theorem "Definition 1 of reach"
-> $$
-> \text{Reach}(M) = (\bar{r})^*[I]
-> $$
+{% block theorem "Definition 1 of reach" %}
+$$\text{Reach}(M) = (\bar{r})^*[I]$$
+{% endblock %}
 
 ### Post
 We'll introduce another definition in order to give an alternative definition of reach. We're still considering a state system $M = (S, I, r, A)$.
 
-> definition "Post"
-> If $X \subseteq S$, define:
-> 
-> $$\post(X) = \bar{r}[X]$$
-> 
-> We also define: 
-> 
-> $$
-> \begin{align}
-> \post^0(X)     & := X \\
-> \post^{n+1}(X) & := \post\left(\post^n(X)\right)
-> \end{align}
-> $$
+{% block definition "Post" %}
+If $X \subseteq S$, define:
+
+$$\post(X) = \bar{r}[X]$$
+
+We also define: 
+
+$$
+\begin{align}
+\post^0(X)     & := X \\
+\post^{n+1}(X) & := \post\left(\post^n(X)\right)
+\end{align}
+$$
+{% endblock %}
 
 This definition of post leads us to another formulation of reach:
 
-> theorem "Definition 2 of reach"
-> $$
-> \bigcup_{n \ge 0} \post^n(I) = \text{Reach}(M)
-> $$
+{% block theorem "Definition 2 of reach" %}
+$$\bigcup_{n \ge 0} \post^n(I) = \text{Reach}(M)$$
+{% endblock %}
 
 The proof is done by expanding the post:
 
@@ -236,30 +239,31 @@ Where:
 $\qed$
 
 ### Invariants
-> definition "Invariant"
-> An *invariant* $P \subseteq S$ of a system $M$ is any superset of the reachable states:
-> 
-> $$
-> \text{Reach}(M) \subseteq P
-> $$
+{% block definition "Invariant" %}
+An *invariant* $P \subseteq S$ of a system $M$ is any superset of the reachable states:
+
+$$\text{Reach}(M) \subseteq P$$
+{% endblock %}
 
 A way to think of invariants is that all the reachable states must "satisfy the invariant", i.e. be included in $P$.
 
-> definition "Inductive Invariant"
-> An *inductive invariant* $P \subseteq S$ is a set satisfying:
-> 
-> - $I \subseteq P$
-> - $s \in P \land (s, a, s') \in r \implies s' \in P$
+{% block definition "Inductive Invariant" %}
+An *inductive invariant* $P \subseteq S$ is a set satisfying:
+
+- $I \subseteq P$
+- $s \in P \land (s, a, s') \in r \implies s' \in P$
+{% endblock %}
 
 Intuitively, the second condition means that you can't "escape" an inductive invariant by taking a step: there can be ingoing edges to an inductive invariant, but no edges exiting the set.
 
 Note that every inductive invariant is also an invariant. Indeed, for an inductive invariant $P$, if $I \subseteq P$ then we must also grow $P$ to include all states reachable from $I$ in order to satisfy the second property. Therefore, $\text{Reach}(M) \subseteq P$ and $P$ is an invariant.
 
-> definition "Inductive strengthening"
-> For an invariant $P$, $P_{\text{ind}}$ is an *inductive strengthening* of $P$ if:
-> 
-> - $P_{\text{ind}}$ is an inductive invariant
-> - $P_{\text{ind}} \subseteq P$
+{% block definition "Inductive strengthening" %}
+For an invariant $P$, $P_{\text{ind}}$ is an *inductive strengthening* of $P$ if:
+
+- $P_{\text{ind}}$ is an inductive invariant
+- $P_{\text{ind}} \subseteq P$
+{% endblock %}
 
 In this case, we have:
 
@@ -319,17 +323,18 @@ $$
 
 With this notation in hand, we can state the following:
 
-> theorem "Formula encoding of boolean functions"
-> We can always represent a transition relation $r$ as a propositional formula $F$ in disjunctive normal form, where:
-> 
-> $$
-> F = 
-> \biglor_{\seq{\seq{v_1, \dots, v_n}, \seq{u_1, \dots, u_m}, \seq{v_1', \dots, v_m'}} \in r} \left(
->   \bigland_{1\le i \le n} s_i^{v_i} \land
->   \bigland_{1\le i \le m} a_i^{u_i} \land
->   \bigland_{1\le i \le n} \seq{s'_i}^{v'_i}
-> \right)
-> $$
+{% block theorem "Formula encoding of boolean functions" %}
+We can always represent a transition relation $r$ as a propositional formula $F$ in disjunctive normal form, where:
+
+$$
+F = 
+\biglor_{\seq{\seq{v_1, \dots, v_n}, \seq{u_1, \dots, u_m}, \seq{v_1', \dots, v_m'}} \in r} \left(
+  \bigland_{1\le i \le n} s_i^{v_i} \land
+  \bigland_{1\le i \le m} a_i^{u_i} \land
+  \bigland_{1\le i \le n} \seq{s'_i}^{v'_i}
+\right)
+$$
+{% endblock %}
 
 For many boolean functions ($\oplus$, $\land$, etc) this formulation will be quite small.
 
@@ -371,36 +376,39 @@ Where $x$ denotes variable identifiers.
 ### QBF
 Having looked at boolean formulas let's now look at a small generalization, QBFs:
 
-> definition "Quantified Boolean Formulas"
-> *Quantified Boolean Formulas* (QBFs) is built from:
-> 
-> - Propositional variables
-> - Constants $0$ and $1$
-> - Operators $\land, \lor, \neg, \rightarrow, \leftrightarrow, \exists, \forall$
+{% block definition "Quantified Boolean Formulas" %}
+*Quantified Boolean Formulas* (QBFs) is built from:
+
+- Propositional variables
+- Constants $0$ and $1$
+- Operators $\land, \lor, \neg, \rightarrow, \leftrightarrow, \exists, \forall$
+{% endblock %}
 
 We will use $=$ as alternative notation for $\leftrightarrow$. A boolean formula is QBF without quantifiers ($\forall$ and $\exists$).
 
 ### Free variables
-> definition "Free variables"
-> The free variables of a formula is the set of variables that are not bound by a quantifier:
->  
-> $$
-> \begin{align}
-> FV(v) & = \set{v} \text{if } v \text{ is a propositional variable} \\
-> FV(F_1 \land F_2) & = FV(F_1) \cup FV(F_2) \\
-> FV(F_1 \lor F_2) & = FV(F_1) \cup FV(F_2) \\
-> FV(F_1 \rightarrow F_2) & = FV(F_1) \cup FV(F_2) \\
-> FV(\neg F_1 ) & = FV(F_1) \\
-> FV(\exists v. F_1 ) & = FV(F_1)\setminus\set{v} \\
-> FV(\forall v. F_1 ) & = FV(F_1)\setminus\set{v} \\
-> \end{align}
-> $$
+{% block definition "Free variables" %}
+The free variables of a formula is the set of variables that are not bound by a quantifier:
+ 
+$$
+\begin{align}
+FV(v) & = \set{v} \text{if } v \text{ is a propositional variable} \\
+FV(F_1 \land F_2) & = FV(F_1) \cup FV(F_2) \\
+FV(F_1 \lor F_2) & = FV(F_1) \cup FV(F_2) \\
+FV(F_1 \rightarrow F_2) & = FV(F_1) \cup FV(F_2) \\
+FV(\neg F_1 ) & = FV(F_1) \\
+FV(\exists v. F_1 ) & = FV(F_1)\setminus\set{v} \\
+FV(\forall v. F_1 ) & = FV(F_1)\setminus\set{v} \\
+\end{align}
+$$
+{% endblock %}
  
 ### Environment
-> definition "Environment"
-> An environment $e$ is a partial map from propositional variables to $\set{0, 1}$ ("false" or "true").
-> 
-> Consider two vectors $\vec{v} = \seq{v_1, \dots, v_n}$ and $\vec{p} = \seq{p_1, \dots, p_n}$ of $n$ propositional variables. We denote the environment as a mapping $[\vec{p}\mapsto\vec{v}]$ given by $e(p_i) = v_i$, $\forall 1 \le i \le n$
+{% block definition "Environment" %}
+An environment $e$ is a partial map from propositional variables to $\set{0, 1}$ ("false" or "true").
+
+Consider two vectors $\vec{v} = \seq{v_1, \dots, v_n}$ and $\vec{p} = \seq{p_1, \dots, p_n}$ of $n$ propositional variables. We denote the environment as a mapping $[\vec{p}\mapsto\vec{v}]$ given by $e(p_i) = v_i$, $\forall 1 \le i \le n$
+{% endblock %}
 
 We denote the result of evaluating a boolean expression $F$ with the environment as $\eval{F}_e$. This can evaluate to $0$ ("false") or $1$ ("true").
 
@@ -428,70 +436,78 @@ def eval(expr: Expr)(implicit env: Var => Boolean): Boolean = expr match {
 
 With this notation in hand, we can introduce the following shorthand:
 
-> definition "Models"
-> We write $e \models F$ to denote that $F$ is true in environment $e$, i.e. that $\eval{F}_e = 1$.
+{% block definition "Models" %}
+We write $e \models F$ to denote that $F$ is true in environment $e$, i.e. that $\eval{F}_e = 1$.
+{% endblock %}
 
 ### Substitution
-> definition "Substitution"
-> Let $F$ and $G$ be propositional formulas, and let $c$ be a variable. Let $F[c := G]$ denote the result of replacing each occurrence of $c$ in $F$ by $G$:
-> 
-> $$
-> \begin{align}
-> c[c := G] & = G \\
-> (F_1 \land F_2)[c := G] & = F_1[c := G] \land F_2[c := G] \\
-> (F_1 \lor F_2)[c := G] & = F_1[c := G] \lor F_2[c := G] \\
-> (\neg F_1)[c := G] & = \neg(F_1[c := G])\\
-> \end{align}
-> $$
+{% block definition "Substitution" %}
+Let $F$ and $G$ be propositional formulas, and let $c$ be a variable. Let $F[c := G]$ denote the result of replacing each occurrence of $c$ in $F$ by $G$:
+
+$$
+\begin{align}
+c[c := G] & = G \\
+(F_1 \land F_2)[c := G] & = F_1[c := G] \land F_2[c := G] \\
+(F_1 \lor F_2)[c := G] & = F_1[c := G] \lor F_2[c := G] \\
+(\neg F_1)[c := G] & = \neg(F_1[c := G])\\
+\end{align}
+$$
+{% endblock %}
 
 We'll also introduce a general notation to simultaneously replace many variables: $F[\vec{c} := \vec{G}]$ denotes the substitution of a vector $\vec{c}$ of variables with a vector of expressions $\vec{G}$.
 
 ### Validity, Satisfiability and Equivalence
-> definition "Satisfiability"
-> A formula $F$ is *satisfiable* $\iff \exists e .\ e \models F$
+{% block definition "Satisfiability" %}
+A formula $F$ is *satisfiable* $\iff \exists e .\ e \models F$
+{% endblock %}
 
 Note that if $F$ is not satisfiable, it is *unsatisfiable*, which means $\forall e, \eval{F}_e = 0$.
 
-> definition "Validity"
-> A formula $F$ is *valid* $\iff \forall e .\ e \models F$
+{% block definition "Validity" %}
+A formula $F$ is *valid* $\iff \forall e .\ e \models F$
+{% endblock %}
 
-> theorem "Validity and unsatisfiability"
-> $F$ is valid $\iff \neg F$ is unsatisfiable.
+{% block theorem "Validity and unsatisfiability" %}
+$F$ is valid $\iff \neg F$ is unsatisfiable.
+{% endblock %}
 
 The proof should follow quite trivially from the definitions.
 
-> definition "Equivalence"
-> Formulas $F$ and $G$ are equivalent $\iff$ $\forall$ environment $e$ defined for all free variables in $FV(F)\cup FV(G)$, we have:
-> 
-> $$e \models F \iff e \models G$$
+{% block definition "Equivalence" %}
+Formulas $F$ and $G$ are equivalent $\iff$ $\forall$ environment $e$ defined for all free variables in $FV(F)\cup FV(G)$, we have:
+
+$$e \models F \iff e \models G$$
+{% endblock %}
 
 This means that two formulas are equivalent if and only if they always return the same values for the same environment (assuming it's defined for all their free variables).
 
-> theorem "Equivalence and validity"
-> $F$ and $G$ are equivalent $\iff$ the formula $F \leftrightarrow G$ is valid.
+{% block theorem "Equivalence and validity" %}
+$F$ and $G$ are equivalent $\iff$ the formula $F \leftrightarrow G$ is valid.
+{% endblock %}
 
 ## Bounded model checking
 ### Formula representation of sequential circuits
-> definition "Sequential circuit"
-> We represent a sequential circuit as a 5-tuple $C = (\vec{s}, \text{Init}, R, \vec{x}, \vec{a})$ where:
-> 
-> - $\vec{s} = \seq{s_1, \dots, s_n}$ is the vector of state variables
-> - $\text{Init}$ is a boolean formula describing the initial state
-> - $R$ is a boolean formula called the *transition formula*
-> - $\vec{x} = \seq{x_1, \dots, x_k}$ is the vector of auxiliary variables
-> - $\vec{a} = \seq{a_1, \dots, a_m}$ is the vector of input variables
-> 
-> The boolean formula $\text{Init}$ tells us which states we can start in, so it can only contain state variables:
-> 
-> $$
-> FV(\text{Init}) \subseteq \set{s_1, \dots, s_n}
-> $$
-> 
-> The transition formula $R$ can only contain state ($\vec{s}$), next-state ($\vec{s'}$), auxiliary ($\vec{x}$) or input ($\vec{a}$) variables:
-> 
-> $$
-> FV(R) \subseteq \set{s_1, \dots, s_n, a_1, \dots, a_m, x_1, \dots, x_k, s'_1, \dots, s'_n}
-> $$
+{% block definition "Sequential circuit" %}
+We represent a sequential circuit as a 5-tuple $C = (\vec{s}, \text{Init}, R, \vec{x}, \vec{a})$ where:
+
+- $\vec{s} = \seq{s_1, \dots, s_n}$ is the vector of state variables
+- $\text{Init}$ is a boolean formula describing the initial state
+- $R$ is a boolean formula called the *transition formula*
+- $\vec{x} = \seq{x_1, \dots, x_k}$ is the vector of auxiliary variables
+- $\vec{a} = \seq{a_1, \dots, a_m}$ is the vector of input variables
+
+The boolean formula $\text{Init}$ tells us which states we can start in, so it can only contain state variables:
+
+$$
+FV(\text{Init}) \subseteq \set{s_1, \dots, s_n}
+$$
+
+The transition formula $R$ can only contain state ($\vec{s}$), next-state ($\vec{s'}$), auxiliary ($\vec{x}$) or input ($\vec{a}$) variables:
+
+$$
+FV(R) \subseteq \set{s_1, \dots, s_n, a_1, \dots, a_m, x_1, \dots, x_k, s'_1, \dots, s'_n}
+$$
+{% endblock %}
 
 The sequential circuit is a representation of a transition system $C = (S, I, r, A)$, where:
 
@@ -546,28 +562,32 @@ A SAT solver is a program that given a boolean formula $F$ either:
 ### Formal proof system
 Let's consider a set of logical formulas $\mathscr{F}$ (e.g. propositional logic).
 
-> definition "Proof system"
-> A *proof system* is a pair $(\mathscr{F}, \text{Infer})$ where $\text{Infer} \subseteq \mathscr{F}^* \times \mathscr{F}$ is a decidable set of inference steps, where:
-> 
-> - A set is *decidable* $\iff$ there is a program to check if an element belongs to it
-> - Given a set $S$, $S^*$ denotes all finite sequences with elements from $S$
+{% block definition "Proof system" %}
+A *proof system* is a pair $(\mathscr{F}, \text{Infer})$ where $\text{Infer} \subseteq \mathscr{F}^* \times \mathscr{F}$ is a decidable set of inference steps, where:
 
-> definition "Inference step"
-> An inference step $S$ is a 2-tuple $S=\seq{\seq{P_1, \dots, P_n}, C}\in\text{Infer}$, which we can denote as:
-> 
-> $$
-> \frac{P_1 \dots P_n}{C}
-> $$
-> 
-> We say that from the *premises* $P_1 \dots P_n$, we derive the *conclusion* $C$.
+- A set is *decidable* $\iff$ there is a program to check if an element belongs to it
+- Given a set $S$, $S^*$ denotes all finite sequences with elements from $S$
+{% endblock %}
 
-> definition "Axiom"
-> We say that an inference step is called an *axiom* when $n = 0$, i.e. that it has no premises:
-> 
-> $$\frac{\qquad}{C}$$
+{% block definition "Inference step" %}
+An inference step $S$ is a 2-tuple $S=\seq{\seq{P_1, \dots, P_n}, C}\in\text{Infer}$, which we can denote as:
 
-> definition "Proof"
-> Given a proof system $\seq{\mathscr{F}, \text{Infer}}$, a *proof* is a finite sequence of inference steps $S_0, \dots, S_m \in \text{Infer}$ such that, for every inference step $S_i$, each premise $P_j$ is a conclusion of a previous step.
+$$
+\frac{P_1 \dots P_n}{C}
+$$
+
+We say that from the *premises* $P_1 \dots P_n$, we derive the *conclusion* $C$.
+{% endblock %}
+
+{% block definition "Axiom" %}
+We say that an inference step is called an *axiom* when $n = 0$, i.e. that it has no premises:
+
+$$\frac{\qquad}{C}$$
+{% endblock %}
+
+{% block definition "Proof" %}
+Given a proof system $\seq{\mathscr{F}, \text{Infer}}$, a *proof* is a finite sequence of inference steps $S_0, \dots, S_m \in \text{Infer}$ such that, for every inference step $S_i$, each premise $P_j$ is a conclusion of a previous step.
+{% endblock %}
 
 ### A minimal propositional logic proof system
 We'll look into a simple logic called the [Hilbert system](https://en.wikipedia.org/wiki/Hilbert_system). We'll define the grammar of our logic as follows. This grammar defines a set of formulas $\mathscr{F}$.
@@ -622,37 +642,42 @@ digraph G {
 ### Provability
 A formula is provable if we can derive it from a set of initial assumptions. We'll start by formally defining what an assumption even is:
 
-> definition "Assumptions"
-> Given $\seq{\mathscr{F}, \text{Infer}}$ where $\text{Infer} \subseteq \mathscr{F}^* \times \mathscr{F}$, and given a set of *assumptions* $A \subseteq \mathscr{F}$, a derivation from $A$ in $\seq{\mathscr{F}, \text{Infer}}$ is a proof in $\seq{\mathscr{F}, \text{Infer}'}$ where:
-> 
-> $$ \text{Infer}' = \text{Infer} \cup \set{\frac{\quad}{F} \mid F \in A} $$
+{% block definition "Assumptions" %}
+Given $\seq{\mathscr{F}, \text{Infer}}$ where $\text{Infer} \subseteq \mathscr{F}^* \times \mathscr{F}$, and given a set of *assumptions* $A \subseteq \mathscr{F}$, a derivation from $A$ in $\seq{\mathscr{F}, \text{Infer}}$ is a proof in $\seq{\mathscr{F}, \text{Infer}'}$ where:
+
+$$ \text{Infer}' = \text{Infer} \cup \set{\frac{\quad}{F} \mid F \in A} $$
+{% endblock %}
 
 In other words, assumptions from $A$ are just treated as axioms (i.e. they are rules that have no prerequisites, hence $\seq{(), F}$). A derivation is a proof that starts from assumptions.
 
-> definition "Provable"
-> We say that "a formula $F \in \mathscr{F}$ is *provable* from a set of assumptions $A$", denoted $A \vdash_{\text{Infer}} F$, $\iff$ there exists a derivation from $A$ in $\text{Infer}$ that contains an inference step whose conclusion is $F$.
-> 
-> We write $\emptyset \vdash_{\text{Infer}} F$ (or simply $\vdash_{\text{Infer}} F$) to denote that there exists a proof in $\text{Infer}$ containing $F$ as a conclusion.
+{% block definition "Provable" %}
+We say that "a formula $F \in \mathscr{F}$ is *provable* from a set of assumptions $A$", denoted $A \vdash_{\text{Infer}} F$, $\iff$ there exists a derivation from $A$ in $\text{Infer}$ that contains an inference step whose conclusion is $F$.
+
+We write $\emptyset \vdash_{\text{Infer}} F$ (or simply $\vdash_{\text{Infer}} F$) to denote that there exists a proof in $\text{Infer}$ containing $F$ as a conclusion.
+{% endblock %}
 
 ### Consequence and soundness in propositional logic
-> definition "Semantic consequence"
-> Given a set of assumptions $A \subseteq \mathscr{F}$, where $\mathscr{F}$ is in propositional logic, and given $C \in \mathscr{F}$, we say that $C$ is a *semantic consequence* of $A$, denoted $A \models C$, $\iff$ for every environment $e$ that defines all variables in $\text{FV}(C) \cup \bigcup_{P \in A} \text{FV}(P)$, we have:
-> 
-> $$ \eval{P}_e = 1 \quad \forall P \in A \implies \eval{C}_e = 1 $$
+{% block definition "Semantic consequence" %}
+Given a set of assumptions $A \subseteq \mathscr{F}$, where $\mathscr{F}$ is in propositional logic, and given $C \in \mathscr{F}$, we say that $C$ is a *semantic consequence* of $A$, denoted $A \models C$, $\iff$ for every environment $e$ that defines all variables in $\text{FV}(C) \cup \bigcup_{P \in A} \text{FV}(P)$, we have:
+
+$$ \eval{P}_e = 1 \quad \forall P \in A \implies \eval{C}_e = 1 $$
+{% endblock %}
 
 In other words, iff an environment makes all assumptions true, and $C$ is true in an environment $e$ when the set of assumptions $A$ are all true in that environment, then we call $C$ a semantic consequence.
 
-> definition "Soundness"
-> A step $((P_1, \dots, P_n), C) \in \text{Infer}$ is sound $\iff \set{P_1, \dots, P_n} \models C$
-> 
-> A proof system $\text{Infer}$ is sound if every inference step is sound.
+{% block definition "Soundness" %}
+A step $((P_1, \dots, P_n), C) \in \text{Infer}$ is sound $\iff \set{P_1, \dots, P_n} \models C$
+
+A proof system $\text{Infer}$ is sound if every inference step is sound.
+{% endblock %}
 
 In other words, a conclusion of step is sound if it is a semantic consequence of the previous steps. A proof is sound if all steps are sound.
 
 If $C$ is an axiom (which has no precondition, meaning that $n = 0$ in the above), this definition of soundness means that $C$ is always a valid formula. We call this a **tautology**.
 
-> theorem "Semantic consequence and provability in sound proof systems"
-> Let $(\mathscr{F}, \text{Infer})$ where $\mathscr{F}$ are propositional logic formulas. If every inference rule in $\text{Infer}$ is sound, then $A \vdash_{\text{Infer}} F$ implies $A \models F$.
+{% block theorem "Semantic consequence and provability in sound proof systems" %}
+Let $(\mathscr{F}, \text{Infer})$ where $\mathscr{F}$ are propositional logic formulas. If every inference rule in $\text{Infer}$ is sound, then $A \vdash_{\text{Infer}} F$ implies $A \models F$.
+{% endblock %}
 
 This theorem tells us that that if all the inference rules are sound, then $F$ is a semantic consequence of $A$ if $F$ is provable from $A$. This may sound somewhat straightforward (if everything is sound, then it seems natural that the semantic consequence follows from provability), but is a nice way to restate the previous definitions.
 
@@ -663,8 +688,9 @@ Let's take a look at two propositional formulas $F$ and $G$. These are semantica
 
 We can prove equivalence by repeatedly applying the following "case analysis" rule, which replaces a given variable $x$ by 0 in $F$ and by 1 in $G$:
 
-> definition "Case analysis rule"
-> $$\frac{F \qquad G}{F[x := 0] \lor G[x := 1]}$$
+{% block definition "Case analysis rule" %}
+$$\frac{F \qquad G}{F[x := 0] \lor G[x := 1]}$$
+{% endblock %}
 
 This is [sound](#definition:soundness), because if we consider an environment $e$ defining $x \in \text{FV}(F) \cup \text{FV}(G)$, and assume $\eval{F}_e = 1$ and $\eval{G}_e = 1$, then:
 
@@ -690,13 +716,15 @@ $$\text{Infer}_D = \set{\frac{F}{F'} \mid F' \text{ is simplified from } F}$$
 
 Remember that a set $A$ of formulas is [satisfiable](#definition:satisfiability) if there exists an environment $e$ such that for every formula $F \in A$, $\eval{F}_e = 1$. We can use $\text{Infer}_D$ to conclude unsatisfiability:
 
-> theorem "Refutation soundness"
-> If $A \vdash_{\text{Infer}_D} 0$ then $A$ is *unsatisfiable*
+{% block theorem "Refutation soundness" %}
+If $A \vdash_{\text{Infer}_D} 0$ then $A$ is *unsatisfiable*
+{% endblock %}
 
 Here, $0$ means false. This follows from the soundness of $\vdash_{\text{Infer}_D}$. More interestingly, the converse is also true.
 
-> theorem "Refutation completeness"
-> If a finite set $A$ is unsatisfiable, then $A \vdash_{\text{Infer}_D} 0$
+{% block theorem "Refutation completeness" %}
+If a finite set $A$ is unsatisfiable, then $A \vdash_{\text{Infer}_D} 0$
+{% endblock %}
 
 This means that $A$ unsatisfiable $\iff A \vdash_{\text{Infer}_D} 0$. 
 
@@ -721,20 +749,23 @@ $$
 The false value can be represented as the empty clause $\emptyset$. Note that seeing an empty clause in <abbr title="Conjunctive Normal Form">CNF</abbr> means that the whole formula is unsatisfiable.
 
 ### Clausal resolution
-> definition "Clausal resolution rule"
-> Let $C_1$ and $C_2$ be two clauses.
-> 
-> $$\frac{C_1 \cup \set{x} \quad C_2 \cup \set{\neg x}}{C_1 \cup C_2}$$
+{% block definition "Clausal resolution rule" %}
+Let $C_1$ and $C_2$ be two clauses.
+
+$$\frac{C_1 \cup \set{x} \quad C_2 \cup \set{\neg x}}{C_1 \cup C_2}$$
+{% endblock %}
 
 This rule resolves two clauses with respect to $x$. It says that if clause $C_1$ contains $x$, and clause $C_2$ contains $\neg x$, then we can remove the variable from the clauses and merge them.
 
-> theorem "Soundness of the clausal resolution rule"
-> Clausal resolution is [sound](#definition:soundness) for all clauses $C_1, C_2$ and propositional variables $x$.
+{% block theorem "Soundness of the clausal resolution rule" %}
+Clausal resolution is [sound](#definition:soundness) for all clauses $C_1, C_2$ and propositional variables $x$.
+{% endblock %}
 
 This tells us that clausal resolution is a valid rule. A stronger result is that we can use clausal resolution to determine satisfiability for any <abbr title="Conjunctive Normal Form">CNF</abbr> formula:
 
-> theorem "Refutational completeness of the clausal resolution rule"
-> A finite set of clauses $A$ is satisfiable $\iff$ there exists a derivation to the empty clause from $A$ using clausal resolution.
+{% block theorem "Refutational completeness of the clausal resolution rule" %}
+A finite set of clauses $A$ is satisfiable $\iff$ there exists a derivation to the empty clause from $A$ using clausal resolution.
+{% endblock %}
 
 ### Unit resolution
 A *unit* clause is a clause that has precisely one literal: it's of the form $\set{L}$ where $L$ is a literal. Note that the literal in a unit clause must be true.
@@ -743,18 +774,20 @@ Given a literal $L$ we define the dual $\bar{L}$ as $\bar{\neg x} = x$ and $\bar
 
 Unit resolution is a special case of resolution where at least one of the clauses is a unit clause. 
 
-> definition "Unit resolution"
-> Let $C$ be a clause, and let $L$ be a literal.
-> 
-> $$\frac{C \qquad \set{L}}{C \setminus \set{\bar{L}}}$$
+{% block definition "Unit resolution" %}
+Let $C$ be a clause, and let $L$ be a literal.
+
+$$\frac{C \qquad \set{L}}{C \setminus \set{\bar{L}}}$$
+{% endblock %}
 
 This is sound (if $L$ is true then $\bar{L}$ is false and can thus be removed from another clause $C$). When applying this rule we get a clause $C' \subseteq C$: this gives us progress towards $\emptyset$, which is good.
 
 ### Equivalence and equisatisfiability
 Let's recall that two formulas $F_1$ and $F_2$ are satisfiable iff $F_1 \models F_2$ and $F_2 \models F_1$. TODO is this a typo? Should it be "equivalent"?
 
-> definition "Equisatisfiability"
-> Two formulas $F_1$ and $F_2$ are *equisatisfiable* $\iff F_1$ is satisfiable whenever $F_2$ is satisfiable.
+{% block definition "Equisatisfiability" %}
+Two formulas $F_1$ and $F_2$ are *equisatisfiable* $\iff F_1$ is satisfiable whenever $F_2$ is satisfiable.
+{% endblock %}
 
 Equivalent formulas are always equisatisfiable, but equisatisfiable formulas are not necessarily equivalent.
 
@@ -1001,8 +1034,9 @@ Then, the reduced ordered BDD (RO-BDD) is obtained by:
 
 Doing this brings us to the following property:
 
-> theorem "Unicity of RO-BDD"
-> With a fixed variable order, the RO-BDD for a Boolean function $f$ is unique
+{% block theorem "Unicity of RO-BDD" %}
+With a fixed variable order, the RO-BDD for a Boolean function $f$ is unique
+{% endblock %}
 
 In the following, we'll always refer to RO-BDDs, and just call them BDDs.
 
@@ -1109,22 +1143,24 @@ private def build2(f: Formula, level: Level): NodeId =
 ## Interpolation-based model checking
 
 ### Interpolation
-> definition "Interpolant"
-> Let $F$ and $G$ be propositional formulas. An *interpolant* for $F$ and $G$ is a formula $H$ such that:
-> 
-> - $F \models H$
-> - $H \models G$
-> - $\text{FV}(H) \subseteq \text{FV}(F) \cap \text{FV}(G)$
+{% block definition "Interpolant" %}
+Let $F$ and $G$ be propositional formulas. An *interpolant* for $F$ and $G$ is a formula $H$ such that:
+
+- $F \models H$
+- $H \models G$
+- $\text{FV}(H) \subseteq \text{FV}(F) \cap \text{FV}(G)$
+{% endblock %}
 
 Note that if these conditions hold, we have $F \models G$. The goal of $H$ is to serve as an explanation of why $F$ implies $G$, using variables that the two have in common.
 
-> theorem "Existence and Lattice of Interpolants"
-> Let $F$ and $G$ be propositional formulas such that $F \models G$ and let $S$ be the set of interpolants of $(F, G)$. Then:
-> 
-> - If $H_1, H_2 \in S$ then $H_1 \land H_2 \in S$ and $H_1 \lor H_2 \in S$
-> - $S \ne \emptyset$
-> - $\exists H_{\text{min}}.\ \forall H\in S.\ H_{\text{min}} \models H$
-> - $\exists H_{\text{max}}.\ \forall H\in S.\ H \models H_{\text{max}}$
+{% block theorem "Existence and Lattice of Interpolants" %}
+Let $F$ and $G$ be propositional formulas such that $F \models G$ and let $S$ be the set of interpolants of $(F, G)$. Then:
+
+- If $H_1, H_2 \in S$ then $H_1 \land H_2 \in S$ and $H_1 \lor H_2 \in S$
+- $S \ne \emptyset$
+- $\exists H_{\text{min}}.\ \forall H\in S.\ H_{\text{min}} \models H$
+- $\exists H_{\text{max}}.\ \forall H\in S.\ H \models H_{\text{max}}$
+{% endblock %}
 
 For instance, let's consider two formulas $F(\vec{x}, \vec{y})$ and $G(\vec{y}, \vec{z})$. The variables they have in common are $\vec{y}$ so we're looking for an interpolant $I(\vec{y})$.
 
@@ -1150,8 +1186,9 @@ $$
 \emptyset \models B \leftrightarrow \exists \vec{p_B}.\ \text{cnf}(B)
 $$
 
-> lemma "Interpolant for CNF"
-> The interpolant $H$ for $\text{cnf}(A)$ and $\text{cnf}(B)$ is also an interpolant for $A$ and $B$
+{% block lemma "Interpolant for CNF" %}
+The interpolant $H$ for $\text{cnf}(A)$ and $\text{cnf}(B)$ is also an interpolant for $A$ and $B$
+{% endblock %}
 
 We'll prove this by showing that all [three properties of interpolants](#definition:interpolant) are preserved:
 
@@ -1362,14 +1399,15 @@ We'll also define granularity levels of a formula:
 - A *clause* is a disjunction of literals
 
 ### Interpretation
-> definition "First-order logic interpretation"
-> A first-order interpretation is denoted $I = (D, e)$, where:
-> 
->  - $D \ne \emptyset$ is the set of constants
->  - $e$ maps constants, functions and predicate functions as follows:
->    + Each constant $c$ into an element of $D$, i.e. $e(c) \in D$
->    + Each function symbol $f$ with $\ar(f) = n$ into a total function of $n$ arguments, i.e. $e(f): D^n \rightarrow D$
->    + Each predicate symbol $p$ with $\ar(p) = n$ into an $n$-ary relation, i.e. $e(p) \subseteq D^n$
+{% block definition "First-order logic interpretation" %}
+A first-order interpretation is denoted $I = (D, e)$, where:
+
+- $D \ne \emptyset$ is the set of constants
+- $e$ maps constants, functions and predicate functions as follows:
+  + Each constant $c$ into an element of $D$, i.e. $e(c) \in D$
+  + Each function symbol $f$ with $\ar(f) = n$ into a total function of $n$ arguments, i.e. $e(f): D^n \rightarrow D$
+  + Each predicate symbol $p$ with $\ar(p) = n$ into an $n$-ary relation, i.e. $e(p) \subseteq D^n$
+{% endblock %}
 
 One thing that's important to understand about first-order logic is that it is not defined over a fixed set of constants. It can be *interpreted* with an arbitrary set of constants $D$, which is not necessarily just booleans (which would be $D = \set{\text{true}, \text{false}}$). Much like with SAT solvers which can return a boolean assignment $e$, in an interpretation of a first-order formula, the choice of $e$ maps constants, function symbols and predicate symbols into actual values.
 
@@ -1394,9 +1432,10 @@ $$
 
 We say that:
 
-> definition "Validity and satisfiability in first-order logic"
-> - $F$ is **valid** if $\forall I.\ \eval{F}_I = 1$
-> - $F$ is **satisfiable** if $\exists I.\ \eval{F}_I = 1$
+{% block definition "Validity and satisfiability in first-order logic" %}
+- $F$ is **valid** if $\forall I.\ \eval{F}_I = 1$
+- $F$ is **satisfiable** if $\exists I.\ \eval{F}_I = 1$
+{% endblock %}
 
 As an example, let's take a formula $F$ with function symbols $p$ and $q$:
 
@@ -1407,8 +1446,9 @@ $$F = \forall x.\ \exists y.\ (p(x, y) \land q(y, x))$$
 
 This leads us to the following observation:
 
-> lemma ""
-> $F$ is valid $\iff \neg F$ is not satisfiable
+{% block lemma %}
+$F$ is valid $\iff \neg F$ is not satisfiable
+{% endblock %}
 
 This means that to check validity, we can instead check satisfiability of the negation. Looking into negations will lead us to defining a normal form for negation. 
 
@@ -1463,16 +1503,17 @@ Indeed, if we assume the left-hand side of the implication to be true, we need t
 
 What's less obvious is a sort of converse: if we assume that the right-hand side holds, we can prove that there exists an $f$ satisfying the whole formula. Note that we can't write $\exists f$ because $f$ is a symbol and the FOL grammar doesn't allow this, but what we can do instead is to extend the signature with a new function symbol $f$ that does not appear in the formula. We call this a Skolem function.
 
-> definition "Skolemization"
-> We can **skolemize** a formula in prenex normal form by replacing:
-> 
-> $$\forall x_1, \dots, x_n.\ \exists y.\ F(x_1, \dots, x_n, y)$$
-> 
-> with
-> 
-> $$\forall x_1, \dots, x_n.\ F(x_1, \dots, x_n, g(x_1, \dots, x_n))$$
-> 
-> Where $g$ is a fresh function symbol (called a Skolem function) of arity $n$.
+{% block definition "Skolemization" %}
+We can **skolemize** a formula in prenex normal form by replacing:
+
+$$\forall x_1, \dots, x_n.\ \exists y.\ F(x_1, \dots, x_n, y)$$
+
+with
+
+$$\forall x_1, \dots, x_n.\ F(x_1, \dots, x_n, g(x_1, \dots, x_n))$$
+
+Where $g$ is a fresh function symbol (called a Skolem function) of arity $n$.
+{% endblock %}
 
 {% comment %}
 TODO this whole section was (probably) presented in class but isn't on the slides.
@@ -1494,14 +1535,15 @@ Where $g$ and $b$ are fresh, and $\text{ar}(g) = 1$, $\text{ar}(b) = 0$, so $b$ 
 
 ***
 
-> definition "Herbrand interpretation"
-> Given $I = (D, E)$ such that $\eval{F}_I = 1$ we can define:
-> 
-> $$I_H = (T, e_H) \text{ such that } \eval{F}_{I_H}=1$$
-> 
-> Where $I_H$ is the [Herbrand interpretation](https://en.wikipedia.org/wiki/Herbrand_interpretation), and $T$ is the Herbrand universe, containing all atomic terms:
-> 
-> $$T ::= c \mid f(T_1, \dots, T_n)$$
+{% block definition "Herbrand interpretation" %}
+Given $I = (D, E)$ such that $\eval{F}_I = 1$ we can define:
+
+$$I_H = (T, e_H) \text{ such that } \eval{F}_{I_H}=1$$
+
+Where $I_H$ is the [Herbrand interpretation](https://en.wikipedia.org/wiki/Herbrand_interpretation), and $T$ is the Herbrand universe, containing all atomic terms:
+
+$$T ::= c \mid f(T_1, \dots, T_n)$$
+{% endblock %}
 
 Note that $T$ may be infinite, but it's countably infinite.
 
@@ -1683,12 +1725,13 @@ This constitutes a Hoare triple, which we'll study in more detail now.
 ### Hoare triples
 Central to Hoare logic are **Hoare triples**.
 
-> definition "Hoare Triple"
-> Let $S$ be the set of possible states. Let $P, Q \subseteq S$. Let $r\subset S \times S$ be a relation over the states $S$. A Hoare triple is defined as:
-> 
-> $$
-> \triple{P}{r}{Q} \iff \forall s, s' \in S.\ (s \in P \land (s, s') \in r \rightarrow s' \in Q)
-> $$
+{% block definition "Hoare Triple" %}
+Let $S$ be the set of possible states. Let $P, Q \subseteq S$. Let $r\subset S \times S$ be a relation over the states $S$. A Hoare triple is defined as:
+
+$$
+\triple{P}{r}{Q} \iff \forall s, s' \in S.\ (s \in P \land (s, s') \in r \rightarrow s' \in Q)
+$$
+{% endblock %}
 
 We call $P$ the precondition and $Q$ the postcondition.
 
@@ -1714,8 +1757,9 @@ In other words, putting conditions on a set makes it smaller.
 The strongest possible condition is "false", which is the set $\emptyset$. The weakest condition is "true", which is the biggest set (all tuples).
 
 #### Definitions
-> definition "Strongest postcondition"
-> $$\sp{P, r} = \set{s' \mid \exists s.\ s \in P \land (s, s') \in r}$$
+{% block definition "Strongest postcondition" %}
+$$\sp{P, r} = \set{s' \mid \exists s.\ s \in P \land (s, s') \in r}$$
+{% endblock %}
 
 To visualize this, let's look at a diagram of the relation $r$:
 
@@ -1726,8 +1770,9 @@ To visualize this, let's look at a diagram of the relation $r$:
 
 If we let $P$ be the red set, then $\sp{P, r}$ is the blue set: it's the smallest set of values that *all* are pointed to from $P$ by $r$. In other words, it's the image of $P$ ($\text{post}(P)$ or $P\bullet r$), which we can notice has the [same definition](#definition:image-of-a-set).
 
-> definition "Weakest precondition"
-> $$\wp{r, Q} = \set{s \mid \forall s'.\ (s, s') \in r \rightarrow s' \in Q}$$
+{% block definition "Weakest precondition" %}
+$$\wp{r, Q} = \set{s \mid \forall s'.\ (s, s') \in r \rightarrow s' \in Q}$$
+{% endblock %}
 
 <figure markdown="1">
   ![Weakest precondition of a relation](/images/fv/weakest-precondition.png)
@@ -1737,12 +1782,13 @@ If we let $P$ be the red set, then $\sp{P, r}$ is the blue set: it's the smalles
 Dually, if we let $Q$ be the blue set, then $\wp{r, Q}$ is the red set: it's the largest set of values that *only* point to $Q$. Notice that there are points that point to $S$ and $Q$ (since $r$ doesn't need to be injective), but those are not included in $\wp{r, Q}$. The weakest precondition is the largest possible set from which we will definitely end up in $Q$ from.
 
 #### Equivalence
-> lemma "Three forms of Hoare Triple"
-> The following three conditions are equivalent.
-> 
-> - $\triple{P}{r}{Q}$
-> - $P \subseteq \wp{r, Q}$
-> - $\sp{P, r} \subseteq Q$
+{% block lemma "Three forms of Hoare Triple" %}
+The following three conditions are equivalent.
+
+- $\triple{P}{r}{Q}$
+- $P \subseteq \wp{r, Q}$
+- $\sp{P, r} \subseteq Q$
+{% endblock %}
 
 These conditions expand into the following formulas, respectively:
 
@@ -1761,27 +1807,30 @@ $\qed$
 #### Characterization
 The above lemma also gives us a good intuitive grip of what wp and sp are: they're the best possible values for $P$ and $Q$, respectively. For the triple to hold, any other $P$ must be a subset of wp (i.e. stronger), and any other $Q$ must be a supserset of $Q$ (i.e. weaker). This leads us to the following characterization lemmas.
 
-> lemma "Characterization of sp"
-> $\sp{P, r}$ is the smallest set $Q$ such that $\triple{P}{r}{Q}$, that is, the two following hold:
-> 
-> - $\triple{P}{r}{\sp{P, r}}$
-> - $\forall Q \subseteq S. \triple{P}{r}{Q} \rightarrow \sp{P, r}\subseteq Q$
+{% block lemma "Characterization of sp" %}
+$\sp{P, r}$ is the smallest set $Q$ such that $\triple{P}{r}{Q}$, that is, the two following hold:
+
+- $\triple{P}{r}{\sp{P, r}}$
+- $\forall Q \subseteq S. \triple{P}{r}{Q} \rightarrow \sp{P, r}\subseteq Q$
+{% endblock %}
 
 The first condition immediately follows from the equivalence in the above lemma: it is equivalent to $\sp{P, r} \subseteq \sp{P, r}$. The second condition ensures that the strongest precondition is the smallest one (as it's a subset of all $Q\subseteq S$).
 
-> lemma "Characterization of wp"
-> $\wp{r, Q}$ is the largest set $P$ such that $\triple{P}{r}{Q}$, that is, the two following hold:
-> 
-> - $\triple{\wp{r, Q}}{r}{Q}$
-> - $\forall P \subseteq S. \triple{P}{r}{Q} \rightarrow P \subseteq \wp{P, r}$
+{% block lemma "Characterization of wp" %}
+$\wp{r, Q}$ is the largest set $P$ such that $\triple{P}{r}{Q}$, that is, the two following hold:
+
+- $\triple{\wp{r, Q}}{r}{Q}$
+- $\forall P \subseteq S. \triple{P}{r}{Q} \rightarrow P \subseteq \wp{P, r}$
+{% endblock %}
 
 The reasoning is the same as above.
 
 #### Duality
 When [defining wp](#definition:weakest-precondition), we could see from the diagram that $\wp{r, Q}$ *almost* corresponded to going backwards from $Q$. And it is *almost*, because we must deal with the cases where values outside of $\wp{r, Q}$ point to $Q$ (which is possible when the relation is not injective). To deal with this, we don't look at $Q\bullet r^{-1}$, but at the complement set of "error states" $S \setminus Q$ (in brown in the diagram).
 
-> lemma "Duality of postcondition-of-inverse and wp"
-> $S \setminus \wp{r, Q} = \sp{S\setminus Q, r^{-1}}$
+{% block lemma "Duality of postcondition-of-inverse and wp" %}
+$S \setminus \wp{r, Q} = \sp{S\setminus Q, r^{-1}}$
+{% endblock %}
  
 Note that $r^{-1} = \set{(y, x) \mid (x, y) \in r}$ and is always defined.
 
@@ -1807,29 +1856,33 @@ As these are equal, we have proven equality. $\qed$
 #### More laws
 First, we'll state a lemma telling us that sp can be applied to each point of a set, or the the whole set, and we get the same results:
 
-> lemma "Pointwise sp"
-> $$\sp{P, r} = \bigcup_{s \in P} \sp{\set{s}, r}$$
+{% block lemma "Pointwise sp" %}
+$$\sp{P, r} = \bigcup_{s \in P} \sp{\set{s}, r}$$
+{% endblock %}
 
 From this, it should be clear what the sp of unions is:
 
-> lemma "Disjunctivity of sp"
-> $$\begin{align}
-> \sp{P_1 \cup P_2, r} & = \sp{P_1, r} \cup \sp{P_2, r} \\
-> \sp{P, r_1 \cup r_2} & = \sp{P, r_1} \cup \sp{P, r_2}
-> \end{align}$$
+{% block lemma "Disjunctivity of sp" %}
+$$\begin{align}
+\sp{P_1 \cup P_2, r} & = \sp{P_1, r} \cup \sp{P_2, r} \\
+\sp{P, r_1 \cup r_2} & = \sp{P, r_1} \cup \sp{P, r_2}
+\end{align}$$
+{% endblock %}
 
 For wp, the wp can be obtained by selecting each point for which the sp is in $Q$. To understand this, remember that the sp is like the image, so we can select all points that only point to $Q$, which is the [intuitive explanation we had](#definition:weakest-precondition) for wp.
 
-> lemma "Pointwise wp"
-> $$\wp{r, Q} = \set{s \mid s \in S \land \sp{\set{s}, r} \subseteq Q}$$
+{% block lemma "Pointwise wp" %}
+$$\wp{r, Q} = \set{s \mid s \in S \land \sp{\set{s}, r} \subseteq Q}$$
+{% endblock %}
 
 Likewise, this should give us an idea of how to deal with intersections of sets:
 
-> lemma "Conjunctivity of wp"
-> $$\begin{align}
-> \wp{r, Q_1 \cap Q_2} & = \wp{r, Q_1} \cap \wp{r, Q_2} \\
-> \wp{r_1 \cup r_2, Q} & = \wp{r_1, Q} \cap \wp{r_2, Q}
-> \end{align}$$
+{% block lemma "Conjunctivity of wp" %}
+$$\begin{align}
+\wp{r, Q_1 \cap Q_2} & = \wp{r, Q_1} \cap \wp{r, Q_2} \\
+\wp{r_1 \cup r_2, Q} & = \wp{r_1, Q} \cap \wp{r_2, Q}
+\end{align}$$
+{% endblock %}
 
 All of these can be proven by expanding to formulas and using basic first-order logic.
 
@@ -1838,14 +1891,15 @@ By now, we've seen how to annotate a single relation, and how to reason about pr
 
 Suppose the possible paths of a program are $J$, a set of relations.
 
-> theorem "Expanding paths"
-> The condition:
-> 
-> $$\triple{P}{\bigcup_{i\in J} r_i}{Q}$$
-> 
-> is equivalent to:
-> 
-> $$\forall i.\ i\in J \rightarrow \triple{P}{r_i}{Q}$$
+{% block theorem "Expanding paths" %}
+The condition:
+
+$$\triple{P}{\bigcup_{i\in J} r_i}{Q}$$
+
+is equivalent to:
+
+$$\forall i.\ i\in J \rightarrow \triple{P}{r_i}{Q}$$
+{% endblock %}
 
 This simply says that to a triple is valid over a set of relations when it is valid over all relations in the set: it serves as a generalization when we're considering multiple possible paths.
 
@@ -1861,24 +1915,26 @@ $$\begin{align}
 
 The first step translates into the [third equivalent form](#lemma:three-forms-of-hoare-triple), and the second step uses [disjunctivity of sp](#lemma:disjunctivity-of-sp). The third step translates the union to a quantified formula, and the last step translates back the the [first equivalent form](#lemma:three-forms-of-hoare-triple). $\qed$
 
-> theorem "Transitivity of Hoare triples"
-> If $\triple{P}{r_1}{Q}$ and $\triple{Q}{r_2}{R}$ then $\triple{P}{r_1 \circ r_2}{R}$. We can write this as the following inference rule:
-> 
-> $$
-> \frac{
->   \triple{P}{r_1}{Q} \qquad \triple{Q}{r_2}{R}
-> }{
->   \triple{P}{r_1 \circ r_2}{R}
-> }
-> $$
+{% block theorem "Transitivity of Hoare triples" %}
+If $\triple{P}{r_1}{Q}$ and $\triple{Q}{r_2}{R}$ then $\triple{P}{r_1 \circ r_2}{R}$. We can write this as the following inference rule:
+
+$$
+\frac{
+  \triple{P}{r_1}{Q} \qquad \triple{Q}{r_2}{R}
+}{
+  \triple{P}{r_1 \circ r_2}{R}
+}
+$$
+{% endblock %}
 
 We won't go into too much detail for this theorem. The two theorems above tell us that if we can annotate Hoare triples for individual statements, we can annotate the whole program.
 
 ### Hoare logic for loops
 For general loops, the simplest rule that we can have is the following. It says that if a single iteration of the loop doesn't change the precondition, then the whole loop doesn't change the precondition.
 
-> lemma "Rule for non-deterministic loops"
-> $$\frac{\triple{P}{r}{P}}{\triple{P}{r^*}{P}}$$
+{% block lemma "Rule for non-deterministic loops" %}
+$$\frac{\triple{P}{r}{P}}{\triple{P}{r^*}{P}}$$
+{% endblock %}
 
 This is obviously going to be true by transitivity, but let's prove it formally nonetheless. We can generalize the previous results to programs with loops. A special case of the [transitivity theorem of Hoare triples](#theorem:transitivity-of-hoare-triples) is when $r_1 = r_2$ and $P = Q = R$. In that case, we have:
 
@@ -1905,18 +1961,19 @@ $$
 
 The relation follows the $r$ relation an arbitrary number of times while the $b$ condition is true, and then finally the $b$ condition is false. This translates almost directly into the following rule:
 
-> lemma "Rule for loop with condition"
-> For a `while (b) { c }` loop, we have:
-> 
-> $$
-> \frac{
->   \triple{P\cap b_s}{r}{P}
-> }{\triple{P}{(\Delta_{b_s} \circ r)^* \circ \Delta_{(\neg b)_s}}{P\cap(\neg b)_s}}
-> $$
-> 
-> Restated with commands and conditions instead of relations and sets:
-> 
-> $$\frac{\triple{P\land b}{c}{P}}{\triple{P}{\text{while }(b)\ c}{P \land \neg b}}$$
+{% block lemma "Rule for loop with condition" %}
+For a `while (b) { c }` loop, we have:
+
+$$
+\frac{
+  \triple{P\cap b_s}{r}{P}
+}{\triple{P}{(\Delta_{b_s} \circ r)^* \circ \Delta_{(\neg b)_s}}{P\cap(\neg b)_s}}
+$$
+
+Restated with commands and conditions instead of relations and sets:
+
+$$\frac{\triple{P\land b}{c}{P}}{\triple{P}{\text{while }(b)\ c}{P \land \neg b}}$$
+{% endblock %}
 
 We trivially have:
 
@@ -1943,19 +2000,22 @@ Applying these rules, we get the lemma. $\qed$
 
 ## Properties of program contexts
 ### Properties of relations
-> lemma "Monotonicity over composition"
-> $$
-> \begin{align}
-> (r_1 \subseteq r_2) & \implies (r_1 \circ s) \subseteq (r_2 \circ s) \\
-> (r_1 \subseteq r_2) & \implies (s \circ r_1) \subseteq (s \circ r_2)
-> \end{align}
-> $$
+{% block lemma "Monotonicity over composition" %}
+$$
+\begin{align}
+(r_1 \subseteq r_2) & \implies (r_1 \circ s) \subseteq (r_2 \circ s) \\
+(r_1 \subseteq r_2) & \implies (s \circ r_1) \subseteq (s \circ r_2)
+\end{align}
+$$
+{% endblock %}
 
-> lemma "Monotonicity over union"
-> $$(r_1 \subseteq r_2) \land (s_1 \subseteq s_2) \implies (r_1 \cup s_1) \subseteq (r_2 \cup s_2)$$
+{% block lemma "Monotonicity over union" %}
+$$(r_1 \subseteq r_2) \land (s_1 \subseteq s_2) \implies (r_1 \cup s_1) \subseteq (r_2 \cup s_2)$$
+{% endblock %}
 
-> lemma "Union distributivity"
-> $$(r_1 \cup r_2) \circ s = (r_1 \circ s) \cup (r_2 \circ s)$$
+{% block lemma "Union distributivity" %}
+$$(r_1 \cup r_2) \circ s = (r_1 \circ s) \cup (r_2 \circ s)$$
+{% endblock %}
 
 ### Properties of expressions
 Expressions are functions that take relations, and construct a more complex relation from them. We'll only consider expressions that use union ($\cup$) and composition ($\circ$). An example of such an expression would be: 
@@ -1964,23 +2024,25 @@ $$E(r) = (b_1 \circ r)\cup (r\circ b_2)$$
 
 We'll see two theorems stating that expressions are monotonic, and that they "sort of distribute" over union (meaning sometimes with equality, but always at least with $\subseteq$).
 
-> theorem "Monotonicity of expressions using union and composition"
-> Let $S$ be the universe, and let $C = \set{r\mid r \subseteq S^2}$ be the set of all possible relations in $S$. Let $E: C \rightarrow C$ be any function building one relation from another, where $E(r)$ is built from:
-> 
-> - $r$,
-> - some additional constant expressions $b_1, \dots, b_n$,
-> - using $\cup$ and $\circ$. 
-> 
-> Such expressions $E$ are monotonic on $C$:
-> 
-> $$r_1 \subseteq r_2 \implies E(r_1) \subseteq E(r_2)$$
+{% block theorem "Monotonicity of expressions using union and composition" %}
+Let $S$ be the universe, and let $C = \set{r\mid r \subseteq S^2}$ be the set of all possible relations in $S$. Let $E: C \rightarrow C$ be any function building one relation from another, where $E(r)$ is built from:
+
+- $r$,
+- some additional constant expressions $b_1, \dots, b_n$,
+- using $\cup$ and $\circ$. 
+
+Such expressions $E$ are monotonic on $C$:
+
+$$r_1 \subseteq r_2 \implies E(r_1) \subseteq E(r_2)$$
+{% endblock %}
 
 This theorem can be proven by induction on the expression tree defining $E$, using the monotonicity properties of $\cup$ and $\circ$ that we [have seen above](#properties-of-relations).
 
-> theorem "Union &ldquo;distributivity&rdquo; of expressions in one direction"
-> Let $r_i$ with $i \in I$ be a family of relations. Then:
-> 
-> $$E\left(\bigcup_{i \in I} r_i \right) \supseteq \bigcup_{i \in I} E(r_i)$$
+{% block theorem "Union &ldquo;distributivity&rdquo; of expressions in one direction" %}
+Let $r_i$ with $i \in I$ be a family of relations. Then:
+
+$$E\left(\bigcup_{i \in I} r_i \right) \supseteq \bigcup_{i \in I} E(r_i)$$
+{% endblock %}
 
 Let $s = \bigcup_{i\in I} r_i$. Note that $\forall i.\ r_i \subseteq s$. Since $E$ is monotonic, $\forall i.\ E(r_i) \subseteq E(s)$. Since all the $E(r_i)$ are included in $E(s)$, so is their union, so $\bigcup_{i \in I} E(r_i) \subseteq E(s)$. 
 
@@ -1997,16 +2059,17 @@ $$
 
 *However*, under some special assumptions on $E$, we actually have full, normal distributivity with equality:
 
-> theorem "Refined union distributivity of expressions"
-> If $E$ satisfies one of the conditions below:
-> 
-> 1. $E(r)$ contains $r$ at most once
-> 2. $E(r)$ contains $r$ any number of times, but $I$ is a set of natural numbers and $r_i$ is an increasing sequence $r_1 \subseteq r_2 \subseteq \dots$
-> 3. $E(r)$ contains $r$ any number of times, but $r_i, i \in I$ is a **directed family** of relations, meaning that for each $i, j$ there exists a $k$ such that $r_i \cup r_j \subseteq r_k$ (and $I$ is possibly uncountably infinite)
-> 
-> Then $E$ distributes over union:
-> 
-> $$E\left(\bigcup_{i \in I} r_i \right) = \bigcup_{i \in I} E(r_i)$$
+{% block theorem "Refined union distributivity of expressions" %}
+If $E$ satisfies one of the conditions below:
+
+1. $E(r)$ contains $r$ at most once
+2. $E(r)$ contains $r$ any number of times, but $I$ is a set of natural numbers and $r_i$ is an increasing sequence $r_1 \subseteq r_2 \subseteq \dots$
+3. $E(r)$ contains $r$ any number of times, but $r_i, i \in I$ is a **directed family** of relations, meaning that for each $i, j$ there exists a $k$ such that $r_i \cup r_j \subseteq r_k$ (and $I$ is possibly uncountably infinite)
+
+Then $E$ distributes over union:
+
+$$E\left(\bigcup_{i \in I} r_i \right) = \bigcup_{i \in I} E(r_i)$$
+{% endblock %}
 
 The third case is actually a generalization of the second. With the increasing sequence, the $r_k$ can just be the bigger relation between $r_i$ and $r_j$. In this second case, $I$ can be finite or countably infinite, which is also less general than the third case.
 
@@ -2066,10 +2129,11 @@ A program adheres to the spec if its relation is a subset of the spec's relation
 Note that the above program representation lets $x$ and $y$ be unconstrained by the `havoc`, and constrains $x'$ and $y'$ through the `assume`. We get $z = z'$ by default, by not writing anything about $z$.
 
 ### Program refinement and equivalence
-> definition "Refinement"
-> For two programs $P_1$ and $P_2$, we define *refinement* $P_1 \sqsubseteq P_2$ if and only if the following is a valid formula:
-> 
-> $$R(P_1) \rightarrow R(P_2)$$
+{% block definition "Refinement" %}
+For two programs $P_1$ and $P_2$, we define *refinement* $P_1 \sqsubseteq P_2$ if and only if the following is a valid formula:
+
+$$R(P_1) \rightarrow R(P_2)$$
+{% endblock %}
 
 We can define the operator in the other direction in the obvious manner:
 
@@ -2079,23 +2143,25 @@ Note that this is nothing more than a new notation for relation subset, since:
 
 $$P_1 \sqsubseteq P_2 \iff \rho(P_1) \subseteq \rho(P_2)$$
 
-> definition "Equivalence"
-> We define *equivalence* of two programs $P_1$ and $P_2$ as: 
-> 
-> $$P_1 \equiv P_2 \iff P_1 \sqsubseteq P_2 \land P_2 \sqsubseteq P_1$$
+{% block definition "Equivalence" %}
+We define *equivalence* of two programs $P_1$ and $P_2$ as: 
+
+$$P_1 \equiv P_2 \iff P_1 \sqsubseteq P_2 \land P_2 \sqsubseteq P_1$$
+{% endblock %}
 
 From the above comment, we can see that this is just new notation for relation equality, since:
 
 $$P_1 \equiv P_2 \iff \rho(P_1) = \rho(P_2)$$
 
-> theorem "Monotonicity of refinement over sequences and if-statements"
-> $$\begin{align}
-> P_1 \sqsubseteq P_2 & \implies (P_1; P) \sqsubseteq (P_2; P) \\
-> P_1 \sqsubseteq P_2 & \implies (P; P_1) \sqsubseteq (P; P_2) \\
-> (P_1 \sqsubseteq P_2) \land (Q_1 \sqsubseteq Q_2) & \implies
->   (\text{if } (*) \ P_1 \text{ else } P_2) \sqsubseteq
->   (\text{if } (*) \ Q_1 \text{ else } Q_2) \\
-> \end{align}$$
+{% block theorem "Monotonicity of refinement over sequences and if-statements" %}
+$$\begin{align}
+P_1 \sqsubseteq P_2 & \implies (P_1; P) \sqsubseteq (P_2; P) \\
+P_1 \sqsubseteq P_2 & \implies (P; P_1) \sqsubseteq (P; P_2) \\
+(P_1 \sqsubseteq P_2) \land (Q_1 \sqsubseteq Q_2) & \implies
+  (\text{if } (*) \ P_1 \text{ else } P_2) \sqsubseteq
+  (\text{if } (*) \ Q_1 \text{ else } Q_2) \\
+\end{align}$$
+{% endblock %}
 
 This follows directly from our lemmas of [monotonicity of relations over composition](#lemma:monotonicity-over-composition) and [monotonicity over union](#lemma:monotonicity-over-union). $\qed$
 
@@ -2143,8 +2209,9 @@ This existential quantifier is annoying, and we will see later how to apply to o
 ### Fixpoints
 Before we see how to translate recursive functions, we need a bit of theory on fixpoints:
 
-> definition "Fixpoint"
-> $s\in C$ is a **fixpoint** of $E: C\rightarrow C$ if $E(s) = s$
+{% block definition "Fixpoint" %}
+$s\in C$ is a **fixpoint** of $E: C\rightarrow C$ if $E(s) = s$
+{% endblock %}
 
 This is analogous to what exists on real function: the fixpoints of $f(x) = x^2 - x - 3$ are $x_1 = -1$ and $x_2 = 3$.
 
@@ -2174,12 +2241,13 @@ $$
 
 Here, the subscript s means "the set corresponding to this formula". We'll how to find this relation $s$:
 
-> theorem "Relation for recursion"
-> Let $E(s)$ be the expression translating the body of a recursive function, where $s$ is the relation of the recursive call. Let $s$ be defined as follows:
-> 
-> $$s = \bigcup_{k \ge 0} E^k(\emptyset)$$
-> 
-> where $E^0(\emptyset) = \emptyset$. The relation $s$ is the least fixpoint of $E$, and $E(s)$ is the relation corresponding to the recursive function.
+{% block theorem "Relation for recursion" %}
+Let $E(s)$ be the expression translating the body of a recursive function, where $s$ is the relation of the recursive call. Let $s$ be defined as follows:
+
+$$s = \bigcup_{k \ge 0} E^k(\emptyset)$$
+
+where $E^0(\emptyset) = \emptyset$. The relation $s$ is the least fixpoint of $E$, and $E(s)$ is the relation corresponding to the recursive function.
+{% endblock %}
 
 We'll prove that $s$ is indeed a fixpoint of $E$. Note that, according to the [theorem of monotonicity of expressions using union and composition](#theorem:monotonicity-of-expressions-using-union-and-composition), $E$ is monotonic. This fact means that we actually satisfy the [second condition of union-distributivity](#theorem:refined-union-distributivity-of-expressions) of $E$. To see this, pick $r_0, r_1, \dots, r_k$ as follows:
 
@@ -2260,12 +2328,13 @@ As before, we can prove that if we consider any relations $c_1, c_2$ such that $
 
 ## Quantifier elimination in Presburger arithmetic
 ### Quantifier elimination
-> definition "Quantifier elimination"
-> Given a formula $F(\vec{y})$, the goal of quantifier elimination (QE) is to find a formula $G(\vec{y})$ that:
-> 
-> - is [equivalent](#definition:equivalence) to $F(\vec{y})$
-> - has no quantifiers
-> - has $\text{FV}(G)\subseteq\text{FV}(F)$
+{% block definition "Quantifier elimination" %}
+Given a formula $F(\vec{y})$, the goal of quantifier elimination (QE) is to find a formula $G(\vec{y})$ that:
+
+- is [equivalent](#definition:equivalence) to $F(\vec{y})$
+- has no quantifiers
+- has $\text{FV}(G)\subseteq\text{FV}(F)$
+{% endblock %}
 
 Generally, given an assignment $\vec{y}$, it's easier to check the truth value of $G(\vec{y})$ because it has no quantifiers. 
 
@@ -2296,21 +2365,19 @@ Another reason to do QE is to remove quantifiers from interpolants, which is use
 ### One-point rule
 The one-point rule is one of the many steps used in quantifier elimination procedures. Note that it is not enough on its own, because it only handles equalities, and not inequalities .
 
-> theorem "One-point rule"
-> If $\vec{y}$ is a tuple of variables not containing $x$, then:
-> 
-> $$
-> \exists x.\ (x = t(\vec{y}) \land F(x, \vec{y})) \iff F(t(\vec{y}), \vec{y})
-> $$
+{% block theorem "One-point rule" %}
+If $\vec{y}$ is a tuple of variables not containing $x$, then:
+
+$$\exists x.\ (x = t(\vec{y}) \land F(x, \vec{y})) \iff F(t(\vec{y}), \vec{y})$$
+{% endblock %}
 
 This rule should make intuitive sense; it's somewhat akin to inlining (in the $\Rightarrow$ direction) or extracting to a variable (in the $\Leftarrow$ direction). In the $\Rightarrow$ direction, we say that we apply the **one-point rule**, and in the $\Leftarrow$ direction we call it **flattening**.
 
 We can also state the dual of this rule, which is the negated version of this statement
 
-> theorem "Dual one-point rule"
-> $$
-> \forall x.\ (x = t(\vec{y}) \rightarrow F(x, \vec{y})) \iff F(t(\vec{y}), \vec{y})
-> $$
+{% block theorem "Dual one-point rule" %}
+$$\forall x.\ (x = t(\vec{y}) \rightarrow F(x, \vec{y})) \iff F(t(\vec{y}), \vec{y})$$
+{% endblock %}
 
 The proof for this is easy; we negate both sides and see that it reduces to the rule for $\exists$:
 
@@ -2491,8 +2558,9 @@ $$
 
 The SAT solver can give us values of $p, q, r$. We have the following theorem:
 
-> theorem "Satisfiability of QF formulas using SAT"
-> $G$ is satisfiable $\iff$ there is an assignment for $p, q, r$ that satisfies $F$
+{% block theorem "Satisfiability of QF formulas using SAT" %}
+$G$ is satisfiable $\iff$ there is an assignment for $p, q, r$ that satisfies $F$
+{% endblock %}
 
 This result generalizes to any $G$ that can be described in terms of $F$ as above. 
 
@@ -2602,8 +2670,9 @@ In this chapter, we'll see a bunch of various topics, and bring it all together 
 ### Least fixpoint
 Suppose we want to model a program $F$ (mapping from one set of states to the next). The idea is to model the execution from a starting state to a least fixpoint of $F$ (which we write $\text{lfp}(F)$, but doing so in fewer steps than the real program would go through by generalizing things.
 
-> definition "Least fixpoint"
-> $$\text{lfp}(F) = \bigcup_{i=0}^\infty F^i(\emptyset)$$
+{% block definition "Least fixpoint" %}
+$$\text{lfp}(F) = \bigcup_{i=0}^\infty F^i(\emptyset)$$
+{% endblock %}
 
 We're given a specification $s$, which describes some set of "good states". Our goal is to prove $\text{lfp}(F)\subseteq s$, which we can do by cases:
 
@@ -2642,8 +2711,9 @@ Note that the lub of a set $S$ can actually belong to $S$ (e.g. take a set of a 
 Looking at open intervals on reals, $(0, 1)$ has no maximal or greatest elements. Its lub is 1.
 
 ### Lattice
-> definition "Lattice"
-> A lattice is a partial order in which every two-element set has a lub and a glb.
+{% block definition "Lattice" %}
+A lattice is a partial order in which every two-element set has a lub and a glb.
+{% endblock %}
 
 We generally define a lattice as $(A, \sqsubseteq)$ where:
 
@@ -2655,8 +2725,9 @@ We generally define a lattice as $(A, \sqsubseteq)$ where:
 
 By induction, this implies the more general lemma:
 
-> lemma ""
+{% block lemma %}
 > In a lattice every non-empty finite set has a lub and a glb.
+{% endblock %}
 
 An example of a lattice is a linear ordering, for which:
 
@@ -2664,10 +2735,11 @@ $$\forall x, y.\ (x \le y \lor y \le x)$$
 
 Indeed, either $x$ or $y$ is the lub.
 
-> definition "Complete lattice"
-> A lattice $(A, \sqsubseteq)$ is complete if every subset of $A$ has a lub and a glb:
-> 
-> $$\forall S \subseteq A.\ \exists \sqcap S, \sqcup S$$
+{% block definition "Complete lattice" %}
+A lattice $(A, \sqsubseteq)$ is complete if every subset of $A$ has a lub and a glb:
+
+$$\forall S \subseteq A.\ \exists \sqcap S, \sqcup S$$
+{% endblock %}
 
 ### Tarski's fixed point theorem
 Let $(A, \sqsubseteq)$ be a complete lattice, and $G: A \rightarrow A$ be a monotonic function. We define $\text{Post}$ as the set of postfix points of $xG$, $\text{Pre}$ as the set of prefix points of $G$, and $\text{Fix}$ as the set of fixed points of $G$
@@ -2678,8 +2750,9 @@ $$\begin{align}
 \text{Post} & = \set{x \mid G(x) = x} \\
 \end{align}$$
 
-> theorem "Tarski's Fixed Point theorem"
-> Let $a = \sqcap \text{Post}$ Then $a$ is the least element of $\text{Fix}$. Dually, $\sqcup \text{Pre}$ is the largest element of $\text{Fix}$.
+{% block theorem "Tarski's Fixed Point theorem" %}
+Let $a = \sqcap \text{Post}$ Then $a$ is the least element of $\text{Fix}$. Dually, $\sqcup \text{Pre}$ is the largest element of $\text{Fix}$.
+{% endblock %}
 
 Let's prove this. Let $x \in \text{Post}$:
 
@@ -2694,35 +2767,40 @@ Tarski's Fixed Point theorem shows that in a complete lattice with a monotonic f
 
 It also guarantees that fixpoints exist in complete lattices, but this proof does not say how to find them. How difficult it is depends on the structure of the lattice.
 
-> lemma ""
-> Let $G$ be a monotonic function on a lattice. Let $a_0 = \bot$ and $a_{n+1}= G(a_n)$. Let $a_* = todo$
+{% block lemma %}
+Let $G$ be a monotonic function on a lattice. Let $a_0 = \bot$ and $a_{n+1}= G(a_n)$. Let $a_* = todo$
+{% endblock %}
 
 ### Omega continuity
-> definition "Omega continuity"
-> A function $G$ is $\omega$-continuous if for every chain $x_0 \sqsubseteq x_1 \sqsubseteq x_2 \sqsubseteq \dots$ we have:
-> 
-> $$G\left(\bigsqcup_{i\ge 0} x_i \right) = \bigsqcup_{i \ge 0} G(x_i)$$
+{% block definition "Omega continuity" %}
+A function $G$ is $\omega$-continuous if for every chain $x_0 \sqsubseteq x_1 \sqsubseteq x_2 \sqsubseteq \dots$ we have:
+
+$$G\left(\bigsqcup_{i\ge 0} x_i \right) = \bigsqcup_{i \ge 0} G(x_i)$$
+{% endblock %}
 
 Todo what's the intuition here? This looks a lot like the theorem in section 12.
 
-> lemma ""
-> For an $\omega$-continuous function $G$, the value $a_* = \bigsqcup_{n \ge 0} G^n(\bot)$ is the least fixpoint of $G$.
+{% block lemma %}
+For an $\omega$-continuous function $G$, the value $a_* = \bigsqcup_{n \ge 0} G^n(\bot)$ is the least fixpoint of $G$.
+{% endblock %}
 
 ### Galois connection
-> definition "Galois connection"
-> A galois connection is defined by two monotonic functions $\alpha: C \rightarrow A$ and $\gamma: A \rightarrow C$ between partial orders $\le$ on $C$ and $\sqsubseteq$ on $A$, such that:
-> 
-> $$\forall c, a.\ \alpha(c) \sqsubseteq a \iff c \le \gamma(a)$$
+{% block definition "Galois connection" %}
+A galois connection is defined by two monotonic functions $\alpha: C \rightarrow A$ and $\gamma: A \rightarrow C$ between partial orders $\le$ on $C$ and $\sqsubseteq$ on $A$, such that:
+
+$$\forall c, a.\ \alpha(c) \sqsubseteq a \iff c \le \gamma(a)$$
+{% endblock %}
 
 Intuitively, this tells us that $c$ is approximated by $a$.
 
-> lemma ""
-> The condition of the Galois connection hold iff the conjunction of these two conditions holds:
-> 
-> $$\begin{align}
-> \forall c.\  & c                 & \le \         & \gamma(\alpha(c)) \\
-> \forall a.\  & \alpha(\gamma(a)) & \sqsubseteq \ & a \\
-> \end{align}$$
+{% block lemma %}
+The condition of the Galois connection hold iff the conjunction of these two conditions holds:
+
+$$\begin{align}
+\forall c.\  & c                 & \le \         & \gamma(\alpha(c)) \\
+\forall a.\  & \alpha(\gamma(a)) & \sqsubseteq \ & a \\
+\end{align}$$
+{% endblock %}
 
 As a small bonus lemma, we can state that the following three conditions are equivalent:
 

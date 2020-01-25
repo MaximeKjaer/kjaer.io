@@ -79,8 +79,9 @@ In the correctness proof below, we'll need a few useful facts, which we won't ta
 #### Correctness proof
 We will prove the following lemma by contradiction.
 
-> lemma "Kruskal correctness"
-> `kruskal_greedy` returns a maximum weight spanning tree.
+{% block lemma "Kruskal correctness" %}
+`kruskal_greedy` returns a maximum weight spanning tree.
+{% endblock %}
 
 We'll suppose for the sake of contradiction that `kruskal_greedy` doesn't return a *maximum* weight spanning tree. This means that we suppose it picks edges $S = \set{s_1, s_2, \dots, s_{n-1}}$ [^number-edges], but that there exists a tree $T = \set{t_1, t_2, \dots, t_{n-1}}$ of higher weight.
 
@@ -121,11 +122,12 @@ The generalization of these two properties will lead us to matroids.
 
 ### Matroids
 #### Definition
-> definition "Matroid"
-> A matroid $M = (E, \mathcal{I})$ is defined on a finite ground set $E$ of elements, and a family $\mathcal{I} \subseteq 2^E$ of subsets of $E$, satisfying two properties:
-> 
-> - $(I_1)$: If $X \subseteq Y$ and $Y \in \mathcal{I}$ then $X\in\mathcal{I}$
-> - $(I_2)$: If $X\in\mathcal{I}$ and $Y\in\mathcal{I}$ and $\abs{Y}>\abs{X}$ then $\exists e \in Y \setminus X : X + e \in \mathcal{I}$
+{% block definition "Matroid" %}
+A matroid $M = (E, \mathcal{I})$ is defined on a finite ground set $E$ of elements, and a family $\mathcal{I} \subseteq 2^E$ of subsets of $E$, satisfying two properties:
+
+- $(I_1)$: If $X \subseteq Y$ and $Y \in \mathcal{I}$ then $X\in\mathcal{I}$
+- $(I_2)$: If $X\in\mathcal{I}$ and $Y\in\mathcal{I}$ and $\abs{Y}>\abs{X}$ then $\exists e \in Y \setminus X : X + e \in \mathcal{I}$
+{% endblock %}
 
 The $(I_1)$ property is called *downward-closedness*, or the *hereditary property*; it tells us that by losing elements of a feasible solution, we still retain a feasible solution.
 
@@ -158,8 +160,9 @@ def greedy(M, w):
 #### Correctness proof
 We'd like to prove the following theorem:
 
-> theorem ""
-> For any ground set $E = \set{1, 2, \dots, n}$ and a family of subsets $\mathcal{I}$, `greedy` finds a maximum weight base for any set of weights $w: E \rightarrow \mathbb{R}$ **if and only if** $M=(E, \mathcal{I})$ is a matroid.
+{% block theorem %}
+For any ground set $E = \set{1, 2, \dots, n}$ and a family of subsets $\mathcal{I}$, `greedy` finds a maximum weight base for any set of weights $w: E \rightarrow \mathbb{R}$ **if and only if** $M=(E, \mathcal{I})$ is a matroid.
+{% endblock %}
 
 The if direction ($\Leftarrow$) follows from the [correctness proof](#correctness-proof) we did for Kruskal's algorithm.
 
@@ -167,8 +170,9 @@ For the only if direction ($\Rightarrow$), we must prove the following claim, wh
 
 [^contrapositive-form]: If we want to prove $A \implies B$ we can equivalently prove the contrapositive $\neg B \implies \neg A$.
 
-> claim ""
-> Suppose $(E, \mathcal{I})$ is not a matroid. Then there exists an assignment of weights $w: E \rightarrow \mathbb{R}$ such that `greedy` does not return a maximum weight base.
+{% block claim %}
+Suppose $(E, \mathcal{I})$ is not a matroid. Then there exists an assignment of weights $w: E \rightarrow \mathbb{R}$ such that `greedy` does not return a maximum weight base.
+{% endblock %}
 
 To prove this, we're going to cook up some weights for which `greedy` doesn't return a maximum weight base when $(E, \mathcal{I})$ isn't a matroid (i.e. the tuple either violates $(I_1)$ or $(I_2)$).
 
@@ -284,8 +288,9 @@ The intersection of two matroids satisfies $(I_1)$, but generally not $(I_2)$.
 
 The following theorem adds a lot of power to the concept of matroids.
 
-> theorem ""
-> There is an efficient algorithm for finding a max-weight independent set in the intersection of two matroids.
+{% block theorem %}
+There is an efficient algorithm for finding a max-weight independent set in the intersection of two matroids.
+{% endblock %}
 
 Here, efficient means polynomial time, if we assume a polynomial time membership oracle. This is the case for all the matroid examples seen in class.
 
@@ -479,8 +484,9 @@ graph G {
 #### Correctness proof
 We now prove the correctness of this algorithm, which is to say that it indeed finds a maximum matching. The algorithm returns a set $M$ with respect to which there are no augmenting paths, so to prove correctness we must prove the following:
 
-> theorem "Augmenting Path Algorithm Correctness"
-> A matching $M$ is maximal **if and only if** there are no augmenting paths with respect to $M$.
+{% block theorem "Augmenting Path Algorithm Correctness" %}
+A matching $M$ is maximal **if and only if** there are no augmenting paths with respect to $M$.
+{% endblock %}
 
 The proof is by contradiction.
 
@@ -539,13 +545,15 @@ In the above, $P$ is not an extreme point because $P = \frac{1}{2} X + \frac{1}{
 
 Extreme points are important because they have useful structural properties that we can exploit to design algorithms and construct proofs. We can state the following theorem about extreme points:
 
-> theorem ""
-> If the feasible region is bounded, then there always exists an optimum which is an extreme point.
+{% block theorem %}
+If the feasible region is bounded, then there always exists an optimum which is an extreme point.
+{% endblock %}
 
 The proof is as follows. As the feasible region is bounded, there is an optimal solution $x^\*$. If $x^\*$ happens to be an extreme point, we are done. The real work in this proof is for the case where $x^\*$ isn't an extreme point. To prove this, we'll have to introduce a small lemma:
 
-> lemma ""
-> Any feasible point can be written as a convex combination of the extreme points.
+{% block lemma %}
+Any feasible point can be written as a convex combination of the extreme points.
+{% endblock %}
 
 This is essentially proven by the following diagram:
 
@@ -620,8 +628,9 @@ But in linear programming, we cannot take on discrete values; instead, we can on
 
 Still, we will see that relaxing $x_e$ to be in $[0, 1]$ still gives us an optimal solution $x^\*$ for which $x_e^\* \in \set{0, 1} \forall e \in E$.
 
-> claim ""
-> For bipartite graphs, any extreme point solution to the LP is integral.
+{% block claim %}
+For bipartite graphs, any extreme point solution to the LP is integral.
+{% endblock %}
 
 Integral means that it is an integer; coupled with the constraint that $0 \le x_e \le 1$, being integral implies $x_e \in \set{0, 1}$.
 
@@ -722,8 +731,9 @@ x_v = \begin{cases}
 \end{cases}
 $$
 
-> claim ""
-> For bipartite graphs, any extreme point to the vertex cover LP is integral.
+{% block claim %}
+For bipartite graphs, any extreme point to the vertex cover LP is integral.
+{% endblock %}
 
 We'll prove this by contradiction. Let $x^\*$ be an extreme point, and $V_f = \set{v : 0 < x_v^\* < 1}$ be the vertices with fractional values in $x^\*$. Suppose toward contradiction that $V_f \ne \emptyset$. 
 
@@ -841,13 +851,14 @@ Note that the dual of the dual is the primal, so we can convert problems both wa
 ### Weak duality
 Weak duality tells us that every dual-feasible solution is a lower bound of primal-feasible solutions.
 
-> theorem "Weak duality"
-> If $x$ is a feasible solution to the primal problem and $y$ is feasible to the dual, then:
-> 
-> $$
-> \sum_{i=1}^n c_i x_i \ge
-> \sum_{j=1}^m b_j y_j
-> $$
+{% block theorem "Weak duality" %}
+If $x$ is a feasible solution to the primal problem and $y$ is feasible to the dual, then:
+
+$$
+\sum_{i=1}^n c_i x_i \ge
+\sum_{j=1}^m b_j y_j
+$$
+{% endblock %}
 
 We can prove this by rewriting the right-hand side:
 
@@ -867,12 +878,13 @@ This leads us to the conclusion that the optimal solution of the primal is lower
 ### Strong duality
 Strong duality tells us that the dual solutions aren't just a lower bound, but that the optimal solutions to the dual and the primal are equal.
 
-> theorem "Strong Duality"
-> If $x$ is an optimal primal solution and $y$ is an optimal dual solution, then:
-> 
-> $$
-> \sum_{i=1}^n c_i x_i = \sum_{j=1}^m b_j y_j
-> $$
+{% block theorem "Strong Duality" %}
+If $x$ is an optimal primal solution and $y$ is an optimal dual solution, then:
+
+$$
+\sum_{i=1}^n c_i x_i = \sum_{j=1}^m b_j y_j
+$$
+{% endblock %}
 
 Furthermore, if the primal problem is unbounded, then the dual problem is infeasible, and vice versa: if the dual is unbounded, the primal is infeasible.
 
@@ -912,30 +924,32 @@ Kőnig's theorem describes an equivalence between the maximum matching and the v
 
 [^hungarian-algorithm-name]: The Hungarian algorithm bears its name in honor of [Kőnig](https://en.wikipedia.org/wiki/D%C3%A9nes_K%C5%91nig) and [Egerváry](https://en.wikipedia.org/wiki/Jen%C5%91_Egerv%C3%A1ry), the two Hungarian mathematicians whose work it is based on.
 
-> theorem "Kőnig's Theorem"
-> Let $M^\*$ be a maximum cardinality matching and $C^\*$ be a minimum vertex cover of a bipartite graph. Then:
-> 
-> $$
-> \abs{M^*} = \abs{C^*}
-> $$
+{% block theorem "Kőnig's Theorem" %}
+Let $M^\*$ be a maximum cardinality matching and $C^\*$ be a minimum vertex cover of a bipartite graph. Then:
+
+$$
+\abs{M^*} = \abs{C^*}
+$$
+{% endblock %}
 
 ### Complementarity slackness
 As a consequence of strong duality, we have a strong relationship between primal and dual optimal solutions:
 
-> theorem "Complementarity Slackness"
-> Let $x\in\mathbb{R}^n$ be a feasible solution to the primal, and let $y\in\mathbb{R}^m$ be a feasible solution to the dual. Then:
-> 
-> $$
-> x, y \text{ are optimal solutions}
-> \iff
-> \begin{cases}
-> x_i > 0 \implies c_i = \sum_{j=1}^m A_{ji} y_j
-> & \forall i = 1, \dots, n \\
-> 
-> y_j > 0 \implies b_j = \sum_{i=1}^n A_{ji} x_i
-> & \forall j = 1, \dots, m \\
-> \end{cases}
-> $$
+{% block theorem "Complementarity Slackness" %}
+Let $x\in\mathbb{R}^n$ be a feasible solution to the primal, and let $y\in\mathbb{R}^m$ be a feasible solution to the dual. Then:
+
+$$
+x, y \text{ are optimal solutions}
+\iff
+\begin{cases}
+x_i > 0 \implies c_i = \sum_{j=1}^m A_{ji} y_j
+& \forall i = 1, \dots, n \\
+
+y_j > 0 \implies b_j = \sum_{i=1}^n A_{ji} x_i
+& \forall j = 1, \dots, m \\
+\end{cases}
+$$
+{% endblock %}
 
 Note that we could equivalently write $x_i \ne 0$ instead of $x_i > 0$ because we assume to have the constraint that $x_i \ge 0$ (similarly for $y_j$).
 
@@ -1119,12 +1133,13 @@ $$
 
 In other words, we can summarize this as the following lemma:
 
-> lemma "Min-cost perfect matching and dual solution"
-> A perfect matching $M$ is of minimum cost **if and only if** there is a feasible dual solution $u, v$ such that:
-> 
-> $$
-> u_a + v_b = c(e) \qquad \forall e = (a, b) \in M
-> $$
+{% block lemma "Min-cost perfect matching and dual solution" %}
+A perfect matching $M$ is of minimum cost **if and only if** there is a feasible dual solution $u, v$ such that:
+
+$$
+u_a + v_b = c(e) \qquad \forall e = (a, b) \in M
+$$
+{% endblock %}
 
 In other words, if we can find a vertex weight assignment such that every edge has the same weight as the sum of its vertex weights, we've found a min-cost perfect matching. This is an interesting insight that will lead us to the Hungarian algorithm.
 
@@ -1198,8 +1213,9 @@ graph G {
 
 Then, we try to find a perfect matching in this graph using the [augmenting path algorithm](#algorithm-1), for instance. However, this graph has no perfect matching (node $E$ is disconnected, $A$ and $B$ are both only connected to $D$). Still, we can use this fact to improve the dual solution $(u, v)$, using Hall's theorem:
 
-> theorem "Hall's theorem"
-> An $n$ by $n$ bypartite graph $G = (A \cup B, E')$ has a perfect matching **if and only if** $\abs{S} \le \abs{N(S)}$ for all $S \subseteq A$
+{% block theorem "Hall's theorem" %}
+An $n$ by $n$ bypartite graph $G = (A \cup B, E')$ has a perfect matching **if and only if** $\abs{S} \le \abs{N(S)}$ for all $S \subseteq A$
+{% endblock %}
 
 Here, $N(S)$ is the *neighborhood* of $S$. In the example above, we have no perfect matching, and we have $S = \set{A, B}$ and $N(S) = \set{D}$.
 
@@ -1382,12 +1398,13 @@ This is still a feasible solution, because for any edge $(u, v)$, we have $x_u^\
 
 We'll now talk about the value of $\alpha$.
 
-> claim ""
-> The weight of $C$ is at most twice the value of the optimal solution of vertex cover.
-> 
-> $$
-> w(C) \le 2\text{VC}_{\text{OPT}}
-> $$
+{% block claim %}
+The weight of $C$ is at most twice the value of the optimal solution of vertex cover.
+
+$$
+w(C) \le 2\text{VC}_{\text{OPT}}
+$$
+{% endblock %}
 
 We prove the claim as follows:
 
@@ -1441,10 +1458,11 @@ $$
 This allows us to give some guarantees on bounds: for instance, suppose $g=2$ and our LP found $\text{OPT}\_{\text{LP}} = 70$. Since the problem instance might have been the one maximizing the integrality, all we can guarantee is that $\text{OPT}(I) \le 2\cdot \text{OPT}\_{\text{LP}}(I) = 140$. In this case, we cannot make an approximation algorithm that approximates better than within a factor $g = 2$.
 
 #### Integrality gap of Vertex Cover
-> claim "Vertex cover integrality gap"
-> Let $g$ be the integrality gap for the Vertex Cover problem on a graph of $n$ vertices.
-> 
-> $$g \ge 2 - \frac{2}{n}$$
+{% block claim "Vertex cover integrality gap" %}
+Let $g$ be the integrality gap for the Vertex Cover problem on a graph of $n$ vertices.
+
+$$g \ge 2 - \frac{2}{n}$$
+{% endblock %}
 
 On a *complete* graph with $n$ vertices, we have $\text{OPT} = n - 1$ because if there are two vertices we don't choose, the edge between them isn't covered. 
 
@@ -1517,14 +1535,15 @@ The algorithm gives each set $d$ chances to be picked. This randomness introduce
 
 As we'll see in the two following claims, we can bound both of them.
 
-> claim "Expected cost in one execution"
-> The expected cost of all sets added in one execution of Step 3 is:
-> 
-> $$
-> \expect{c(C)} 
-> = \sum_{i=1}^m x_i^* \cdot c(S_i) 
-> = \text{LP}_{\text{OPT}}
-> $$
+{% block claim "Expected cost in one execution" %}
+The expected cost of all sets added in one execution of Step 3 is:
+
+$$
+\expect{c(C)} 
+= \sum_{i=1}^m x_i^* \cdot c(S_i) 
+= \text{LP}_{\text{OPT}}
+$$
+{% endblock %}
 
 For each set $S_i \in \mathcal{T}$, we let $Y_{S_i}$ be a random indicator variable telling us whether $S_i$ was picked to be in $C$:
 
@@ -1556,22 +1575,24 @@ $$
 
 From this, we can immediately derive the following corollary: 
 
-> corollary "Expected cost in d execution"
-> The expected cost of $C$ after $d$ executions of Step 3 is at most:
-> 
-> $$
-> \expect{c(C)}
-> =   d \cdot \sum_{i=1}^m c(S_i)x_i^*
-> \le d \cdot \text{LP}_{\text{OPT}}
-> \le d \cdot \text{OPT}
-> $$
+{% block corollary "Expected cost in d execution" %}
+The expected cost of $C$ after $d$ executions of Step 3 is at most:
+
+$$
+\expect{c(C)}
+=   d \cdot \sum_{i=1}^m c(S_i)x_i^*
+\le d \cdot \text{LP}_{\text{OPT}}
+\le d \cdot \text{OPT}
+$$
+{% endblock %}
 
 Note that $\text{LP}_{\text{OPT}} \le \text{OPT}$ because LP is a relaxation of the ILP, so its optimum can only be better (i.e. lower for minimization problems like this one). This gives us some probabilistic bound on the first "bad event" of the cost being high.
 
 We also need to look into the other "bad event" of the solution not being feasible:
 
-> claim "Probability of unsatisfied constraint"
-> The probability that a constraint is unsatisfied after a single execution is at most $\frac{1}{e}$.
+{% block claim "Probability of unsatisfied constraint" %}
+The probability that a constraint is unsatisfied after a single execution is at most $\frac{1}{e}$.
+{% endblock %}
 
 A constraint is unsatisfied if $\exists e \in \mathcal{U} : e$ is not covered by $C$. Suppose that the unsatisfied constraint contains $k$ variables:
 
@@ -1606,10 +1627,11 @@ To get a better bound, we could have our algorithm pick set $S_i$ with probabili
 
 Another technique to "boost" the probability of having a feasible solution is to run the loop $d$ times instead of once. In the following, we'll pick $d = c\cdot\ln(n)$ because it will enable us to get nice closed forms. But these proofs could be done for any other formulation of $d$.
 
-> claim "Probability of feasible solution"
-> The output $C$ after $d=c\cdot\ln(n)$ executions is a feasible solution with probability at least:
-> 
->  $$\prob{C \text{ feasible}} \ge 1 - \frac{1}{n^{c-1}}$$
+{% block claim "Probability of feasible solution" %}
+The output $C$ after $d=c\cdot\ln(n)$ executions is a feasible solution with probability at least:
+
+$$\prob{C \text{ feasible}} \ge 1 - \frac{1}{n^{c-1}}$$
+{% endblock %}
 
 The probability that a given constraint $i$ is unsatisfied after $d$ executions of step 3 is at most:
 
@@ -1637,8 +1659,9 @@ $$
 
 At this point, we have an idea of the probabilities of the two "bad events": we have an expected value of the cost, and a bound of the probability of the solution not being feasible. Still, there might be a bad correlation between the two: maybe the feasible outputs have very high cost? Maybe all infeasible solutions have low cost? The following claim deals with that worry.
 
-> claim "Probability of both good events"
-> The algorithm outputs a feasible solution of cost at most $4d\text{OPT}$ with probability greater that $\frac{1}{2}$.
+{% block claim "Probability of both good events" %}
+The algorithm outputs a feasible solution of cost at most $4d\text{OPT}$ with probability greater that $\frac{1}{2}$.
+{% endblock %}
 
 Let $\mu$ be the expected cost, which by the corollary is $d\cdot\text{OPT}$. We can upper-bound the "bad event" of the cost being very bad: by [Markov's inequality](#theorem:markov-s-inequality) we have $\prob{\text{cost} > 4\mu} \le \frac{1}{4}$. We chose a factor $4$ here because this will give us a nice bound later on; we could pick any number to obtain another bound. We can also upper-bound the "bad event" of the solution being infeasible, which we know (thanks to [the previous claim](#claim:probability-of-feasible-solution)) to be upper-bounded by $\frac{1}{n^{c-1}} \le \frac{1}{n}$ for $d = c\cdot\ln(n)$ iterations. By [union bound](https://en.wikipedia.org/wiki/Boole%27s_inequality), the probability that no bad event happens is at least $1 - \frac{1}{4} - \frac{1}{n}$. Supposing $n > 4$, this probability is indeed greater than $\frac{1}{2}$. $\qed$
 
@@ -1682,12 +1705,13 @@ We begin by assigning a weight $w_i^{(1)}$ to each expert $i$, initialized at 1.
 
 We chose to update the experts' weights by a factor $\frac{1}{2}$, which leads us to some fast learning (maybe too fast!). 
 
-> theorem "16.1"
-> For any sequence of outcomes, any duration $T$ and any expert $i$:
-> 
-> $$
-> \text{# of WM mistakes} \le 2.41 \cdot (\text{# of }i\text{'s mistakes}) + \log_2(n)
-> $$
+{% block theorem "16.1" %}
+For any sequence of outcomes, any duration $T$ and any expert $i$:
+
+$$
+\text{# of WM mistakes} \le 2.41 \cdot (\text{# of }i\text{'s mistakes}) + \log_2(n)
+$$
+{% endblock %}
 
 The $2.41$ seems very arbitrary, but we'll show where it comes from.
 
@@ -1801,15 +1825,16 @@ This means that the weights increase when it was profitable to follow the expert
 
 An alternative strategy is the Multiplicative Weights Update (MWU) strategy, which uses $w_i^{(t+1)} = w_i^{(t)} \cdot (1 - \epsilon \cdot m_i^{(t)})$. This is just as good, as it leads us to the same guarantee:
 
-> theorem ""
-> Suppose $\epsilon \le 1$, and $\vec{p}^{(t)}$ is chosen by Hedge for $t \in [T]$. Then for any expert $i$:
-> 
-> $$
-> \expect{\text{final loss}} 
-> = \sum_{t=1}^T \vec{p}^{(t)} \cdot \vec{m}^{(t)}
-> \le
-> \sum_{t=1}^T m_i^{(t)} + \frac{\ln(n)}{\epsilon} + \epsilon T
-> $$
+{% block theorem %}
+Suppose $\epsilon \le 1$, and $\vec{p}^{(t)}$ is chosen by Hedge for $t \in [T]$. Then for any expert $i$:
+
+$$
+\expect{\text{final loss}} 
+= \sum_{t=1}^T \vec{p}^{(t)} \cdot \vec{m}^{(t)}
+\le
+\sum_{t=1}^T m_i^{(t)} + \frac{\ln(n)}{\epsilon} + \epsilon T
+$$
+{% endblock %}
 
 Note that this inequality holds for any expert $i$, and in particular, for the best expert. Let's take a look at the terms in this inequality:
 
@@ -1934,41 +1959,43 @@ We get to the final result by dividing by $\epsilon$ and rearranging the terms. 
 
 From this, we can infer a corollary that will be useful for solving covering LPs. For these problems, it's useful to consider the *average cost* incurred per day. We will also generalize the cost vector so that it can take values in $[-\rho, \rho]^n$ instead of just $[-1, 1]^n$. This $\rho$ is called the **width**.
 
-> corollary "Long-term average regret"
-> Suppose $\epsilon \le 1$. For $t \in [T]$, let $\vec{p}^{(t)}$ be picked by Hedge, and assume the cost vectors are $\vec{m}^{(t)} \in [-\rho, \rho]^n$.
-> 
-> If $T \ge (4\rho^2 \ln n) / \epsilon^2$, then for any expert $i$:
-> 
-> $$
-> \frac{1}{T}\sum_{t=1}^T \vec{p}^{(t)}\cdot\vec{m}^{(t)}
-> \le
-> \frac{1}{T} \sum_{t=1}^T m_i^{(t)} + 2\epsilon
-> $$
+{% block corollary "Long-term average regret" %}
+Suppose $\epsilon \le 1$. For $t \in [T]$, let $\vec{p}^{(t)}$ be picked by Hedge, and assume the cost vectors are $\vec{m}^{(t)} \in [-\rho, \rho]^n$.
+
+If $T \ge (4\rho^2 \ln n) / \epsilon^2$, then for any expert $i$:
+
+$$
+\frac{1}{T}\sum_{t=1}^T \vec{p}^{(t)}\cdot\vec{m}^{(t)}
+\le
+\frac{1}{T} \sum_{t=1}^T m_i^{(t)} + 2\epsilon
+$$
+{% endblock %}
 
 This tells us that the average daily performance is as good as the best expert's average daily performance, within some linear term $2\epsilon$. The "average regret" is the difference between the algorithm's and the expert's average daily performances.
 
 ### Covering LPs
 Covering LPs are defined as follows:
 
-> definition ""
-> A linear program of the form:
-> 
-> $$
-> \begin{align}
-> \textbf{minimize: }   & \sum_{j=1}^n c_j x_j   & \\
-> \textbf{subject to: } 
->     & A x \ge b \\
->     & 0 \le x_j \le 1 & \forall j \\
-> \end{align}
-> $$
-> 
-> is a **covering** LP if all coefficients of the constraints and objective function are non-negative:
-> 
-> $$
-> A \in \mathbb{R}_+^{m\times n}, \;
-> b \in \mathbb{R}_+^m \text{ and }
-> c \in \mathbb{R}_+^n
-> $$
+{% block definition %}
+A linear program of the form:
+
+$$
+\begin{align}
+\textbf{minimize: }   & \sum_{j=1}^n c_j x_j   & \\
+\textbf{subject to: } 
+    & A x \ge b \\
+    & 0 \le x_j \le 1 & \forall j \\
+\end{align}
+$$
+
+is a **covering** LP if all coefficients of the constraints and objective function are non-negative:
+
+$$
+A \in \mathbb{R}_+^{m\times n}, \;
+b \in \mathbb{R}_+^m \text{ and }
+c \in \mathbb{R}_+^n
+$$
+{% endblock %}
 
 Note that covering LPs require the variables to be in $[0, 1]$ (whereas the more general form of LPs simply requires $x \ge 0$). Vertex cover and set cover, for instance, satisfy this requirement. 
 
@@ -2242,8 +2269,9 @@ Let $(S^\*, \bar{S^\*})$ be the optimal minimum cut of $G$, of size $k$. We'll w
 
 First, let's take a look at the probability that a single edge is in the optimal min-cut. This corresponds to the probability of the algorithm chose "the wrong edge" when picking uniformly at random: if it contracts an edge that should have been in $E(S^\*, \bar{S^\*})$, then it will not output the optimal solution.
 
-> claim "Probability of picking an edge in the cut"
-> The probability that a uniformly random edge is in $E(S^\*, \bar{S^\*})$ is at most $2/n$
+{% block claim "Probability of picking an edge in the cut" %}
+The probability that a uniformly random edge is in $E(S^\*, \bar{S^\*})$ is at most $2/n$
+{% endblock %}
 
 Consider the first contraction of the algorithm (this is without loss of generality). Let $e$ be a uniformly random edge in $G$:
 
@@ -2283,15 +2311,17 @@ $$
 
 In the following, we'll need to use the following property of the algorithm:
 
-> claim "Min-cut size does not decrease"
-> For any graph $G$, when we contract an edge $e$, the size of the minimum cut does not decrease.
+{% block claim "Min-cut size does not decrease" %}
+For any graph $G$, when we contract an edge $e$, the size of the minimum cut does not decrease.
+{% endblock %}
 
 We won't prove this, but it seems intuitive. If $G'$ is a version of $G$ where $e$ has been contracted, then $\text{MINCUT}(G) \le \text{MINCUT}(G')$.
 
 Now, let's try to analyze the probability that the full algorithm returns the correct solution:
 
-> theorem "Karger probability of success"
-> For any graph $G = (V, E)$ with $n$ nodes and a min-cut $(S^\*, \bar{S^\*})$, Karger's algorithm returns $(S^\*, \bar{S^\*})$ with probability at least $\frac{2}{n(n-1)} = 1 / {n \choose 2}$
+{% block theorem "Karger probability of success" %}
+For any graph $G = (V, E)$ with $n$ nodes and a min-cut $(S^\*, \bar{S^\*})$, Karger's algorithm returns $(S^\*, \bar{S^\*})$ with probability at least $\frac{2}{n(n-1)} = 1 / {n \choose 2}$
+{% endblock %}
 
 Let $A_i$ be the probability that the edge picked in step $i$ of the loop is not in $\mincutedges$. The algorithm succeeds in finding the min-cut $\mincut$ if $A_1, A_2, \dots, A_{n-2}$ all occur. By the chain rule, the probability of this is:
 
@@ -2340,8 +2370,9 @@ Finally, $(4)$ uses the definition of the binomial coefficient. $\qed$
 
 This leads us to the following corollary:
 
-> corollary "Maximum number of min-cuts"
-> Any graph has at most $n \choose 2$ min-cuts.
+{% block corollary "Maximum number of min-cuts" %}
+Any graph has at most $n \choose 2$ min-cuts.
+{% endblock %}
 
 The proof for this is short and sweet: suppose that there is a graph $G$ that has more than $n \choose 2$ min-cuts. Then, for one of those cuts, the algorithm would find that exact cut with probability less that $1 / {n \choose 2}$, which is a contradiction. $\qed$
 
@@ -2390,8 +2421,9 @@ $$
 
 Using the [master theorem](/algorithms/#master-theorem) to solve this recursion, we find that the algorithm runs in $\bigO{n^2 \log n}$.
 
-> theorem "Karger-Stein probability of success"
-> The Karger-Stein algorithm finds a min-cut with probability at least $\frac{1}{2\log_2 n}$.
+{% block theorem "Karger-Stein probability of success" %}
+The Karger-Stein algorithm finds a min-cut with probability at least $\frac{1}{2\log_2 n}$.
+{% endblock %}
 
 Suppose we have a graph $H$, which is a version of $G$ on which some contractions have been made. Suppose it has $r$ vertices, and let $(S^\*, \bar{S^\*})$ be a min-cut of $H$. Just as in [the proof of success probability of Karger](#theorem:theorem:karger-probability-of-success), the probability of not picking an edge in $(S^\*, \bar{S^\*})$ in any of the $r - \frac{2}{\sqrt{2}}$ steps of the loop is:
 
@@ -2462,12 +2494,13 @@ For polynomials of a single variable, it's quite easy to test if it is zero. By 
 
 For the multivariate case, things aren't so simple. In fact, a multivariate polynomial may have infinitely many roots. However, not all hope is lost. The Schwartz-Zippel lemma tells us:
 
-> lemma "Schwartz-Zippel"
-> Let $p(x_1, \dots, x_n)$ be a **nonzero** polynomial of $n$ variables with degree $d$. Let $S \subseteq \mathbb{R}$ be a finite set, with at least $d$ elements in it. If we assign $x_1, \dots, x_n$ values from $S$ independently and uniformly at random, then:
-> 
-> $$
-> \prob{p(x_1, \dots, x_n) = 0} \le \frac{d}{\abs{S}} 
-> $$
+{% block lemma "Schwartz-Zippel" %}
+Let $p(x_1, \dots, x_n)$ be a **nonzero** polynomial of $n$ variables with degree $d$. Let $S \subseteq \mathbb{R}$ be a finite set, with at least $d$ elements in it. If we assign $x_1, \dots, x_n$ values from $S$ independently and uniformly at random, then:
+
+$$
+\prob{p(x_1, \dots, x_n) = 0} \le \frac{d}{\abs{S}} 
+$$
+{% endblock %}
 
 #### Proof for one dimension
 Let's start by proving this for $d = 1$. We want to know whether $p(x) = q(x)$ for all inputs $x$. As we saw above, this is equivalent to answering whether $g(x) = p(x) - q(x) = 0$. When the polynomial is one-dimensional, we can write it as follows:
@@ -2513,14 +2546,15 @@ Fix $x_1, \dots, x_{n-1}$ arbitrarily. All values in $p(x_1, \dots, x_n)$ are kn
 
 We've reduced it to the univariate case again, but this is actually not enough. An adversary could select $x_1, \dots, x_{n-1}$ such that the resulting polynomial is 0, despite $p$ being nonzero. To salvage the argument, we must prove that this adversarial scenario is rare. We'll need to make use of long division for this.
 
-> definition "Long division for polynomials"
-> Let $p(x)$ be a polynomial of degree $d$ and $d(x)$ be the polynomial with degree $k \le d$. Then we can write $p(x)$ as:
-> 
-> $$
-> p(x) = d(x) q(x) + r(x)
-> $$
-> 
-> Where the **quotient** $q(x)$ has degree at most $d-k$, the **remainder** $r(x)$ has degree at most $k - 1$. The polynomial $d(x)$ is the **divisor**.
+{% block definition "Long division for polynomials" %}
+Let $p(x)$ be a polynomial of degree $d$ and $d(x)$ be the polynomial with degree $k \le d$. Then we can write $p(x)$ as:
+
+$$
+p(x) = d(x) q(x) + r(x)
+$$
+
+Where the **quotient** $q(x)$ has degree at most $d-k$, the **remainder** $r(x)$ has degree at most $k - 1$. The polynomial $d(x)$ is the **divisor**.
+{% endblock %}
 
 Let $k$ be the largest degree of $x_n$ in all monomials in $p$. This means $p$ can be "long divided" by $x_n$ as follows:
 
@@ -2562,14 +2596,15 @@ Note that in the second step, we don't need to know $\prob{q \ne 0}$, we just up
 ### Matrix identity
 We can use Schwartz-Zippel for identity testing of matrices too; suppose we are given three $n\times n$ matrices $A, B, C$. We'd like to test whether $AB = C$. Matrix multiplication is expensive ($\bigO{n^3}$ or [slightly less](/algorithms/#strassens-algorithm-for-matrix-multiplication)). Instead, we can use the Schwartz-Zippel:
 
-> theorem "Schwartz-Zippel for matrices"
-> If $AB \ne C$ then:
-> 
-> $$
-> \mathbb{P}_{x_i \sim S}\left[
->   ABx \ne Cx
-> \right] \ge 1 - \frac{1}{\abs{S}}
-> $$
+{% block theorem "Schwartz-Zippel for matrices" %}
+If $AB \ne C$ then:
+
+$$
+\mathbb{P}_{x_i \sim S}\left[
+  ABx \ne Cx
+\right] \ge 1 - \frac{1}{\abs{S}}
+$$
+{% endblock %}
 
 Rather than infer it from Schwartz-Zippel, we'll give a direct proof of this. Let's write $AB$ and $C$ as row vectors:
 
@@ -2640,8 +2675,9 @@ $$
 
 We have a nice theorem on this adjacency matrix:
 
-> theorem "Perfect Matching and Determinant"
-> A graph $G$ has a perfect matching **if and only if** the determinant $\det(A)$ is not identical to zero.
+{% block theorem "Perfect Matching and Determinant" %}
+A graph $G$ has a perfect matching **if and only if** the determinant $\det(A)$ is not identical to zero.
+{% endblock %}
 
 Let's first prove the $\Rightarrow$ direction. Suppose $G$ has a perfect matching, i.e. a bijection $f$ mapping every $a \in A$ to a unique $b \in B$. We can see $f$ as a permutation on the set of integers $[n]$. 
 
@@ -2710,18 +2746,19 @@ One extreme is that everyone earns exactly the same amount of 6000 CHF, in which
 
 Markov's inequality tells us about this worst-case scenario. It allows us to give a bound on the average salary $X$ for the "worst possible" distribution.
 
-> theorem "Markov's inequality"
-> Let $X \ge 0$ be a random variable. Then, for all $k$:
-> 
-> $$
-> \prob{X \ge k \cdot \expect{X}} \le \frac{1}{k}
-> $$
-> 
-> Equivalently:
-> 
-> $$
-> \prob{X \ge k} \le \frac{\expect{X}}{k}
-> $$
+{% block theorem "Markov's inequality" %}
+Let $X \ge 0$ be a random variable. Then, for all $k$:
+
+$$
+\prob{X \ge k \cdot \expect{X}} \le \frac{1}{k}
+$$
+
+Equivalently:
+
+$$
+\prob{X \ge k} \le \frac{\expect{X}}{k}
+$$
+{% endblock %}
 
 In the salary example, $X$ denotes the average salary. We know that $\expect{X} = 6000$; we want to look at the probability that $X \ge 8000$, which we can write as $X \ge k\cdot\expect{X}$ for $k = \frac{4}{3}$. This confirms what we said above. The probability that the salary $X$ is at most $8000$ is at most $\frac{1}{k} = \frac{3}{4}$.
 
@@ -2751,30 +2788,30 @@ Markov's inequality is a bound we can give if we don't know much about the distr
 
 We can get a stronger bound if we know the variance of the distribution.
 
-> definition "Variance"
-> The variance of a random variable $X$ is defined as:
-> 
-> $$
-> \var{X} = \expect{(X - \expect{X})^2} = \expect{X^2} - \expect{X}^2
-> $$
+{% block definition "Variance" %}
+The variance of a random variable $X$ is defined as:
+
+$$\var{X} = \expect{(X - \expect{X})^2} = \expect{X^2} - \expect{X}^2$$
+{% endblock %}
 
 ### Chebyshev's inequality
 Using the variance of the distribution, we can give the following bound on how much the empirical average will diverge from the true mean:
 
-> theorem "Chebyshev's inequality"
-> For any random variable $X$,
-> 
-> $$
-> \prob{\abs{X - \expect{X}} > \epsilon} < \frac{\var{X}}{\epsilon^2}
-> $$
-> 
-> Equivalently:
-> 
-> $$
-> \prob{\abs{X - \expect{X}} > k\sigma} \le \frac{1}{k^2}
-> $$
-> 
-> where $\sigma = \sqrt{\var{X}}$ is the standard deviation of $X$.
+{% block theorem "Chebyshev's inequality" %}
+For any random variable $X$,
+
+$$
+\prob{\abs{X - \expect{X}} > \epsilon} < \frac{\var{X}}{\epsilon^2}
+$$
+
+Equivalently:
+
+$$
+\prob{\abs{X - \expect{X}} > k\sigma} \le \frac{1}{k^2}
+$$
+
+where $\sigma = \sqrt{\var{X}}$ is the standard deviation of $X$.
+{% endblock %}
 
 Note that we used strict inequality, but that for continuous random variables, these can be replaced with non-strict inequalities without loss of generality.
 
@@ -2816,21 +2853,21 @@ $$
 
 To use Chebyshev's inequality, we first need to calculate the variance. To do that, we will first introduce the idea of *pairwise independence*.
 
-> definition "Pairwise independence"
-> A set of random variables $X_1, X_2, \dots, X_n$ are *pairwise independent* if for all $1 \le i, j \le n$:
-> 
-> $$
-> \expect{X_i X_j} = \expect{X_i} \expect{X_j}
-> $$
+{% block definition "Pairwise independence" %}
+A set of random variables $X_1, X_2, \dots, X_n$ are *pairwise independent* if for all $1 \le i, j \le n$:
+
+$$\expect{X_i X_j} = \expect{X_i} \expect{X_j}$$
+{% endblock %}
 
 Note that full independence implies pairwise independence.
 
-> lemma "Variance of a sum"
-> For any set of pairwise independent $X_1, \dots, X_n$:
-> 
-> $$
-> \var{X_1 + \dots + X_n} = \var{X_1} + \dots + \var{X_n}
-> $$
+{% block lemma "Variance of a sum" %}
+For any set of pairwise independent $X_1, \dots, X_n$:
+
+$$
+\var{X_1 + \dots + X_n} = \var{X_1} + \dots + \var{X_n}
+$$
+{% endblock %}
 
 We can write:
 
@@ -2924,19 +2961,21 @@ This is an exponentially improved bound compared to Chebyshev's inequality. To g
 
 There are different formulations of Chernoff bounds, each tuned to different assumptions. We start with the statement for a sum of independent Bernoulli trials:
 
-> theorem "Chernoff bounds for a sum of independent Bernoulli trials"
-> Let $X = \sum_{i = 1}^n X_i$ where $X_i$ = 1 with probability $p_i$ and $X_i = 0$ with probability $1 - p_i$, and all $X_i$ are independent. Let $\mu = \expect{X} = \sum_{i=1}^n p_i$. Then:
-> 
-> 1. **Upper tail**: $\prob{X \ge (1 + \delta)\mu} \le \exp{\left(-\frac{\delta^2}{2+\delta}\mu\right)}$ for all $\delta > 0$
-> 2. **Lower tail**: $\prob{X \le (1 - \delta)\mu} \le \exp{\left(-\frac{\delta^2}{2}\mu\right)}$ for all $\delta > 0$
+{% block theorem "Chernoff bounds for a sum of independent Bernoulli trials" %}
+Let $X = \sum_{i = 1}^n X_i$ where $X_i$ = 1 with probability $p_i$ and $X_i = 0$ with probability $1 - p_i$, and all $X_i$ are independent. Let $\mu = \expect{X} = \sum_{i=1}^n p_i$. Then:
+
+1. **Upper tail**: $\prob{X \ge (1 + \delta)\mu} \le \exp{\left(-\frac{\delta^2}{2+\delta}\mu\right)}$ for all $\delta > 0$
+2. **Lower tail**: $\prob{X \le (1 - \delta)\mu} \le \exp{\left(-\frac{\delta^2}{2}\mu\right)}$ for all $\delta > 0$
+{% endblock %}
 
 Another formulation of the Chernoff bounds, called Hoeffding's inequality, applies to bounded random variables, regardless of their distribution:
 
-> theorem "Hoeffding's Inequality"
-> Let $X_1, \dots, X_n$ be independent random variables such that $a \le X_i \le b$ for all $i$ Let $X = \sum_{i=1}^n X_i$ and set $\mu = \expect{X}$. Then:
-> 
-> 1. **Upper tail**: $\prob{X \ge (1 + \delta)\mu} \le \exp{\left(-\frac{2\delta^2\mu^2}{n(b-a)^2}\right)}$ for all $\delta > 0$
-> 2. **Lower tail**: $\prob{X \ge (1 - \delta)\mu} \le \exp{\left(-\frac{-\delta^2\mu^2}{n(b-a)^2}\right)}$ for all $\delta > 0$
+{% block theorem "Hoeffding's Inequality" %}
+Let $X_1, \dots, X_n$ be independent random variables such that $a \le X_i \le b$ for all $i$ Let $X = \sum_{i=1}^n X_i$ and set $\mu = \expect{X}$. Then:
+
+1. **Upper tail**: $\prob{X \ge (1 + \delta)\mu} \le \exp{\left(-\frac{2\delta^2\mu^2}{n(b-a)^2}\right)}$ for all $\delta > 0$
+2. **Lower tail**: $\prob{X \ge (1 - \delta)\mu} \le \exp{\left(-\frac{-\delta^2\mu^2}{n(b-a)^2}\right)}$ for all $\delta > 0$
+{% endblock %}
 
 <br>
 
@@ -3073,13 +3112,14 @@ Luckily, we can save on storage by using the following observation: in the above
 ### 2-universal hash families
 Let's start by defining 2-universality:
 
-> definition "2-universal hash families (Carter Wegman 1979)"
-> A family $\mathcal{H}$ of hash functions is 2-universal if for any $x\ne y \in U$, the following inequality holds:
-> 
-> $$
-> \mathbb{P}_{h \in \mathcal{H}}\left[h(x) = h(y)\right] 
-> \le \frac{1}{N}
-> $$
+{% block definition "2-universal hash families (Carter Wegman 1979)" %}
+A family $\mathcal{H}$ of hash functions is 2-universal if for any $x\ne y \in U$, the following inequality holds:
+
+$$
+\mathbb{P}_{h \in \mathcal{H}}\left[h(x) = h(y)\right] 
+\le \frac{1}{N}
+$$
+{% endblock %}
 
 We can design 2-universal hash families in the following way. Choose a prime $p \in \set{\abs{U}, \abs{U} + 1, \dots, 2\abs{U}}$ and let:
 
@@ -3095,15 +3135,16 @@ $$
 
 This works because the integers modulo $p$ form a field when $p$ is prime, so we can define addition, multiplication and division among them. 
 
-> lemma "Lemma 2, 2-Universal Hash Families"
-> For any $x \ne y$ and $s \ne t$, the following system has exactly one solution:
-> 
-> $$
-> \begin{align}
-> ax + b = s & \mod p \\
-> ay + b = t & \mod p \\
-> \end{align}
-> $$
+{% block lemma "Lemma 2, 2-Universal Hash Families" %}
+For any $x \ne y$ and $s \ne t$, the following system has exactly one solution:
+
+$$
+\begin{align}
+ax + b = s & \mod p \\
+ay + b = t & \mod p \\
+\end{align}
+$$
+{% endblock %}
 
 Since $[p]$ constitutes a finite field, we have that $a = (x - y)^{-1}(s -t)$ and $b = s - ax$. $\qed$
 
@@ -3128,8 +3169,9 @@ This probability describes two cases, which we will comment:
 
 These observations lead us to the following lemma:
 
-> lemma "Lemma 3, 2-Universal Hash Families"
-> $\mathcal{H} = \set{h_{a, b} : a, b \in [p] \land a\ne 0}$ is universal.
+{% block lemma "Lemma 3, 2-Universal Hash Families" %}
+$\mathcal{H} = \set{h_{a, b} : a, b \in [p] \land a\ne 0}$ is universal.
+{% endblock %}
 
 To prove this, we will have to check the definition, i.e. whether the probability of two different values hashing to the same value is less than $\frac{1}{N}$. For any $x \ne y$:
 
@@ -3186,26 +3228,28 @@ Step $(2)$ is true if we assume $N \ge \abs{S}$. Step $(1)$ places a (large) upp
 ### k-wise independence
 Intuitively, a collection of events is $k$-wise independent if any subset of $k$ of them are mutually independent. We can formalize this as follows:
 
-> definition "k-wise independent hash family"
-> A family $\mathcal{H}$ of has functions is $k$-wise independent if for any $k$ distinct elements $(x_1, \dots, x_k) \in U^k$ and any numbers $(u_1, \dots, u_k)$ we have:
-> 
-> $$
-> \mathbb{P}_{h\in\mathcal{H}}\left[
->   h(x_1) = u_1 \land \dots \land h(x_k) = u_k
-> \right] = \left(
->   \frac{1}{\abs{U}}
-> \right)^k
-> $$
+{% block definition "k-wise independent hash family" %}
+A family $\mathcal{H}$ of has functions is $k$-wise independent if for any $k$ distinct elements $(x_1, \dots, x_k) \in U^k$ and any numbers $(u_1, \dots, u_k)$ we have:
+
+$$
+\mathbb{P}_{h\in\mathcal{H}}\left[
+  h(x_1) = u_1 \land \dots \land h(x_k) = u_k
+\right] = \left(
+  \frac{1}{\abs{U}}
+\right)^k
+$$
+{% endblock %}
 
 Recall [the definition we gave previously for pairwise independence](#definition:pairwise-independence). Generalizing this to $k$-wise independence, we get:
 
-> lemma "Expectation of product of k-wise independent variables"
-> For any set of $k$-wise independent $X_1, \dots, X_n$:
-> 
-> $$
-> \expect{X_{i_1} X_{i_2} \dots X_{i_k}}
-> = \expect{X_{i_1}} \expect{X_{i_2}} \dots \expect{X_{i_k}}
-> $$
+{% block lemma "Expectation of product of k-wise independent variables" %}
+For any set of $k$-wise independent $X_1, \dots, X_n$:
+
+$$
+\expect{X_{i_1} X_{i_2} \dots X_{i_k}}
+= \expect{X_{i_1}} \expect{X_{i_2}} \dots \expect{X_{i_k}}
+$$
+{% endblock %}
 
 For some prime number $p$ consider the family of functions constructed by choosing $a_0, \dots, a_{k-1}$ uniformly at random in $\set{0, 1, \dots, p-1}$, and letting the function be defined as:
 
@@ -3217,23 +3261,25 @@ This function is $k$-wise independent. We can store it with $\bigO{k \log \abs{U
 
 We can adapt the [discussion on 2-universality](#2-universal-hash-families) to pairwise independence (also called 2-wise independence).
 
-> definition "2-wise independent hash family"
-> We say that $\mathcal{H}$ is 2-wise independent if for any $x \ne y$ and any pair of $s, t \in [N]$,
-> 
-> $$
-> \mathbb{P}_{h\in\mathcal{H}}\left[h(x) = s \land h(y) = t\right]
-> = \frac{1}{N^2}
-> $$
+{% block definition "2-wise independent hash family" %}
+We say that $\mathcal{H}$ is 2-wise independent if for any $x \ne y$ and any pair of $s, t \in [N]$,
+
+$$
+\mathbb{P}_{h\in\mathcal{H}}\left[h(x) = s \land h(y) = t\right]
+= \frac{1}{N^2}
+$$
+{% endblock %}
 
 Note that 2-wise independence implies 1-wise independence.
 
-> definition "1-wise independent hash family"
-> We say that $\mathcal{H}$ is 1-wise independent if for any $x\in U$ and any pair of $s \in [N]$,
-> 
-> $$
-> \mathbb{P}_{h\in\mathcal{H}}\left[h(x) = s\right]
-> = \frac{1}{N}
-> $$
+{% block definition "1-wise independent hash family" %}
+We say that $\mathcal{H}$ is 1-wise independent if for any $x\in U$ and any pair of $s \in [N]$,
+
+$$
+\mathbb{P}_{h\in\mathcal{H}}\left[h(x) = s\right]
+= \frac{1}{N}
+$$
+{% endblock %}
 
 ### Load balancing
 Let's discuss how large the linked lists can get. For simplicity, we'll consider a situation in which we hash $n$ keys into a hash table of size $n$. We also assume that the funciton is completely random, rather than just 2-universal as above.
@@ -3318,17 +3364,15 @@ To analyze the quality of the solutions, we'll proceed in two steps: first an up
 
 Let $\hat{f}_j$ denote the answer output by the algorithm, and $f_j$ be the true answer.
 
-> claim "Misra-Gries upper bound"
-> $$
-> \hat{f}_j \le f_j
-> $$
+{% block claim "Misra-Gries upper bound" %}
+$$\hat{f}_j \le f_j$$
+{% endblock %}
 
 We only increase the counter for $j$ when we have seen $j$. $\qed$
 
-> claim "Misra-Gries lower bound"
-> $$
-> f_j - \frac{m}{k} \le \hat{f}_j
-> $$
+{% block claim "Misra-Gries lower bound" %}
+$$f_j - \frac{m}{k} \le \hat{f}_j$$
+{% endblock %}
 
 We need to look into how often we decrement the counters. To simplify the argumentation, we allow ourselves a small re-interpretation, but everything stays exactly equivalent. We'll consider that whenever `A[j]` is decremented, we also decrement $k - 1$ other counters, for a total of $k$ decrements at a time.
 
@@ -3336,12 +3380,13 @@ Since the stream consists of $m$ elements, there can be at most $m/k$ decrements
 
 We can summarize these two claims in a theorem about Misra-Gries:
 
-> theorem "Misra-Gries"
-> The Misra-Gries algorithm with parameter $k$ uses one pass and $\bigO{k(\log m + \log n)}$ bits of memory. For any token $j$, it provides an estimate $\hat{f}_j$ satisfying:
-> 
-> $$
-> f_j - \frac{m}{k} \le \hat{f}_j \le f_j
-> $$
+{% block theorem "Misra-Gries" %}
+The Misra-Gries algorithm with parameter $k$ uses one pass and $\bigO{k(\log m + \log n)}$ bits of memory. For any token $j$, it provides an estimate $\hat{f}_j$ satisfying:
+
+$$
+f_j - \frac{m}{k} \le \hat{f}_j \le f_j
+$$
+{% endblock %}
 
 We can use the Misra-Gries algorithm to solve the **Frequent** problem with one additional pass. If some token $j$ has $f_j > \frac{m}{k}$ then its counter `A[j]` will be $> 0$ at the end of the algorithm. Thus we can make a second pass over the input stream counting the exact frequencies of all elements $j \in \text{keys}(A)$ and output the set of desired elements.
 
@@ -3363,8 +3408,9 @@ That is, with probability $1 - \delta$ we have a 3-approximate solution. The amo
 #### Ingredients
 We need a [pairwise independent hash family](#k-wise-independence) $\mathcal{H}$. The following fact will be useful:
 
-> lemma "Lemma 2: Pairwise independent hash family"
-> There exists a pairwise independent hash family so that $h$ can be sampled by picking $\bigO{\log n}$ random bits. Moreover, $h(x)$ can be calculated in space $\bigO{\log n}$.
+{% block lemma "Lemma 2: Pairwise independent hash family" %}
+There exists a pairwise independent hash family so that $h$ can be sampled by picking $\bigO{\log n}$ random bits. Moreover, $h(x)$ can be calculated in space $\bigO{\log n}$.
+{% endblock %}
 
 We will also need the $\text{zeros}$ function. For an integer $p > 0$, let $\text{zeros}(p)$ denote the number of zeros that the binary representation of $p$ *ends* with (trailing `0`s). Formally:
 
@@ -3583,12 +3629,11 @@ def output():
 
 At the end of the algorithm, we have $Z = \sum_{i=1}^n f_i h(i)$.
 
-> claim "$F_2$ unbiased estimator"
-> $Z^2$ is an unbiased estimator:
-> 
-> $$
-> \expect{Z^2} = \norm{\vec{f}}_2^2
-> $$
+{% block claim "$F_2$ unbiased estimator" %}
+$Z^2$ is an unbiased estimator:
+
+$$\expect{Z^2} = \norm{\vec{f}}_2^2$$
+{% endblock %}
 
 Let's prove this. 
 
@@ -3609,10 +3654,9 @@ In step $(1)$, we simply expand the square. Step $(2)$ separates products of ide
 
 [^push-down-expectation]: 4-independence implies 2-independence. We can then use the [lemma for expectation of the product of random variables](#lemma:expectation-of-product-of-k-wise-independent-variables) to "push down" expectation.
 
-> claim "$F_2$ variance"
-> $$
-> \var{Z^2} \le 2 \norm{\vec{f}}_2^4
-> $$
+{% block claim "$F_2$ variance" %}
+$$\var{Z^2} \le 2 \norm{\vec{f}}_2^4$$
+{% endblock %}
 
 Recall that we can compute the variance using the following formula:
 
@@ -3701,14 +3745,15 @@ In this case, the algorithm is:
 
 We make the following claim about this algorithm:
 
-> claim ""
-> Let $\norm{\vec{f}}_2^2$ denote the exact correct answer. The algorithm produces outputs an answer $\tilde{Z}^2$ satisfying:
-> 
-> $$
-> \prob{\abs{\tilde{Z}^2 - \norm{\vec{f}}_2^2} \ge \epsilon \norm{\vec{f}}_2^2}
-> \le \frac{1}{3}
-> \label{eq:f2-goal}\tag{$F_2$ goal}
-> $$
+{% block claim %}
+Let $\norm{\vec{f}}_2^2$ denote the exact correct answer. The algorithm produces outputs an answer $\tilde{Z}^2$ satisfying:
+
+$$
+\prob{\abs{\tilde{Z}^2 - \norm{\vec{f}}_2^2} \ge \epsilon \norm{\vec{f}}_2^2}
+\le \frac{1}{3}
+\label{eq:f2-goal}\tag{$F_2$ goal}
+$$
+{% endblock %}
 
 By linearity of expectation, $\tilde{Z}^2$ remains an unbiased estimator as:
 
@@ -3747,22 +3792,23 @@ Intuitively, a *locality sensitive hashing function* (LSH function) is a hash fu
 
 To be more precise, if $\text{dist}(p, q) \le r$ we want to map $p$ and $q$ to the same value with high probability; if $\text{dist}(p, q) > c\cdot r$, we want $p$ and $q$ to hash to different values with high probability. More formally:
 
-> definition "Locality sensitive hashing families"
-> Let $U$ be the universe containing the points $P$. Suppose he have a family $\mathcal{H} = \set{h: U \rightarrow \mathbb{Z}}$ of functions mapping from $U$ to $\mathbb{Z}$. We say $\mathcal{H}$ is $(r, c\cdot r, p_1, p_2)$-LSH if for all $p, q \in U$:
-> 
-> $$
-> \begin{align}
-> \text{dist}(p, q) \le r 
-> & \implies \mathbb{P}_{h\sim\mathcal{H}}\left[
->   h(p) = h(q)
-> \right] \ge p_1 \\
-> 
-> \text{dist}(p, q) \ge c\cdot r 
-> & \implies \mathbb{P}_{h\sim\mathcal{H}}\left[
->   h(p) = h(q)
-> \right] \le p_2 \\
-> \end{align}
-> $$
+{% block definition "Locality sensitive hashing families" %}
+Let $U$ be the universe containing the points $P$. Suppose he have a family $\mathcal{H} = \set{h: U \rightarrow \mathbb{Z}}$ of functions mapping from $U$ to $\mathbb{Z}$. We say $\mathcal{H}$ is $(r, c\cdot r, p_1, p_2)$-LSH if for all $p, q \in U$:
+
+$$
+\begin{align}
+\text{dist}(p, q) \le r 
+& \implies \mathbb{P}_{h\sim\mathcal{H}}\left[
+  h(p) = h(q)
+\right] \ge p_1 \\
+
+\text{dist}(p, q) \ge c\cdot r 
+& \implies \mathbb{P}_{h\sim\mathcal{H}}\left[
+  h(p) = h(q)
+\right] \le p_2 \\
+\end{align}
+$$
+{% endblock %}
 
 Here, the distance function could be anything, but we'll just consider it to be Euclidean distance for the sake of simplicity.
 
@@ -3839,8 +3885,9 @@ We'll assume $p_1 = p_2^\rho$ for some $\rho < 1$. We'll see that this $\rho$ pa
 ### Example: LSH for binary vectors
 Let's give an example of a LSH family for binary vectors. Consider $P \subseteq \set{0, 1}^d$, and let $\text{dist}$ be the [Manhattan distance](https://en.wikipedia.org/wiki/Taxicab_geometry) (i.e. the number of bits that are different between the two binary vectors).
 
-> claim ""
-> The family $\mathcal{H} := \set{h_i}_{i=1}^d$, where $h_i(p) = p_i$ selects the $i$<sup>th</sup> bit of $p$, is $(r, c\cdot r, e^{-r/d}, e^{-c\cdot r/d})$-LSH.
+{% block claim %}
+The family $\mathcal{H} := \set{h_i}_{i=1}^d$, where $h_i(p) = p_i$ selects the $i$<sup>th</sup> bit of $p$, is $(r, c\cdot r, e^{-r/d}, e^{-c\cdot r/d})$-LSH.
+{% endblock %}
 
 Observe that for each $p, q \in \set{0, 1}^d$:
 
@@ -3958,37 +4005,35 @@ Ignoring lower-order terms, the algorithm runs with memory $\bigO{n^{\rho + 1}}$
 
 ## Submodularity
 ### Definition
-> definition "Set function"
-> A set function $f : 2^N \rightarrow \mathbb{R}$ is a function assigning a real value to every subset $S \subseteq N$ of a ground set $N$.
+{% block definition "Set function" %}
+A set function $f : 2^N \rightarrow \mathbb{R}$ is a function assigning a real value to every subset $S \subseteq N$ of a ground set $N$.
+{% endblock %}
 
 In many cases, the value of an item may depend on whether we already have selected some other item. For instance, just buying one shoe is much less valuable than buying both. Or in the other direction, in a stamp collection, once we already have a stamp of a particular type, an additional stamp of the same type is less valuable.
 
 In this latter example, the function that assigns a (monetary) value to the stamp collection corresponds to a *submodular function*.
 
-> definition "Classic definition of submodularity"
-> A set function $f$ is submodular if, for all $A, B \subseteq N$:
-> 
-> $$
-> f(A) + f(B) \ge f(A \cup B) + f(A \cap B)
-> $$
+{% block definition "Classic definition of submodularity" %}
+A set function $f$ is submodular if, for all $A, B \subseteq N$:
+
+$$f(A) + f(B) \ge f(A \cup B) + f(A \cap B)$$
+{% endblock %}
 
 An alternative (but equivalent) definition of submodularity may make more intuitive sense, but requires the introduction of the concept of *marginal contribution*:
 
-> definition "Marginal contribution"
-> Given a set function $f$, a set $S \subseteq N$ and an element $u \in S$, the *marginal contribution* of $u$ to $S$ is defined as:
-> 
-> $$
-> f(u \mid S) := f(S \cup \set{u}) - f(S)
-> $$
+{% block definition "Marginal contribution" %}
+Given a set function $f$, a set $S \subseteq N$ and an element $u \in S$, the *marginal contribution* of $u$ to $S$ is defined as:
+
+$$f(u \mid S) := f(S \cup \set{u}) - f(S)$$
+{% endblock %}
 
 The marginal contribution measures how much value an individual element $u$ adds if added to a set $S$. This allows us to give the alternative definition of submodularity:
 
-> definition "Diminishing returns definition of submodularity"
-> A set function $f$ is submodular *if and only if* for all $A \subseteq B \subseteq N$ and each $u \in N \setminus B$ the following holds:
-> 
-> $$
-> f(u \mid A) \ge f(u \mid B)
-> $$
+{% block definition "Diminishing returns definition of submodularity" %}
+A set function $f$ is submodular *if and only if* for all $A \subseteq B \subseteq N$ and each $u \in N \setminus B$ the following holds:
+
+$$f(u \mid A) \ge f(u \mid B)$$
+{% endblock %}
 
 Intuitively, this means that a function is submodular if adding elements to a smaller set has a larger marginal contribution than if added to a larger set. Let's prove that this is equivalent to the [classic definition](#definition:classic-definition-of-submodularity).
 
@@ -4106,16 +4151,17 @@ To do that, we can start by thinking of $f : 2^N \rightarrow \mathbb{R}$ as $f :
 
 We also introduce an equivalence between $N$ and $[n]$ (we can just let the elements in $N$ be numbered).
 
-> definition "Lovász extension"
-> Let $f : \set{0, 1}^n \rightarrow \mathbb{R}$. Define $\hat{f}: [0, 1]^n \rightarrow \mathbb{R}$, the Lovász extension of $f$, as:
-> 
-> $$
-> \hat{f}(z) = \mathbb{E}_{\lambda\sim\mathcal{U}(0, 1)}\left[
->   f(\set{i : z_i \ge \lambda})
-> \right] \quad \forall z\in[0, 1]^n 
-> $$
-> 
-> where $\lambda\sim\mathcal{U}(0, 1)$ denotes a uniformly random sample on $[0, 1]$.
+{% block definition "Lovász extension" %}
+Let $f : \set{0, 1}^n \rightarrow \mathbb{R}$. Define $\hat{f}: [0, 1]^n \rightarrow \mathbb{R}$, the Lovász extension of $f$, as:
+
+$$
+\hat{f}(z) = \mathbb{E}_{\lambda\sim\mathcal{U}(0, 1)}\left[
+  f(\set{i : z_i \ge \lambda})
+\right] \quad \forall z\in[0, 1]^n 
+$$
+
+where $\lambda\sim\mathcal{U}(0, 1)$ denotes a uniformly random sample on $[0, 1]$.
+{% endblock %}
 
 In other words, given a vector $z \in [0, 1]^n$, the extension $\hat{f}$ returns the expectation of placing a threshold $\lambda$ uniformly at random in $[0, 1]$, and evaluating $f$ with the set of terms in $z$ that are $\ge \lambda$.
 
@@ -4137,16 +4183,15 @@ Note that for any $\lambda \in [z_i, z_{i+1}[$ (the probability of this event be
 
 All of this leads us to the following formulation:
 
-> definition "Lovász extension formulation"
-> Let $1 = z_0 \ge z_1 \ge z_2 \ge \dots \ge z_n \ge z_{n+1} = 0$ be the non-increasingly ordered components of $z$.
-> 
-> Let $S_i = \set{1, 2, \dots, i}$ where $\emptyset = S_0 \subseteq S_1 \subseteq \dots \subseteq S_n = [n]$. We let $S_i$ be ordered by the same permutation that ordered the $z_i$.
-> 
-> Then:
-> 
-> $$
-> \hat{f}(z) = \sum_{i=0}^n (z_i - z_{i+1})f(S_i)
-> $$
+{% block definition "Lovász extension formulation" %}
+Let $1 = z_0 \ge z_1 \ge z_2 \ge \dots \ge z_n \ge z_{n+1} = 0$ be the non-increasingly ordered components of $z$.
+
+Let $S_i = \set{1, 2, \dots, i}$ where $\emptyset = S_0 \subseteq S_1 \subseteq \dots \subseteq S_n = [n]$. We let $S_i$ be ordered by the same permutation that ordered the $z_i$.
+
+Then:
+
+$$\hat{f}(z) = \sum_{i=0}^n (z_i - z_{i+1})f(S_i)$$
+{% endblock %}
 
 This stems from the fact that the probability of $\lambda \in [z_i, z_{i+1})$ is equal to $z_i - z_{i+1}$, for any $i \in [n]\cup\set{0}$, as $\lambda$ is uniformly distributed in $[0, 1]$. Additionally, if this event happens, then $\set{j \mid z_j \ge \lambda} = S_i$. $\qed$
 
@@ -4175,12 +4220,13 @@ $$
 #### Convexity of the Lovász extension
 If the Lovász extension is convex, we have a whole host of convex optimization methods that we can apply (subgradient descent, ellipsoid, ...). Therefore, the following theorem is crucial.
 
-> theorem "Convexity of the Lovász extension"
-> Let $\hat{f}$ be the Lovász extension of $f : \set{0, 1}^n \rightarrow \mathbb{R}$. Then:
-> 
-> $$
-> \hat{f}\text{ is convex} \iff f\text{ is submodular}
-> $$
+{% block theorem "Convexity of the Lovász extension" %}
+Let $\hat{f}$ be the Lovász extension of $f : \set{0, 1}^n \rightarrow \mathbb{R}$. Then:
+
+$$
+\hat{f}\text{ is convex} \iff f\text{ is submodular}
+$$
+{% endblock %}
 
 This proof is quite long, we will only show the $\Rightarrow$ direction, that is, $f$ submodular $\implies \hat{f}$ convex. Let's start with an outline of the proof:
 
@@ -4261,22 +4307,21 @@ z^T x^*
 \end{align}
 $$
 
-> claim "Convexity proof claim 1"
-> $$
-> z^T x^* = \hat{f}(z)
-> $$
+{% block claim "Convexity proof claim 1" %}
+$$z^T x^* = \hat{f}(z)$$
+{% endblock %} 
 
 This follows from the [closed formulation of the Lovász extension](#definition:lovasz-extension-formulation) and from $(\ref{eq:convexity-step-3})$. $\qed$
 
-> claim "Convexity proof claim 2"
-> $$
-> z^T x^* = \sum_{S\subseteq N} y_S f(S)
-> $$
+{% block claim "Convexity proof claim 2" %}
+$$z^T x^* = \sum_{S\subseteq N} y_S f(S)$$
+{% endblock %}
 
 This is proven by $(\ref{eq:convexity-step-4})$. $\qed$
 
-> claim "Convexity proof claim 3"
-> $y^*$ is feasible for the dual.
+{% block claim "Convexity proof claim 3" %}
+$y^*$ is feasible for the dual.
+{% endblock %}
 
 Observe that $y^*$ has all non-negative entries because $z_i \ge z_{i+1} \ge \dots \ge z_{n+1} = 0$. Further, for any $i$:
 
@@ -4290,8 +4335,9 @@ $$
 
 The third step happens because the sum is telescoping. This exactly satisfies the dual LP, as required. $\qed$
 
-> claim "Convexity proof claim 4"
-> $x^*$ is feasible for the primal.
+{% block claim "Convexity proof claim 4" %}
+$x^*$ is feasible for the primal.
+{% endblock %}
 
 Observe that:
 
@@ -4359,18 +4405,19 @@ However, this algorithm can produce suboptimal results. For instance, if we cons
 
 Still, we can show that the greedy algorithm gives a constant factor approximation. To show this, we'll need to introduce a lemma about marginal contributions:
 
-> lemma "Sum of marginal contributions"
-> Let $f : 2^N \rightarrow \mathbb{R}$ be a submodular function, and let $S, T\subseteq N$. Then:
-> 
-> $$
-> \sum_{e \in T \setminus S} f(e \mid S) \ge f(T \cup S) - f(S)
-> $$
-> 
-> Equivalently:
-> 
-> $$
-> f(S \cup T) \le f(S) + \sum_{e \in T \setminus S} f(e \mid S)
-> $$
+{% block lemma "Sum of marginal contributions" %}
+Let $f : 2^N \rightarrow \mathbb{R}$ be a submodular function, and let $S, T\subseteq N$. Then:
+
+$$
+\sum_{e \in T \setminus S} f(e \mid S) \ge f(T \cup S) - f(S)
+$$
+
+Equivalently:
+
+$$
+f(S \cup T) \le f(S) + \sum_{e \in T \setminus S} f(e \mid S)
+$$
+{% endblock %}
 
 This tells us that the individual contributions of $T \setminus S$ to $S$ are more than the contribution of all of $T \setminus S$. In this instance, "the sum of the parts" is greater than the whole.
 
@@ -4388,12 +4435,13 @@ The inequality follows from the submodularity of $f$. $\qed$
 
 This allows us to prove the following theorem:
 
-> theorem "Approximation guarantee of greedy maximization of a submodular function"
-> Let $S$ be the set produced by the greedy algorithm for maximizing a monotone submodular function $f$ subject to a cardinality constraint $k$. Let $O$ be any set of at most $k$ elements. Then:
-> 
-> $$
-> f(S) \ge \left(1 - \frac{1}{e}\right) f(O) \approx 0.632 f(O)
-> $$
+{% block theorem "Approximation guarantee of greedy maximization of a submodular function" %}
+Let $S$ be the set produced by the greedy algorithm for maximizing a monotone submodular function $f$ subject to a cardinality constraint $k$. Let $O$ be any set of at most $k$ elements. Then:
+
+$$
+f(S) \ge \left(1 - \frac{1}{e}\right) f(O) \approx 0.632 f(O)
+$$
+{% endblock %}
 
 If this is true for any set $O$, it is also true for the optimal solution; therefore, the theorem tells us that the greedy algorithm is a $(1 - 1/e)$ approximation algorithm.
 
@@ -4495,12 +4543,11 @@ def double_greedy_submodular_maximization(N, f):
 
 Before we can prove that this algorithm is a $\frac{1}{3}$ approximation, we need some lemmas.
 
-> lemma "Sum of marginal contributions in double greedy"
-> For every $1 \le i \le n$:
-> 
-> $$
-> a_i + b_i \ge 0
-> $$
+{% block lemma "Sum of marginal contributions in double greedy" %}
+For every $1 \le i \le n$:
+
+$$a_i + b_i \ge 0$$
+{% endblock %}
 
 This should be clear for a linear function $f$ (which is a special case of a submodular function), in which $a_i + b_i = 0$. We aim to prove this for the more general case of submodular functions.
 
@@ -4552,13 +4599,14 @@ $$
 
 Note that $\text{OPT}_0 = \text{OPT}$ and that $\text{OPT}_n = X_n = Y_n$.
 
-> lemma "Decrease in $\text{OPT}_i$"
-> At each step $i$:
-> 
-> $$
-> \left[f(X_i) + f(Y_i)\right] - \left[f(X_{i-1}) + f(Y_{i-1})\right]
-> \ge f(\text{OPT}_{i-1}) - f(\text{OPT}_i)
-> $$
+{% block lemma "Decrease in $\text{OPT}_i$" %}
+At each step $i$:
+
+$$
+\left[f(X_i) + f(Y_i)\right] - \left[f(X_{i-1}) + f(Y_{i-1})\right]
+\ge f(\text{OPT}_{i-1}) - f(\text{OPT}_i)
+$$
+{% endblock %}
 
 Intuitively, this tells us that each step $i$ brings about a decrease in the value of $\text{OPT}_i$, but this decrease is always matched by an increase in the value of either $X_i$ or $Y_i$.
 
@@ -4602,8 +4650,9 @@ Let's now consider $\text{OPT}\_i$ Since $a\_i \ge b\_i$, we take $u\_i$, and th
 
 With these lemma in place, we can get to the approximation theorem for this algorithm.
 
-> theorem "Double greedy approximation"
-> The above algorithm is a $\frac{1}{3}$ approximation for unconstrained submodular maximization.
+{% block theorem "Double greedy approximation" %}
+The above algorithm is a $\frac{1}{3}$ approximation for unconstrained submodular maximization.
+{% endblock %}
 
 If we sum the inequality of [the lemma on $\text{OPT}_i$](#lemma:decrease-in-text-opt-i) over $i \in [n]$:
 
@@ -4644,25 +4693,23 @@ An easy algorithm is to rent every winter until we have paid $B$ in rent, and th
 ### Competitive ratio
 Note that the factor 2 in the above example isn't an approximation ratio, but something we call a *competitive ratio*. A competitive ratio is the performance loss we get by going to online algorithm, while an approximation ratio is what we get by going from NP to P.
 
-> definition "Competitive ratio"
-> If we have an online problem and some algorithm $\text{ALG}$ that, given an instance $I$ of the problem, gives the cost $\text{ALG}$ of the solution. Assume $\text{OPT}(I)$ is the best possible solution of instance $I$. Then:
-> 
-> $$
-> \max_{I} \frac{\text{ALG}(I)}{\text{OPT}(I)}
-> $$
-> 
-> is called the *competitive ratio* of the algorithm.
+{% block definition "Competitive ratio" %}
+If we have an online problem and some algorithm $\text{ALG}$ that, given an instance $I$ of the problem, gives the cost $\text{ALG}$ of the solution. Assume $\text{OPT}(I)$ is the best possible solution of instance $I$. Then:
+
+$$\max_{I} \frac{\text{ALG}(I)}{\text{OPT}(I)}$$
+
+is called the *competitive ratio* of the algorithm.
+{% endblock %}
 
 The competitive ratio is how far off our algorithm is from the optimal solution in the worst case. An alternative definition of competitive ratio allows for some warm-up cost:
 
-> definition "Strong competitive ratio"
-> Assume the same setting as in the [definition of competitive ratio](#definition:competitive-ratio) above. We call $r$ the *competitive ratio* if:
-> 
-> $$
-> \text{ALG}(I) \le r \cdot \text{OPT}(I) + c
-> $$
-> 
-> for all $I$ and some constant $c$ independent of the length of the sequence $I$. If $c=0$, $r$ is the *strong competitive ratio*
+{% block definition "Strong competitive ratio" %}
+Assume the same setting as in the [definition of competitive ratio](#definition:competitive-ratio) above. We call $r$ the *competitive ratio* if:
+
+$$\text{ALG}(I) \le r \cdot \text{OPT}(I) + c$$
+
+for all $I$ and some constant $c$ independent of the length of the sequence $I$. If $c=0$, $r$ is the *strong competitive ratio*
+{% endblock %}
 
 
 ### Caching
@@ -4684,8 +4731,9 @@ A few examples of deterministic caching algorithms are:
 - **LFU (Least Frequently Used)**: the page in the cache that has been used the least gets evicted
 - **LIFO (Last In First Out)**: the cache is like a stack, where we push new pages, and pop to evict
 
-> claim "Competitive ratio of LRU and FIFO"
-> LRU and FIFO have a competitive ratio of $k$ (where $k$ is the size of the cache).
+{% block claim "Competitive ratio of LRU and FIFO" %}
+LRU and FIFO have a competitive ratio of $k$ (where $k$ is the size of the cache).
+{% endblock %}
 
 We'll divide the request sequence $\sigma$ into phases as follows:
 
@@ -4708,8 +4756,9 @@ If none of the pages $p_2^i$ to $p_k^i$ have a cache miss, then $p_1^{i+1}$ must
 
 On the other hand, LRU and FIFO make at most $k$ misses per phase, so $\text{ALG}(I)$, and they are thus $k$-competitive. $\qed$
 
-> claim "Competitive ratio of LFU and LIFO"
-> LFU and LIFO have *unbounded* competitive ratio. This means that the competitive ratio isn't bounded in terms of the parameters of the problem ($k$ and $N$), but rather by the size of input. 
+{% block claim "Competitive ratio of LFU and LIFO" %}
+LFU and LIFO have *unbounded* competitive ratio. This means that the competitive ratio isn't bounded in terms of the parameters of the problem ($k$ and $N$), but rather by the size of input.
+{% endblock %}
 
 Having unbounded competitive ratios is *bad*. To prove this, we'll consider an input stream on which they perform particularly badly. Suppose we have a cache of size $k$, which originally contains pages $1$ through $k$. Suppose main memory has $N > k$ pages. 
 
@@ -4730,8 +4779,9 @@ $$
 
 In the warm-up phase, we have no cache misses because we assume the cache to already have values $1$ through $k$. Then, page $k$ is requested, which is a cache hit for the same reason. From there on out, LFU evicts $k$ to make space for $k+1$ and vice versa. This means $2m$ cache misses, while an optimal strategy would only have a single cache miss, for the first request for page $k+1$ (it would evict any other page than $k$). Making $m$ large allows us to get any competitive ratio we want. $\qed$
 
-> lemma "Best competitive ratio for caching"
-> No deterministic online algorithm for caching can achieve a better competitive ratio than $k$, where $k$ is the size of the cache.
+{% block lemma "Best competitive ratio for caching" %}
+No deterministic online algorithm for caching can achieve a better competitive ratio than $k$, where $k$ is the size of the cache.
+{% endblock %}
 
 Let $\text{ALG}$ be a deterministic online caching algorithm. Suppose the cache has size $k$ and currently holds pages $1$ to $k$. Suppose $N > k$ is the number of pages in memory.
 
@@ -4753,17 +4803,19 @@ The following randomized caching strategy is known as the marking algorithm. Sim
 
 Let's state the following about the competitive ratio of this strategy:
 
-> lemma "Competitive ratio of the marking algorithm"
-> The above strategy achieves a competitive ratio of:
-> 
-> $$
-> 2H_k = 2\left(\frac{1}{1} + \frac{1}{2} + \dots + \frac{1}{k} \right)
-> $$
+{% block lemma "Competitive ratio of the marking algorithm" %}
+The above strategy achieves a competitive ratio of:
+
+$$
+2H_k = 2\left(\frac{1}{1} + \frac{1}{2} + \dots + \frac{1}{k} \right)
+$$
+{% endblock %}
 
 The above algorithm is almost the best we can do:
 
-> lemma "Best possible competitive ratio"
-> No randomized online algorithm has a competitive ratio better than $H_k$
+{% block lemma "Best possible competitive ratio" %}
+No randomized online algorithm has a competitive ratio better than $H_k$
+{% endblock %}
 
 ### Secretary problem
 The following problem is called the secretary problem:
@@ -4817,29 +4869,31 @@ We want to maximize the above. For large enough $r$, this is at $r = \frac{n}{e}
 In spectral graph theory, we look at the eigenvectors and eigenvalues of the (normalized) adjacency matrix of a graph.
 
 ### Adjacency matrix
-> definition "Adjacency matrix"
-> The adjacency matrix $A$ of a graph $G = (V, E)$ of $n = \abs{V}$ vertices is a $\mathbb{R}^{n\times n}$ matrix defined by:
-> 
-> $$
-> A_{ij} = \begin{cases}
-> 1 & \text{if } \set{i, j} \in E \\
-> 0 & \text{otherwise} \\
-> \end{cases}
-> $$
-> 
-> for every pair $i, j \in V$
+{% block definition "Adjacency matrix" %}
+The adjacency matrix $A$ of a graph $G = (V, E)$ of $n = \abs{V}$ vertices is a $\mathbb{R}^{n\times n}$ matrix defined by:
+
+$$
+A_{ij} = \begin{cases}
+1 & \text{if } \set{i, j} \in E \\
+0 & \text{otherwise} \\
+\end{cases}
+$$
+
+for every pair $i, j \in V$
+{% endblock %}
 
 For this course, we'll assume without loss of generality that all graphs are $d$-regular (all vertices have $d$ edges, degree $d$). This will greatly simplify notation.
 
-> definition "Normalized adjacency matrix"
-> The normalized adjacency matrix $M$ of a $d$-regular graph is $\frac{1}{d}A$, where $A$ is the adjacency matrix.
-> 
-> $$
-> M_{ij} = \begin{cases}
-> \frac{1}{d} & \text{if } \set{i, j} \in E \\
-> 0 & \text{otherwise} \\
-> \end{cases}
-> $$
+{% block definition "Normalized adjacency matrix" %}
+The normalized adjacency matrix $M$ of a $d$-regular graph is $\frac{1}{d}A$, where $A$ is the adjacency matrix.
+
+$$
+M_{ij} = \begin{cases}
+\frac{1}{d} & \text{if } \set{i, j} \in E \\
+0 & \text{otherwise} \\
+\end{cases}
+$$
+{% endblock %}
 
 This matrix $M$ is also called the *random walk matrix* of the graph. To see why, consider the following graph:
 
@@ -4880,41 +4934,41 @@ $$
 More generally, $M^k p$ is the probability distribution after $k$ steps.
 
 ### Eigenvalues and eigenvectors
-> definition "Eigenvalues and eigenvectors"
-> A vector $v$ is an eigenvector of a matrix $M$, with eigenvalue $\lambda$, if:
-> 
-> $$
-> Mv = \lambda v
-> $$
+{% block definition "Eigenvalues and eigenvectors" %}
+A vector $v$ is an eigenvector of a matrix $M$, with eigenvalue $\lambda$, if:
+
+$$Mv = \lambda v$$
+{% endblock %}
 
 We'll state the following as a fact of linear algebra. We can use this because our normalized adjacency matrix $M$ is real and symmetric.
 
-> lemma "Eigenvalues"
-> If $M \in \mathbb{R}^{n \times n}$ is symmetric, then:
-> 
-> 1. $M$ has $n$ non-necessarily distinct real eigenvalues $\lambda_1 \ge \lambda_2 \ge \dots \ge \lambda_n$
-> 2. If $v_1, v_2, \dots, v_{i-1}$ are eigenvectors for $\lambda_1, \lambda_2, \dots, \lambda_{i-1}$ then $\exists v_i : Mv_i = \lambda_i$. If there are multiple vectors satisfying the above, then any such vector $v_i$ can be selected to be the eigenvector corresponding to $\lambda_i$.
+{% block lemma "Eigenvalues" %}
+If $M \in \mathbb{R}^{n \times n}$ is symmetric, then:
+
+1. $M$ has $n$ non-necessarily distinct real eigenvalues $\lambda_1 \ge \lambda_2 \ge \dots \ge \lambda_n$
+2. If $v_1, v_2, \dots, v_{i-1}$ are eigenvectors for $\lambda_1, \lambda_2, \dots, \lambda_{i-1}$ then $\exists v_i : Mv_i = \lambda_i$. If there are multiple vectors satisfying the above, then any such vector $v_i$ can be selected to be the eigenvector corresponding to $\lambda_i$.
+{% endblock %}
 
 The second point in particular means that we can always find an orthonormal basis, corresponding to the eigenvectors.
 
 ### Relating eigenvalues to graph properties
 Let's state the following observation without proof. This will be very important for the rest of this section.
 
-> lemma "Observation on product with normalized adjacency matrix"
-> Consider a vector $x \in \mathbb{R}^n$, which assigns a value $x(i)$ to each vertex $i \in V$. Let $y = Mx$, where $M$ is the normalized adjacency matrix of a graph $G=(V, E)$. Then:
-> 
-> $$
-> y(i) = \sum_{\set{i, j}\in E} \frac{x(j)}{d}
-> $$
+{% block lemma "Observation on product with normalized adjacency matrix" %}
+Consider a vector $x \in \mathbb{R}^n$, which assigns a value $x(i)$ to each vertex $i \in V$. Let $y = Mx$, where $M$ is the normalized adjacency matrix of a graph $G=(V, E)$. Then:
+
+$$y(i) = \sum_{\set{i, j}\in E} \frac{x(j)}{d}$$
+{% endblock %}
 
 That is, the value that $y$ assigns to a vertex $i$ is the average of the value assigned to the neighbors. Using this observation, we can prove the following properties:
 
-> lemma "Eigenvalues and graph properties"
-> Let $M$ be the normalized adjacency matrix of a $d$-regular graph $G$ and let $\lambda_1 \ge \lambda_2 \ge \dots \ge \lambda_n$ be its eigenvalues. Then:
-> 
-> 1. $\lambda_1 = 1$
-> 2. $\lambda_2 = 1 \iff G$ is disconnected
-> 3. $\lambda_n = -1 \iff$ one component of $G$ is bipartite
+{% block lemma "Eigenvalues and graph properties" %}
+Let $M$ be the normalized adjacency matrix of a $d$-regular graph $G$ and let $\lambda_1 \ge \lambda_2 \ge \dots \ge \lambda_n$ be its eigenvalues. Then:
+
+1. $\lambda_1 = 1$
+2. $\lambda_2 = 1 \iff G$ is disconnected
+3. $\lambda_n = -1 \iff$ one component of $G$ is bipartite
+{% endblock %}
 
 Let's prove these properties.
 
@@ -5021,19 +5075,20 @@ To fix the second point, we can do a "lazy random walk" in which we have a proba
 
 In any case, the above observations tell us that the mixing time has to do with the values $\lambda_2$ and $\lambda_n$. The following lemma tells us that the quantity $\max(\abs{\lambda_2}, \abs{\lambda_n})$ is important to mixing time:
 
-> lemma "Mixing time"
-> Let $G = (V, E)$ be a $d$-regular graph and let $1 = \lambda_1 \ge \lambda_2 \ge \dots \ge \lambda_n \ge -1$ be the eigenvalues of the normalized adjacency matrix $M$ of $G$.
-> 
-> If $\max(\abs{\lambda_2}, \abs{\lambda_n}) \le 1-\epsilon$ then no matter from which vertex $s$ we start, we will be at any vertex with probability $\approx\frac{1}{n}$ after $k=\bigO{\frac{1}{\epsilon}\log n}$ steps.
-> 
-> More precisely, if $p$ is the vector of our starting position (a one-hot vector taking value 1 only on the vertex $s$ on which we started), then:
-> 
-> $$
-> \norm{M^k p - \left(\frac{1}{n}, \dots, \frac{1}{n}\right)}_2^2
-> \le \smallO{\frac{1}{n^2}}
-> $$
-> 
-> when $k = \frac{c}{\epsilon}\log n$ for some constant $c$.
+{% block lemma "Mixing time" %}
+Let $G = (V, E)$ be a $d$-regular graph and let $1 = \lambda_1 \ge \lambda_2 \ge \dots \ge \lambda_n \ge -1$ be the eigenvalues of the normalized adjacency matrix $M$ of $G$.
+
+If $\max(\abs{\lambda_2}, \abs{\lambda_n}) \le 1-\epsilon$ then no matter from which vertex $s$ we start, we will be at any vertex with probability $\approx\frac{1}{n}$ after $k=\bigO{\frac{1}{\epsilon}\log n}$ steps.
+
+More precisely, if $p$ is the vector of our starting position (a one-hot vector taking value 1 only on the vertex $s$ on which we started), then:
+
+$$
+\norm{M^k p - \left(\frac{1}{n}, \dots, \frac{1}{n}\right)}_2^2
+\le \smallO{\frac{1}{n^2}}
+$$
+
+when $k = \frac{c}{\epsilon}\log n$ for some constant $c$.
+{% endblock %}
 
 This lemma tells us that after $k = \frac{c}{\epsilon}\log n$ steps, we'll be within a distance $\frac{1}{n^2}$ from a truly uniform distribution. The parameter $\epsilon$ is controlled by $\lambda_2$ and $\lambda_n$, so the number of steps to do will depend on the graph structure, as anticipated.
 
@@ -5078,18 +5133,15 @@ $$
 With $c > 2$, we get the result we wanted. $\qed$
 
 ### Conductance
-> definition "Conductance"
-> Let $G = (V, E)$ be a $d$-regular graph with $n = \abs{V}$ vertices. We define the conductance $h(S)$ of a cut $S \subseteq V$:
-> 
-> $$
-> h(S) = \frac{\abs{\delta(S)}}{d\cdot\min\set{\abs{S}, \abs{S\setminus V}}}
-> $$
-> 
-> where $\delta(S)$ denotes the set of edges crossing the cut. We also define the conductance of the graph $G$:
-> 
-> $$
-> h(G) = \min_{S\subset V : S \ne \emptyset} h(S)
-> $$
+{% block definition "Conductance" %}
+Let $G = (V, E)$ be a $d$-regular graph with $n = \abs{V}$ vertices. We define the conductance $h(S)$ of a cut $S \subseteq V$:
+
+$$h(S) = \frac{\abs{\delta(S)}}{d\cdot\min\set{\abs{S}, \abs{S\setminus V}}}$$
+
+where $\delta(S)$ denotes the set of edges crossing the cut. We also define the conductance of the graph $G$:
+
+$$h(G) = \min_{S\subset V : S \ne \emptyset} h(S)$$
+{% endblock %}
 
 In other words, the conductance of a cut is the number of edges crossing the cut, divided by the number of edges that *could* cross the cut (if the smaller component's vertices all used their $d$ edges to cross the cut, and not internally).
 
@@ -5098,17 +5150,15 @@ The conductance of the graph is that of the cut with the smallest conductance.
 ### Cheeger's inequalities
 Note that a disconnected graph has conductance 0, and that a fully connected graph has conductance 1. Indeed, the conductance is closely related to $\lambda_2$. Cheeger's inequalities give us a quantified version of the fact that $\lambda_2 = 1 \iff G$ is disconnected:
 
-> theorem "Cheeger's inequalities"
-> $$
-> \frac{1 - \lambda_2}{2} \le h(G) \le \sqrt{2(1 - \lambda_2)}
-> $$
+{% block theorem "Cheeger's inequalities" %}
+$$\frac{1 - \lambda_2}{2} \le h(G) \le \sqrt{2(1 - \lambda_2)}$$
+{% endblock %}
 
 We'll only prove the lower bound. The lecture notes contain a very long and tedious proof of the upper bound. For the lower bound, it'll be useful to introduce an alternative way to define eigenvalues of $M$, namely as an optimization problem on the Rayleigh coefficient $\frac{x^T M x}{x^Tx}$.
 
-> lemma "$\lambda_1$ in Rayleigh form"
-> $$
-> \lambda_1 = \max_{x\in\mathbb{R}^n : x \ne 0} \frac{x^T M x}{x^Tx}
-> $$
+{% block lemma "$\lambda_1$ in Rayleigh form" %}
+$$\lambda_1 = \max_{x\in\mathbb{R}^n : x \ne 0} \frac{x^T M x}{x^Tx}$$
+{% endblock %}
 
 We'll prove this by upper-bounding and lower-bounding $\lambda_1$. Let's start with $\lambda_1 \le \max_{x\in\mathbb{R}^n : x \ne 0} \frac{x^T M x}{x^Tx}$:
 
@@ -5138,13 +5188,14 @@ $$
 
 The inequality follows from the "tallest person in the class" argument which we've used previously. $\qed$
 
-> lemma "$\lambda_2$ in Rayleigh form"
-> Let $v_1$ be the eigenvector corresponding to $\lambda_1$. Then:
-> 
-> $$
-> \lambda_2 
-> = \max_{x\in\mathbb{R}^n : x \perp v_1} \frac{x^T M x}{x^T x}
-> $$
+{% block lemma "$\lambda_2$ in Rayleigh form" %}
+Let $v_1$ be the eigenvector corresponding to $\lambda_1$. Then:
+
+$$
+\lambda_2 
+= \max_{x\in\mathbb{R}^n : x \perp v_1} \frac{x^T M x}{x^T x}
+$$
+{% endblock %}
 
 The proof is very similar to that of the previous lemma. We will first upper-bound $\lambda_2$. Let $v_2$ be the eigenvector associated to $\lambda_2$. We have $v_2 \perp v_1$, so:
 
@@ -5208,26 +5259,27 @@ $$
 $$
 
 
-> note ""
-> What happens if we let $x$ be a vector taking value 1 for vertices in $S$, and 0 everywhere else? 
-> 
-> **Numerator**. To determine the value of the numerator, let's look at the tree possible cases in the sum:
-> 
-> - Edges $(i, j)$ where $i, j\in S$ have $x(i) - x(j) = 1 - 1 = 0$
-> - Edges $(i, j)$ where $i, j\notin S$ have $x(i) - x(j) = 0 - 0 = 0$
-> - Edges $(i, j)$ where $i \in S$ and $j \notin S$ (or vice versa) have $(x(i) - x(j))^2 = (\pm 1)^2 = 1$
-> 
-> So in total, only edges crossing the cut count towards the total, and the numerator thus sums up to $\abs{E(S, \bar{S})}$. 
-> 
-> **Denominator**. For the denominator, $x^T x = \sum_{i\in V} x(i)^2$. Again, since the values are all 0 or 1, this sums up to $\abs{S}$. 
-> 
-> **Result**. In summary, we get:
-> 
-> $$
-> 1 - \lambda_2 = \frac{\abs{E(S, \bar{S})}}{d\cdot\abs{S}}
-> $$
-> 
-> Notice that this is the formulation of conductance. This is obviously a special case of the previous more general formulation, which we can consider as a continuous relaxation of the cut problem. That is indeed the intuition behind Cheeger's inequalities. Let's therefore generalize this result for the continuous case.
+{% block note %}
+What happens if we let $x$ be a vector taking value 1 for vertices in $S$, and 0 everywhere else? 
+
+**Numerator**. To determine the value of the numerator, let's look at the tree possible cases in the sum:
+
+- Edges $(i, j)$ where $i, j\in S$ have $x(i) - x(j) = 1 - 1 = 0$
+- Edges $(i, j)$ where $i, j\notin S$ have $x(i) - x(j) = 0 - 0 = 0$
+- Edges $(i, j)$ where $i \in S$ and $j \notin S$ (or vice versa) have $(x(i) - x(j))^2 = (\pm 1)^2 = 1$
+
+So in total, only edges crossing the cut count towards the total, and the numerator thus sums up to $\abs{E(S, \bar{S})}$. 
+
+**Denominator**. For the denominator, $x^T x = \sum_{i\in V} x(i)^2$. Again, since the values are all 0 or 1, this sums up to $\abs{S}$. 
+
+**Result**. In summary, we get:
+
+$$
+1 - \lambda_2 = \frac{\abs{E(S, \bar{S})}}{d\cdot\abs{S}}
+$$
+
+Notice that this is the formulation of conductance. This is obviously a special case of the previous more general formulation, which we can consider as a continuous relaxation of the cut problem. That is indeed the intuition behind Cheeger's inequalities. Let's therefore generalize this result for the continuous case.
+{% endblock %}
 
 We consider (w.l.o.g.) that $\abs{S} \le \abs{V}/2$ (otherwise we could swap the set we consider to be called $S$, i.e. consider $V\setminus S$). We define $y \in \mathbb{R}^n$ as follows:
 

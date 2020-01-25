@@ -4,9 +4,10 @@ description: Monads are this scary, complicated thing for many people learning S
 edited: true
 ---
 
-<div class="block note" markdown="1">
+{% block note %}
 This article assumes a little knowledge of Scala, notably of `Option`, `map` and `flatMap`. However, these concepts are also found in many other languages, so my hope is that it should also be fairly accessible to people who do not know Scala in particular.
-</div>
+{% endblock %} 
+
 
 I've been a teaching assistant at <abbr title="Swiss Federal Institute of Technology, Lausanne">EPFL</abbr> for various Scala courses for about a year and a half. In this job, I've gotten to read and grade a lot of code written by other students; I get to see what people understand well, and what's causing difficulties.
 
