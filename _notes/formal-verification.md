@@ -731,22 +731,25 @@ This means that $A$ unsatisfiable $\iff A \vdash_{\text{Infer}_D} 0$.
 For the proof, we can take the conjunction of formulas in $A$ and existentially quantify it to get $A'$ (i.e. $\exists x. A$)
 
 ### Conjunctive Normal Form (CNF)
+
+*[CNF]: Conjunctive Normal Form
+
 To define conjunctive normal form, we need to define the three levels of the formula:
 
-- <abbr title="Conjunctive Normal Form">CNF</abbr> is the conjunction of clauses
+- CNF is the conjunction of clauses
 - A clause is a disjunction of literals
 - A literal is either a variable $x$ or its negation $\neg x$
 
 This is a nice form to work with, because we have the following property: if $C$ is a clause then $\eval{C}_e = 1 \iff$ there exists a literal $x_i \in C$ such that $\eval{x_i}_e = 1$.
 
-We can represent formulas in <abbr title="Conjunctive Normal Form">CNF</abbr> as a set of sets. For instance:
+We can represent formulas in CNF as a set of sets. For instance:
 
 $$
 A = a \land b \land (\neg a \lor \neg b) 
 \equiv \set{\set{a}, \set{b}, \set{\neg a, \neg b}}
 $$
 
-The false value can be represented as the empty clause $\emptyset$. Note that seeing an empty clause in <abbr title="Conjunctive Normal Form">CNF</abbr> means that the whole formula is unsatisfiable.
+The false value can be represented as the empty clause $\emptyset$. Note that seeing an empty clause in CNF means that the whole formula is unsatisfiable.
 
 ### Clausal resolution
 {% block definition "Clausal resolution rule" %}
@@ -761,7 +764,7 @@ This rule resolves two clauses with respect to $x$. It says that if clause $C_1$
 Clausal resolution is [sound](#definition:soundness) for all clauses $C_1, C_2$ and propositional variables $x$.
 {% endblock %}
 
-This tells us that clausal resolution is a valid rule. A stronger result is that we can use clausal resolution to determine satisfiability for any <abbr title="Conjunctive Normal Form">CNF</abbr> formula:
+This tells us that clausal resolution is a valid rule. A stronger result is that we can use clausal resolution to determine satisfiability for any CNF formula:
 
 {% block theorem "Refutational completeness of the clausal resolution rule" %}
 A finite set of clauses $A$ is satisfiable $\iff$ there exists a derivation to the empty clause from $A$ using clausal resolution.
@@ -796,7 +799,7 @@ Tseytin's transformation is based on the following insight: if $F$ and $G$ are t
 
 $$(x \leftrightarrow G) \land F[G := x]$$
 
-[Tseytin's transformation](https://en.wikipedia.org/wiki/Tseytin_transformation) applies this recursively in order to transform an expression to <abbr title="Conjunctive Normal Form">CNF</abbr>. To show this, let's consider a formula using $\neg, \land, \lor, \oplus, \rightarrow, \leftrightarrow$:
+[Tseytin's transformation](https://en.wikipedia.org/wiki/Tseytin_transformation) applies this recursively in order to transform an expression to CNF. To show this, let's consider a formula using $\neg, \land, \lor, \oplus, \rightarrow, \leftrightarrow$:
 
 $$
 F = ((p \lor q) \land r) \rightarrow (\neg s)
@@ -813,7 +816,7 @@ x_4 & \leftrightarrow x_3 \rightarrow x_1 \\
 
 Note that these formulas refer to subterms by their newly introduced equivalent variable. This prevents us from having an explosion of terms in this transformation.
 
-Each of these equivalences can be converted to <abbr title="Conjunctive Normal Form">CNF</abbr> by using De Morgan's law, and switching between $\oplus$ and $\leftrightarrow$. The resulting conversions are:
+Each of these equivalences can be converted to CNF by using De Morgan's law, and switching between $\oplus$ and $\leftrightarrow$. The resulting conversions are:
 
 | Operation             | CNF                                              |
 | :-------------------- | :----------------------------------------------- |
@@ -842,10 +845,13 @@ x_4 \land
 $$
 
 ### SAT Algorithms for CNF
-Now that we know how to transform to <abbr title="Conjunctive Normal Form">CNF</abbr>, let's look into algorithms that solve SAT for <abbr title="Conjunctive Normal Form">CNF</abbr> formulas.
+Now that we know how to transform to CNF, let's look into algorithms that solve SAT for CNF formulas.
 
 #### DPLL
-The basic algorithm that we'll use is [<abbr title="Davis–Putnam–Logemann–Loveland">DPLL</abbr>](https://en.wikipedia.org/wiki/DPLL_algorithm), which applies clausal resolution recursively until an empty clause appears, or all clauses are unit clauses. This works thanks to the [theorem on refutational completeness of the clausal resolution rule](#theorem:refutational-completeness-of-the-clausal-resolution-rule).
+
+*[DPLL]: Davis–Putnam–Logemann–Loveland
+
+The basic algorithm that we'll use is [DPLL](https://en.wikipedia.org/wiki/DPLL_algorithm), which applies clausal resolution recursively until an empty clause appears, or all clauses are unit clauses. This works thanks to the [theorem on refutational completeness of the clausal resolution rule](#theorem:refutational-completeness-of-the-clausal-resolution-rule).
 
 {% highlight scala linenos %}
 def DPLL(S: Set[Clause]): Bool = {
@@ -1178,7 +1184,7 @@ Let's define $I(C)$ as the interpolant for $A \land (\neg C \mid_A)$ and $B \lan
 There are multiple ways of constructing this $I(C)$, like the Symmetric System or McMillan's System (which uses a SAT solver). There are many interpolants that exist, and it's unclear which is best. Small formulas are good, but we do not currently know any efficient algorithms to find them.
 
 ### Tseytin's transformation and interpolants
-Remember that [Tseytin's transformation](#tseytins-transformation) transforms an expression into <abbr title="Conjunctive Normal Form">CNF</abbr> by introducing fresh variables. Suppose we have converted $A$ and $B$ to $\text{cnf}(A)$ and $\text{cnf}(B)$, and that the newly introduced variables are $\vec{p_A}$ and $\vec{p_B}$, respectively. The results of the Tseytin transformations are:
+Remember that [Tseytin's transformation](#tseytins-transformation) transforms an expression into CNF by introducing fresh variables. Suppose we have converted $A$ and $B$ to $\text{cnf}(A)$ and $\text{cnf}(B)$, and that the newly introduced variables are $\vec{p_A}$ and $\vec{p_B}$, respectively. The results of the Tseytin transformations are:
 
 $$
 \emptyset \models A \leftrightarrow \exists \vec{p_A}.\ \text{cnf}(A) 

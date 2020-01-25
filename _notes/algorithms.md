@@ -1292,6 +1292,9 @@ We can extend both representations to include other attributes such as edge weig
 ### Traversing / Searching a graph
 
 #### Breadth-First Search (BFS)
+
+*[BFS]: Breadth-First Search
+
 - **Input**: Graph $G=(V, E)$, either directed or undirected and source vertex $s\in V$.
 - **Output**: $v.d = $ distance (smallest number of edges) from s to v for all vertices v.
 
@@ -1327,6 +1330,9 @@ This is $\mathcal{O}(V+E)$:
 BFS may not reach all vertices. We can save the shortest path tree by keeping track of the edge that discovered the vertex.
 
 #### Depth-first search (DFS)
+
+*[DFS]: Depth-First Search
+
 - **Input**: Graph $G = (V, E)$, either directed or undirected
 - **Output**: 2 timestamps on each vertex: discovery time `v.d` and finishing time `v.f`
 
@@ -1359,7 +1365,7 @@ This runs in $\Theta(V+E)$.
 
 ![Classification of edges: tree edge, back edge, forward edge, cross edge](/images/algorithms/edges-classification.png)
 
-In <abbr title="Depth First Search">DFS</abbr> of an undirected graph we get only tree and back edges; no forward or back-edges.
+In DFS of an undirected graph we get only tree and back edges; no forward or back-edges.
 
 ### Parenthesis theorem
 $\forall u, v$, exactly one of the following holds:
@@ -1381,7 +1387,7 @@ def topological sort(G):
     output vertices in order of decreasing finishing time
 {% endhighlight %}
 
-Same running time as <abbr title="Depth First Search">DFS</abbr>, $\Theta(V+E)$. 
+Same running time as DFS, $\Theta(V+E)$. 
 
 Topological sort can be useful for ordering dependencies, for instance. Given a dependency graph, it produces a sequential order in which to load them, so that no dependency is loaded before its prerequisite. However, this only works for acyclic dependency graphs; a sequential order cannot arise from cyclic dependencies.
 
@@ -1401,7 +1407,7 @@ When we explore *(u, v)*, what are the colors of *u* and *v*?
 <!-- Lecture 15 -->
 
 #### Lemma: When is a directed graph acyclic?
-A directed graph G is acyclic **if and only if** a <abbr title="Depth First Search">DFS</abbr> of G yields no back edges.
+A directed graph G is acyclic **if and only if** a DFS of G yields no back edges.
 
 ### Strongly connected component
 A strongly connected component (SCC) of a directed graph is a **maximal** set of vertices $C \subseteq V$ such that $\forall u, v\in C,  u \leadsto v \text{ and } v\leadsto u$.
@@ -1550,7 +1556,7 @@ $(3) \Rightarrow (1)$: Recall that $\| f\| \leq c(S, T) \forall \text{cut } (S, 
 {% enddetails %}
 
 ### Time for finding max-flow (or min-cut)
-- It takes $\mathcal{O}(E)$ time to find a a path in the residual network (using for example <abbr title="Breadth First Search">BFS</abbr>).
+- It takes $\mathcal{O}(E)$ time to find a a path in the residual network (using for example BFS).
 - Each time the flow value is increased by at least 1
 - So running time is $\mathcal{O}(E\cdot \| f_{\text{max}} \|)$, where $\| f_{\text{max}} \|$ is the value of a max flow.
 
@@ -1558,7 +1564,7 @@ If capacities are irrational then the Ford-Fulkerson might not terminate. Howeve
 
 |  Augmenting path  |        Number of iterations        |
 | :---------------- | :--------------------------------- |
-| <abbr title="Breadth First Search">BFS</abbr> Shortest path | $ \leq\frac{1}{2}E\cdot V $      |
+| BFS Shortest path | $ \leq\frac{1}{2}E\cdot V $      |
 | Fattest path      | $ \leq E\cdot \log{(E\cdot U)} $ |
 
 Where $U$ is the maximum flow value, and the fattest path is the path with largest minimum capacity (the bottleneck).
@@ -1576,7 +1582,7 @@ Every matching defines a flow of value equal to the number of edges in the match
 Works because flow conservation is equivalent to: no student is matched more than once, no job is matched more than once.
 
 ### Edmonds-Kart algorithm
-It's just like [Ford-Fulkerson](#ford-fulkerson-method), but we pick the **shortest** augmenting path (in the sense of the minimal number of edges, found with <abbr title="Depth First Search">DFS</abbr>).
+It's just like [Ford-Fulkerson](#ford-fulkerson-method), but we pick the **shortest** augmenting path (in the sense of the minimal number of edges, found with DFS).
 
 {% highlight python linenos %}
 def edmonds_kart(G):
@@ -1696,7 +1702,10 @@ def link(x, y):
             y.rank = y.rank + 1
 {% endhighlight %}
 
-## Minimum Spanning Trees
+## Minimum Spanning Trees (MST)
+
+*[MST]: Minimum Spanning Tree
+
 A spanning tree of a graph is a set of edges that is:
 
 1. Acyclic
@@ -1705,7 +1714,7 @@ A spanning tree of a graph is a set of edges that is:
 We want to find the *minimum* spanning tree of a graph, that is, a spanning tree of minimum total weights.
 
 - **Input**: an undirected graph G with weight *w(u, v)* for each edge $(u, v)\in E$.
-- **Output**: an <abbr title="Minimum Spanning Tree">MST</abbr>: a spanning tree of minimum total weights
+- **Output**: an MST: a spanning tree of minimum total weights
 
 There are 2 natural greedy algorithms for this.
 
@@ -1753,7 +1762,7 @@ When we start every node has the key `infinity` and our root has key 0, so we pi
 The total runtime is the max of the above, so $\mathcal{O}(E\log{V})$ (which can be made $\mathcal{O}(V\log{V})$ with careful queue implementation).
 
 ### Kruskal's algorithm
-Start from an empty forest *T* and greedily maintain forest *T* which will become an <abbr title="Minimum Spanning Tree">MST</abbr> at the end. At each step, add the cheapest edge that does not create a cycle.
+Start from an empty forest *T* and greedily maintain forest *T* which will become an MST at the end. At each step, add the cheapest edge that does not create a cycle.
 
 ![Kruskal's algorithm in action](/images/algorithms/kruskal.gif)
 
@@ -1865,7 +1874,7 @@ There is no negative cycle reachable from the source if and only if no distances
 ### Dijkstra's algorithm
 - This algorithm only works when all weights are nonnegative.
 - It's greedy, and faster than Bellman-Ford.
-- It's very similar to Prim's algorithm; could also be described as a weighted version of <abbr title="Breadth First Search">BFS</abbr>.
+- It's very similar to Prim's algorithm; could also be described as a weighted version of BFS.
 
 We start with a Source $S = \{ s \}$, and greedily grow *S*. At each step, we add to *S* the vertex that is closest to *S* (where distance is defined `u.d + w(u, v)`).
 

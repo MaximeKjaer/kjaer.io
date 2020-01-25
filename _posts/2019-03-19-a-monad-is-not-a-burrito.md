@@ -8,8 +8,9 @@ edited: true
 This article assumes a little knowledge of Scala, notably of `Option`, `map` and `flatMap`. However, these concepts are also found in many other languages, so my hope is that it should also be fairly accessible to people who do not know Scala in particular.
 {% endblock %} 
 
+*[EPFL]: Swiss Federal Institute of Technology, Lausanne
 
-I've been a teaching assistant at <abbr title="Swiss Federal Institute of Technology, Lausanne">EPFL</abbr> for various Scala courses for about a year and a half. In this job, I've gotten to read and grade a lot of code written by other students; I get to see what people understand well, and what's causing difficulties.
+I've been a teaching assistant at EPFL for various Scala courses for about a year and a half. In this job, I've gotten to read and grade a lot of code written by other students; I get to see what people understand well, and what's causing difficulties.
 
 The most common thing I've seen is a tendency for novice Scala programmers to use `Option`s quite awkwardly. I think the root of that problem is an incomplete understanding of what monads really are, and what they're useful for. 
 

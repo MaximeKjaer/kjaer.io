@@ -1080,13 +1080,15 @@ Keeping it between the applications and the OS is incorrect; we would ruin the s
 
 We can solve the above with the following solutions:
 
+*[PC]: Program Counter
+
 1. If an application does a syscall, it wants to perform it in its *guest OS*. But the syscalls go to the VMM, which holds syscall vectors for the physical machine. But we want to access the syscall vectors for the OS in the guest OS, so the VMM must somehow forward the syscall.
 
    Remember that hardware directs syscalls to physical syscall vectors; it puts the machine into kernel mode and jumps to the machine's syscall handler.
 
    Therefore, at boot time, the VMM installs physical machine syscall vectors. At guest OS boot time, the OS wants to install its syscall vectors through a privileged instruction. But being in user mode, it traps to the VMM, which will thus gain the information of where the OS syscall handlers are.
 
-   When the VMM's syscall handler is called, it can set the <abbr title="Program Counter">PC</abbr> to the appropriate syscall vector in the OS, and returns to user mode, in which the guest OS will run its syscall handler. Inevitably, this guest OS syscall handler will execute the "return to user mode" instruction, which traps to the VMM, that can set the PC to the instruction following the original syscall and return to user mode in the guest OS.
+   When the VMM's syscall handler is called, it can set the PC to the appropriate syscall vector in the OS, and returns to user mode, in which the guest OS will run its syscall handler. Inevitably, this guest OS syscall handler will execute the "return to user mode" instruction, which traps to the VMM, that can set the PC to the instruction following the original syscall and return to user mode in the guest OS.
 
 2. On switching back from the VMM to the VM, if the return address is in the guest OS, we allow all memory accesses within the VM. If it is outside the guest OS (i.e. to an application), we disallow access to the guest OS memory. This is all done through protections in the page table.
 

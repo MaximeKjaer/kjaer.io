@@ -36,7 +36,7 @@ We'll start with a problem called *maximum weight spanning trees*.
 - **Input**: A graph $G = (V, E)$ with edge weights $w: E \rightarrow \mathbb{R}$
 - **Output**: A spanning tree $T \subseteq E$ of maximum weight $\sum_{e\in T} w(e)$
 
-A [spanning tree](/algorithms/#minimum-spanning-trees) is a subgraph connecting all vertices of $G$ in the minimum possible number of edges. Being a tree, it is acyclic by definition.
+A [spanning tree](/algorithms/#minimum-spanning-trees-mst) is a subgraph connecting all vertices of $G$ in the minimum possible number of edges. Being a tree, it is acyclic by definition.
 
 #### Kruskal's algorithm
 We'll consider the simplest greedy algorithm: [Kruskal's algorithm](/algorithms/#kruskals-algorithm)[^minimum-and-maximum-kruskals], which greedily adds the largest weight edge if it doesn't create a cycle.
