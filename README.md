@@ -27,7 +27,6 @@ See the [Jekyll Documentation](https://jekyllrb.com/docs/posts/) for how to crea
 | `fallback-color` | Hex color code of the color (in quotes) that will be shown behind the hero image. This is especially useful if the hero image fails to load, or takes a while to do so. If we show the image's average color, the flash of the image appearing will be less harsh. I've been using [Color Thief](http://lokeshdhakar.com/projects/color-thief/) to get this average color. | `site.hero.fallback-color` |
 | `comments` | If `false`, there won't be a Disqus comment field on the post | `true` |
 | `published` | If `false`, the post won't be rendered or published | `true` |
-| `unlisted` | If `true`, the post will be published, but won't be listed in the RSS feed or on the front page | `false` |
 | `edited` | If `true`, there will be a link leading to the post's GitHub edit history at the bottom of the post | `false` |
 | `hn` | If a HN link is specified, there will be a link leading to the HN discussion at the bottom of the post | ` ` |
 
@@ -54,7 +53,6 @@ image: /images/hero/example.jpg
 fallback-color: "#0f45b7"
 description: A sample post showing how YAML Frontmatter works on this site.
 comments: false
-unlisted: true
 edited: true
 hn: https://news.ycombinator.com/item?id=12114523
 ---
