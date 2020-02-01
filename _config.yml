@@ -77,6 +77,7 @@ plugins:
   - jekyll-feed # Automatically create an RSS feed on build
   - jekyll-mathjax-csp # Server-side rendering of math with MathJax
   - jekyll-diagrams # Server-side rendering of graphs with Graphviz
+  - jekyll-block
 
 feed:
   excerpt_only: true

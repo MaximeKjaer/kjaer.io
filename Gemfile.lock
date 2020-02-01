@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/MaximeKjaer/jekyll-mathjax-csp.git
-  revision: 63fdbde8ff7d9beb55dbe34c2982a28bbc8b0489
+  revision: 54c69f5ee29f5ab485ba2813a1fbe38760f3d692
   branch: jekyll4
   specs:
     jekyll-mathjax-csp (1.1.0)
@@ -57,6 +57,8 @@ GEM
       rouge (~> 3.0)
       safe_yaml (~> 1.0)
       terminal-table (~> 1.8)
+    jekyll-block (0.0.1)
+      jekyll (>= 3.6, < 5.0)
     jekyll-diagrams (0.5.1)
       jekyll (>= 3.7, < 5.0)
     jekyll-feed (0.13.0)
@@ -109,6 +111,7 @@ PLATFORMS
 DEPENDENCIES
   html-proofer
   jekyll (~> 4.0.0)
+  jekyll-block (~> 0.0.1)
   jekyll-diagrams (~> 0.5.0)
   jekyll-feed
   jekyll-mathjax-csp (~> 1.1.0)!
