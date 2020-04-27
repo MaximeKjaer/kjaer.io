@@ -5,7 +5,7 @@
 My personal blog. Built with Jekyll.
 
 [![Screenshot of my website](https://i.imgur.com/QVTzndb.jpg "Screenshot of my website")](https://i.imgur.com/QVTzndb.jpg)
-y
+
 ## Installation
 
 The site builds with Jekyll, but also has a few NPM dependencies. To install all dependencies, you'll need Node and npm, as well as Ruby and bundler. You can then run:
@@ -65,29 +65,35 @@ This is the end of the article!
 ```
 
 ## Building the site
-### Development
-In a development environment, the following command should suffice:
 
-    jekyll serve
+### Installing dependencies
+
+```console
+$ rbenv install
+$ rbenv reshash
+$ bundle install
+$ npm install
+$ sudo apt install graphviz
+```
+
+### Development
+
+To serve the site locally with incremental builds and autorefresh, run:
+
+```console
+$ npm run serve
+```
 
 ### Production
-In production, we're not serving the site locally, we're building it. This is done through the following command:
 
-    jekyll build
+To build the site for production, run:
+
+```console
+$ npm run build
+```
 
 To prepare the site for production, a few additional steps are taken.
 
 - Autoprefixer ensures that all the CSS is compatible with the 2 last versions if every browser
 - Hero images are resized to the breakpoints defined in `_config.yml`
 - Assets are Zopfli-compressed
-
-There's a grunt task set up that handles the first two:
-
-    grunt build
-
-The last one is (for now) a simple bash command to the zopfli binary. It would be great to manage this through Grunt though.
-
-    zopfli --i1000 $files
-
-Luckily, this is all done automagically with Travis CI. You can see the scripts it runs in the [`_scripts` folder](/tree/master/_scripts).
-
