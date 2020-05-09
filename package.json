@@ -21,6 +21,7 @@
 	},
 	"scripts": {
 		"build": "bundle exec jekyll build",
+		"build:prod": "JEKYLL_ENV=production bundle exec jekyll build --config _config.yml,_config-prod.yml",
 		"serve": "bundle exec jekyll serve --incremental --livereload --open-url",
 		"optimize": "gulp optimize",
 		"test": "bundle exec rake test",
