@@ -5,24 +5,22 @@
 //
 //---------------------------
 
-.hero {
+header.hero {
 	@media print {
 		display: none;
 	}
 	
 	position: relative;
+	display: flex;
+	flex-direction: column;
 	
-	height: 560px;
-	height: 55vh; // Override for devices that support it.
-	min-height: 30em;
 	width: 100%;
 	margin: 0;
-	padding-bottom: 4em;
+	padding-bottom: 10em;
 	
 	background-position: center;
 	background-size: cover;
 	
-	text-align: center;
 	text-shadow: 0 0 5px rgba($black, 0.8);
 	color: $white;
 
@@ -30,18 +28,48 @@
 		color: $white;
 		text-decoration: none;
 	}
+
+	nav {
+		display: flex;
+		justify-content: flex-end;
+		@include media($small-screen) {
+			justify-content: space-between;
+		}
+		
+		a {
+			opacity: 1;
+			transition: opacity $transition-time;
+	
+			font-family: $title-font;
+			font-weight: $title-weight-light;
+			
+			position: relative;
+			padding: 0.5em 1em;
+			margin: 1em;
+			border: 1px solid $white;
+			
+			text-decoration: none;
+			font-size: $large;
+			
+			color: $white;
+	
+			&:hover {
+				opacity: 0.7;
+			}
+		}
+	}
 	
 	.title {
-		transform: translateY(-50%);
-
-		position: relative;
-		top: 50%;
+		display: block;
+		align-self: center;
+		padding-top: 2em;
 		
+		text-align: center;
 		font-family: $title-font;
-		display: inline-block;
 	}
 	
 	.title, h1, p {
+		width: auto;
 		margin: 0;
 	}
 	
@@ -52,37 +80,8 @@
 	p {
 		font-size: $xx-large;
 		font-weight: $title-weight;
-
 		@include media($small-screen) {
 			font-size: $x-large;
-		}
-	}
-}
-
-.top-right {
-	position: absolute;
-	top: 30px;
-	right: 10px;
-	
-	font-family: $title-font;
-	font-weight: $title-weight-light;
-	
-	a {
-		opacity: 1;
-		transition: opacity $transition-time;
-		
-		position: relative;
-		padding: 0.5em 1em;
-		margin: 1em;
-		border: 1px solid $white;
-		
-		text-decoration: none;
-		font-size: $large;
-		
-		color: $white;
-
-		&:hover {
-			opacity: 0.7;
 		}
 	}
 }
