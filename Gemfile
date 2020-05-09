@@ -1,6 +1,7 @@
 source "https://rubygems.org"
 
 gem "jekyll", "~> 4.0.0"
+gem "kramdown", "2.1.0"
 group :jekyll_plugins do
   gem "jekyll-sitemap", "~> 1.4.0"
   gem "jekyll-feed"
