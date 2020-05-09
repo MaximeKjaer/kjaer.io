@@ -1,4 +1,4 @@
-const { parallel } = require("gulp");
+const { parallel, series } = require("gulp");
 const { src, dest } = require("gulp");
 const autoprefixer = require("gulp-autoprefixer");
 const brotli = require("gulp-brotli");
@@ -39,14 +39,16 @@ function clean() {
   return del(["_site"]);
 }
 
-function styles() {
+function autoprefixCSS() {
   return modified(paths.css)
     .pipe(autoprefixer())
-    .pipe(dest(paths.css.dest))
-    .pipe(zopfli())
-    .pipe(dest(paths.css.dest))
-    .pipe(brotli.compress())
     .pipe(dest(paths.css.dest));
+}
+
+function compressCSS() {
+  const gz = src(paths.css.src).pipe(zopfli());
+  const br = src(paths.css.src).pipe(brotli.compress());
+  return merge(gz, br).pipe(dest(paths.css.dest));
 }
 
 function html() {
@@ -126,6 +128,8 @@ function replaceExt(ext) {
   return p =>
     path.join(path.dirname(p), path.basename(p, path.extname(p)) + ext);
 }
+
+const styles = series(autoprefixCSS, compressCSS);
 
 exports.clean = clean;
 exports.optimize = parallel(images, styles, html, heroImages);
