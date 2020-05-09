@@ -5,6 +5,9 @@ cache:
   directories:
     - node_modules
 
+env:
+  - JEKYLL_ENV=production
+
 addons:
   ssh_known_hosts:
     - kjaermaxi.me

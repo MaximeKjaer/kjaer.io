@@ -7,6 +7,8 @@ group :jekyll_plugins do
   gem "jekyll-mathjax-csp", "~> 1.2.0"
   gem "jekyll-diagrams", "~> 0.5.0"
   gem "jekyll-block", "~> 0.0.1"
+  gem "jekyll-zopfli"
+  gem "jekyll-brotli"
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

@@ -1,7 +1,6 @@
 const { parallel, series } = require("gulp");
 const { src, dest } = require("gulp");
 const autoprefixer = require("gulp-autoprefixer");
-const brotli = require("gulp-brotli");
 const changed = require("gulp-changed");
 const del = require("del");
 const filter = require("gulp-filter");
@@ -12,7 +11,6 @@ const path = require("path");
 const readYaml = require("read-yaml");
 const responsive = require("gulp-responsive");
 const webp = require("gulp-webp");
-const zopfli = require("gulp-zopfli-green");
 
 const config = readYaml.sync("_config.yml");
 
@@ -43,23 +41,6 @@ function autoprefixCSS() {
   return modified(paths.css)
     .pipe(autoprefixer())
     .pipe(dest(paths.css.dest));
-}
-
-function compressCSS() {
-  const gz = src(paths.css.src).pipe(zopfli());
-  const br = src(paths.css.src).pipe(brotli.compress());
-  return merge(gz, br).pipe(dest(paths.css.dest));
-}
-
-function html() {
-  const modifiedExt = ext =>
-    modified(
-      paths.html,
-      transform(p => p + ext)
-    );
-  const gz = modifiedExt(".gz").pipe(zopfli());
-  const br = modifiedExt(".br").pipe(brotli.compress());
-  return merge(gz, br).pipe(dest(paths.html.dest));
 }
 
 function heroImages() {
@@ -129,8 +110,6 @@ function replaceExt(ext) {
     path.join(path.dirname(p), path.basename(p, path.extname(p)) + ext);
 }
 
-const styles = series(autoprefixCSS, compressCSS);
-
 exports.clean = clean;
-exports.optimize = parallel(images, styles, html, heroImages);
+exports.optimize = parallel(images, autoprefixCSS, heroImages);
 exports.default = exports.build;
