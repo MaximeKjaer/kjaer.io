@@ -18,7 +18,7 @@ before_install:
   - bash _scripts/install.sh
 
 script:
-  - npm run build
+  - npm run build:prod
   - npm run optimize
 
 deploy:
