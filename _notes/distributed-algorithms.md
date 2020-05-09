@@ -140,7 +140,7 @@ Note that this piece of code is meant to sit between two abstraction levels; it 
 
 Note that a stubborn link will deliver the same message infinitely many times, according to SL1. Wanting to only deliver once will lead us to perfect links.
 
-#### Perfect link  (PL)
+#### Perfect link (PL)
 Here again, we respect the send/deliver interface. The properties are:
 
 - **PL1. Reliable delivery**: If a correct process $p$ sends a message $m$ to a correct process $q$, then $q$ eventually delivers $m$
@@ -1883,7 +1883,7 @@ We'll prove properties on this. The main point to note is that these proofs make
   
   To prove this, we first define a set of $k+1$ correct (non-Byzantine) intermediary nodes. These nodes all receive $m$ from $S$, send it to $R$, which places it in $\Omega$. Eventually, we'll have $k+1$ nodes in the set, and then $x=m$.
   
-  By the liveness and safety property, we know that initially $x=0, eventually $x=m$, and we never have $x=m'$.
+  By the liveness and safety property, we know that initially $x=0$, eventually $x=m$, and we never have $x=m'$.
   
 - **Optimality**: if $f \ge k + 1$, it is impossible to ensure the safety property.
   
