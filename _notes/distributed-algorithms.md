@@ -16,6 +16,27 @@ course: CS-451
 * TOC
 {:toc}
 
+*[ATTA]: According To The Algorithm
+*[FLL]: Fair Loss Link
+*[BEB]: Best Effort Broadcast
+*[SL]: Stubborn Link
+*[PL]: Perfect Link
+*[RB]: Reliable Broadcast
+*[CB]: Causal Broadcast
+*[CO]: Causal Order
+*[VC]: Vector Clock
+*[TOB]: Total Order Broadcast
+*[FIFO]: First In First Out
+*[SM]: Shared Memory
+*[ACK]: Acknowledgment
+*[NACK]: Negative Acknowledgment
+*[NBAC]: Non-Blocking Atomic Commit
+*[2PC]: Two-Phase Commit
+*[URB]: Uniform Reliable Broadcast
+*[TRB]: Terminating Reliable Broadcast
+*[GM]: Group Membership
+*[VS]: View-Synchronous broadcast
+
 ## Introduction
 In terms of abstraction layers, distributed algorithms are sandwiched between the application layer (processes) the network layer (channels). We have a few commonly used abstractions in this course:
 
@@ -330,7 +351,7 @@ We'll sketch a proof for the properties:
 - **No duplication**: as for RB
 - **No creation**: as for RB
 - **Agreement**: Assume some correct process $p$ `rbDelivers` a message $m$ that was `rbBroadcast` by some process $q$.
-  + If $q$ is correct, then by BEB1 (BEB validity), all correct processes will `bebDeliver` $m$, and ATTA deliver $m$ through `rbDeliver`. 
+  + If $q$ is correct, then by BEB1 (BEB validity), all correct processes will `bebDeliver` $m$, and according to the algorithm (ATTA), deliver $m$ through `rbDeliver`. 
   + If $q$ crashes, then by PFD1 (strong completeness of $\mathcal{P}$), $p$ detects the crash and ATTA echoes $m$ with `bebBroadcast` to all. Since $p$ is correct, then by BEB1 (BEB validity), all correct processes `bebDeliver` and then, ATTA, `rbDeliver` $m$.
 
 Note that the proof only uses the completeness property of the failure detector (PFD1), not the accuracy property (PFD2). Therefore, the predictor can either be perfect $\mathcal{P}$ or eventually perfect $\diamond\mathcal{P}$.
