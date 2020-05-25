@@ -1,11 +1,10 @@
 source "https://rubygems.org"
 
 gem "jekyll", "~> 4.0.0"
-gem "kramdown", "2.1.0"
 group :jekyll_plugins do
   gem "jekyll-sitemap", "~> 1.4.0"
   gem "jekyll-feed"
-  gem "jekyll-mathjax-csp", "~> 1.2.0"
+  gem "jekyll-mathjax-csp", "~> 1.3.1"
   gem "jekyll-diagrams", "~> 0.5.0"
   gem "jekyll-block", "~> 0.0.1"
   gem "jekyll-zopfli"
