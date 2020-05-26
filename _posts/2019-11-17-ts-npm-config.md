@@ -1,6 +1,7 @@
 ---
 title: The in-depth guide to configuring TypeScript NPM packages
 description: Configuration is hard to get right. This article discusses configuration options, lists alternative possibilities, and shares some common pitfalls and lessons learned the hard way.
+updated: 2020-05-26
 ---
 
 When working on a Web project, I find it to be *really hard* to get the tooling configuration right: there are so many tools doing different things, so many options and alternatives to choose from, and oh-so-many ways that things can go wrong. This article is meant as an in-depth, step-by-step guide to a configuration that works really well.
@@ -15,6 +16,7 @@ Still, If you'd just like to see the resulting code, I did also make [a GitHub r
 {:toc}
 
 ## Guiding principles
+
 We should always choose tools that (1) do something we actually need, (2) are widely used and actively maintained, and (3) require the [least amount of configuration](https://en.wikipedia.org/wiki/Convention_over_configuration).
 
 Things should work cross-platform, if possible. This means on any developer's machine (Linux, Windows or macOS), in any language (TypeScript or JavaScript) and in any runtime environment (Node.js or browsers).
@@ -33,7 +35,7 @@ We'll aim for the following directory structure:
 |   └── ...
 ├── src/
 |   ├── hello.ts         <- File containing our code
-|   ├── index.ts
+|   └── index.ts
 ├── test/
 |   └── hello.test.ts    <- Test of src/hello.ts
 ├── README.md
@@ -49,7 +51,7 @@ $ git clone <REPO_URL>
 $ cd <REPO_DIR>
 ```
 
-With the repo on our machine, we can already make our first edit: we don't want to track the output of the build, so we can add `dist` to the `.gitignore`.
+With the repo on our machine, we can already make our first edit: we don't want to track the output of the build, so we can add `/dist` to the `.gitignore`.
 
 ## Package manager
 The most commonly used package managers are:
@@ -125,7 +127,32 @@ The blacklist approach takes more work and involves [security risks](https://med
 
 We prefix the path with `/` to make sure that we refer to the one at the root of the project. Otherwise, a folder named `./src/dist` would also be included.
 
+To see what is being distributed, we can run `npm pack`, which produces the following cute output:
+
+{% highlight console %}
+$ npm pack
+📦  npm-ts-template@0.0.0
+=== Tarball Contents === 
+1.1kB LICENSE        
+180B  dist/hello.js  
+237B  dist/index.js  
+1.8kB package.json   
+3.3kB README.md      
+41B   dist/hello.d.ts
+25B   dist/index.d.ts
+=== Tarball Details === 
+name:          npm-ts-template                   
+version:       0.0.0                                   
+filename:      npm-ts-template-0.0.0.tgz         
+package size:  2.9 kB                                  
+unpacked size: 6.7 kB                                  
+shasum:        759c73c63738523eb1e4747d7da0e825d3663156
+integrity:     sha512-aqG6pPIjMsEVc[...]pz40qqkd3XiUw==
+total files:   7                                       
+{% endhighlight %}
+
 ### Scripts
+
 NPM scripts allow us to abstract over the exact choice of tool, and provide simple commands for common tasks. To keep things standardized, organized and simple, we'll use [standard NPM task names](https://github.com/voorhoede/npm-style-guide#use-standard-script-names), [grouped by prefix](https://github.com/voorhoede/npm-style-guide#group-related-scripts-by-prefix) as folllows:
 
 - `build`: build the production version of the project
@@ -223,7 +250,7 @@ Therefore, the first file we define is `tsconfig.json`, as usual. This file hold
 {% highlight json linenos %}
 {
   "compilerOptions": {
-    "noEmit": true
+    "noEmit": true,
     "target": "esnext",
     "module": "commonjs",
     "sourceMap": true,
@@ -268,7 +295,7 @@ Let's go a step back and discuss some of the options in `tsconfig.json`:
 
   CommonJS became popular, but had some drawbacks. Alternative proposals came up: AMD proposed better tree-shaking, UMD tried to bridge the gap between AMD and CommonJS, and eventually, ECMAScript proposed the ESM standard. This is the one where you write your imports as `import { add } from "./add"` and your exports as `export function add(a, b) { ... }`.
 
-  In TypeScript, you can (and should) use the standard ESM syntax. But perhaps the users of your module are writing plain JavaScript with CommonJS (*gasp!* 😱). Long story short, you should just set this option to `"commonjs"` to make sure everybody can use your package, whether they're using TypeScript or JavaScript, and are targeting Node.js or the Web.
+  In TypeScript, you can (and should) use the standard ESM syntax. But perhaps the users of your module are writing plain JavaScript with CommonJS (*gasp!* 😱). Or perhaps they're targeting Node.js, where ESM is [still experimental](https://nodejs.org/api/esm.html#esm_ecmascript_modules) (*double gasp!* 😱). Long story short, you should just set this option to `"commonjs"` to make sure everybody can use your package, whether they're using TypeScript or JavaScript, and are targeting Node.js or the Web.
 
 - `"declaration": true`
 
@@ -339,7 +366,7 @@ Since Mocha 6.0.0, we can configure the tests with a `.mocharc.json` file:
 {
     "require": "ts-node/register",
     "spec": "test/**/*.test.ts",
-    "watch-extensions": "ts"
+    "watch-files": ["test/**", "src/**"]
 }
 {% endhighlight %}
 
@@ -400,11 +427,11 @@ We now have code, and we have tests for it, so it may even be correct code. But 
 - [Standard JS](https://standardjs.com/)
 - [Prettier](https://prettier.io/)
 
-ESLint is a bit of a workhorse. Its name suggest that it's just for linting, but it also has support for formatting options. *Everything* is configurable in ESLint. Really, I counted 290 rules on [the rules list](https://eslint.org/docs/rules/)[^count]! 
+ESLint is a bit of a workhorse. Its name suggest that it's just for linting, but it also has support for formatting options. *Everything* is configurable in ESLint. Really, I counted 299 rules on [the rules list](https://eslint.org/docs/rules/)[^count]! 
 
 [^count]: I took me an hour to count those by hand. Or perhaps I ran `document.querySelectorAll(".rule-list tr").length` in a console, who knows.
 
-That might actually be too much. We can bikeshed on tabs vs spaces forever, but I learned to stop worrying and to love more opinionated formatters, like Standard JS or Prettier. They have sensible defaults, and [don't let you mess with things](https://standardjs.com/#i-disagree-with-rule-x-can-you-change-it) (or [not too much](https://prettier.io/docs/en/options.html), anyway). 
+That might actually be too many options for a formatter. We can bikeshed on tabs vs spaces forever, but I learned to stop worrying and to love more opinionated formatters, like Standard JS or Prettier. They have sensible defaults, and [don't let you mess with things](https://standardjs.com/#i-disagree-with-rule-x-can-you-change-it) (or [not too much](https://prettier.io/docs/en/options.html), anyway). 
 
 While Standard JS requires [some configuration](https://standardjs.com/#typescript) to work with TypeScript, Prettier works out of the box, so we'll use that.
 
@@ -412,25 +439,20 @@ While Standard JS requires [some configuration](https://standardjs.com/#typescri
 $ npm install --save-dev prettier
 ```
 
-The only way to tell Prettier what to format is through the command line, so we'll add the formatting commands to the `package.json`:
+We'll add some NPM scripts to run Prettier on all supported files in the project directory. Since Prettier 2.0, we can simply add the following to `package.json`:
 
 {% highlight json-doc linenos %}
 {
   ...
-  "config": {
-    "formatted": "**/*.{json,ts,tsx,js,jsx,yaml,yml}"
-  },
   "scripts": {
-    "test:formatting": "prettier --write $npm_package_config_formatted",
-    "fix:formatting": "prettier --check $npm_package_config_formatted",
+    "test:formatting": "prettier --write .",
+    "fix:formatting": "prettier --check .",
     ...
   }
 }
 {% endhighlight %}
 
-The `"config"` field is a [small trick](https://docs.npmjs.com/files/package.json#config) that allows us to set variables in `package.json`. Using a variable here ensures that the formatting fix and check always run on the exact same files, and that we don't have to repeat the file glob.
-
-To avoid formatting compiled files, we can add a `.prettierignore` file:
+To avoid formatting compiled files, we can add a `.prettierignore` file containing paths to ignore:
 
 {% highlight text linenos %}
 dist
@@ -442,56 +464,127 @@ With compilation, testing and formatting in place, we have working, tested, pret
 - [TSLint](https://palantir.github.io/tslint/)
 - [ESLint](https://eslint.org/)
 
-TSLint has long been the de-facto linter for TypeScript. However, the maintainers [are deprecating TSLint in 2019](https://github.com/palantir/tslint/issues/4534), and migrating all their linting rules to ESLint.
-
-At the time of this writing, some of the rules we need the most are not yet available in ESLint, so we'll still use TSLint. However, we can take some solace in knowing that there is [a CLI tool](https://github.com/typescript-eslint/tslint-to-eslint-config) that migrates a TSLint setup to ESLint in a single command, so we can easily change this later.
+TSLint has long been the de-facto linter for TypeScript. However, the maintainers [are deprecating TSLint in 2019](https://github.com/palantir/tslint/issues/4534), and migrating all their linting rules to ESLint. Since ESLint is the linter that will be maintained going forward, we'll go with that.
 
 ```console
-$ npm install --save-dev tslint
+$ npm install --save-dev eslint
 ```
 
-We can add TSLint as an NPM script by adding the following to `package.json`:
+We can add ESLint as an NPM script by adding the following to `package.json`:
 
 {% highlight json-doc linenos %}
 {
   ...
   "scripts": {
-    "test:lint": "tslint --project tsconfig.json",
-    "fix:lint": "tslint --project tsconfig.json --fix",
+    "test:lint": "eslint --ext .js,.ts .",
+    "fix:lint": "eslint --ext .js,.ts --fix .",
     ...
   }
 }
 {% endhighlight %}
 
-Some of the rules that TSLint can enforce may clash with Prettier. To avoid writing conflicting rules, we can use [tslint-config-prettier](https://www.npmjs.com/package/tslint-config-prettier), which disables all possibly problematic rules.
+ESLint needs some plugins to work with TypeScript, namely `@typescript-eslint/eslint-plugin` and `@typescript-eslint/parser`. I also like to have the `eslint-plugin-import` plugin in order to have linting of imports.
 
 ```console
-$ npm install --save-dev tslint-config-prettier
+$ npm install --save-dev eslint-plugin-import @typescript-eslint/eslint-plugin @typescript-eslint/parser 
 ```
 
-We'll write our linting rules in a `tslint.json` file. Note that we must also reference `tslint-config-prettier` to disable bad rules.
+Additionally, some of the rules that ESLint can enforce may clash with Prettier. To avoid writing conflicting rules, we can use [eslint-config-prettier](https://www.npmjs.com/package/eslint-config-prettier), which disables all possibly problematic rules.
 
-{% highlight ts linenos %}
+```console
+$ npm install --save-dev eslint-config-prettier
+```
+
+We'll write our linting rules in a `.eslintrc.json` file. Unfortunately, it seems like there's no getting around a little verbosity here; the file below loads all of the above plugins, adds setup for TypeScript, and sets a few rules that I find reasonable:
+
+{% highlight jsonc linenos %}
 {
-  "extends": ["tslint:recommended", "tslint-config-prettier"],
+  "root": true,
+  "env": {
+    "browser": true,
+    "es6": true,
+    "node": true
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "tsconfig.json",
+    "sourceType": "module"
+  },
+  "plugins": ["@typescript-eslint", "import"],
+  "extends": [
+    // Recommended defaults for ESLint:
+    "eslint:recommended",
+    // Turn off what's checked by TS compiler:
+    "plugin:@typescript-eslint/eslint-recommended",
+    // Turn on recommended TS-specific rules:
+    "plugin:@typescript-eslint/recommended",
+    // Turn on extra rules that require type-checking:
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    // Turn on rules for imports:
+    "plugin:import/typescript",
+    // Turn off rules conflicting with Prettier:
+    "prettier"
+  ],
+  "ignorePatterns": ["node_modules", "dist", "coverage"],
   "rules": {
-    "member-access": [true, "no-public"],
-    "interface-name": false,
-    "no-default-export": true,
-    "no-restricted-globals": true
+    // This is already checked by Typescript's "noUnusedLocals" setting
+    "@typescript-eslint/no-unused-vars": "off",
+
+    // No reason to disallow
+    "@typescript-eslint/no-inferrable-types": "off",
+
+    // Optimize code for legibility, not for ease of parsing
+    "@typescript-eslint/no-use-before-define": "off",
+
+    // Allow all interface names
+    "@typescript-eslint/interface-name-prefix": "off",
+
+    // Require type annotations for return types, with some exceptions
+    "@typescript-eslint/explicit-function-return-type": [
+      "warn",
+      {
+        "allowExpressions": true,
+        "allowTypedFunctionExpressions": true,
+        "allowHigherOrderFunctions": true
+      }
+    ],
+
+    // Disallow default exports; only allow named exports
+    "import/no-default-export": "error",
+
+    // Impose alphabetically ordered imports
+    "import/order": "error",
+
+    // Standardize usage of array types (`T[]` or `Array<T>`)
+    "@typescript-eslint/array-type": [
+      "error",
+      { "default": "array-simple", "readonly": "generic" }
+    ],
+
+    // Disallow variable names conflicting with deprecated globals
+    "no-restricted-globals": [
+      "error",
+      "event",
+      "name",
+      "external",
+      "orientation"
+    ],
+
+    // Disallow use of `console`
+    "no-console": "error"
   }
 }
 {% endhighlight %}
 
-The first two rules disable some defaults that I do not find particularly useful. The next two rules are actually useful:
+Most of these are fairly straightforward, and are somewhat a matter of preference. However, there are two that can actually prevent serious problems:
 
 - `no-default-export`
   
-  Using `default export` is problematic [for a number of reasons](https://humanwhocodes.com/blog/2019/01/stop-using-default-exports-javascript-module/), so we enforce the `no-default-export` rule to prevent it. This rule does not exist in ESLint yet, and is one of the reasons we're still using TSLint.
+  Using `default export` is problematic [for a number of reasons](https://humanwhocodes.com/blog/2019/01/stop-using-default-exports-javascript-module/), so we enforce the `no-default-export` rule to prevent it.
 
 - `no-restricted-globals`
   
-  For some variable names (`name`, `location` or `event`), using an undeclared variable type-checks in TypeScript (for historical reasons that have to do with early versions of Internet Explorer). Using the `no-restricted-globals` rule in TSLint can help catch these errors. 
+  For some variable names (`event`, `name`, `external` or `orientation`), using an undeclared variable actually type-checks in TypeScript. For instance, `console.log(event)` type-checks even when `event` isn't defined, because TypeScript understands `event` as a reference to the global `event` variable that used to be available in Internet Explorer. You can see this in action by [compiling and running this snippet](https://www.typescriptlang.org/play?#code/MYewdgziA2CmB00QHMAUAiWA3WYAuAXAAToA0R2ueAlANwBQokMCSa6YAhgLazFlEuvOo3BQ4iFBlgAPPLABOXaP3Kz5SztBFNxrKehAKAllU55j4VUSOn85y2DpA). Odds are that you don't ever want to refer to long-deprecated global variables, and that any such references are actually errors. Using the `no-restricted-globals` rule in ESLint can help catch these cases.
 
 ## Continuous Integration
 With Continuous Integration (CI), we can catch errors early by running all tests on every commit and PR. It's also quite convenient to have a service do deployments for us. Many CI providers exist:
@@ -523,7 +616,7 @@ deploy:
   email: firstname.lastname@example.com # npmjs.com account email
   on:
     tags: true
-    repo: GITHUB-USERNAME/REPO-NAME
+    repo: YOUR-GITHUB-USERNAME/YOUR-REPO-NAME
 {% endhighlight %}
 
 The last thing we need to do is to add an encrypted access token so that Travis CI can deploy for us. The [Travis docs](https://docs.travis-ci.com/user/deployment/npm/#npm-auth-token) has us covered, and is worth a read if you're following along at home. We'll need to install and run the Travis CLI[^install-gem] to add an encrypted auth token to Travis:
