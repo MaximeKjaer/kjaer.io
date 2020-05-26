@@ -3,7 +3,6 @@
 	--block-border-color: #{darken($block-color, 50%)};
 }
 
-
 .block {
 	@include block(#eee);
 	padding: 0.3em 2em;
@@ -28,19 +27,15 @@
 		margin-top: 0.5em;
 	}
 
-	&.definition {
-		@include block(hsl(195, 36, 91));
+	&.definition, &.note, &.question {
+		@include block($block-blue);
 	}
 
 	&.theorem {
-		@include block(hsl(100, 36, 91));
-	}
-
-	&.note {
-		@include block(hsl(195, 36, 91));
+		@include block($block-green);
 	}
 
 	&.lemma {
-		@include block(hsl(220, 36, 91));
+		@include block($block-purple);
 	}
 }
