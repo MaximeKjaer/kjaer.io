@@ -1,2 +1,5 @@
+zopfli:
+  replace_files: true
+
 sass:
   sourcemap: never
