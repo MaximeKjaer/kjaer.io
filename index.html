@@ -8,11 +8,8 @@ layout: default
             <a href="{{ post.url }}">
                 <h1>{{ post.title }}</h1>
             </a>
-            {% if post.date %}
-                <p class="date">
-                    <time datetime="{{ post.date | date: '%F' }}">{{ post.date | date: "%B %e, %Y" }}</time>
-                </p>
-            {% endif %}
+            {% include date.html date=post.date %}
+            {% include date.html prefix="Updated " date=post.updated %}
         </header>
         {{ post.excerpt }}
         <a href="{{ post.url }}">Read more</a>

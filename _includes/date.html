@@ -1,0 +1,8 @@
+{% if include.date %}
+    <p class="date">
+        {{ include.prefix | default: "" }}
+        <time datetime="{{ include.date | date: '%F' }}">
+            {{ include.date | date: "%B %e, %Y" }}
+        </time>
+    </p>
+{% endif %}

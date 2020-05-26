@@ -28,6 +28,7 @@ See the [Jekyll Documentation](https://jekyllrb.com/docs/posts/) for how to crea
 | `comments` | If `false`, there won't be a Disqus comment field on the post | `true` |
 | `published` | If `false`, the post won't be rendered or published | `true` |
 | `edited` | If `true`, there will be a link leading to the post's GitHub edit history at the bottom of the post | `false` |
+| `updated` | If set to a date, the update date will be displayed, and `edited` will be considered `true` | ` ` |
 | `hn` | If a HN link is specified, there will be a link leading to the HN discussion at the bottom of the post | ` ` |
 
 ### Excerpt separator

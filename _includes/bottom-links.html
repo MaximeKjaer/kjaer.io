@@ -1,4 +1,5 @@
-{% assign gh = page.edited and site.github %}
+{%- comment -%}Logical operators are right-associative{%- endcomment -%}
+{% assign gh = site.github and page.edited or page.updated %}
 {% assign hn = page.hn %}
 
 {% if gh or hn %}
