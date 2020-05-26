@@ -77,7 +77,7 @@ figure.highlight, div.highlight {
 
 	// Command prompts ("$" in console mode, corresponding to the
 	// `Generic.Prompt` Rouge token) should not be selectable.
-	.gp {
+	.gp, .gp + .w {
 		user-select: none;
 	}	
 
