@@ -1,18 +1,2 @@
-zopfli:
-  replace_files: true
-  extensions:
-    - '.html'
-    # CSS disabled because autoprefixer needs to run
-    # - '.css'
-    - '.js'
-    - '.txt'
-    - '.ttf'
-    - '.atom'
-    - '.stl'
-    - '.xml'
-    - '.svg'
-    - '.eot'
-
-
 sass:
   sourcemap: never

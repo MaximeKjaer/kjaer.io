@@ -78,7 +78,6 @@ plugins:
   - jekyll-mathjax-csp # Server-side rendering of math with MathJax
   - jekyll-diagrams # Server-side rendering of graphs with Graphviz
   - jekyll-block
-  - jekyll-zopfli
 
 feed:
   excerpt_only: true
