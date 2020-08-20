@@ -1,0 +1,19 @@
+.bibliography-container {
+    ol {
+        counter-reset: list;
+        display: table;
+        padding-left: 0 !important;
+    }
+    
+    ol > li {
+        list-style-type: none;
+        display: table-row;
+    }
+
+    ol > li:before {
+        content: "[" counter(list, decimal) "]";
+        display: table-cell;
+        padding-right: .5em;
+        counter-increment: list;
+    }
+}
