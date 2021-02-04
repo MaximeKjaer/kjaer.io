@@ -1,7 +1,7 @@
 ---
 title: The in-depth guide to configuring TypeScript NPM packages
 description: Configuration is hard to get right. This article discusses configuration options, lists alternative possibilities, and shares some common pitfalls and lessons learned the hard way.
-updated: 2020-05-26
+updated: 2021-02-04
 ---
 
 When working on a Web project, I find it to be *really hard* to get the tooling configuration right: there are so many tools doing different things, so many options and alternatives to choose from, and oh-so-many ways that things can go wrong. This article is meant as an in-depth, step-by-step guide to a configuration that works really well.
@@ -445,8 +445,8 @@ We'll add some NPM scripts to run Prettier on all supported files in the project
 {
   ...
   "scripts": {
-    "test:formatting": "prettier --write .",
-    "fix:formatting": "prettier --check .",
+    "test:formatting": "prettier --check .",
+    "fix:formatting": "prettier --write .",
     ...
   }
 }
