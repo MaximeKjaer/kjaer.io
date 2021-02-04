@@ -17,6 +17,11 @@ course: CS-250
 - Introduction to Algorithms, Third edition (2009), T. Cormen, C. Lerserson, R. Rivest, C. Stein (*book on which the course is based*)
 - The Art of Computer Programming, Donald Knuth (*a classic*)
 
+$$
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\bigO}[1]{\mathcal{O}\left(#1\right)}
+$$
+
 ## Analyzing algorithms
 We'll work under a model that assumes that:
 
@@ -198,12 +203,19 @@ You have the prices that a stock traded at over a period of *n* consecutive days
 
 ![An example of stock prices over a few days](/images/algorithms/stock-chart.png)
 
-The naïve approach of buying at the lowest and selling at the highest won't work, as the lowest price might occur *after* the highest.
+The naïve approach of buying at the all-time lowest and selling at the all-time highest won't work, as the lowest price might occur *after* the highest.
 
-- **Input**: An array `A[1..n]` of numbers
+We describe the problem as follows:
+
+- **Input**: An array `A[1..n]` of price changes
 - **Output**: Indices `i` and `j` such that `A[i..j]` has the greatest sum of any nonempty, contiguous subarray of `A`, along with the sum of the values in `A[i..j]`
 
+Note that the array `A` could be price changes prices on each day, the two problems are equivalent (and can be converted into each other in linear time). In the first case, profit is `sum(A[i..j])`, while in the second the profit is `A[j] - A[i]`. We will be talking about this problem in the first form, with the price changes. 
+
+We can also decide to allow or disallow buying and selling on the same day, which would give us 0 profit. In other words, this would be disallowing empty maximum subarrays. We'll first see a variant which disallows it, and then a variant which allows it.
+
 ### Divide and Conquer
+
 - **Divide** the subarray into two subarrays of as equal size as possible: Find the midpoint mid of the subarrays, and consider the subarrays `A[low..mid]` and `A[mid+1..high]`
     + This can run in $\Theta(1)$
 - **Conquer** by finding maximum subarrays of `A[low..mid]` and `A[mid+1..high]`
@@ -228,7 +240,7 @@ def find_maximum_subarray(A, low, high):
         # Find the best solution of the three:
         if l_sum >= r_sum and l_sum >= x_sum:
             return (l_low, l_high, l_sum)
-        elsif r_sum >= l_sum and r_sum >= x_sum:
+        elif r_sum >= l_sum and r_sum >= x_sum:
             return (r_low, r_high, r_sum)
         else:
             return (x_low, x_high, x_sum)
@@ -256,9 +268,50 @@ def find_max_crossing_subarray(A, low, mid, high):
     return (l_max, r_max, l_sum + r_sum)
 {% endhighlight %}
 
-
 ![Example of how to solve the maximum subarray problem](/images/algorithms/maxsubarray.png)
 
+### Improvement with Dynamic Programming
+
+The divide-and-conquer $\mathcal{O}(n \log n)$ algorithm can be improved to $\mathcal{O}(n)$, which is optimal. This algorithm is known as Kadane's algorithm. For the sake of simplicity, we won't keep track of indices in this variant, but we could extend it to do so (see [Wikipedia article](https://en.wikipedia.org/wiki/Maximum_subarray_problem#Kadane's_algorithm)). Also note that we will be looking at the variant of the problem which allows empty maximum subarrays (but it can be easily adapted to disallow it, see [Wikipedia article](https://en.wikipedia.org/wiki/Maximum_subarray_problem#Kadane's_algorithm)).
+
+{% highlight python linenos %}
+def find_max_subarray(A: List[int]) -> int:
+    best_sum = 0
+    current_sum = 0
+    for x in A:
+        current_sum = max(0, current_sum + x)
+        best_sum = max(best_sum, current_sum)
+    return best_sum    
+{% endhighlight %}
+
+This is a "simple" example of [dynamic programming](#dynamic-programming), which we'll talk more about later. It is "simple" because we don't actually need memoization, as each subproblem only needs to be computed once. But it can still be useful to think of it in DP terms. We can describe the DP recursion as follows, where the $r$ array contains the sum of the maximum subarray ending at $j$ (or in terms of our stock market analogy, the profit made if we sell on day $j$):
+
+$$
+\begin{align}
+r[0] & = 0 \\
+r[j] & = \max(r[j-1] + A[j], 0) \quad \forall j \in \set{0, \dots, n-1} \\
+\end{align}
+$$
+
+Let's try to get an intuitive sense for what the recursion says. To compute the maximum subarray ending at $j$, we can either extend the max subarray ending at $j-1$ to include day $j$, or if that makes us lose money, we can say that the best way to sell on day $j$ is to also buy on day $j$ (which gives us 0 profit).
+
+Why is this valid? The above recursion has an important property: $r[j]$ holds the maximum over all $i\in\set{0, \dots, j}$ of the sum $A[i] + \dots + A[j]$. In other words, it holds the max sum for a subarray starting anywhere before $j$ (or at $j$) and ending at $j$. 
+
+By returning the max value contained in $r$, we then have the maximum subarray.
+
+The recursion also nicely shows that each index in the recursion only uses the index before, which gives us an easy way to construct a bottom-up variant of the algorithm. We can translate the recursion to the loop invariant that is true for Kadane's algorithm: at the beginning of step $j$, `current_sum` holds the value of the maximum subarray ending at $j-1$.
+
+This is all an exercise in how to think of this problem, because if we are given the list of prices rather than the list of changes, it may be more intuitive to see how we can solve this:
+
+{% highlight python linenos %}
+def find_max_profit(prices: List[int]) -> int:
+    min_price = float("inf")
+    max_profit = 0
+    for price in prices:
+        min_price = min(price, min_price)
+        max_profit = max(max_profit, price - min_price)
+    return max_profit
+{% endhighlight %}
 
 ## Matrix multiplication
 
@@ -308,19 +361,19 @@ What really broke the Divide-and-Conquer approach is the fact that we had to do 
 There is a way to do only 7 recursive multiplications of $n/2\times n/2$ matrices, rather than 8. Our recurrence relation is now:
 
 $$ 
-T(n) = 7\cdot T(n/2) + \Theta(n^2) = \Theta(n^{log_2(7)}) = \Theta(n^{2.807\dots}) 
+T(n) = 7\cdot T(n/2) + \Theta(n^2) = \Theta(n^{\log_2(7)}) = \Theta(n^{2.807\dots}) 
 $$
 
 Strassen's method is the following:
 
 ![Strassen's method](/images/algorithms/strassen.png)
 
-Note that when our matrix's size isn't a power of two, we can just pad our operands with zeros until we do have a power of two size. This still runs in $\Theta(n^{log_2{(7)}})$.
+Note that when our matrix's size isn't a power of two, we can just pad our operands with zeros until we do have a power of two size. This still runs in $\Theta(n^{\log_2{(7)}})$.
 
 #### Notes about Strassen
 - First to beat $\Theta(n^3)$ time
 - Faster methods are known today: Coppersmith and Winograd's method runs in
-time $\mathcal{O}(n^{2.376})$, which has recently been improved by Vassilevska Williams to $\mathcal{O}(n^{2.3727})$.
+time $\bigO{n^{2.376}}$, which has recently been improved by Vassilevska Williams to $\bigO{n^{2.3727}}$.
 - How to multiply matrices in best way is still a big open problem 
 - The naive method is better for small instances because of hidden constants in Strassen's method's runtime.
 
@@ -346,60 +399,90 @@ $$
 ## Heaps and Heapsort
 
 ### Heaps
-A heap is a *nearly complete binary tree* (meaning that the last level may not be complete). The main property of a heap is:
+A heap is a *nearly complete* binary tree (meaning that the last level may not be complete). In a max-heap, the maximum element is at the root, while the minimum element takes that place in a min-heap.
 
-- **Max-heap**: the key of `i`'s children is smaller or equal to `i`'s key.
-- **Min-heap**: the key of `i`'s children is greater or equal to `i`'s key.
-
-In a max-heap, the maximum element is at the root, while the minimum element takes that place in a min-heap.
-
-![Max-heats and min-heats' ordering](/images/algorithms/heats.png)
-
-The height of a node is the number of edges on a longest simple path from the node down to a leaf. The height of the heap is therefore simply the height of the root, $\Theta(\log{n})$.
-
-We can store the heap in a list, where:
+We can store the heap in a list, where each element stores the value of a node:
 
 - `Root` is `A[1]`
 - `Left(i)` is `2i`
 - `Right(i)` is `2i + 1`
 - `Parent(i)` is `floor(i/2)`
 
+The main property of a heap is:
+
+{% block definition "Heap property" %}
+A heap rooted at position `i` in an array satisfies the heap property if:
+
+- **Max-heap**: the key of `i`'s children is smaller or equal to `i`'s key.
+- **Min-heap**: the key of `i`'s children is greater or equal to `i`'s key.
+{% endblock %}
+
+In a heap, all nodes satisfy the heap property. Note that this does **not** mean that a heap is fully ordered. It has *some* notion of order, in that children are smaller or equal to their parent, but no guarantee is made about values in the left subtree compared to those in the right subtree. 
+
+![Max-heats and min-heats' ordering](/images/algorithms/heats.png)
+
+A good way to understand a heap is to say that if you pick a path through the heap from root to leaf and traverse it, you are guaranteed to see numbers in decreasing order for a max-heap, and increasing order for a min-heap.
+
+The height of a node is the number of edges on a longest simple path from the node down to a leaf. The height of the heap is therefore simply the height of the root, $\bigO{\log{n}}$.
+
 #### Max-Heapify
-It's a very important algorithm for manipulating heaps. Given an *i* such that the subtrees of *i* are heaps, it ensures that the subtree rooted at *i* is a heap satisfying the heap property.
+
+It's a very important algorithm for manipulating heaps. Given an *i* such that the subtrees of *i* are heaps, it ensures that the subtree rooted at *i* is a heap satisfying the heap property. The outline is as follows:
 
 - Compare `A[i]`, `A[Left(i)]`, `A[Right(i)]`
 - If necessary, swap `A[i]` with the largest of the two children to preserve heap property.
 - Continue this process of comparing and swapping down the heap, until the subtree rooted at *i* is a max-heap.
 
 {% highlight python linenos %}
-# A is the array in which the heap is implemented
-# i is the index where we want to heapify
-# n is the size of A
-def max_heapify(A, i, n):
+def max_heapify(A: List[int], i: int, n: int):
+    """
+    Modifies `A` in-place so that the node at `i` roots a heap.
+
+    A : List in which the left and right children of `i` root heaps 
+        (but `i` may not)
+    i : Index of the node which we want to heapify
+    n : Length of `A`
+    """
     l = Left(i)
     r = Right(i)
-    if l <= n and A[l] > A[i]: # if left is larger than parent
+
+    # Pick larger of left (if it exists) and parent:
+    if l <= n and A[l] > A[i]:
         largest = l
-    else largest = i
-    if r <= n and A[r] > A[largest]: # if right is larger than both left and parent
+    else:
+        largest = i
+    
+    # Pick larger of right (if it exists) and current largest:
+    if r <= n and A[r] > A[largest]:
         largest = r
-    if largest != i: # If we have to make a swap
-        exchange A[i] with A[largest]
+    
+    # If the root isn't already the largest, swap the root with the
+    # largest:
+    if largest != i:
+        swap A[i] and A[largest]
         max_heapify(A, largest, n)
 {% endhighlight %}
 
-This runs in $\Theta(\text{height of } i) = \mathcal{O}(\log{n})$ and uses $\Theta(n)$ space.
+This runs in $\Theta(\text{height of } i) = \bigO{\log{n}}$ and uses $\Theta(n)$ space.
+
+What may be surprising is that we only recurse when the node at `i` isn't the largest; but remember that `A` is already such that the left and right subtrees of `i` already satisfy the [heap property](#definition:heap-property); they are already the roots of heaps. If `i` is larger than both left and right, then we preserve the heap property. If not, we may have to recursively modify one subtree to preserve the property.
 
 #### Building a heap
 Given an unordered array `A` of length `n`, `build_max_heap` outputs a heap.
 
 {% highlight python linenos %}
-def build_max_heap(A, n):
+def build_max_heap(A: List[int], n: int):
+    """
+    Modifies `A` in-place so that `A` becomes a heap.
+
+    A : List of numbers
+    n : Length of `A`
+    """
     for i = floor(n/2) downto 1:
         max_heapify(A, i, n)
 {% endhighlight %}
 
-This procedure operates in place. We can start at $\lfloor{\frac{n}{2}}\rfloor$ since all elements after that threshold are leaves, so we're not going to heapify those anyway.
+This procedure operates in-place. We can start at $\lfloor{\frac{n}{2}}\rfloor$ since all elements after that threshold are leaves, so we're not going to heapify those anyway. Note that the node index `i` decreases, meaning that we're generally going upwards in the tree. This is on purpose, as [`max_heapify`](#max-heapify) may go back downwards in order to push small elements down to the bottom of the heap.
 
 We have $\mathcal{O}(n)$ calls to `max_heapify`, each of which takes $\mathcal{O}(\log{n})$ time, so we have $\mathcal{O}(n\log{n})$ in total. 
 However, **we can give a tighter bound**: the time to run `max_heapify` is linear in the height of the node it's run on. Hence, the time is bounded by:
