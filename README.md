@@ -90,7 +90,7 @@ $ npm run serve
 To build the site for production, run:
 
 ```console
-$ npm run build
+$ npm run build:prod
 ```
 
 To prepare the site for production, a few additional steps are taken.
