@@ -445,8 +445,8 @@ We'll add some NPM scripts to run Prettier on all supported files in the project
 {
   ...
   "scripts": {
-    "test:formatting": "prettier --check .",
-    "fix:formatting": "prettier --write .",
+    "test:format": "prettier --check .",
+    "fix:format": "prettier --write .",
     ...
   }
 }
