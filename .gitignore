@@ -7,7 +7,7 @@ _site
 node_modules
 *.bat
 .jekyll-metadata
-_posts/drafts
+_posts/_drafts
 _sass/.scss-lint.yml
 *.log
 *.iml
